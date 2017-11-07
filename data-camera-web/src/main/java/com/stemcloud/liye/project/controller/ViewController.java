@@ -13,21 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author liye on 2017/11/6
  */
 @Controller
-public class ViewController implements ErrorController {
+public class ViewController {
     private Logger logger = LoggerFactory.getLogger(ViewController.class);
 
     @GetMapping("/hello")
     public String hello() {
         return "hello";
-    }
-
-    @GetMapping("/error")
-    public String error(){
-        return "hello";
-    }
-
-    @Override
-    public String getErrorPath() {
-        return "/error";
     }
 }

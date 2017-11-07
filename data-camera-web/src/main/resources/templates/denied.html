@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>页面出错了</title>
+
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{css/custom.css}"/>
+</head>
+<body>
+    <div class="navbar-wrapper" th:include="module/nav::nav">
+    </div>
+    <div class="container">
+        <h1 class="text-center"><strong>页面出错了</strong></h1>
+        <h1 th:if="${param.error403}" class="text-center"><strong>403ERROR：</strong>你的权限无法访问这个页面</h1>
+        <h1 th:if="${param.error404}" class="text-center"><strong>404ERROR：</strong>未找到该页面</h1>
+        <h1 th:if="${param.error500}" class="text-center"><strong>500ERROR：</strong>服务器异常</h1>
+        <h2 class="text-center"><a th:href="@{/}">回到主页</a></h2>
+    </div>
+
+    <script th:src="@{source/jquery.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+</body>
+</html>
