@@ -1,0 +1,36 @@
+/** index css **/
+body{
+    background: #fff;
+    padding-top:60px;
+}
+
+.nav-container{
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.nav-container .nav-title{
+    text-align: center;
+    height: 35px;
+    line-height: 35px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.nav-container .nav-content{
+    padding-top: 10px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #9d9d9d;
+}
+
+.nav-container .nav-search{
+    padding-top: 10px;
+    text-align: center;
+}
+
+.nav-container .nav-button{
+    margin-top: 10px;
+    text-align: center;
+}

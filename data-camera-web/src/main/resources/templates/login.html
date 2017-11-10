@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>STEM云传感器用户登陆</title>
+
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+
+    <!-- form validation -->
+    <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/shake/csshake.min.css}"/>
+    <link rel="stylesheet" th:href="@{css/login.css}"/>
+</head>
+<body>
+    <div class="container">
+        <div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+            <img alt="" th:src="@{/img/logo.png}" />
+            <img th:class="!${param.error}?'':'shake-opacity shake-constant shake-constant--hover'" alt="" th:src="@{/img/rocketsignin.png}" />
+
+            <div class="login-container">
+                <h1 class="login-title">欢迎登陆STEM云传感器系统</h1>
+                <span class="text-center login-sub-title">如果是学生用户，请使用教师给你分配的用户名和密码登陆</span>
+                <div class="form-box">
+                    <form id="login_form" role="form" name="form" th:action="@{/login}" method="post">
+                        <div class="form-group">
+                            <input autofocus="autofocus" class="form-control" name="username" type="text" placeholder="用户名"/>
+                            <input class="form-control" name="password" type="password" placeholder="密码"/>
+                        </div>
+                        <div th:if="${param.error}" class="alert alert-danger animated fadeInUp">用户名密码错误，请重试</div>
+                        <button type="submit" class="btn btn-success btn-block login">登陆</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{source/jquery.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+
+    <!-- form validation -->
+    <script th:src="@{source/validation/formValidation.min.js}"></script>
+    <script th:src="@{source/validation/bootstrap.min.js}"></script>
+
+    <script>
+        $('#login_form').formValidation({
+            framework: 'bootstrap',
+            fields: {
+                username: { validators: { notEmpty: { message: '用户名不能为空'} } },
+                password: { validators: { notEmpty: { message: '密码不能为空'} } }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -11,7 +11,8 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Belongs to data-camera-web
  * Description:
- *  self exception
+ *  self exception, HttpStatus.INTERNAL_SERVER_ERROR
+ *  filter http status 500
  * @author liye on 2017/11/7
  */
 @ControllerAdvice
@@ -29,9 +30,9 @@ public class MyExceptionHandler {
         logger.info("Self-RuntimeException");
         ModelAndView m = new ModelAndView();
         m.addObject("exception", exception.getMessage());
-        m.setViewName("hello");
+        exception.printStackTrace();
+        m.setViewName("exception");
         return m;
-
     }
 
     /**
@@ -45,7 +46,8 @@ public class MyExceptionHandler {
         logger.info("Self-Exception");
         ModelAndView m = new ModelAndView();
         m.addObject("exception", exception.getMessage());
-        m.setViewName("hello");
+        m.setViewName("exception");
+        exception.printStackTrace();
         return m;
 
     }

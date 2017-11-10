@@ -1,0 +1,64 @@
+/** app css **/
+body{
+    background: rgba(245, 245, 245, 0.8);
+    padding-top:60px;
+}
+
+.app-tab-pane-content{
+    padding-top: 10px;
+}
+
+.app-page-introduction{
+    padding-left: 30px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #5b9bd1;
+}
+
+/** app-experiment.html **/
+.app-show-sensor-title{
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.app-show-sensor-content{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 2px solid #eeeeee;
+}
+
+.app-show-video-content{
+    padding: 10px;
+    border: 2px solid #eeeeee;
+}
+
+.recorder-button {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.recorder-button .btn{
+    text-transform: uppercase;
+    font-size: 24px;
+    font-weight: 600;
+    margin-right: 20px;
+    height: 80px;
+    width: 80px;
+    -webkit-border-radius: 50% !important;
+    -moz-border-radius: 50% !important;
+    border-radius: 50% !important;
+}
+
+/** app-analysis.html **/
+.app-analysis .exp-chart:first-child{
+    margin-top: 5px;
+}
+.app-analysis .exp-video{
+    padding: 20px 30px 10px 30px;
+}

@@ -1,5 +1,6 @@
 package com.stemcloud.liye.project.domain.base;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -30,6 +31,7 @@ public class ExperimentInfo {
     private AppInfo app;
 
     @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "experiment")
+    @JsonManagedReference
     private
     Set<TrackInfo> trackInfoList;
 
@@ -103,5 +105,19 @@ public class ExperimentInfo {
 
     public Date getModifyTime() {
         return modifyTime;
+    }
+
+    @Override
+    public String toString() {
+        return "ExperimentInfo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", app=" + app +
+                ", trackInfoList=" + trackInfoList +
+                ", isDeleted=" + isDeleted +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                '}';
     }
 }

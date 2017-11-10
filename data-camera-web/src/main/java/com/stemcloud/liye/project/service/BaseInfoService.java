@@ -8,6 +8,8 @@ import com.stemcloud.liye.project.domain.base.AppInfo;
 import com.stemcloud.liye.project.domain.base.ExperimentInfo;
 import com.stemcloud.liye.project.domain.base.SensorInfo;
 import com.stemcloud.liye.project.domain.base.TrackInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ import java.util.List;
  */
 @Service
 public class BaseInfoService {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final AppRepository appRepository;
     private final SensorRepository sensorRepository;
     private final ExperimentRepository experimentRepository;
@@ -48,5 +52,24 @@ public class BaseInfoService {
 
     public List<TrackInfo> getOnlineTrack(){
         return trackRepository.findByIsDeletedOrderByCreateTime(0);
+    }
+
+    public Boolean isAppBelongUser(long id, String user) {
+        AppInfo app = appRepository.findById(id);
+        if (app == null){
+            logger.warn("null app " + id);
+            return false;
+        }
+        logger.info("compare user " + user + " with app creator " + app.getCreator());
+        return app.getIsDeleted() == 0 && user.equals(app.getCreator());
+    }
+
+    public AppInfo getCurrentApp(long id){
+        return appRepository.findById(id);
+    }
+
+    public List<ExperimentInfo> getOnlineExpOfApp(long id){
+        AppInfo app = appRepository.findById(id);
+        return experimentRepository.findByAppAndIsDeleted(app, 0);
     }
 }

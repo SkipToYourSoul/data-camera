@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+    <title>DATA CAMERA应用页</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/loading/fakeLoader.css}"/>
+    <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{source/video/video-js.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/timeline/timeline.css}"/>
+    <link rel="stylesheet" th:href="@{source/datepicker/bootstrap-datetimepicker.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
+    <link rel="stylesheet" th:href="@{css/v1/app.css}"/>
+</head>
+<body>
+    <div class="navbar-wrapper" th:include="module/common::nav">
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 col-xs-3 sidebar">
+                <div class="profile-sidebar">
+                    <!-- SIDEBAR USERPIC -->
+                    <div class="profile-userpic" th:if="!${param.id}">
+                        <img th:src="@{/img/index/nav2.png}" class="img-responsive" alt=""/>
+                    </div>
+                    <!-- END SIDEBAR USERPIC -->
+                    <!-- SIDEBAR USER TITLE -->
+                    <div class="profile-app-info">
+                        <div class="info-title" th:text="${param.id}?${app.name}:'欢迎来到应用管理页面'">
+                        </div>
+                        <div class="info-description">
+                            <div th:if="!${param.id}">
+                                在这里可以看到你账户下的设备及应用的相关统计
+                            </div>
+                            <div th:if="${param.id}">
+                                <div th:text="|应用编号: ${app.id}|"></div>
+                                <div th:text="|创建时间: ${#dates.format(app.createTime, 'yyyy-MM-dd HH:mm:ss')}|"></div>
+                                <div th:text="|应用描述: ${app.description}|"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END SIDEBAR USER TITLE -->
+                    <!-- SIDEBAR BUTTONS -->
+                    <div class="profile-buttons" th:if="!${param.id}">
+                        <button type="button" class="btn btn-success btn-large" data-toggle="modal" data-target="#app-modal" todo="new">新建应用</button>
+                    </div>
+                    <div class="profile-buttons" th:if="${param.id}">
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑应用</button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除应用</button>
+                    </div>
+                    <!-- END SIDEBAR BUTTONS -->
+
+                    <!-- SIDEBAR MENU -->
+                    <div class="profile-usermenu">
+                        <strong>应用管理</strong>
+                        <ul class="nav main-menu">
+                            <li th:class="${param.id}?'':'active'">
+                                <a th:href="@{/app}"><i class="glyphicon glyphicon-home"></i>应用管理页面</a>
+                            </li>
+                        </ul>
+                        <strong>应用列表</strong><span class="badge pull-right" th:text="${#lists.size(apps)}">0</span>
+                        <ul class="nav">
+                            <th:block th:each="app,index:${apps}">
+                                <li th:class="${param.id eq app.id}?'active':''">
+                                    <a th:text="${app.name}" th:href="@{/app(id=${app.id})}" th:class="|app-${index.count}|"></a></li>
+                            </th:block>
+                        </ul>
+                    </div>
+                    <!-- END MENU -->
+                </div>
+            </div>
+
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 col-xs-9 col-xs-offset-3 profile-content">
+                <div th:if="!${param.id}" id="app-management">
+                    <img th:src="@{/img/quickstart.jpg}" class="img-responsive" alt="xxx1"/>
+                </div>
+                <div th:if="${param.id}">
+                    <ul class="nav nav-pills" role="tablist" id="main-tab">
+                        <li role="presentation" class="active"><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
+                        <li role="presentation"><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">数据分析模式</a></li>
+                        <li role="presentation"><a href="#app-history" aria-controls="app-history" role="tab" data-toggle="tab">历史数据查看</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane active fade in app-tab-pane-content"></div>
+                        <!--<div th:include="module/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
+                        <div th:include="module/app-history::app-history" id="app-history" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:include="module/modal::app-modal"></div>
+
+    <script th:src="@{source/jquery.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+
+    <!--
+        apps: List<AppInfo>
+    -->
+    <script th:inline="javascript">
+        var apps = [[${apps}]];
+        var app = [[${app}]];
+        var experiments = [[${experiments}]];
+    </script>
+
+    <script th:src="@{source/loading/fakeLoader.min.js}"></script>
+
+    <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
+    <script th:src="@{source/bootbox/bootbox.min.js}"></script>
+
+    <script th:src="@{source/validation/formValidation.min.js}"></script>
+    <script th:src="@{source/validation/bootstrap.min.js}"></script>
+
+    <script th:src="@{source/echarts/echarts.common.min.js}"></script>
+    <script th:src="@{source/echarts/infographic.js}"></script>
+
+    <script th:src="@{source/video/video.min.js}"></script>
+    <script th:src="@{source/timeline/timeline.js}"></script>
+    <script th:src="@{source/datepicker/bootstrap-datetimepicker.min.js}"></script>
+
+    <script th:src="@{js/common.js}"></script>
+    <script th:src="@{js/app/app-controller.js}"></script>
+    <!--<script th:if="${param.id}" th:src="@{js/app/app-chart-option.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/app/app-show.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/app/app-analysis.js}"></script>-->
+</body>
+</html>

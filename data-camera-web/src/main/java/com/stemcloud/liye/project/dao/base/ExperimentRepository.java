@@ -1,5 +1,6 @@
 package com.stemcloud.liye.project.dao.base;
 
+import com.stemcloud.liye.project.domain.base.AppInfo;
 import com.stemcloud.liye.project.domain.base.ExperimentInfo;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,6 +29,14 @@ public interface ExperimentRepository extends CrudRepository<ExperimentInfo, Lon
      * @return exp
      */
     ExperimentInfo findById(long id);
+
+    /**
+     * find exps by app
+     * @param appInfo app
+     * @param isDeleted
+     * @return list exp
+     */
+    List<ExperimentInfo> findByAppAndIsDeleted(AppInfo appInfo, int isDeleted);
 
     /**
      * update experiment

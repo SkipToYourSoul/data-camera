@@ -9,10 +9,7 @@ import com.stemcloud.liye.project.service.CrudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -38,7 +35,7 @@ public class CrudController {
         this.crudService = crudService;
     }
 
-    @GetMapping("/app/new")
+    @PostMapping("/app/new")
     public Long newApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         AppInfo appInfo = new AppInfo();
         String user = commonService.getCurrentLoginUser(request);
@@ -51,7 +48,7 @@ public class CrudController {
         return id;
     }
 
-    @GetMapping("/app/update")
+    @PostMapping("/app/update")
     public Integer updateApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         String user = commonService.getCurrentLoginUser(request);
         Long id = Long.parseLong(queryParams.get("app-id"));
@@ -86,7 +83,7 @@ public class CrudController {
         return crudService.deleteApp(id);
     }
 
-    @GetMapping("/exp/new")
+    @PostMapping("/exp/new")
     public Long newExp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         ExperimentInfo expInfo = new ExperimentInfo();
         String user = commonService.getCurrentLoginUser(request);
@@ -101,7 +98,7 @@ public class CrudController {
         return id;
     }
 
-    @GetMapping("/exp/update")
+    @PostMapping("/exp/update")
     public Integer updateExp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         String user = commonService.getCurrentLoginUser(request);
         Long id = Long.parseLong(queryParams.get("exp-id"));

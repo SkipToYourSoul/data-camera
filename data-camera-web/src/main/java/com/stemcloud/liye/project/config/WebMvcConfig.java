@@ -1,5 +1,7 @@
 package com.stemcloud.liye.project.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.web.servlet.ErrorPage;
@@ -23,20 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
-    @Bean
-    public EmbeddedServletContainerCustomizer containerCustomizer() {
-        // filter http status 403,404,500
-        return new EmbeddedServletContainerCustomizer() {
-            @Override
-            public void customize(ConfigurableEmbeddedServletContainer container) {
-                // session timeout, 单位为s
-                container.setSessionTimeout(60 * 60 * 2);
-                container.addErrorPages(new ErrorPage(HttpStatus.FORBIDDEN, "/denied?error403"));
-                container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/denied?error404"));
-                container.addErrorPages(new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/denied?error500"));
-            }
-        };
-    }
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Bean
     public SecurityInterceptor getSecurityInterceptor() {

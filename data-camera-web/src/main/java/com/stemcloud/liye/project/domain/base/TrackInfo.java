@@ -1,6 +1,7 @@
 package com.stemcloud.liye.project.domain.base;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,7 +21,8 @@ public class TrackInfo {
     @GeneratedValue
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     private ExperimentInfo experiment;
 
     @OneToOne
@@ -54,7 +56,6 @@ public class TrackInfo {
         return experiment;
     }
 
-    @JsonBackReference
     public void setExperiment(ExperimentInfo experiment) {
         this.experiment = experiment;
     }
@@ -81,5 +82,21 @@ public class TrackInfo {
 
     public Date getModifyTime() {
         return modifyTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){ return true;}
+        if (o == null || getClass() != o.getClass()){ return false;}
+
+        TrackInfo trackInfo = (TrackInfo) o;
+
+        return id == trackInfo.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
     }
 }

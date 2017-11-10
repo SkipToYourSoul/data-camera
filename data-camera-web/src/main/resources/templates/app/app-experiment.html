@@ -1,0 +1,61 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="app-experiment">
+        <!-- 应用内容 -->
+        <div class="row">
+            <!-- 如果应用不为空 -->
+            <th:block th:if="${not #lists.isEmpty(apps)}">
+                <!-- 页面说明 -->
+                <div class="app-page-introduction">
+                    <p>
+                        <i class="fa fa-info-circle"></i>&nbsp;在实验模式中，你能够随时监控传感器的数据，并且根据你的需要录制数据，录制的数据会被保存，你可以在“数据分析模式”下分析这些数据。
+                    </p>
+                    <p><i class="fa fa-info-circle"></i>&nbsp;点击“监控”按钮，让数据动起来，此时传感器数据会被保存到数据库中；点击“录制”按钮，录制并保存你想要的实验数据</p>
+                </div>
+
+                <div class="col-sm-12">
+                    <!-- 遍历构造实验tab -->
+                    <th:block th:each="experiment,index:${experiments}">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    <strong th:text="|实验: ${experiment.name}|"></strong>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <th:block th:each="track:${experiment.trackInfoList}">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12">
+                                            <div class="app-show-sensor-title" th:text="|轨迹-${track.id}|">
+                                            </div>
+                                            <div th:id="|experiment-track-${experiment.id}-${track.id}|" class="app-show-sensor-content">
+                                                传感器数据加载中
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
+                                <div class="row">
+                                    <div class="recorder-button">
+                                        <button class="btn btn-warning" th:data="${experiment.id}" onclick="monitor(this)">监控</button>
+                                        <button class="btn btn-danger" th:data="${experiment.id}" onclick="recorder(this)">录制</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="recorder-button" style="margin-bottom: 20px">
+                        <button class="btn btn-success">+</button>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+
+        <div th:include="module/common::sub-footer"></div>
+    </div>
+</body>
+
+</html>
