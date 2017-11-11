@@ -78,12 +78,9 @@ public class ViewController {
             model.addAttribute("app", baseInfoService.getCurrentApp(id));
             // --- get experiments of the app
             List<ExperimentInfo> experiments = baseInfoService.getOnlineExpOfApp(id);
-            model.addAttribute("experiments", experiments);
-
             for (ExperimentInfo exp : experiments){
-                Set<TrackInfo> tracks = exp.getTrackInfoList();
                 Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
-                for (TrackInfo track: tracks){
+                for (TrackInfo track: exp.getTrackInfoList()){
                     if (track.getIsDeleted() == 0){
                         TrackInfo newTrack = new TrackInfo();
                         newTrack.setId(track.getId());
@@ -92,8 +89,8 @@ public class ViewController {
                     }
                 }
                 exp.setTrackInfoList(newTracks);
-                logger.info(exp.toString());
             }
+            model.addAttribute("experiments", experiments);
         }
 
         return "app";

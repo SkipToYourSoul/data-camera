@@ -133,8 +133,12 @@
 
     <script th:src="@{js/common.js}"></script>
     <script th:src="@{js/app/app-controller.js}"></script>
-    <!--<script th:if="${param.id}" th:src="@{js/app/app-chart-option.js}"></script>
-    <script th:if="${param.id}" th:src="@{js/app/app-show.js}"></script>
-    <script th:if="${param.id}" th:src="@{js/app/app-analysis.js}"></script>-->
+    <script th:if="${param.id}" th:src="@{js/app/app-charts.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/app/app-experiment.js}"></script>
+    <!--<script th:if="${param.id}" th:src="@{js/app/app-analysis.js}"></script>-->
+
+    <script>
+        init_track();
+    </script>
 </body>
 </html>

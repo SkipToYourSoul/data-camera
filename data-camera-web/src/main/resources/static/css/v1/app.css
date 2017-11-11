@@ -18,24 +18,52 @@ body{
 }
 
 /** app-experiment.html **/
-.app-show-sensor-title{
-    padding-left: 10px;
-    padding-right: 10px;
+.app-exp-button-group{
+    margin-bottom: 10px;
+}
+
+.app-exp-track-chart{
+    padding-top: 10px;
+    padding-bottom: 10px;
     margin-bottom: 5px;
-    margin-top: 10px;
+    border: 2px solid #eeeeee;
+    height: 300px;
+}
+
+.app-exp-track-statistics{
+    border-radius: 5%;
+    background-color: rgba(154, 154, 154, 0.2);
+    min-height: 40px;
+    height: 280px;
+}
+
+.app-exp-track-statistics .title{
+    padding: 15px 10px 5px 10px;
+    margin-bottom: 5px;
     font-size: 14px;
     font-weight: 600;
 }
 
-.app-show-sensor-content{
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border: 2px solid #eeeeee;
+.app-exp-track-statistics .content{
+    padding: 5px 10px 5px 10px;
 }
 
-.app-show-video-content{
-    padding: 10px;
-    border: 2px solid #eeeeee;
+.app-exp-track-statistics .content-title{
+    margin: 0 auto 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #9d9d9d;
+    text-align: left;
+}
+
+.app-exp-track-statistics .content-text{
+    font-size: 20px;
+    color: #5c5b5b;
+}
+
+.app-exp-track-statistics .content-threshold-text{
+    font-size: 20px;
+    color: #ff5a00;
 }
 
 .recorder-button {
