@@ -7,7 +7,7 @@ var new_device_text = "确认创建";
 var edit_device_text = "确认修改";
 var $edit_app_form = $('#edit-app-form');
 var $app_modal = $('#app-modal');
-var $edit_exp_form = $('#edit-edit-form');
+var $edit_exp_form = $('#edit-exp-form');
 var $exp_modal = $('#exp-modal');
 var $exp_select = $('#exp-select');
 var current_exp_id = 0;
@@ -64,7 +64,7 @@ $app_modal.on('show.bs.modal', function (event) {
 function deleteApp(){
     bootbox.confirm({
         title: "删除应用?",
-        message: "确认删除应用吗? 应用相关的传感器相关数据也会被删除.",
+        message: "确认删除应用吗? 应用相关的数据也会被删除.",
         buttons: {
             cancel: {
                 label: '<i class="fa fa-times"></i> 取消'
@@ -77,7 +77,7 @@ function deleteApp(){
             if (result){
                 $.ajax({
                     type: 'get',
-                    url: crud_address + '/app/delete?id=' + app['id'],
+                    url: crud_address + '/app/delete?app-id=' + app['id'],
                     success: function (id) {
                         location.replace(current_address);
                     },
@@ -123,15 +123,16 @@ $edit_exp_form.formValidation({
     }
 }).on('success.form.fv', function (evt){
     evt.preventDefault();
+    var action = $('#exp-confirm-btn').text();
     var url = crud_address + '/exp/update';
     var data = $(this).serialize() + "&app-id=" + app['id'];
-    data += edit_device_text == action?data + "&exp-id=" + current_exp_id:data;
+    data = edit_device_text == action?data + "&exp-id=" + current_exp_id:data;
     $.ajax({
         type: 'post',
         url: url,
         data: data,
         success: function (id) {
-            window.location.href = current_address + "?id=" + id;
+            window.location.href = current_address + "?id=" + app['id'];
         },
         error: function (id) {
             message_info("操作应用失败，失败ID为：" + id, 'error');
@@ -164,3 +165,33 @@ $exp_modal.on('show.bs.modal', function (event) {
         initExpSelect(freeSensors);
     }
 });
+
+function deleteExp(evt) {
+    var exp_id = evt.getAttribute('data');
+    bootbox.confirm({
+        title: "删除实验?",
+        message: "确认删除实验吗? 实验相关的数据也会被删除.",
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i> 取消'
+            },
+            confirm: {
+                label: '<i class="fa fa-check"></i> 确认删除'
+            }
+        },
+        callback: function (result) {
+            if (result){
+                $.ajax({
+                    type: 'get',
+                    url: crud_address + '/exp/delete?exp-id=' + exp_id,
+                    success: function (id) {
+                        location.replace(current_address);
+                    },
+                    error: function (id) {
+                        message_info("删除应用失败", 'error');
+                    }
+                });
+            }
+        }
+    });
+}

@@ -45,8 +45,10 @@ public class CrudService {
         return appRepository.updateApp(app.getId(), app.getName(), app.getDescription());
     }
 
-    public int deleteApp(Long id){
-        return appRepository.deleteApp(id);
+    public void deleteApp(Long id){
+        int a = appRepository.deleteApp(id);
+        int s = sensorRepository.unboundSensorByApp(id);
+        logger.info("MODIFY " + a + " RECORDER OF dc_base_app_info, MODIFY " + s + " RECORDER OF dc_base_sensor_info.");
     }
 
     public AppInfo findApp(Long id){
@@ -56,8 +58,8 @@ public class CrudService {
     /**************/
     /* EXPERIMENT */
     /**************/
-    public long newExp(ExperimentInfo exp){
-        return expRepository.save(exp).getId();
+    public ExperimentInfo saveExp(ExperimentInfo exp){
+        return expRepository.save(exp);
     }
 
     public int updateExp(ExperimentInfo exp){
@@ -75,8 +77,16 @@ public class CrudService {
     /************/
     /* TRACK    */
     /************/
-    public long newTrack(TrackInfo track){
-        return trackRepository.save(track).getId();
+    public void newTrackAndBoundSensor(ExperimentInfo exp, SensorInfo sensor){
+        TrackInfo track = new TrackInfo();
+        track.setExperiment(exp);
+        track.setSensor(sensor);
+        TrackInfo trackInfo = trackRepository.save(track);
+        long sensorId = trackInfo.getSensor().getId();
+        long trackId = trackInfo.getId();
+        long expId = trackInfo.getExperiment().getId();
+        long appId = trackInfo.getExperiment().getApp().getId();
+        sensorRepository.boundSensor(sensorId, appId, expId, trackId);
     }
 
     public int deleteTrack(Long id){

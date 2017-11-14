@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,9 +49,9 @@ public class CrudController {
         } else {
             Long id = Long.parseLong(queryParams.get("app-id"));
             appInfo = crudService.findApp(id);
-            if (null == appInfo){
-                throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE APP");
-            }
+        }
+        if (null == appInfo){
+            throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE APP");
         }
 
         appInfo.setCreator(user);
@@ -67,53 +68,53 @@ public class CrudController {
     }
 
     @GetMapping("/app/delete")
-    public Integer deleteApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+    public String deleteApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         Long id = Long.parseLong(queryParams.get("app-id"));
         String user = commonService.getCurrentLoginUser(request);
         if (id <= 0){
             throw new IllegalArgumentException("ERROR PARAMETERS WHEN DELETE APP");
         }
         logger.info("USER " + user + " DELETE APP " + id);
-        return crudService.deleteApp(id);
-    }
-
-    @PostMapping("/exp/new")
-    public Long newExp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        ExperimentInfo expInfo = new ExperimentInfo();
-        String user = commonService.getCurrentLoginUser(request);
-        expInfo.setName(queryParams.get("exp-name"));
-        expInfo.setDescription(queryParams.get("exp-desc"));
-
-        Long appId = Long.parseLong(queryParams.get("app-id"));
-        expInfo.setApp(crudService.findApp(appId));
-
-        Long id = crudService.newExp(expInfo);
-        logger.info("USER " + user + " NEW EXP " + id);
-        return id;
+        crudService.deleteApp(id);
+        return "SUCCESS";
     }
 
     @PostMapping("/exp/update")
-    public Integer updateExp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+    public String updateExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select") List<String> sensors, HttpServletRequest request){
+        String expId = "exp-id";
+        String expName = "exp-name";
+        String expDesc = "exp-desc";
+        ExperimentInfo expInfo = null;
         String user = commonService.getCurrentLoginUser(request);
-        Long id = Long.parseLong(queryParams.get("exp-id"));
-        if (id <= 0){
+
+        if (!queryParams.containsKey(expId)){
+            expInfo = new ExperimentInfo();
+        } else {
+            Long id = Long.parseLong(queryParams.get("exp-id"));
+            expInfo = crudService.findExp(id);
+        }
+        if (null == expInfo){
             throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE EXPERIMENT");
         }
 
-        ExperimentInfo expInfo = crudService.findExp(id);
-        expInfo.setId(id);
-        logger.info("USER " + user + " UPDATE EXP " + id);
-
-        String expName = "exp-name";
         if (queryParams.containsKey(expName) && !queryParams.get(expName).trim().isEmpty()) {
             expInfo.setName(queryParams.get(expName));
         }
-        String expDesc = "exp-desc";
         if (queryParams.containsKey(expDesc) && !queryParams.get(expDesc).trim().isEmpty()) {
             expInfo.setDescription(queryParams.get(expDesc));
         }
+        ExperimentInfo newExpInfo = crudService.saveExp(expInfo);
 
-        return crudService.updateExp(expInfo);
+        // add sensor on experiment
+        if (sensors.size() > 0){
+            for (String s: sensors){
+                long sensorId = Long.parseLong(s);
+                crudService.newTrackAndBoundSensor(newExpInfo, crudService.findSensor(sensorId));
+            }
+        }
+        logger.info("USER " + user + " UPDATE EXP " + newExpInfo.getId() + ", ADD " + sensors.size() + " SENSORS TO THE EXP.");
+
+        return "SUCCESS";
     }
 
     @GetMapping("/exp/delete")
@@ -127,18 +128,6 @@ public class CrudController {
         return crudService.deleteExp(id);
     }
 
-    @GetMapping("/track/new")
-    public Long newTrack(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        TrackInfo trackInfo = new TrackInfo();
-        String user = commonService.getCurrentLoginUser(request);
-        Long expId = Long.parseLong(queryParams.get("exp-id"));
-        trackInfo.setExperiment(crudService.findExp(expId));
-
-        Long id = crudService.newTrack(trackInfo);
-        logger.info("USER " + user + " NEW TRACK " + id);
-        return id;
-    }
-
     @PostMapping("/bound")
     public String boundTest(@RequestParam Map<String, String> queryParams){
         System.out.println("In bound request " + queryParams.size());
@@ -148,7 +137,7 @@ public class CrudController {
         return "test";
     }
 
-    @GetMapping("/track/bound")
+    /*@GetMapping("/track/bound")
     public Long boundTrack(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         String user = commonService.getCurrentLoginUser(request);
         Long trackId = Long.parseLong(queryParams.get("track-id"));
@@ -175,7 +164,7 @@ public class CrudController {
 
         logger.info("USER " + user + " UNBOUND SENSOR ON TRACK " + trackId);
         return crudService.newTrack(track);
-    }
+    }*/
 
     @GetMapping("/track/delete")
     public Integer deleteTrack(@RequestParam Map<String, String> queryParams, HttpServletRequest request){

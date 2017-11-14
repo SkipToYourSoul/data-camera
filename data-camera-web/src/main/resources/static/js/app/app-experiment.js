@@ -31,6 +31,11 @@ function initTrack() {
                     text: sensor.name
                 });
                 value = sensor.id;
+            } else {
+                source.push({
+                    value: 0,
+                    text: '解绑当前设备'
+                });
             }
             for (var index in freeSensors){
                 source.push({
@@ -39,7 +44,6 @@ function initTrack() {
                 });
             }
             $track_bound_dom.editable({
-                prepend: "解绑当前设备",
                 value: value,
                 source: source,
                 sourceError: 'error loading data',

@@ -24,9 +24,12 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
-                                <strong th:text="|实验: ${experiment.name}|"></strong>
+                                <strong th:text="|实验：${experiment.name}|">
+                                </strong>
+                                <button class="btn pull-right label label-danger" th:data="${experiment.id}" onclick="deleteExp(this)">x</button>
                                 <button class="btn pull-right label label-warning" th:data="${experiment.id}"
-                                        data-toggle="modal" data-target="#exp-modal" todo="edit">编辑当前实验</button>
+                                        data-toggle="modal" data-target="#exp-modal" todo="edit"
+                                        style="margin-right: 10px">+</button>
                             </div>
                         </div>
                         <div class="panel-body">

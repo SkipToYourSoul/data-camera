@@ -48,6 +48,39 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
     List<SensorInfo> findByCreatorAndAppIdAndExpIdAndTrackId(String creator, long appId, long expId, long trackId);
 
     /**
+     * bound sensor
+     * @param sensorId
+     * @param appId
+     * @param expId
+     * @param trackId
+     * @return
+     */
+    @Query(value = "UPDATE SensorInfo s SET s.appId = ?2, s.expId = ?3, s.trackId = ?4  WHERE s.id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer boundSensor(long sensorId, long appId, long expId, long trackId);
+
+    /**
+     * unbound sensor by appId
+     * @param appId
+     * @return
+     */
+    @Query(value = "UPDATE SensorInfo s SET s.appId = 0, s.expId = 0, s.trackId = 0  WHERE s.appId = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer unboundSensorByApp(long appId);
+
+    /**
+     * unbound sensor by expId
+     * @param expId
+     * @return
+     */
+    @Query(value = "UPDATE SensorInfo s SET s.appId = 0, s.expId = 0, s.trackId = 0  WHERE s.expId = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer unboundSensorByExp(long expId);
+
+    /**
      * delete sensor
      * @param id
      * @return recorder count
