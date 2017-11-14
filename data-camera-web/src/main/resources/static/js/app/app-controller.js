@@ -1,14 +1,21 @@
 /**
  *  Belongs to smart-sensor
  *  Author: liye on 2017/10/11
- *  Description:
+ *  Description: new/edit/delete app,exp
  */
-var new_app_text = "新建应用";
-var edit_app_text = "确认修改";
+var new_device_text = "确认创建";
+var edit_device_text = "确认修改";
+var $edit_app_form = $('#edit-app-form');
+var $app_modal = $('#app-modal');
+var $edit_exp_form = $('#edit-edit-form');
+var $exp_modal = $('#exp-modal');
+var $exp_select = $('#exp-select');
+var current_exp_id = 0;
 
+// ----------------------------
 // --- new, edit, delete app
-$new_app_form = $('#new-app-form');
-$new_app_form.formValidation({
+// ----------------------------
+$edit_app_form.formValidation({
     framework: 'bootstrap',
     icon: {
         valid: 'glyphicon glyphicon-ok',
@@ -16,17 +23,13 @@ $new_app_form.formValidation({
     },
     fields: {
         'app-name': {validators: {notEmpty: {message: '应用名不能为空'}}},
-        'app-description': {validators: {notEmpty: {message: '应用描述不能为空'}}}
+        'app-desc': {validators: {notEmpty: {message: '应用描述不能为空'}}}
     }
 }).on('success.form.fv', function (evt){
     evt.preventDefault();
     var action = $('#app-confirm-btn').text();
-    var url = crud_address + '/app/new';
-    var data = $(this).serialize();
-    if (edit_app_text == action){
-        url = current_address + '/app/update';
-        data = $(this).serialize() + "&app-id=" + app['id']
-    }
+    var url = crud_address + '/app/update';
+    var data = edit_device_text == action?$(this).serialize() + "&app-id=" + app['id']:$(this).serialize();
     $.ajax({
         type: 'post',
         url: url,
@@ -35,27 +38,24 @@ $new_app_form.formValidation({
             window.location.href = current_address + "?id=" + id;
         },
         error: function (id) {
-            message_info("操作应用失败", 'error');
+            message_info("操作应用失败，失败ID为：" + id, 'error');
         }
     });
 }).on('err.form.fv', function (evt) {
-    message_info("表单提交失败", 'error');
+    message_info("应用表单提交失败", 'error');
 });
 
-$app_modal = $('#app-modal');
-$app_modal.on('shown.bs.modal', function (event) {
+$app_modal.on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var todo = button.attr('todo');
     var modal = $(this);
 
     if (todo == "new"){
-        modal.find('.modal-title').text('新建应用');
-        $('#app-confirm-btn').text(new_app_text);
+        $('#app-confirm-btn').text(new_device_text);
         $('#app-name').val("");
         $('#app-desc').val("");
     } else if (todo == "edit"){
-        modal.find('.modal-title').text('编辑应用');
-        $('#app-confirm-btn').text("确认修改");
+        $('#app-confirm-btn').removeClass('btn-success').addClass('btn-warning').text(edit_device_text);
         $('#app-name').val(app['name']);
         $('#app-desc').val(app['description']);
     }
@@ -90,3 +90,77 @@ function deleteApp(){
     });
 }
 
+// ----------------------------
+// --- new, edit, delete exp
+// ----------------------------
+function initExpSelect(free_sensors){
+    var valueHtml = '<optgroup label="数值型传感器" data-max-options="2">';
+    var videoHtml = '<optgroup label="摄像头" data-max-options="2">';
+    for (var i in free_sensors){
+        var sensor = free_sensors[i];
+        var text = sensor['name'] + '(' + sensor['code'] + ')';
+        if (sensor['sensorConfig']['type'] == 1){
+            valueHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+        } else if (sensor['sensorConfig']['type'] == 2){
+            videoHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+        }
+    }
+    valueHtml += '</optgroup>';
+    videoHtml += '</optgroup>';
+    $exp_select.html(valueHtml + videoHtml);
+    $exp_select.selectpicker('refresh');
+}
+
+$edit_exp_form.formValidation({
+    framework: 'bootstrap',
+    icon: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove'
+    },
+    fields: {
+        'exp-name': {validators: {notEmpty: {message: '实验名不能为空'}}},
+        'exp-desc': {validators: {notEmpty: {message: '实验描述不能为空'}}}
+    }
+}).on('success.form.fv', function (evt){
+    evt.preventDefault();
+    var url = crud_address + '/exp/update';
+    var data = $(this).serialize() + "&app-id=" + app['id'];
+    data += edit_device_text == action?data + "&exp-id=" + current_exp_id:data;
+    $.ajax({
+        type: 'post',
+        url: url,
+        data: data,
+        success: function (id) {
+            window.location.href = current_address + "?id=" + id;
+        },
+        error: function (id) {
+            message_info("操作应用失败，失败ID为：" + id, 'error');
+        }
+    });
+}).on('err.form.fv', function (evt) {
+    message_info("实验表单提交失败", 'error');
+});
+
+$exp_modal.on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var todo = button.attr('todo');
+    current_exp_id = button.attr('data');
+    var modal = $(this);
+
+    if (todo == "new"){
+        $('#exp-confirm-btn').text(new_device_text);
+        $('#exp-name').val("");
+        $('#exp-desc').val("");
+        initExpSelect(freeSensors);
+    } else if (todo == "edit"){
+        $('#exp-confirm-btn').removeClass('btn-success').addClass('btn-warning').text(edit_device_text);
+        for (var index in experiments){
+            if ( current_exp_id == '' + experiments[index].id){
+                $('#exp-name').val(experiments[index]['name']);
+                $('#exp-desc').val(experiments[index]['description']);
+                break;
+            }
+        }
+        initExpSelect(freeSensors);
+    }
+});

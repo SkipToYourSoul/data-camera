@@ -72,4 +72,12 @@ public class BaseInfoService {
         AppInfo app = appRepository.findById(id);
         return experimentRepository.findByAppAndIsDeleted(app, 0);
     }
+
+    public List<SensorInfo> getAvailableSensorOfCurrentUser(String user){
+        return sensorRepository.findByCreatorAndAppIdAndExpIdAndTrackId(user, 0, 0, 0);
+    }
+
+    public List<SensorInfo> getSensorsOfCurrentApp(long appId){
+        return sensorRepository.findByAppId(appId);
+    }
 }

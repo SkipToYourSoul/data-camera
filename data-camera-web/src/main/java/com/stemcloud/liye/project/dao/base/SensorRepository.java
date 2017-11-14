@@ -31,6 +31,23 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
     SensorInfo findById(long id);
 
     /**
+     * find sensor by app id
+     * @param appId
+     * @return sensors
+     */
+    List<SensorInfo> findByAppId(long appId);
+
+    /**
+     * use to find available app of current user
+     * @param creator
+     * @param appId
+     * @param expId
+     * @param trackId
+     * @return sensors
+     */
+    List<SensorInfo> findByCreatorAndAppIdAndExpIdAndTrackId(String creator, long appId, long expId, long trackId);
+
+    /**
      * delete sensor
      * @param id
      * @return recorder count

@@ -7,31 +7,85 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="app-modal-title">新建应用</h4>
+                        <h4 class="modal-title" id="app-modal-title">应用编辑窗口</h4>
                     </div>
                     <div class="modal-body">
-                        <form class="form-horizontal" role="form" id="new-app-form">
+                        <form class="form-horizontal" role="form" id="edit-app-form">
                             <div class="form-group">
-                                <label for="app-name" class="col-sm-2 control-label">应用名</label>
+                                <label for="app-name" class="col-sm-2 control-label">应用标题</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control"
-                                           name="app-name" id="app-name" placeholder="应用名不能为空"/>
+                                           name="app-name" id="app-name" placeholder="应用标题不能为空"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="app-description" class="col-sm-2 control-label">应用描述</label>
+                                <label for="app-desc" class="col-sm-2 control-label">应用描述</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control"
                                               name="app-desc"
                                               rows="5"
                                               required="required"
                                               placeholder="简单描述你的应用，不能为空"
-                                              id="app-description"></textarea>
+                                              id="app-desc"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
-                                    <button type="button" class="btn btn-success btn-block" onclick="$('#new-app-form').submit()" id="app-confirm-btn">新建应用</button>
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-app-form').submit()" id="app-confirm-btn">确认创建</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="exp-modal">
+        <div class="modal fade" id="exp-modal" tabindex="-1" role="dialog" aria-labelledby="exp-modal-title">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exp-modal-title">实验编辑窗口</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="edit-exp-form">
+                            <div class="form-group">
+                                <label for="exp-name" class="col-sm-2 control-label">实验标题</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control"
+                                           name="exp-name" id="exp-name" placeholder="实验标题不能为空"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exp-desc" class="col-sm-2 control-label">实验描述</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control"
+                                              name="exp-desc"
+                                              rows="5"
+                                              required="required"
+                                              placeholder="简单描述你的实验，不能为空"
+                                              id="exp-desc"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exp-select" class="col-sm-2 control-label">添加设备(可用的)</label>
+                                <div class="col-sm-10">
+                                    <select class="selectpicker"
+                                            multiple="multiple"
+                                            data-width="100%"
+                                            id="exp-select"
+                                            name="exp-select"
+                                            title="选取传感器，可多选"
+                                            data-selected-text-format="count > 3"
+                                            data-actions-box="true">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-exp-form').submit()" id="exp-confirm-btn">确认创建</button>
                                 </div>
                             </div>
                         </form>

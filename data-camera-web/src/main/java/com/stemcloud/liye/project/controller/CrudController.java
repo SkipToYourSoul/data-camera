@@ -9,6 +9,7 @@ import com.stemcloud.liye.project.service.CrudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,41 +36,34 @@ public class CrudController {
         this.crudService = crudService;
     }
 
-    @PostMapping("/app/new")
-    public Long newApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        AppInfo appInfo = new AppInfo();
-        String user = commonService.getCurrentLoginUser(request);
-        appInfo.setCreator(user);
-        appInfo.setName(queryParams.get("app-name"));
-        appInfo.setDescription(queryParams.get("app-desc"));
-
-        Long id = crudService.newApp(appInfo);
-        logger.info("USER " + user + " NEW APP " + id);
-        return id;
-    }
-
     @PostMapping("/app/update")
-    public Integer updateApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+    public Long updateApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        String appId = "app-id";
+        String appName = "app-name";
+        String appDesc = "app-desc";
+        AppInfo appInfo = null;
         String user = commonService.getCurrentLoginUser(request);
-        Long id = Long.parseLong(queryParams.get("app-id"));
-        if (id <= 0){
-            throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE APP");
+        if (!queryParams.containsKey(appId)){
+            appInfo = new AppInfo();
+        } else {
+            Long id = Long.parseLong(queryParams.get("app-id"));
+            appInfo = crudService.findApp(id);
+            if (null == appInfo){
+                throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE APP");
+            }
         }
 
-        AppInfo appInfo = crudService.findApp(id);
-        appInfo.setId(id);
-        logger.info("USER " + user + " UPDATE APP " + id);
-
-        String appName = "app-name";
+        appInfo.setCreator(user);
         if (queryParams.containsKey(appName) && !queryParams.get(appName).trim().isEmpty()) {
             appInfo.setName(queryParams.get(appName));
         }
-        String appDesc = "app-desc";
         if (queryParams.containsKey(appDesc) && !queryParams.get(appDesc).trim().isEmpty()) {
             appInfo.setDescription(queryParams.get(appDesc));
         }
+        Long id = crudService.newApp(appInfo);
+        logger.info("USER " + user + " UPDATE APP " + id);
 
-        return crudService.updateApp(appInfo);
+        return id;
     }
 
     @GetMapping("/app/delete")
@@ -143,6 +137,15 @@ public class CrudController {
         Long id = crudService.newTrack(trackInfo);
         logger.info("USER " + user + " NEW TRACK " + id);
         return id;
+    }
+
+    @PostMapping("/bound")
+    public String boundTest(@RequestParam Map<String, String> queryParams){
+        System.out.println("In bound request " + queryParams.size());
+        for (Map.Entry<String, String> entry: queryParams.entrySet()){
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+        return "test";
     }
 
     @GetMapping("/track/bound")

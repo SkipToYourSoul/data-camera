@@ -2,6 +2,7 @@ package com.stemcloud.liye.project.controller;
 
 import com.stemcloud.liye.project.domain.base.AppInfo;
 import com.stemcloud.liye.project.domain.base.ExperimentInfo;
+import com.stemcloud.liye.project.domain.base.SensorInfo;
 import com.stemcloud.liye.project.domain.base.TrackInfo;
 import com.stemcloud.liye.project.service.BaseInfoService;
 import com.stemcloud.liye.project.service.CommonService;
@@ -73,10 +74,11 @@ public class ViewController {
             // --- id is null, in app management page
             logger.info("APP PAGE: IN APP MANAGE PAGE!");
         } else {
-            // --- app detail page
+            // --- APP: app detail page
             logger.info("APP PAGE: IN APP DETAIL PAGE!");
             model.addAttribute("app", baseInfoService.getCurrentApp(id));
-            // --- get experiments of the app
+
+            // --- EXP: get experiments of the app
             List<ExperimentInfo> experiments = baseInfoService.getOnlineExpOfApp(id);
             for (ExperimentInfo exp : experiments){
                 Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
@@ -91,6 +93,12 @@ public class ViewController {
                 exp.setTrackInfoList(newTracks);
             }
             model.addAttribute("experiments", experiments);
+
+            // --- SENSOR: get user's sensor of this app and available sensors
+            List<SensorInfo> availableSensor = baseInfoService.getAvailableSensorOfCurrentUser(user);
+            model.addAttribute("freeSensors", availableSensor);
+            List<SensorInfo> sensors = baseInfoService.getSensorsOfCurrentApp(id);
+            model.addAttribute("sensors", sensors);
         }
 
         return "app";

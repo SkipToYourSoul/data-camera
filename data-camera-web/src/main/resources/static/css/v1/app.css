@@ -22,17 +22,21 @@ body{
     margin-bottom: 10px;
 }
 
+.app-exp-track-container{
+    padding: 10px 10px 10px 0;
+    margin: 10px 5px;
+    border: 2px solid #eeeeee;
+}
+
 .app-exp-track-chart{
     padding-top: 10px;
     padding-bottom: 10px;
-    margin-bottom: 5px;
-    border: 2px solid #eeeeee;
     height: 300px;
 }
 
 .app-exp-track-statistics{
     border-radius: 5%;
-    background-color: rgba(154, 154, 154, 0.2);
+    background-color: rgba(154, 154, 154, 0.1);
     min-height: 40px;
     height: 280px;
 }
@@ -58,12 +62,12 @@ body{
 
 .app-exp-track-statistics .content-text{
     font-size: 20px;
-    color: #5c5b5b;
+    color: #ff5a00;
 }
 
 .app-exp-track-statistics .content-threshold-text{
     font-size: 20px;
-    color: #ff5a00;
+    color: #5c5b5b;
 }
 
 .recorder-button {
