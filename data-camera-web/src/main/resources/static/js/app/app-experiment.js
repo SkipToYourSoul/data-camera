@@ -24,28 +24,26 @@ function initTrack() {
             var $track_bound_dom = $('#track-bound-' + track_id);
             var sensor = (null == track['sensor'])?null:track['sensor'];
             var source = [];
-            var value = null;
+            var value = "";
             if (null != sensor){
+                // already bound
                 source.push({
                     value: sensor.id,
                     text: sensor.name
                 });
                 value = sensor.id;
             } else {
-                source.push({
-                    value: 0,
-                    text: '解绑当前设备'
-                });
-            }
-            for (var index in freeSensors){
-                source.push({
-                    value: freeSensors[index].id,
-                    text: freeSensors[index].name
-                });
+                for (var index in freeSensors){
+                    source.push({
+                        value: freeSensors[index].id,
+                        text: freeSensors[index].name
+                    });
+                }
             }
             $track_bound_dom.editable({
-                value: value,
+                prepend: '未绑定设备',
                 source: source,
+                value: value,
                 sourceError: 'error loading data',
                 pk: track_id,
                 validate: function (value) {
@@ -53,9 +51,15 @@ function initTrack() {
                         return '数据监控中，不能进行绑定操作';
                     }
                 },
-                url: crud_address + '/bound',
-                success: function(data, config) {
-                    message_info('success' + data, 'info');
+                url: crud_address + '/bound/toggle',
+                success: function(result) {
+                    // refresh editable
+                    if (result['action'] == 'unbound'){
+
+                    } else if (result['action'] == 'bound'){
+
+                    }
+                    window.location.href = current_address + "?id=" + app['id'];
                 },
                 error: function (error) {
                     message_info('error' + error, 'info');

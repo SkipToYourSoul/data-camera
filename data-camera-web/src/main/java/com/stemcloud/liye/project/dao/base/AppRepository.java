@@ -31,18 +31,6 @@ public interface AppRepository extends CrudRepository<AppInfo, Long> {
     AppInfo findById(long id);
 
     /**
-     * update app
-     * @param id
-     * @param name
-     * @param description
-     * @return recorder count
-     */
-    @Query(value = "UPDATE AppInfo a SET a.name = ?2, a.description = ?3 WHERE a.id = ?1")
-    @Modifying
-    @Transactional(rollbackFor = Exception.class)
-    Integer updateApp(long id, String name, String description);
-
-    /**
      * delete app
      * @param id
      * @return recorder count

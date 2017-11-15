@@ -41,6 +41,16 @@ public interface TrackRepository extends CrudRepository<TrackInfo, Long> {
     Integer boundSensor(long sensorId, long trackId);
 
     /**
+     * unbound sensor on track
+     * @param trackId
+     * @return recorder count
+     */
+    @Query(value = "UPDATE TrackInfo t SET t.sensor = null WHERE t.id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer unboundSensor(long trackId);
+
+    /**
      * delete track
      * @param id
      * @return recorder count

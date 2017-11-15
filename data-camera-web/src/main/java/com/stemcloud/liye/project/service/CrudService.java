@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Belongs to data-camera-web
  * Description:
@@ -37,18 +40,19 @@ public class CrudService {
     /*************/
     /* APP       */
     /*************/
-    public long newApp(AppInfo app){
+    public long saveApp(AppInfo app){
         return appRepository.save(app).getId();
     }
 
-    public int updateApp(AppInfo app){
-        return appRepository.updateApp(app.getId(), app.getName(), app.getDescription());
-    }
-
     public void deleteApp(Long id){
+        // delete app
         int a = appRepository.deleteApp(id);
-        int s = sensorRepository.unboundSensorByApp(id);
-        logger.info("MODIFY " + a + " RECORDER OF dc_base_app_info, MODIFY " + s + " RECORDER OF dc_base_sensor_info.");
+        logger.info("DELETE APP " + id);
+        AppInfo app = appRepository.findById(id);
+        List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeleted(app, 0);
+        for (ExperimentInfo exp : experiments){
+            deleteExp(exp.getId());
+        }
     }
 
     public AppInfo findApp(Long id){
@@ -62,12 +66,16 @@ public class CrudService {
         return expRepository.save(exp);
     }
 
-    public int updateExp(ExperimentInfo exp){
-        return expRepository.updateExp(exp.getId(), exp.getName(), exp.getDescription());
-    }
-
-    public int deleteExp(Long id){
-        return expRepository.deleteExp(id);
+    public void deleteExp(Long id){
+        int e = expRepository.deleteExp(id);
+        logger.info("DELETE EXPERIMENT " + id);
+        ExperimentInfo exp = expRepository.findById(id);
+        Set<TrackInfo> tracks = exp.getTrackInfoList();
+        for (TrackInfo track: tracks){
+            if (track.getIsDeleted() == 0) {
+                deleteTrack(track.getId());
+            }
+        }
     }
 
     public ExperimentInfo findExp(Long id){
@@ -87,10 +95,21 @@ public class CrudService {
         long expId = trackInfo.getExperiment().getId();
         long appId = trackInfo.getExperiment().getApp().getId();
         sensorRepository.boundSensor(sensorId, appId, expId, trackId);
+        logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
     }
 
-    public int deleteTrack(Long id){
-        return trackRepository.deleteTrack(id);
+    public void deleteTrack(Long id){
+        int t = trackRepository.deleteTrack(id);
+        logger.info("DELETE TRACK " + id);
+        TrackInfo track = trackRepository.findById(id);
+        // unbound sensor
+        if (null != track.getSensor()){
+            long sensorId = track.getSensor().getId();
+            if (track.getSensor().getIsDeleted() == 0) {
+                int s = sensorRepository.unboundSensorById(sensorId);
+                logger.info("UNBOUND SENSOR " + sensorId);
+            }
+        }
     }
 
     public TrackInfo findTrack(Long id){
@@ -110,5 +129,22 @@ public class CrudService {
 
     public SensorInfo findSensor(Long id){
         return sensorRepository.findById(id);
+    }
+
+    public void unboundSensor(long sensorId, long trackId){
+        trackRepository.unboundSensor(trackId);
+        sensorRepository.unboundSensorById(sensorId);
+        logger.info("UNBOUND SENSOR " + sensorId + " ON TRACK " + trackId);
+    }
+
+    public void boundSensor(long sensorId, long trackId){
+        TrackInfo trackInfo = trackRepository.findById(trackId);
+        SensorInfo sensorInfo = sensorRepository.findById(sensorId);
+        trackInfo.setSensor(sensorInfo);
+        trackRepository.save(trackInfo);
+        long expId = trackInfo.getExperiment().getId();
+        long appId = trackInfo.getExperiment().getApp().getId();
+        sensorRepository.boundSensor(sensorId, appId, expId, trackId);
+        logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
     }
 }
