@@ -28,6 +28,10 @@ public class TrackInfo {
     @OneToOne
     private SensorInfo sensor;
 
+    @Column(name = "type",
+            columnDefinition = "INT DEFAULT 0")
+    private int type;
+
     @Column(name = "is_deleted",
             columnDefinition = "INT DEFAULT 0")
     private int isDeleted = 0;
@@ -66,6 +70,14 @@ public class TrackInfo {
 
     public void setSensor(SensorInfo sensor) {
         this.sensor = sensor;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getIsDeleted() {

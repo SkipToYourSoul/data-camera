@@ -101,6 +101,7 @@ public class CrudController {
             throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE EXPERIMENT");
         }
 
+        expInfo.setApp(crudService.findApp(Long.valueOf(queryParams.get("app-id"))));
         if (queryParams.containsKey(expName) && !queryParams.get(expName).trim().isEmpty()) {
             expInfo.setName(queryParams.get(expName));
         }
@@ -135,6 +136,7 @@ public class CrudController {
         return "SUCCESS";
     }
 
+    /* bound/unbound sensor on track */
     @PostMapping("/bound/toggle")
     public Map<String, String> boundToggle(@RequestParam Map<String, String> queryParams){
         Map<String, String> result = new HashMap<String, String>();
@@ -162,6 +164,7 @@ public class CrudController {
         return result;
     }
 
+    /* delete track */
     @GetMapping("/track/delete")
     public String deleteTrack(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         String user = commonService.getCurrentLoginUser(request);

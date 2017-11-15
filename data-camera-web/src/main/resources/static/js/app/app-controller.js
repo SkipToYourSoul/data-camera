@@ -35,7 +35,7 @@ $edit_app_form.formValidation({
         url: url,
         data: data,
         success: function (id) {
-            window.location.href = current_address + "?id=" + id;
+            window.location.href = current_address + "?id=" + app['id'];
         },
         error: function (id) {
             message_info("操作应用失败，失败ID为：" + id, 'error');
@@ -185,10 +185,43 @@ function deleteExp(evt) {
                     type: 'get',
                     url: crud_address + '/exp/delete?exp-id=' + exp_id,
                     success: function (id) {
-                        location.replace(current_address);
+                        window.location.href = current_address + "?id=" + app['id'];
                     },
                     error: function (id) {
                         message_info("删除应用失败", 'error');
+                    }
+                });
+            }
+        }
+    });
+}
+
+// ----------------------------
+// --- delete track
+// ----------------------------
+function deleteTrack(evt) {
+    var track_id = evt.getAttribute('data');
+    bootbox.confirm({
+        title: "删除轨迹?",
+        message: "确认删除轨迹吗? 轨迹相关的数据也会被删除.",
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i> 取消'
+            },
+            confirm: {
+                label: '<i class="fa fa-check"></i> 确认删除'
+            }
+        },
+        callback: function (result) {
+            if (result){
+                $.ajax({
+                    type: 'get',
+                    url: crud_address + '/track/delete?track-id=' + track_id,
+                    success: function (id) {
+                        window.location.href = current_address + "?id=" + app['id'];
+                    },
+                    error: function (id) {
+                        message_info("删除轨迹失败", 'error');
                     }
                 });
             }

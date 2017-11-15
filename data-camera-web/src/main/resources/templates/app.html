@@ -73,7 +73,7 @@
                         <strong>应用列表</strong><span class="badge pull-right" th:text="${#lists.size(apps)}">0</span>
                         <ul class="nav">
                             <th:block th:each="app,index:${apps}">
-                                <li th:class="${param.id eq app.id}?'active':''">
+                                <li th:class="${#httpServletRequest.getParameter('id') eq ''+app.id}?'active':''">
                                     <a th:text="${app.name}" th:href="@{/app(id=${app.id})}" th:class="|app-${index.count}|"></a></li>
                             </th:block>
                         </ul>
@@ -117,9 +117,6 @@
         var experiments = [[${experiments}]];
         var freeSensors = [[${freeSensors}]];
         var sensors = [[${sensors}]];
-
-
-        var test = [[${test}]];
     </script>
 
     <script th:src="@{source/loading/fakeLoader.min.js}"></script>
@@ -146,7 +143,7 @@
     <!--<script th:if="${param.id}" th:src="@{js/app/app-analysis.js}"></script>-->
 
     <script>
-        initTrack();
+        initTrackOfExperiments();
     </script>
 </body>
 </html>

@@ -19,6 +19,11 @@
             </div>
 
             <div class="col-sm-12">
+                <th:block th:if="${#lists.isEmpty(experiments)}">
+                    <hr/>
+                    <h3>TIPS: 应用下还没有实验哦，点击“添加一个实验”新建一个吧:)</h3>
+                    <hr/>
+                </th:block>
                 <!-- 遍历构造实验tab -->
                 <th:block th:each="experiment,index:${experiments}">
                     <div class="panel panel-default">
@@ -43,17 +48,24 @@
                                         </div>
                                         <div class="col-xs-4 col-sm-4 col-md-4">
                                             <div class="app-exp-track-statistics">
-                                                <div class="title" th:text="|轨迹${track.id}-统计信息|">
+                                                <div class="title">
+                                                    <span th:text="|轨迹${track.id}-统计信息|"></span>
+                                                    <button class="btn pull-right label label-danger" th:data="${track.id}" onclick="deleteTrack(this)">x</button>
                                                 </div>
                                                 <div class="content">
                                                     <div class="content-title">绑定的设备：
-                                                        <!--<strong class="content-text" th:if="${track.sensor != null}" th:text="|${track.sensor.name}(${track.sensor.code})|">-</strong>
-                                                        <strong class="content-text" th:if="${track.sensor == null}">未绑定传感器</strong>-->
                                                         <a href="#" th:id="|track-bound-${track.id}|" data-type="select" data-title="绑定设备"></a>
                                                     </div>
-                                                    <div class="content-title">最大值: <strong class="content-text">-</strong></div>
-                                                    <div class="content-title">最小值: <strong class="content-text">-</strong></div>
-                                                    <div class="content-title">平均值: <strong class="content-text">-</strong></div>
+                                                    <div th:if="${track.sensor ne null and track.sensor.sensorConfig.type eq 1}">
+                                                        <div class="content-title">最大值: <strong class="content-text">-</strong></div>
+                                                        <div class="content-title">最小值: <strong class="content-text">-</strong></div>
+                                                        <div class="content-title">平均值: <strong class="content-text">-</strong></div>
+                                                    </div>
+                                                    <div th:if="${track.sensor ne null and track.sensor.sensorConfig.type eq 2}">
+                                                        <div class="content-title">录制状态: <strong class="content-text">-</strong></div>
+                                                        <div class="content-title">开始录制时间: <strong class="content-text">-</strong></div>
+                                                        <div class="content-title">结束录制时间: <strong class="content-text">-</strong></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -63,8 +75,8 @@
                             <th:block th:if="${not #lists.isEmpty(experiment.trackInfoList)}">
                                 <div class="row">
                                     <div class="recorder-button">
-                                        <button class="btn btn-warning" th:data="${experiment.id}" onclick="monitor(this)">监控</button>
-                                        <button class="btn btn-danger" th:data="${experiment.id}" onclick="recorder(this)">录制</button>
+                                        <button class="btn btn-warning" th:data="${experiment.id}" onclick="monitor(this)">开始监控</button>
+                                        <button class="btn btn-danger" th:data="${experiment.id}" onclick="recorder(this)">开始录制</button>
                                     </div>
                                 </div>
                             </th:block>
