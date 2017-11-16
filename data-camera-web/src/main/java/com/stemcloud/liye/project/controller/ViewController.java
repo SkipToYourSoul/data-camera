@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Belongs to data-camera-web
@@ -78,27 +76,55 @@ public class ViewController {
             logger.info("APP PAGE: IN APP DETAIL PAGE!");
             model.addAttribute("app", baseInfoService.getCurrentApp(id));
 
-            // --- EXP: get experiments of the app
+            // --- EXP: get experiments of the app, get bound sensors, get monitor, recorder sensors
             List<ExperimentInfo> experiments = baseInfoService.getOnlineExpOfApp(id);
+            Map<Long, List<SensorInfo>> boundSensors = new HashMap<Long, List<SensorInfo>>(experiments.size());
+            Map<Long, Integer> isExperimentMonitor = new HashMap<Long, Integer>(experiments.size());
+            Map<Long, Integer> isExperimentRecorder = new HashMap<Long, Integer>(experiments.size());
             for (ExperimentInfo exp : experiments){
                 Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
+                isExperimentMonitor.put(exp.getId(), 0);
+                isExperimentRecorder.put(exp.getId(), 0);
+
                 for (TrackInfo track: exp.getTrackInfoList()){
                     if (track.getIsDeleted() == 0){
                         TrackInfo newTrack = new TrackInfo();
                         newTrack.setId(track.getId());
                         newTrack.setSensor(track.getSensor());
+                        newTrack.setType(track.getType());
                         newTracks.add(newTrack);
+
+                        // add bound sensors
+                        if (track.getSensor() != null){
+                            List<SensorInfo> expBoundSensors = new ArrayList<SensorInfo>();
+                            if (boundSensors.containsKey(exp.getId())){
+                                expBoundSensors = boundSensors.get(exp.getId());
+                            }
+                            expBoundSensors.add(track.getSensor());
+                            boundSensors.put(exp.getId(), expBoundSensors);
+
+                            if (track.getSensor().getIsMonitor() == 1){
+                                isExperimentMonitor.put(exp.getId(), 1);
+                            }
+                            if (track.getSensor().getIsRecoder() == 1){
+                                isExperimentRecorder.put(exp.getId(), 1);
+                            }
+                        }
                     }
                 }
                 exp.setTrackInfoList(newTracks);
             }
             model.addAttribute("experiments", experiments);
+            model.addAttribute("isExperimentMonitor", isExperimentMonitor);
+            model.addAttribute("isExperimentRecorder", isExperimentRecorder);
 
             // --- SENSOR: get user's sensor of this app and available sensors
             List<SensorInfo> availableSensor = baseInfoService.getAvailableSensorOfCurrentUser(user);
             model.addAttribute("freeSensors", availableSensor);
-            List<SensorInfo> sensors = baseInfoService.getSensorsOfCurrentApp(id);
-            model.addAttribute("sensors", sensors);
+            model.addAttribute("boundSensors", boundSensors);
+
+            /*List<SensorInfo> sensors = baseInfoService.getSensorsOfCurrentApp(id);
+            model.addAttribute("sensors", sensors);*/
         }
 
         return "app";

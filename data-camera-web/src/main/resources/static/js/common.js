@@ -6,6 +6,7 @@
 var context_path = "/camera";
 var base_address = window.location.origin + context_path;
 var crud_address = base_address + "/crud";
+var data_addrss = base_address + "/data";
 
 var current_address = window.location.href;
 if (current_address.indexOf('?') >= 0){

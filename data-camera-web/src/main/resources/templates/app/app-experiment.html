@@ -31,13 +31,26 @@
                             <div class="panel-title">
                                 <strong th:text="|实验：${experiment.name}|">
                                 </strong>
-                                <button class="btn pull-right label label-danger" th:data="${experiment.id}" onclick="deleteExp(this)">x</button>
-                                <button class="btn pull-right label label-warning" th:data="${experiment.id}"
-                                        data-toggle="modal" data-target="#exp-modal" todo="edit"
-                                        style="margin-right: 10px">+</button>
                             </div>
                         </div>
                         <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="app-exp-status-container">
+                                        <span>实验状态</span>
+                                        <span class="label label-warning" th:id="|experiment-state-${experiment.id}|">非监控</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="app-exp-status-container">
+                                        <span>实验操作</span>
+                                        <button class="btn label label-warning" th:data="${experiment.id}"
+                                                data-toggle="modal" data-target="#exp-modal" todo="edit"
+                                                style="margin-right: 10px">编辑实验</button>
+                                        <button class="btn label label-danger" th:data="${experiment.id}" onclick="deleteExp(this)">删除实验</button>
+                                    </div>
+                                </div>
+                            </div>
                             <th:block th:each="track,index:${experiment.trackInfoList}">
                                 <div class="app-exp-track-container">
                                     <div class="row">
@@ -47,21 +60,23 @@
                                             </div>
                                         </div>
                                         <div class="col-xs-4 col-sm-4 col-md-4">
-                                            <div class="app-exp-track-statistics">
+                                            <div class="app-exp-track-statistics" th:switch="${track.type}">
                                                 <div class="title">
-                                                    <span th:text="|轨迹${track.id}-统计信息|"></span>
+                                                    <span th:case="0" th:text="|未绑定设备的轨迹|"></span>
+                                                    <span th:case="1" th:text="|数值型轨迹${track.id}-统计信息|"></span>
+                                                    <span th:case="2" th:text="|视频轨迹${track.id}-统计信息|"></span>
                                                     <button class="btn pull-right label label-danger" th:data="${track.id}" onclick="deleteTrack(this)">x</button>
                                                 </div>
-                                                <div class="content">
+                                                <div class="content" th:switch="${track.type}">
                                                     <div class="content-title">绑定的设备：
                                                         <a href="#" th:id="|track-bound-${track.id}|" data-type="select" data-title="绑定设备"></a>
                                                     </div>
-                                                    <div th:if="${track.sensor ne null and track.sensor.sensorConfig.type eq 1}">
+                                                    <div th:case="1">
                                                         <div class="content-title">最大值: <strong class="content-text">-</strong></div>
                                                         <div class="content-title">最小值: <strong class="content-text">-</strong></div>
                                                         <div class="content-title">平均值: <strong class="content-text">-</strong></div>
                                                     </div>
-                                                    <div th:if="${track.sensor ne null and track.sensor.sensorConfig.type eq 2}">
+                                                    <div th:case="2">
                                                         <div class="content-title">录制状态: <strong class="content-text">-</strong></div>
                                                         <div class="content-title">开始录制时间: <strong class="content-text">-</strong></div>
                                                         <div class="content-title">结束录制时间: <strong class="content-text">-</strong></div>
@@ -75,8 +90,8 @@
                             <th:block th:if="${not #lists.isEmpty(experiment.trackInfoList)}">
                                 <div class="row">
                                     <div class="recorder-button">
-                                        <button class="btn btn-warning" th:data="${experiment.id}" onclick="monitor(this)">开始监控</button>
-                                        <button class="btn btn-danger" th:data="${experiment.id}" onclick="recorder(this)">开始录制</button>
+                                        <button class="btn btn-warning" th:data="${experiment.id}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.id}|">开始监控</button>
+                                        <button class="btn btn-danger" th:data="${experiment.id}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.id}|">开始录制</button>
                                     </div>
                                 </div>
                             </th:block>

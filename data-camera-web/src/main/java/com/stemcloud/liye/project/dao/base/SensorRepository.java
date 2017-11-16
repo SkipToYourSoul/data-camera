@@ -48,6 +48,14 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
     List<SensorInfo> findByCreatorAndAppIdAndExpIdAndTrackId(String creator, long appId, long expId, long trackId);
 
     /**
+     * find monitor sensors of current exp
+     * @param expId
+     * @param isMonitor
+     * @return
+     */
+    List<SensorInfo> findByExpIdAndIsMonitor(long expId, int isMonitor);
+
+    /**
      * bound sensor
      * @param sensorId
      * @param appId

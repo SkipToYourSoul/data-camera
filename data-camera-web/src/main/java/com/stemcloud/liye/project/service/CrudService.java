@@ -89,6 +89,7 @@ public class CrudService {
         TrackInfo track = new TrackInfo();
         track.setExperiment(exp);
         track.setSensor(sensor);
+        track.setType(sensor.getSensorConfig().getType());
         TrackInfo trackInfo = trackRepository.save(track);
         long sensorId = trackInfo.getSensor().getId();
         long trackId = trackInfo.getId();

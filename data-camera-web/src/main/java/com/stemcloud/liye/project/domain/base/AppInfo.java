@@ -7,9 +7,9 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Belongs to smart-sensor
- * Author: liye on 2017/8/2
- * Description: base app info
+ * Belongs to data-camera-web
+ * Description:
+ *  base app info
  * @author liye
  */
 @Entity

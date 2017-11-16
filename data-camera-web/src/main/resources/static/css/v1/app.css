@@ -22,6 +22,18 @@ body{
     margin-bottom: 10px;
 }
 
+.app-exp-status-container{
+    padding-left: 5px;
+    padding-right: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-left: 3px solid #9d9d9d;
+}
+
+.app-exp-status-container span{
+    margin-right: 20px;
+}
+
 .app-exp-track-container{
     padding: 10px 10px 10px 0;
     margin: 10px 5px;
