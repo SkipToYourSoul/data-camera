@@ -5,6 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Belongs to data-camera-web
@@ -29,4 +30,12 @@ public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
      * @return
      */
     List<ValueData> findByTrackIdAndSensorIdAndCreateTimeGreaterThanEqualOrderByCreateTime(long trackId, long sensorId, Date time);
+
+    /**
+     * find data in sensor ids
+     * @param timestamp
+     * @param ids
+     * @return
+     */
+    List<ValueData> findByCreateTimeGreaterThanEqualAndSensorIdInOrderByCreateTime(Date timestamp, Set<Long> ids);
 }

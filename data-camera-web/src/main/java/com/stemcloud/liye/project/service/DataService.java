@@ -4,12 +4,12 @@ import com.stemcloud.liye.project.dao.base.SensorRepository;
 import com.stemcloud.liye.project.dao.data.ValueDataRepository;
 import com.stemcloud.liye.project.domain.base.SensorInfo;
 import com.stemcloud.liye.project.domain.data.ValueData;
+import com.stemcloud.liye.project.domain.view.ChartTimeSeries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Belongs to data-camera-web
@@ -22,29 +22,48 @@ public class DataService {
     private final SensorRepository sensorRepository;
     private final ValueDataRepository valueDataRepository;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     @Autowired
     public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository) {
         this.sensorRepository = sensorRepository;
         this.valueDataRepository = valueDataRepository;
     }
 
-    public void getRecentDataOfBoundSensors(long expId, long timestamp){
-        List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsMonitor(expId, 1);
+    public Map<Long, Map<String, List<ChartTimeSeries>>> getRecentDataOfBoundSensors(long expId, long timestamp){
+        List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsMonitorAndIsDeleted(expId, 1, 0);
+        Set<Long> boundSensorIds = new HashSet<Long>();
+        for (SensorInfo bs: boundSensors){
+            boundSensorIds.add(bs.getId());
+        }
+        List<ValueData> newData = valueDataRepository.findByCreateTimeGreaterThanEqualAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds);
+        // sensor_id, (data_key, List<data_value>)
+        Map<Long, Map<String, List<ChartTimeSeries>>> result = new HashMap<Long, Map<String, List<ChartTimeSeries>>>();
 
+        for (ValueData d : newData){
+            long sensorId = d.getSensorId();
+            String key = d.getKey();
+            Double value = d.getValue();
+            Date time = d.getCreateTime();
 
-        for (SensorInfo sensor: boundSensors){
-            long trackId = sensor.getTrackId();
-            long sensorId = sensor.getId();
-            System.out.println("track: " + trackId);
-            System.out.println("sensor: " + sensorId);
-            System.out.println(dateFormat.format(new Date(timestamp)));
-
-            List<ValueData> data = valueDataRepository.findByTrackIdAndSensorIdAndCreateTimeGreaterThanEqualOrderByCreateTime(trackId, sensorId, new Date(timestamp));
-            for (ValueData d: data){
-                System.out.println(d.toString());
+            if (!result.containsKey(sensorId)){
+                Map<String, List<ChartTimeSeries>> map = new HashMap<String, List<ChartTimeSeries>>();
+                List<ChartTimeSeries> list = new ArrayList<ChartTimeSeries>();
+                list.add(new ChartTimeSeries(time, value));
+                map.put(key, list);
+                result.put(sensorId, map);
+            } else {
+                Map<String, List<ChartTimeSeries>> map = result.get(sensorId);
+                List<ChartTimeSeries> list = new ArrayList<ChartTimeSeries>();
+                if (map.containsKey(key)){
+                    list = map.get(key);
+                    list.add(new ChartTimeSeries(time, value));
+                } else {
+                    list.add(new ChartTimeSeries(time, value));
+                }
+                map.put(key, list);
+                result.put(sensorId, map);
             }
         }
+
+        return result;
     }
 }

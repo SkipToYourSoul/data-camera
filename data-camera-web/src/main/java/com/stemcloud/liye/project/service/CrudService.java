@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -147,5 +148,17 @@ public class CrudService {
         long appId = trackInfo.getExperiment().getApp().getId();
         sensorRepository.boundSensor(sensorId, appId, expId, trackId);
         logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
+    }
+
+    public Integer changeSensorsStatusOfCurrentExperiment(long expId, int isMonitor){
+        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsMonitorAndIsDeleted(expId, isMonitor, 0);
+        Set<Long> ids = new HashSet<Long>();
+        for (SensorInfo sensor : sensors){
+            ids.add(sensor.getId());
+        }
+
+        int s = sensorRepository.monitorSensorByIds(ids, Math.abs(isMonitor - 1));
+        logger.info("CHANGE STATUS OF SENSOR: " + s);
+        return s;
     }
 }

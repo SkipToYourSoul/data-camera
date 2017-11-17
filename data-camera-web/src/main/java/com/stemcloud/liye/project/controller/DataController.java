@@ -6,6 +6,8 @@ import com.stemcloud.liye.project.domain.base.SensorInfo;
 import com.stemcloud.liye.project.domain.base.TrackInfo;
 import com.stemcloud.liye.project.service.BaseInfoService;
 import com.stemcloud.liye.project.service.DataService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/data")
 public class DataController {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final BaseInfoService baseService;
     private final DataService dataService;
 
@@ -55,12 +59,12 @@ public class DataController {
     }
 
     @GetMapping("/monitor")
-    String monitor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        for (Map.Entry<String, String> entry: queryParams.entrySet()){
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        dataService.getRecentDataOfBoundSensors(Long.parseLong(queryParams.get("exp-id")), Long.parseLong(queryParams.get("timestamp")));
+    Map monitor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        Long beginTime = System.currentTimeMillis();
+        Map result = dataService.getRecentDataOfBoundSensors(Long.parseLong(queryParams.get("exp-id")), Long.parseLong(queryParams.get("timestamp")));
+        Long endTime = System.currentTimeMillis();
 
-        return "success";
+        logger.info("request latest data: " + (endTime - beginTime));
+        return result;
     }
 }

@@ -225,4 +225,19 @@ public class CrudController {
         logger.info("USER " + user + " DELETE TRACK " + sensorId);
         return crudService.deleteSensor(sensorId);
     }
+
+    @GetMapping("/monitor")
+    public Integer boundSensor(@RequestParam Map<String, String> queryParams){
+        Long expId = Long.valueOf(queryParams.get("exp-id"));
+        int action = Integer.parseInt(queryParams.get("action"));
+
+        // action = 0, start monitor, find sensor where is_monitor = 0
+        // action = 1, stop monitor, find sensor where is_monitor = 1
+        try {
+            crudService.changeSensorsStatusOfCurrentExperiment(expId, action);
+        } catch (Exception e){
+            return 0;
+        }
+        return 1;
+    }
 }

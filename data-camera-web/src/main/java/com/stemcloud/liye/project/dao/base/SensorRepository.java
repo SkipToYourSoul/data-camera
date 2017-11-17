@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Belongs to data-camera-web
@@ -51,9 +52,10 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
      * find monitor sensors of current exp
      * @param expId
      * @param isMonitor
+     * @param isDeleted
      * @return
      */
-    List<SensorInfo> findByExpIdAndIsMonitor(long expId, int isMonitor);
+    List<SensorInfo> findByExpIdAndIsMonitorAndIsDeleted(long expId, int isMonitor, int isDeleted);
 
     /**
      * bound sensor
@@ -77,6 +79,17 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     Integer unboundSensorById(long id);
+
+    /**
+     * change the monitor status
+     * @param ids
+     * @param action
+     * @return
+     */
+    @Query(value = "UPDATE SensorInfo s SET s.isMonitor = ?2 WHERE s.id in ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer monitorSensorByIds(Set<Long> ids, int action);
 
     /**
      * delete sensor

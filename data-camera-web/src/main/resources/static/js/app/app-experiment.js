@@ -80,24 +80,41 @@ function expMonitor(button){
     var exp_state_dom = $('#experiment-state-' + exp_id);
     var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
 
-    if (isExperimentMonitor[exp_id] == 0){
-        // start monitor
-        isExperimentMonitor[exp_id] = 1;
-        exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在监控');
-        exp_monitor_btn.html('停止监控');
+    $.ajax({
+        type: 'get',
+        url: crud_address + "/monitor",
+        data: {
+            "exp-id": exp_id,
+            "action": isExperimentMonitor[exp_id]
+        },
+        success: function (response) {
+            if (response == 0){
+                message_info('操作无效', 'error');
+                return;
+            }
+            if (isExperimentMonitor[exp_id] == 0){
+                // start monitor
+                isExperimentMonitor[exp_id] = 1;
+                exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在监控');
+                exp_monitor_btn.html('停止监控');
 
-        exp_monitor_interval[exp_id] = setInterval(function () {
-            askForData(exp_id);
-        }, 2000);
-    } else if (isExperimentMonitor[exp_id] == 1){
-        // stop monitor
-        isExperimentMonitor[exp_id] = 0;
-        exp_state_dom.removeClass('label-success').addClass('label-warning').text('非监控');
-        exp_monitor_btn.html('开始监控');
+                exp_monitor_interval[exp_id] = setInterval(function () {
+                    askForData(exp_id);
+                }, 2000);
+            } else if (isExperimentMonitor[exp_id] == 1){
+                // stop monitor
+                isExperimentMonitor[exp_id] = 0;
+                exp_state_dom.removeClass('label-success').addClass('label-warning').text('非监控');
+                exp_monitor_btn.html('开始监控');
 
-        clearInterval(exp_monitor_interval[exp_id]);
-        delete exp_monitor_interval[exp_id];
-    }
+                clearInterval(exp_monitor_interval[exp_id]);
+                delete exp_monitor_interval[exp_id];
+            }
+        },
+        error: function (response) {
+            message_info("操作失败，失败原因为：" + response, 'error');
+        }
+    });
 
     function askForData(exp_id) {
         message_info('实验' + exp_id + '运行中', 'info', 1);

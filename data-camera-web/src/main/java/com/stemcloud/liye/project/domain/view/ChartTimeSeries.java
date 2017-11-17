@@ -14,7 +14,7 @@ public class ChartTimeSeries {
     private Date name;
     private List<Object> value;
 
-    public ChartTimeSeries(Date date, String value) {
+    public ChartTimeSeries(Date date, Double value) {
         List<Object> list = new ArrayList<Object>();
         list.add(date);
         list.add(value);
