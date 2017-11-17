@@ -32,6 +32,8 @@ public class DataService {
 
     public void getRecentDataOfBoundSensors(long expId, long timestamp){
         List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsMonitor(expId, 1);
+
+
         for (SensorInfo sensor: boundSensors){
             long trackId = sensor.getTrackId();
             long sensorId = sensor.getId();
