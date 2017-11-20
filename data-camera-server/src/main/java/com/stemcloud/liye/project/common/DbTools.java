@@ -31,21 +31,36 @@ public class DbTools {
             conn = bdp.getConnection();
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
+
+            ps.close();
+            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-                if (conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
         return rs;
+    }
+
+    public static int saveValueData(long sensorId, long trackId, String key, Double value){
+        String sql = String.format("INSERT INTO %s (data_key, data_value, sensor_id, track_id) VALUES (?,?,?,?)", "dc_value_data");
+        DruidPooledConnection conn = null;
+        PreparedStatement ps = null;
+        int result = 0;
+        try {
+            conn = bdp.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, key);
+            ps.setDouble(2, value);
+            ps.setLong(3, sensorId);
+            ps.setLong(4, sensorId);
+            result = ps.executeUpdate();
+
+            ps.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }
