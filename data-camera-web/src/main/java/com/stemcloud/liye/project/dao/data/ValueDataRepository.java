@@ -37,5 +37,5 @@ public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
      * @param ids
      * @return
      */
-    List<ValueData> findByCreateTimeGreaterThanEqualAndSensorIdInOrderByCreateTime(Date timestamp, Set<Long> ids);
+    List<ValueData> findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(Date timestamp, Set<Long> ids);
 }

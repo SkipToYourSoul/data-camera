@@ -58,6 +58,13 @@ public class DataController {
         return baseService.getOnlineTrack();
     }
 
+    /**
+     * Map<Long, Map<String, List<ChartTimeSeries>>>
+     *     sensor_id, (data_key, List<data_value>)
+     * @param queryParams
+     * @param request
+     * @return
+     */
     @GetMapping("/monitor")
     Map monitor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         Long beginTime = System.currentTimeMillis();

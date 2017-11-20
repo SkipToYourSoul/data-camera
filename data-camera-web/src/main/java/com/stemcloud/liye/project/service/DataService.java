@@ -34,7 +34,7 @@ public class DataService {
         for (SensorInfo bs: boundSensors){
             boundSensorIds.add(bs.getId());
         }
-        List<ValueData> newData = valueDataRepository.findByCreateTimeGreaterThanEqualAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds);
+        List<ValueData> newData = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds);
         // sensor_id, (data_key, List<data_value>)
         Map<Long, Map<String, List<ChartTimeSeries>>> result = new HashMap<Long, Map<String, List<ChartTimeSeries>>>();
 

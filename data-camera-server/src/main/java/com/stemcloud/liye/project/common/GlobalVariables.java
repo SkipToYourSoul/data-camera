@@ -1,7 +1,5 @@
 package com.stemcloud.liye.project.common;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -12,5 +10,6 @@ import java.util.concurrent.ConcurrentMap;
  * @author liye on 2017/11/18
  */
 public class GlobalVariables {
-    public static ConcurrentMap<Long, Integer> sensorMonitorStatus = new ConcurrentHashMap<Long, Integer>();
+    public static ConcurrentMap<String, Integer> sensorMonitorStatus = new ConcurrentHashMap<String, Integer>();
+    public static ConcurrentMap<String, String> sensorInfo = new ConcurrentHashMap<String, String>();
 }

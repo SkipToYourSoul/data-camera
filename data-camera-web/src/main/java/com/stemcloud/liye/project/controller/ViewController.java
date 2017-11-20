@@ -81,6 +81,7 @@ public class ViewController {
             Map<Long, List<SensorInfo>> boundSensors = new HashMap<Long, List<SensorInfo>>(experiments.size());
             Map<Long, Integer> isExperimentMonitor = new HashMap<Long, Integer>(experiments.size());
             Map<Long, Integer> isExperimentRecorder = new HashMap<Long, Integer>(experiments.size());
+            List<TrackInfo> tracks = new ArrayList<TrackInfo>();
             for (ExperimentInfo exp : experiments){
                 Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
                 isExperimentMonitor.put(exp.getId(), 0);
@@ -88,6 +89,7 @@ public class ViewController {
 
                 for (TrackInfo track: exp.getTrackInfoList()){
                     if (track.getIsDeleted() == 0){
+                        tracks.add(track);
                         TrackInfo newTrack = new TrackInfo();
                         newTrack.setId(track.getId());
                         newTrack.setSensor(track.getSensor());
@@ -117,6 +119,9 @@ public class ViewController {
             model.addAttribute("experiments", experiments);
             model.addAttribute("isExperimentMonitor", isExperimentMonitor);
             model.addAttribute("isExperimentRecorder", isExperimentRecorder);
+
+            // --- TRACK
+            model.addAttribute("tracks", tracks);
 
             // --- SENSOR: get user's sensor of this app and available sensors
             List<SensorInfo> availableSensor = baseInfoService.getAvailableSensorOfCurrentUser(user);

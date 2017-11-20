@@ -1,5 +1,6 @@
 package com.stemcloud.liye.project.domain.view;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,7 @@ public class ChartTimeSeries {
 
     public ChartTimeSeries(Date date, Double value) {
         List<Object> list = new ArrayList<Object>();
-        list.add(date);
+        list.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date));
         list.add(value);
         this.value = list;
         this.name = date;

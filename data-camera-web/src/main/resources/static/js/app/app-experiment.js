@@ -4,6 +4,12 @@
  *  Description:
  */
 
+var chart_object = {};
+var exp_monitor_interval = {};
+var exp_newest_timestamp = {
+    1: 1511150400000
+};
+
 function initTrackOfExperiments() {
     // message_info("Init tracks", "info", 3);
     for (var index in experiments){
@@ -18,6 +24,7 @@ function initTrackOfExperiments() {
             var chart_dom = "experiment-track-" + exp_id + "-" + track_id;
             var chart = echarts.init(document.getElementById(chart_dom), "", opts = {});
             chart.setOption(experimentChartOption(legend));
+            chart_object[chart_dom] = chart;
 
             // init track bound sensor
             var $track_bound_dom = $('#track-bound-' + track_id);
@@ -48,8 +55,15 @@ function initTrackOfExperiments() {
                 sourceError: 'error loading data',
                 pk: track_id,
                 validate: function (value) {
-                    if (isExperimentMonitor[exp_id] == 1){
-                        return '数据监控中，不能进行绑定操作';
+                    var track_id = $(this)['context']['id'].split('-')[2];
+                    for (var index in tracks){
+                        if (tracks[index]['id'] + '' != track_id){
+                            continue;
+                        }
+                        var e = tracks[index]['experiment']['id'];
+                        if (isExperimentMonitor[e] == 1){
+                            return '数据监控中，不能进行绑定操作';
+                        }
                     }
                 },
                 url: crud_address + '/bound/toggle',
@@ -70,11 +84,6 @@ function initTrackOfExperiments() {
     }
 }
 
-var exp_monitor_interval = {};
-var exp_newest_timestamp = {
-    0: new Date().getTime(),
-    1: new Date().getTime()
-};
 function expMonitor(button){
     var exp_id = button.getAttribute('data');
     var exp_state_dom = $('#experiment-state-' + exp_id);
@@ -117,14 +126,45 @@ function expMonitor(button){
     });
 
     function askForData(exp_id) {
-        message_info('实验' + exp_id + '运行中', 'info', 1);
         var exp_bound_sensors = boundSensors[exp_id];
-        var exp_bound_sensor_ids = [];
         $.get(data_addrss + "/monitor", {
             "exp-id": exp_id,
-            "timestamp": /*exp_newest_timestamp[exp_id]*/1510838700518
+            "timestamp": exp_newest_timestamp[exp_id]
         }, function (response) {
-            message_info(response, 'info', 3);
+            // --- traverse the sensors of this experiment
+            for (var index in exp_bound_sensors){
+                var sensor = exp_bound_sensors[index];
+                if (!response.hasOwnProperty(sensor['id'])){
+                    continue;
+                }
+                // --- init
+                var sensor_id = sensor['id'];
+                var track_id = sensor['trackId'];
+                var chart_dom = "experiment-track-" + exp_id + "-" + track_id;
+                var chart = chart_object[chart_dom];
+                var series = chart.getOption()['series'];
+
+                // --- update series data
+                var legend = sensor['sensorConfig']['dimension'].split(';');
+                for (var i in legend){
+                    var key = legend[i];
+                    if (!response[sensor_id].hasOwnProperty(key)){
+                        continue;
+                    }
+                    var new_data = response[sensor_id][key];
+                    series[i]['data'].push.apply( series[i]['data'], new_data );
+
+                    var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
+                    if (new_time > exp_newest_timestamp[exp_id]){
+                        exp_newest_timestamp[exp_id] = new_time;
+                    }
+                }
+
+                // -- set new option
+                chart_object[chart_dom].setOption({
+                    series: series
+                });
+            }
         });
     }
 }
