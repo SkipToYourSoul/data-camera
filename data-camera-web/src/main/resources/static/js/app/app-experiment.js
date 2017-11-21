@@ -15,6 +15,8 @@ function initTrackOfExperiments() {
     for (var index in experiments){
         var experiment = experiments[index];
         var exp_id = experiment['id'];
+        exp_newest_timestamp[exp_id] = new Date().getTime();
+
         for (var i in experiment['trackInfoList']){
             var track = experiment['trackInfoList'][i];
             var track_id = track['id'];
@@ -68,18 +70,21 @@ function initTrackOfExperiments() {
                 },
                 url: crud_address + '/bound/toggle',
                 success: function(result) {
-                    // refresh editable
-                    if (result['action'] == 'unbound'){
-
-                    } else if (result['action'] == 'bound'){
-
-                    }
                     window.location.href = current_address + "?id=" + app['id'];
                 },
                 error: function (error) {
-                    message_info('error' + error, 'info');
+                    message_info('绑定操作失败: ' + error, 'error');
                 }
             });
+        }
+    }
+
+    // click monitor button
+    for (var exp_id in isExperimentMonitor){
+        var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
+        if (isExperimentMonitor[exp_id] == 1){
+            isExperimentMonitor[exp_id] = 0;
+            exp_monitor_btn.click();
         }
     }
 }
@@ -97,7 +102,7 @@ function expMonitor(button){
             "action": isExperimentMonitor[exp_id]
         },
         success: function (response) {
-            if (response == 0){
+            if (response == -1){
                 message_info('操作无效', 'error');
                 return;
             }
@@ -167,4 +172,29 @@ function expMonitor(button){
             }
         });
     }
+}
+
+function expRecorder(button) {
+    var exp_id = button.getAttribute('data');
+    var exp_monitor_btn = $('#experiment-recorder-' + exp_id);
+    
+    if (!isExperimentMonitor.hasOwnProperty(exp_id) || isExperimentMonitor['exp_id'] == 0){
+        message_info("实验" + exp_id + "未开始监控，无法记录！");
+        return;
+    }
+
+    $.ajax({
+        type: 'get',
+        url: crud_address + "/recorder",
+        data: {
+            "exp-id": exp_id,
+            "action": isExperimentRecorder[exp_id]
+        },
+        success: function (response) {
+
+        },
+        error: function (response) {
+            message_info("操作失败，失败原因为：" + response, 'error');
+        }
+    });
 }

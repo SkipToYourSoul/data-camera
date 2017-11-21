@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>DATA CAMERA设备页</title>
+
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/table/bootstrap-table.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
+</head>
+<body>
+    <div class="navbar-wrapper" th:include="module/common::nav">
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="margin-top: 70px; padding-left: 20px; padding-right: 20px">
+                    <div id="toolbar">
+                        <button class="btn btn-success" action="new" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-plus-circle"></i>&nbsp;新增设备</button>
+                        <button class="btn btn-warning" action="edit" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-info-circle"></i>&nbsp;编辑设备</button>
+                        <button class="btn btn-danger" onclick="deleteSensor()"><i class="fa fa-minus-circle"></i>&nbsp;删除设备</button>
+                    </div>
+                    <table id="table"
+                           data-select-item-name="select"
+                           data-sort-name="id"
+                           data-sort-order="desc"
+                           data-toolbar="#toolbar"
+                           data-search="true"
+                           data-show-refresh="true"
+                           data-show-toggle="true"
+                           data-show-columns="true"
+                           data-show-export="true"
+                           data-show-pagination-switch="true"
+                           data-pagination="true"
+                           data-id-field="id"
+                           data-page-size="10"
+                           data-page-list="[10, 25, 50, 100, ALL]"
+                           data-pagination-first-text="First"
+                           data-pagination-pre-text="Previous"
+                           data-pagination-next-text="Next"
+                           data-pagination-last-text="Last"
+                           data-row-style="rowStyle">
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div th:include="module/common::sub-footer"></div>
+        </div>
+    </div>
+
+    <div th:include="module/modal::sensor-modal"></div>
+
+    <script th:src="@{source/jquery.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+
+    <script th:src="@{source/table/bootstrap-table.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
+    <script th:src="@{source/bootbox/bootbox.min.js}"></script>
+
+    <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/validation/formValidation.min.js}"></script>
+    <script th:src="@{source/validation/bootstrap.min.js}"></script>
+
+    <!--
+        sensors: List<SensorInfo>
+     -->
+    <script th:inline="javascript">
+        var sensors = [[${sensors}]];
+    </script>
+
+    <script th:src="@{js/common.js}"></script>
+    <script th:src="@{js/device/device-controller.js}"></script>
+</body>
+</html>
