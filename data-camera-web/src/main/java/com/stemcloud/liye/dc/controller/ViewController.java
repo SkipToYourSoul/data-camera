@@ -81,7 +81,8 @@ public class ViewController {
             Map<Long, List<SensorInfo>> boundSensors = new HashMap<Long, List<SensorInfo>>(experiments.size());
             Map<Long, Integer> isExperimentMonitor = new HashMap<Long, Integer>(experiments.size());
             Map<Long, Integer> isExperimentRecorder = new HashMap<Long, Integer>(experiments.size());
-            Map<Long, TrackInfo> tracks = new HashMap<Long, TrackInfo>();
+            Map<Long, Date> expRecorderTime = new HashMap<Long, Date>(experiments.size());
+            Map<Long, TrackInfo> tracks = new HashMap<Long, TrackInfo>(16);
             for (Map.Entry<Long, ExperimentInfo> entry : experiments.entrySet()){
                 long expId = entry.getKey();
                 ExperimentInfo exp = entry.getValue();
@@ -101,17 +102,18 @@ public class ViewController {
                         // add bound sensors
                         if (track.getSensor() != null){
                             List<SensorInfo> expBoundSensors = new ArrayList<SensorInfo>();
-                            if (boundSensors.containsKey(exp.getId())){
-                                expBoundSensors = boundSensors.get(exp.getId());
+                            if (boundSensors.containsKey(expId)){
+                                expBoundSensors = boundSensors.get(expId);
                             }
                             expBoundSensors.add(track.getSensor());
-                            boundSensors.put(exp.getId(), expBoundSensors);
+                            boundSensors.put(expId, expBoundSensors);
 
                             if (track.getSensor().getIsMonitor() == 1){
-                                isExperimentMonitor.put(exp.getId(), 1);
+                                isExperimentMonitor.put(expId, 1);
                             }
                             if (track.getSensor().getIsRecoder() == 1){
-                                isExperimentRecorder.put(exp.getId(), 1);
+                                isExperimentRecorder.put(expId, 1);
+                                expRecorderTime.put(expId, baseInfoService.getRecorderInfoOfExp(expId).getStartTime());
                             }
                         }
                     }
@@ -121,6 +123,7 @@ public class ViewController {
             model.addAttribute("experiments", experiments);
             model.addAttribute("isExperimentMonitor", isExperimentMonitor);
             model.addAttribute("isExperimentRecorder", isExperimentRecorder);
+            model.addAttribute("expRecorderTime", expRecorderTime);
 
             // --- TRACK
             model.addAttribute("tracks", tracks);

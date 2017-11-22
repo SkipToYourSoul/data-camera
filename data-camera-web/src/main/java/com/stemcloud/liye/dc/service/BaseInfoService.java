@@ -4,10 +4,12 @@ import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
+import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +33,15 @@ public class BaseInfoService {
     private final SensorRepository sensorRepository;
     private final ExperimentRepository experimentRepository;
     private final TrackRepository trackRepository;
+    private final RecorderRepository recorderRepository;
 
     @Autowired
-    public BaseInfoService(AppRepository appRepository, SensorRepository sensorRepository, ExperimentRepository experimentRepository, TrackRepository trackRepository) {
+    public BaseInfoService(AppRepository appRepository, SensorRepository sensorRepository, ExperimentRepository experimentRepository, TrackRepository trackRepository, RecorderRepository recorderRepository) {
         this.appRepository = appRepository;
         this.sensorRepository = sensorRepository;
         this.experimentRepository = experimentRepository;
         this.trackRepository = trackRepository;
+        this.recorderRepository = recorderRepository;
     }
 
     /** APPS **/
@@ -93,5 +97,10 @@ public class BaseInfoService {
 
     public List<SensorInfo> getSensorsOfCurrentApp(long appId){
         return sensorRepository.findByAppId(appId);
+    }
+
+    /** RECORDERS **/
+    public RecorderInfo getRecorderInfoOfExp(long expId){
+        return recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
     }
 }

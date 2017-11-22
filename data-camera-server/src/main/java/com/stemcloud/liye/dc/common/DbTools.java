@@ -25,7 +25,7 @@ public class DbTools {
     }
 
     public static int saveValueData(long sensorId, long trackId, String key, Double value){
-        String sql = String.format("INSERT INTO %s (data_key, data_value, sensor_id, track_id, create_time) VALUES (?,?,?,?,?)", "dc_value_data");
+        String sql = String.format("INSERT INTO %s (data_key, data_value, sensor_id, track_id, create_time) VALUES (?,?,?,?,?)", "dc_data_value_data");
         DruidPooledConnection conn = null;
         PreparedStatement ps = null;
         int result = 0;

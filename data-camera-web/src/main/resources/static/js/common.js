@@ -68,3 +68,10 @@ Date.prototype.Format = function (fmt) {
         if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
 };
+
+function isEmptyObject(obj) {
+    for (var key in obj){
+        return false;//返回false，不为空对象
+    }
+    return true;//返回true，为空对象
+}

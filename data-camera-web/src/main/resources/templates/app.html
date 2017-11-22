@@ -89,13 +89,11 @@
                 <div th:if="${param.id}">
                     <ul class="nav nav-pills" role="tablist" id="main-tab">
                         <li role="presentation" class="active"><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
-                        <li role="presentation"><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">数据分析模式</a></li>
-                        <li role="presentation"><a href="#app-history" aria-controls="app-history" role="tab" data-toggle="tab">历史数据查看</a></li>
+                        <li role="presentation"><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">分析模式</a></li>
                     </ul>
                     <div class="tab-content">
                         <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane active fade in app-tab-pane-content"></div>
-                        <!--<div th:include="module/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
-                        <div th:include="module/app-history::app-history" id="app-history" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>-->
+                        <!--<div th:include="module/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div> -->
                     </div>
                 </div>
             </div>
@@ -109,14 +107,24 @@
     <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
 
     <!--
-        apps: List<AppInfo>
-
+        apps:
+            key = app_id
+            value = appInfo
+        experiments:
+            key = exp_id
+            value = expInfo
+        tracks:
+            key = track_id
+            value = trackInfo
         isExperimentMonitor:
             key = exp_id
             if in monitor status, value = 1, else value = 0
         isExperimentRecorder:
             key = exp_id
             value = recorder start time
+        expRecorderTime:
+            key = exp_id
+            value = experiment recorder time if it in recorder state
     -->
     <script th:inline="javascript">
         var apps = [[${apps}]];
@@ -130,6 +138,7 @@
 
         var isExperimentMonitor = [[${isExperimentMonitor}]];
         var isExperimentRecorder = [[${isExperimentRecorder}]];
+        var expRecorderTime = [[${expRecorderTime}]];
     </script>
 
     <script th:src="@{source/loading/fakeLoader.min.js}"></script>
@@ -157,7 +166,7 @@
 
     <script>
         if (app != null) {
-            initTrackOfExperiments();
+            initResourceOfExperimentPage();
         }
     </script>
 </body>

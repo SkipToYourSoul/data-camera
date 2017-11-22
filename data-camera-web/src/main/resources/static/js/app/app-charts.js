@@ -11,7 +11,7 @@ var experimentChartOption = function (legend) {
         series.push({
             name: name,
             type: 'line',
-            symbolSize:10,
+            symbolSize: 6,
             symbol:'circle',
             hoverAnimation: false,
             markArea: {

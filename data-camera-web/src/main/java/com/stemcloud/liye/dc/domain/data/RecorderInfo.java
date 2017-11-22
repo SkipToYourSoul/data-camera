@@ -37,6 +37,10 @@ public class RecorderInfo {
             columnDefinition = "INT DEFAULT 1")
     private int isRecorder = 1;
 
+    @Column(name = "is_deleted",
+            columnDefinition = "INT DEFAULT 0")
+    private int isDeleted = 0;
+
     public long getId() {
         return id;
     }
@@ -91,5 +95,13 @@ public class RecorderInfo {
 
     public void setIsRecorder(int isRecorder) {
         this.isRecorder = isRecorder;
+    }
+
+    public int getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(int isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

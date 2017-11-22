@@ -6,15 +6,11 @@
 
 var chart_object = {};
 var exp_monitor_interval = {};
-var exp_newest_timestamp = {
-    1: 1511150400000
-};
-var recorder_timestamp = {
+var exp_newest_timestamp = {};
+var recorder_timestamp = {};
 
-};
-
-function initTrackOfExperiments() {
-    // message_info("Init tracks", "info", 3);
+function initResourceOfExperimentPage() {
+    // init experiment track and sensors
     for (var exp_id in experiments){
         var experiment = experiments[exp_id];
         exp_newest_timestamp[exp_id] = new Date().getTime();
@@ -81,12 +77,27 @@ function initTrackOfExperiments() {
         }
     }
 
-    // click monitor button
-    for (var exp_id in isExperimentMonitor){
-        var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
-        if (isExperimentMonitor[exp_id] == 1){
-            isExperimentMonitor[exp_id] = 0;
-            exp_monitor_btn.click();
+    // init experiment which is in monitoring state
+    for (var id in isExperimentMonitor){
+        var exp_monitor_btn = $('#experiment-monitor-' + id);
+        var exp_monitor_dom = $('#experiment-es-' + id);
+        var exp_recorder_btn = $('#experiment-recorder-' + id);
+        var exp_recorder_dom = $('#experiment-rs-' + id);
+
+        if (isExperimentMonitor[id] == 1){
+            exp_monitor_dom.removeClass('label-warning').addClass('label-success').text('正在监控');
+            exp_monitor_btn.html('停止监控');
+
+            if (isExperimentRecorder[id] == 1){
+                exp_recorder_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
+                exp_recorder_btn.html("停止录制");
+
+                recorder_timestamp[id] = [];
+                recorder_timestamp[id].push(expRecorderTime[id]);
+
+                exp_newest_timestamp[id] = new Date(parseTime(expRecorderTime[id])).getTime();
+            }
+            doInterval(id);
         }
     }
 }
@@ -119,23 +130,87 @@ function expMonitor(button){
                 exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在监控');
                 exp_monitor_btn.html('停止监控');
 
-                exp_monitor_interval[exp_id] = setInterval(function () {
-                    askForData(exp_id);
-                }, 2000);
+                doInterval(exp_id);
             } else if (isExperimentMonitor[exp_id] == 1){
                 // stop monitor
-                isExperimentMonitor[exp_id] = 0;
-                exp_state_dom.removeClass('label-success').addClass('label-warning').text('非监控');
-                exp_monitor_btn.html('开始监控');
-
-                clearInterval(exp_monitor_interval[exp_id]);
-                delete exp_monitor_interval[exp_id];
+                pageStopMonitor(exp_id);
             }
         },
         error: function (response) {
             message_info("操作失败，失败原因为：" + response, 'error');
         }
     });
+}
+
+function expRecorder(button) {
+    var exp_id = button.getAttribute('data');
+    var exp_state_dom = $('#experiment-rs-' + exp_id);
+    var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
+    
+    if (!isExperimentMonitor.hasOwnProperty(exp_id) || isExperimentMonitor[exp_id] == 0){
+        message_info("实验" + exp_id + "未开始监控，无法记录！");
+        return;
+    }
+
+    $.ajax({
+        type: 'get',
+        url: crud_address + "/recorder",
+        data: {
+            "exp-id": exp_id,
+            "action": isExperimentRecorder[exp_id]
+        },
+        success: function (response) {
+            if (response == -1 || response == 0){
+                message_info('操作无效', 'error');
+                return;
+            }
+
+            if (!recorder_timestamp.hasOwnProperty(exp_id)){
+                recorder_timestamp[exp_id] = [];
+            }
+
+            if (recorder_timestamp[exp_id].length % 2 == 0){
+                message_info("实验" + exp_id + ": 开始记录");
+                exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
+                exp_recorder_btn.html("停止录制");
+
+                isExperimentRecorder[exp_id] = 1;
+                recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+            } else {
+                message_info("实验" + exp_id + ": 停止记录");
+                pageStopRecorder(exp_id);
+            }
+        },
+        error: function (response) {
+            message_info("操作失败，失败原因为：" + response, 'error');
+        }
+    });
+}
+
+function pageStopMonitor(exp_id){
+    if (isExperimentRecorder[exp_id] == 1){
+        pageStopRecorder(exp_id);
+    }
+
+    isExperimentMonitor[exp_id] = 0;
+    $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-warning').text('非监控');
+    $('#experiment-monitor-' + exp_id).html('开始监控');
+
+    clearInterval(exp_monitor_interval[exp_id]);
+    delete exp_monitor_interval[exp_id];
+}
+
+function pageStopRecorder(exp_id){
+    $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-warning').text('非录制');
+    $('#experiment-recorder-' + exp_id).html("开始录制");
+    isExperimentRecorder[exp_id] = 0;
+    recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+}
+
+function doInterval(exp_id){
+    exp_monitor_interval[exp_id] = setInterval(function(){
+        askForData(exp_id);
+    }, 2000);
 
     function askForData(exp_id) {
         var exp_bound_sensors = boundSensors[exp_id];
@@ -143,7 +218,9 @@ function expMonitor(button){
             "exp-id": exp_id,
             "timestamp": exp_newest_timestamp[exp_id]
         }, function (response) {
-            var now = new Date();
+            if (isEmptyObject(response)){
+                return;
+            }
             // --- traverse the sensors of this experiment
             for (var index in exp_bound_sensors){
                 var sensor = exp_bound_sensors[index];
@@ -181,9 +258,9 @@ function expMonitor(button){
                         // - recorder ing
                         var mark_index = Math.floor(recorder_length/2);
                         mark_list[mark_index] = [{
-                            xAxis: recorder_timestamp[exp_id][recorder_length - 1]
+                            xAxis: parseTime(recorder_timestamp[exp_id][recorder_length - 1])
                         }, {
-                            xAxis: now.Format("yyyy-MM-dd HH:mm:ss")
+                            xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
                         }];
                         series[0]['markArea']['data'] = mark_list;
                     }
@@ -196,53 +273,4 @@ function expMonitor(button){
             }
         });
     }
-}
-
-function expRecorder(button) {
-    var exp_id = button.getAttribute('data');
-    var exp_state_dom = $('#experiment-rs-' + exp_id);
-    var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
-    
-    if (!isExperimentMonitor.hasOwnProperty(exp_id) || isExperimentMonitor['exp_id'] == 0){
-        message_info("实验" + exp_id + "未开始监控，无法记录！");
-        return;
-    }
-
-    $.ajax({
-        type: 'get',
-        url: crud_address + "/recorder",
-        data: {
-            "exp-id": exp_id,
-            "action": isExperimentRecorder[exp_id]
-        },
-        success: function (response) {
-            if (response == -1 || response == 0){
-                message_info('操作无效', 'error');
-                return;
-            }
-
-            if (!recorder_timestamp.hasOwnProperty(exp_id)){
-                recorder_timestamp[exp_id] = [];
-            }
-
-            if (recorder_timestamp[exp_id].length % 2 == 0){
-                message_info("实验" + exp_id + ": 开始记录");
-                exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
-                exp_recorder_btn.html("停止录制");
-
-                isExperimentRecorder[exp_id] = 1;
-                recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-            } else {
-                message_info("实验" + exp_id + ": 停止记录");
-                exp_state_dom.removeClass('label-success').addClass('label-warning').text('非录制');
-                exp_recorder_btn.html("开始录制");
-
-                isExperimentRecorder[exp_id] = 0;
-                recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-            }
-        },
-        error: function (response) {
-            message_info("操作失败，失败原因为：" + response, 'error');
-        }
-    });
 }

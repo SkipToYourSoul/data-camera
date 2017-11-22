@@ -155,7 +155,7 @@ public class CrudService {
         logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
     }
 
-    public Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId, int isMonitor){
+    public Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId, int isMonitor) throws Exception {
         List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsMonitorAndIsDeleted(expId, isMonitor, 0);
         Set<Long> ids = new HashSet<Long>();
         for (SensorInfo sensor : sensors){
@@ -164,7 +164,13 @@ public class CrudService {
 
         int s = 0;
         if (ids.size() > 0) {
-            s = sensorRepository.monitorSensorByIds(ids, Math.abs(isMonitor - 1));
+            if (isMonitor == 0){
+                s = sensorRepository.monitorSensorByIds(ids, 1);
+            } else if (isMonitor == 1){
+                s = sensorRepository.monitorSensorByIds(ids, 0);
+                changeSensorsRecorderStatusOfCurrentExperiment(expId, 1);
+            }
+
         }
         logger.info("CHANGE MONITOR STATUS OF SENSOR: " + s);
         return s;
@@ -202,7 +208,7 @@ public class CrudService {
             } else if (isRecorder == 1){
                 s = sensorRepository.recorderSensorByIds(ids, 0);
                 // end recorder
-                RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorder(expId, 1);
+                RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
                 if (recorderInfo == null){
                     throw new Exception("end record, but no record info in table");
                 }

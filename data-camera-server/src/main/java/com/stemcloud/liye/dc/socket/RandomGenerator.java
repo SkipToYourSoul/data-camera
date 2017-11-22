@@ -27,28 +27,6 @@ public class RandomGenerator {
     }
 
     /**
-     * generate temperature and humidity value
-     */
-    public void thSensor(String sensorCode) throws InterruptedException {
-        long time = System.currentTimeMillis();
-        while (true){
-            if (GlobalVariables.sensorMonitorStatus.containsKey(sensorCode) && GlobalVariables.sensorMonitorStatus.get(sensorCode) == 1) {
-                long sensorId = Long.parseLong(GlobalVariables.sensorInfo.get(sensorCode).split("_")[0]);
-                long trackId = Long.parseLong(GlobalVariables.sensorInfo.get(sensorCode).split("_")[1]);
-
-                DbTools.saveValueData(sensorId, trackId, "温度", randomDouble(10, 15));
-                DbTools.saveValueData(sensorId, trackId, "湿度", randomDouble(20, 20));
-            }
-            long cost = System.currentTimeMillis() - time;
-            if (cost < 5000L){
-                Thread.sleep(5000L - cost);
-                logger.info("generate data, cost {} millis", cost);
-            }
-            time = System.currentTimeMillis();
-        }
-    }
-
-    /**
      * generate random data of all monitor sensors
      * @throws InterruptedException
      */
