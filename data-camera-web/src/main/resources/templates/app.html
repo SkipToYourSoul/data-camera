@@ -70,11 +70,11 @@
                                 <a th:href="@{/app}"><i class="glyphicon glyphicon-home"></i>应用管理页面</a>
                             </li>
                         </ul>
-                        <strong>应用列表</strong><span class="badge pull-right" th:text="${#lists.size(apps)}">0</span>
+                        <strong>应用列表</strong><span class="badge pull-right" th:text="${#maps.size(apps)}">0</span>
                         <ul class="nav">
-                            <th:block th:each="app,index:${apps}">
-                                <li th:class="${#httpServletRequest.getParameter('id') eq ''+app.id}?'active':''">
-                                    <a th:text="${app.name}" th:href="@{/app(id=${app.id})}" th:class="|app-${index.count}|"></a></li>
+                            <th:block th:each="entry,index:${apps}">
+                                <li th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
+                                    <a th:text="${entry.value.name}" th:href="@{/app(id=${entry.key})}" th:class="|app-${index.count}|"></a></li>
                             </th:block>
                         </ul>
                     </div>
@@ -110,12 +110,21 @@
 
     <!--
         apps: List<AppInfo>
+
+        isExperimentMonitor:
+            key = exp_id
+            if in monitor status, value = 1, else value = 0
+        isExperimentRecorder:
+            key = exp_id
+            value = recorder start time
     -->
     <script th:inline="javascript">
         var apps = [[${apps}]];
         var app = [[${app}]];
+
         var experiments = [[${experiments}]];
         var tracks = [[${tracks}]];
+
         var freeSensors = [[${freeSensors}]];
         var boundSensors = [[${boundSensors}]];
 
@@ -147,7 +156,9 @@
     <!--<script th:if="${param.id}" th:src="@{js/app/app-analysis.js}"></script>-->
 
     <script>
-        initTrackOfExperiments();
+        if (app != null) {
+            initTrackOfExperiments();
+        }
     </script>
 </body>
 </html>

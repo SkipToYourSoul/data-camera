@@ -19,7 +19,7 @@
             </div>
 
             <div class="col-sm-12">
-                <th:block th:if="${#lists.isEmpty(experiments)}">
+                <th:block th:if="${#maps.isEmpty(experiments)}">
                     <hr/>
                     <h3>TIPS: 应用下还没有实验哦，点击“添加一个实验”新建一个吧:)</h3>
                     <hr/>
@@ -29,7 +29,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
-                                <strong th:text="|实验：${experiment.name}|">
+                                <strong th:text="|实验：${experiment.value.name}|">
                                 </strong>
                             </div>
                         </div>
@@ -38,24 +38,25 @@
                                 <div class="col-sm-6">
                                     <div class="app-exp-status-container">
                                         <span>实验状态</span>
-                                        <span class="label label-warning" th:id="|experiment-state-${experiment.id}|">非监控</span>
+                                        <span class="label label-warning" th:id="|experiment-es-${experiment.key}|">非监控</span>
+                                        <span class="label label-warning" th:id="|experiment-rs-${experiment.key}|">非录制</span>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="app-exp-status-container">
                                         <span>实验操作</span>
-                                        <button class="btn label label-warning" th:data="${experiment.id}"
+                                        <button class="btn label label-warning" th:data="${experiment.key}"
                                                 data-toggle="modal" data-target="#exp-modal" todo="edit"
                                                 style="margin-right: 10px">编辑实验</button>
-                                        <button class="btn label label-danger" th:data="${experiment.id}" onclick="deleteExp(this)">删除实验</button>
+                                        <button class="btn label label-danger" th:data="${experiment.key}" onclick="deleteExp(this)">删除实验</button>
                                     </div>
                                 </div>
                             </div>
-                            <th:block th:each="track,index:${experiment.trackInfoList}">
+                            <th:block th:each="track,index:${experiment.value.trackInfoList}">
                                 <div class="app-exp-track-container">
                                     <div class="row">
                                         <div class="col-xs-8 col-sm-8 col-md-8">
-                                            <div th:id="|experiment-track-${experiment.id}-${track.id}|" class="app-exp-track-chart">
+                                            <div th:id="|experiment-track-${experiment.key}-${track.id}|" class="app-exp-track-chart">
                                                 轨迹加载中，请稍后
                                             </div>
                                         </div>
@@ -87,11 +88,11 @@
                                     </div>
                                 </div>
                             </th:block>
-                            <th:block th:if="${not #lists.isEmpty(experiment.trackInfoList)}">
+                            <th:block th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}">
                                 <div class="row">
                                     <div class="recorder-button">
-                                        <button class="btn btn-warning" th:data="${experiment.id}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.id}|">开始监控</button>
-                                        <button class="btn btn-danger" th:data="${experiment.id}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.id}|">开始录制</button>
+                                        <button class="btn btn-warning" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">开始监控</button>
+                                        <button class="btn btn-danger" th:data="${experiment.key}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.key}|">开始录制</button>
                                     </div>
                                 </div>
                             </th:block>

@@ -9,12 +9,14 @@ var exp_monitor_interval = {};
 var exp_newest_timestamp = {
     1: 1511150400000
 };
+var recorder_timestamp = {
+
+};
 
 function initTrackOfExperiments() {
     // message_info("Init tracks", "info", 3);
-    for (var index in experiments){
-        var experiment = experiments[index];
-        var exp_id = experiment['id'];
+    for (var exp_id in experiments){
+        var experiment = experiments[exp_id];
         exp_newest_timestamp[exp_id] = new Date().getTime();
 
         for (var i in experiment['trackInfoList']){
@@ -58,11 +60,11 @@ function initTrackOfExperiments() {
                 pk: track_id,
                 validate: function (value) {
                     var track_id = $(this)['context']['id'].split('-')[2];
-                    for (var index in tracks){
-                        if (tracks[index]['id'] + '' != track_id){
+                    for (var current_id in tracks){
+                        if (current_id + '' != track_id){
                             continue;
                         }
-                        var e = tracks[index]['experiment']['id'];
+                        var e = tracks[current_id]['experiment']['id'];
                         if (isExperimentMonitor[e] == 1){
                             return '数据监控中，不能进行绑定操作';
                         }
@@ -91,8 +93,13 @@ function initTrackOfExperiments() {
 
 function expMonitor(button){
     var exp_id = button.getAttribute('data');
-    var exp_state_dom = $('#experiment-state-' + exp_id);
+    var exp_state_dom = $('#experiment-es-' + exp_id);
     var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
+
+    if (!boundSensors.hasOwnProperty(exp_id)){
+        message_info('实验未绑定任何设备', 'error');
+        return;
+    }
 
     $.ajax({
         type: 'get',
@@ -102,7 +109,7 @@ function expMonitor(button){
             "action": isExperimentMonitor[exp_id]
         },
         success: function (response) {
-            if (response == -1){
+            if (response == -1 || response == 0){
                 message_info('操作无效', 'error');
                 return;
             }
@@ -136,6 +143,7 @@ function expMonitor(button){
             "exp-id": exp_id,
             "timestamp": exp_newest_timestamp[exp_id]
         }, function (response) {
+            var now = new Date();
             // --- traverse the sensors of this experiment
             for (var index in exp_bound_sensors){
                 var sensor = exp_bound_sensors[index];
@@ -165,6 +173,22 @@ function expMonitor(button){
                     }
                 }
 
+                // --- update series markArea (if recorder)
+                if (recorder_timestamp.hasOwnProperty(exp_id)){
+                    var mark_list = series[0]['markArea']['data'];
+                    var recorder_length = recorder_timestamp[exp_id].length;
+                    if (recorder_length % 2 == 1){
+                        // - recorder ing
+                        var mark_index = Math.floor(recorder_length/2);
+                        mark_list[mark_index] = [{
+                            xAxis: recorder_timestamp[exp_id][recorder_length - 1]
+                        }, {
+                            xAxis: now.Format("yyyy-MM-dd HH:mm:ss")
+                        }];
+                        series[0]['markArea']['data'] = mark_list;
+                    }
+                }
+
                 // -- set new option
                 chart_object[chart_dom].setOption({
                     series: series
@@ -176,7 +200,8 @@ function expMonitor(button){
 
 function expRecorder(button) {
     var exp_id = button.getAttribute('data');
-    var exp_monitor_btn = $('#experiment-recorder-' + exp_id);
+    var exp_state_dom = $('#experiment-rs-' + exp_id);
+    var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
     
     if (!isExperimentMonitor.hasOwnProperty(exp_id) || isExperimentMonitor['exp_id'] == 0){
         message_info("实验" + exp_id + "未开始监控，无法记录！");
@@ -191,7 +216,30 @@ function expRecorder(button) {
             "action": isExperimentRecorder[exp_id]
         },
         success: function (response) {
+            if (response == -1 || response == 0){
+                message_info('操作无效', 'error');
+                return;
+            }
 
+            if (!recorder_timestamp.hasOwnProperty(exp_id)){
+                recorder_timestamp[exp_id] = [];
+            }
+
+            if (recorder_timestamp[exp_id].length % 2 == 0){
+                message_info("实验" + exp_id + ": 开始记录");
+                exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
+                exp_recorder_btn.html("停止录制");
+
+                isExperimentRecorder[exp_id] = 1;
+                recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+            } else {
+                message_info("实验" + exp_id + ": 停止记录");
+                exp_state_dom.removeClass('label-success').addClass('label-warning').text('非录制');
+                exp_recorder_btn.html("开始录制");
+
+                isExperimentRecorder[exp_id] = 0;
+                recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+            }
         },
         error: function (response) {
             message_info("操作失败，失败原因为：" + response, 'error');

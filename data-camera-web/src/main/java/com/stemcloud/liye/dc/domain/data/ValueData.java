@@ -12,7 +12,7 @@ import java.util.Date;
  * @author liye on 2017/11/16
  */
 @Entity
-@Table(name = "dc_value_data")
+@Table(name = "dc_data_value_data")
 public class ValueData {
     @Id
     @GeneratedValue

@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Belongs to data-camera-web
@@ -38,20 +40,24 @@ public class BaseInfoService {
         this.trackRepository = trackRepository;
     }
 
-    public List<AppInfo> getOnlineApps(String user){
-        return appRepository.findByCreatorAndIsDeletedOrderByCreateTime(user, 0);
+    /** APPS **/
+    public Map<Long, AppInfo> getOnlineApps(String user){
+        List<AppInfo> apps = appRepository.findByCreatorAndIsDeletedOrderByCreateTime(user, 0);
+        Map<Long, AppInfo> map = new HashMap<Long, AppInfo>(apps.size());
+        for (AppInfo app: apps){
+            map.put(app.getId(), app);
+        }
+        return map;
     }
 
-    public List<SensorInfo> getOnlineSensor(String user){
-        return sensorRepository.findByCreatorAndIsDeletedOrderByCreateTime(user, 0);
-    }
-
-    public List<ExperimentInfo> getOnlineExp(){
-        return experimentRepository.findByIsDeletedOrderByCreateTime(0);
-    }
-
-    public List<TrackInfo> getOnlineTrack(){
-        return trackRepository.findByIsDeletedOrderByCreateTime(0);
+    public Map<Long, ExperimentInfo> getOnlineExpOfApp(long id){
+        AppInfo app = appRepository.findById(id);
+        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeleted(app, 0);
+        Map<Long, ExperimentInfo> map = new HashMap<Long, ExperimentInfo>(experiments.size());
+        for (ExperimentInfo exp : experiments){
+            map.put(exp.getId(), exp);
+        }
+        return map;
     }
 
     public Boolean isAppBelongUser(long id, String user) {
@@ -68,9 +74,17 @@ public class BaseInfoService {
         return appRepository.findById(id);
     }
 
-    public List<ExperimentInfo> getOnlineExpOfApp(long id){
-        AppInfo app = appRepository.findById(id);
-        return experimentRepository.findByAppAndIsDeleted(app, 0);
+    /** SENSORS **/
+    public List<SensorInfo> getOnlineSensor(String user){
+        return sensorRepository.findByCreatorAndIsDeletedOrderByCreateTime(user, 0);
+    }
+
+    public List<ExperimentInfo> getOnlineExp(){
+        return experimentRepository.findByIsDeletedOrderByCreateTime(0);
+    }
+
+    public List<TrackInfo> getOnlineTrack(){
+        return trackRepository.findByIsDeletedOrderByCreateTime(0);
     }
 
     public List<SensorInfo> getAvailableSensorOfCurrentUser(String user){

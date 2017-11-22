@@ -39,7 +39,7 @@ public class DataController {
     }
 
     @GetMapping("/app")
-    List<AppInfo> app(){
+    Map<Long, AppInfo> app(){
         return baseService.getOnlineApps("root");
     }
 

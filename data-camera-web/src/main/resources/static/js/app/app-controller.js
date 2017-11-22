@@ -155,10 +155,10 @@ $exp_modal.on('show.bs.modal', function (event) {
         initExpSelect(freeSensors);
     } else if (todo == "edit"){
         $('#exp-confirm-btn').removeClass('btn-success').addClass('btn-warning').text(edit_device_text);
-        for (var index in experiments){
-            if ( current_exp_id == '' + experiments[index].id){
-                $('#exp-name').val(experiments[index]['name']);
-                $('#exp-desc').val(experiments[index]['description']);
+        for (var exp_id in experiments){
+            if ( current_exp_id == '' + exp_id){
+                $('#exp-name').val(experiments[exp_id]['name']);
+                $('#exp-desc').val(experiments[exp_id]['description']);
                 break;
             }
         }

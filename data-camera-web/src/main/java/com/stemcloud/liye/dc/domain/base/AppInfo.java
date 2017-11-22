@@ -91,4 +91,17 @@ public class AppInfo {
     public void setIsDeleted(int isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    @Override
+    public String toString() {
+        return "AppInfo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", creator='" + creator + '\'' +
+                ", description='" + description + '\'' +
+                ", isDeleted=" + isDeleted +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                '}';
+    }
 }

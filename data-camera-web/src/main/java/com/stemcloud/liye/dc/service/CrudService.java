@@ -4,14 +4,17 @@ import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
+import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,12 +33,14 @@ public class CrudService {
     private final ExperimentRepository expRepository;
     private final TrackRepository trackRepository;
     private final SensorRepository sensorRepository;
+    private final RecorderRepository recorderRepository;
 
-    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository) {
+    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, RecorderRepository recorderRepository) {
         this.appRepository = appRepository;
         this.expRepository = expRepository;
         this.trackRepository = trackRepository;
         this.sensorRepository = sensorRepository;
+        this.recorderRepository = recorderRepository;
     }
 
     /*************/
@@ -165,17 +170,47 @@ public class CrudService {
         return s;
     }
 
-    public Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId, int isRecorder){
+    public Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId, int isRecorder) throws Exception {
         List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, isRecorder, 0);
         Set<Long> ids = new HashSet<Long>();
+
+        StringBuilder sensorSb = new StringBuilder();
+        StringBuilder trackSb = new StringBuilder();
+
         for (SensorInfo sensor : sensors){
             ids.add(sensor.getId());
+            sensorSb.append(sensor.getId());
+            sensorSb.append(",");
+            trackSb.append(sensor.getTrackId());
+            trackSb.append(",");
         }
+
         int s = 0;
         if (ids.size() > 0) {
-            s = sensorRepository.recorderSensorByIds(ids, Math.abs(isRecorder - 1));
+            sensorSb.deleteCharAt(sensorSb.length() - 1);
+            trackSb.deleteCharAt(trackSb.length() - 1);
+
+            if (isRecorder == 0){
+                s = sensorRepository.recorderSensorByIds(ids, 1);
+                // start recorder, new a recorder info
+                RecorderInfo recorderInfo = new RecorderInfo();
+                recorderInfo.setExpId(expId);
+                recorderInfo.setSensorIds(sensorSb.toString());
+                recorderInfo.setTrackIds(trackSb.toString());
+                recorderInfo.setStartTime(new Date());
+                recorderRepository.save(recorderInfo);
+            } else if (isRecorder == 1){
+                s = sensorRepository.recorderSensorByIds(ids, 0);
+                // end recorder
+                RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorder(expId, 1);
+                if (recorderInfo == null){
+                    throw new Exception("end record, but no record info in table");
+                }
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date());
+            }
         }
         logger.info("CHANGE RECORDER STATUS OF SENSOR: " + s);
+
         return s;
     }
 }

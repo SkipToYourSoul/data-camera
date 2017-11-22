@@ -232,13 +232,14 @@ public class CrudController {
 
         // action = 0, start monitor, find sensor where is_monitor = 0
         // action = 1, stop monitor, find sensor where is_monitor = 1
+        int monitorCount = 0;
         try {
-            crudService.changeSensorsMonitorStatusOfCurrentExperiment(expId, action);
+            monitorCount = crudService.changeSensorsMonitorStatusOfCurrentExperiment(expId, action);
         } catch (Exception e){
             e.printStackTrace();
             return -1;
         }
-        return 1;
+        return monitorCount;
     }
 
     @GetMapping("/recorder")
@@ -249,6 +250,7 @@ public class CrudController {
         // action = 0, start recorder, find sensor where is_recorder = 0
         // action = 1, stop recorder, find sensor where is_recorder = 1
         try {
+            logger.info("recorder exp {} with action {}", expId, action);
             crudService.changeSensorsRecorderStatusOfCurrentExperiment(expId, action);
         } catch (Exception e){
             e.printStackTrace();

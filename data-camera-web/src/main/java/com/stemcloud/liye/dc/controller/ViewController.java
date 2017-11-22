@@ -59,13 +59,13 @@ public class ViewController {
         // --- can't visit app that not belong the user
         if (id != null && !baseInfoService.isAppBelongUser(id, user)){
             logger.warn("The user: " + user + " has not the app " + id);
-            response.sendRedirect(request.getContextPath() + "/login");
-            return "login";
+            response.sendRedirect(request.getContextPath() + "/index");
+            return "index";
         }
 
         logger.info("In app.html");
         model.addAttribute("inApp", true);
-        List<AppInfo> apps = baseInfoService.getOnlineApps(user);
+        Map<Long, AppInfo> apps = baseInfoService.getOnlineApps(user);
         model.addAttribute("apps", apps);
 
         if (id == null){
@@ -77,19 +77,21 @@ public class ViewController {
             model.addAttribute("app", baseInfoService.getCurrentApp(id));
 
             // --- EXP: get experiments of the app, get bound sensors, get monitor, recorder sensors
-            List<ExperimentInfo> experiments = baseInfoService.getOnlineExpOfApp(id);
+            Map<Long, ExperimentInfo> experiments = baseInfoService.getOnlineExpOfApp(id);
             Map<Long, List<SensorInfo>> boundSensors = new HashMap<Long, List<SensorInfo>>(experiments.size());
             Map<Long, Integer> isExperimentMonitor = new HashMap<Long, Integer>(experiments.size());
             Map<Long, Integer> isExperimentRecorder = new HashMap<Long, Integer>(experiments.size());
-            List<TrackInfo> tracks = new ArrayList<TrackInfo>();
-            for (ExperimentInfo exp : experiments){
-                Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
-                isExperimentMonitor.put(exp.getId(), 0);
-                isExperimentRecorder.put(exp.getId(), 0);
+            Map<Long, TrackInfo> tracks = new HashMap<Long, TrackInfo>();
+            for (Map.Entry<Long, ExperimentInfo> entry : experiments.entrySet()){
+                long expId = entry.getKey();
+                ExperimentInfo exp = entry.getValue();
+                isExperimentMonitor.put(expId, 0);
+                isExperimentRecorder.put(expId, 0);
 
+                Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
                 for (TrackInfo track: exp.getTrackInfoList()){
                     if (track.getIsDeleted() == 0){
-                        tracks.add(track);
+                        tracks.put(track.getId(), track);
                         TrackInfo newTrack = new TrackInfo();
                         newTrack.setId(track.getId());
                         newTrack.setSensor(track.getSensor());
@@ -127,9 +129,6 @@ public class ViewController {
             List<SensorInfo> availableSensor = baseInfoService.getAvailableSensorOfCurrentUser(user);
             model.addAttribute("freeSensors", availableSensor);
             model.addAttribute("boundSensors", boundSensors);
-
-            /*List<SensorInfo> sensors = baseInfoService.getSensorsOfCurrentApp(id);
-            model.addAttribute("sensors", sensors);*/
         }
 
         return "app";

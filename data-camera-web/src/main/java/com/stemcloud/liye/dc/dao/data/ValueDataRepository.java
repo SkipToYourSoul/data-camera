@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Belongs to data-camera-web
  * Description:
- *  dc_value_data
+ *  dc_data_value_data
  * @author liye on 2017/11/6
  */
 public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
