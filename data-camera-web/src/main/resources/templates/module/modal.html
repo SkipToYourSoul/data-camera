@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
+    <!-- 新增／编辑 应用 -->
     <div th:fragment="app-modal">
         <div class="modal fade" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="app-modal-title">
             <div class="modal-dialog" role="document">
@@ -41,6 +42,7 @@
         </div>
     </div>
 
+    <!-- 新增／编辑 实验 -->
     <div th:fragment="exp-modal">
         <div class="modal fade" id="exp-modal" tabindex="-1" role="dialog" aria-labelledby="exp-modal-title">
             <div class="modal-dialog" role="document">
@@ -96,8 +98,8 @@
     </div>
 
     <!-- 新增，编辑设备 -->
-    <div th:fragment="new-sensor-modal">
-        <div class="modal fade" id="new-sensor-modal" tabindex="-1" role="dialog" aria-labelledby="new-sensor-modal-title">
+    <div th:fragment="sensor-modal">
+        <div class="modal fade" id="sensor-modal" tabindex="-1" role="dialog" aria-labelledby="new-sensor-modal-title">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
