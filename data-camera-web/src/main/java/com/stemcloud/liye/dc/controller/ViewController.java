@@ -148,8 +148,8 @@ public class ViewController {
         String currentUser = commonService.getCurrentLoginUser(request);
         if (currentUser == null) {
             logger.warn("No login user");
-            response.sendRedirect(request.getContextPath() + "/login");
-            return "login";
+            response.sendRedirect(request.getContextPath() + "/index");
+            return "index";
         }
 
         // --- get the devices of user
