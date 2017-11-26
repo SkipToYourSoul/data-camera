@@ -1,0 +1,71 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="app-analysis">
+        <div class="row">
+            <!-- 页面说明 -->
+            <div class="app-page-introduction">
+                <p>
+                    <i class="fa fa-info-circle"></i>&nbsp;在数据分析模式中，你能够分析之前所录制的实验数据
+                </p>
+                <p>
+                    <i class="fa fa-info-circle"></i>&nbsp;你可以任意编辑你所记录的数据，并以回放的方式来重现数据
+                </p>
+            </div>
+
+            <div class="col-md-12 col-sm-12">
+                <div th:if="${not #maps.isEmpty(experiments)}">
+                    <ul class="nav nav-tabs" role="tablist" id="app-analysis-tab">
+                        <th:block th:each="entry,index:${experiments}">
+                            <li role="presentation" th:class="${index.count eq 1}?'active':''">
+                                <a th:href="|#tab-experiment-${entry.key}|"
+                                   role="tab" data-toggle="tab"
+                                   th:text="|实验：${entry.value.name}|"></a></li>
+                        </th:block>
+                    </ul>
+                    <div class="tab-content" style="margin-top:10px">
+                        <th:block th:each="entry,index:${experiments}">
+                            <div th:id="|tab-experiment-${entry.key}|" role="tabpanel"
+                                 th:class="${index.count eq 1}?'tab-pane active fade in':'tab-pane fade'">
+                                <!-- contents -->
+                                <th:block th:if="${#lists.isEmpty(recorders[entry.key])}">
+                                    <h3>该实验下暂无内容，可在实验模式下录制数据内容</h3>
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                </th:block>
+                                <th:block th:each="recorder,index:${recorders[entry.key]}">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <div class="panel-title">
+                                                <strong th:text="|实验片段${index.count},
+                                                数据时间: ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></strong>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-xs-8 col-sm-8 col-md-8">
+                                                    <div th:id="|analysis-chart-${entry.key}-${recorder.id}|">
+                                                        这里是数据图
+                                                    </div>
+                                                    <div th:id="|analysis-video-${entry.key}-${recorder.id}|">
+                                                        这里是视频图
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-4 col-sm-4 col-md-4">
+                                                    一些操作
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:include="module/common::sub-footer"></div>
+    </div>
+</body>
+</html>

@@ -74,4 +74,21 @@ public class DataController {
         logger.info("request latest data: " + (endTime - beginTime));
         return result;
     }
+
+    /**
+     * Map<Long, Map<Long, List<ChartTimeSeries>>>
+     *      content_id, (track_id, List<data_value>)
+     * @param queryParams
+     * @return
+     */
+    @GetMapping("/content")
+    Map content(@RequestParam Map<String, String> queryParams){
+        Long beginTime = System.currentTimeMillis();
+        long expId = Long.parseLong(queryParams.get("exp-id"));
+        Map result = dataService.getContentDataOfExperiment(expId);
+        Long endTime = System.currentTimeMillis();
+        logger.info("request latest data: " + (endTime - beginTime));
+
+        return result;
+    }
 }

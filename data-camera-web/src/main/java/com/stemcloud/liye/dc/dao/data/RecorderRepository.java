@@ -7,6 +7,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Belongs to data-camera-web
@@ -23,6 +25,14 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
      * @return
      */
     RecorderInfo findByExpIdAndIsRecorderAndIsDeleted(long expId, int inRecorder, int isDeleted);
+
+    /**
+     * find recorders of current app
+     * @param ids
+     * @return
+     */
+    @Query(value = "SELECT r FROM RecorderInfo r WHERE r.expId IN ?1 AND r.isDeleted = 0 AND r.isRecorder = 0 AND r.endTime IS NOT NULL")
+    List<RecorderInfo> findByExperiments(Set<Long> ids);
 
     /**
      * end recorder, update end time

@@ -1,8 +1,10 @@
 package com.stemcloud.liye.dc.service;
 
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
+import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
+import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.ValueData;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +22,13 @@ import java.util.*;
 public class DataService {
     private final SensorRepository sensorRepository;
     private final ValueDataRepository valueDataRepository;
+    private final RecorderRepository recorderRepository;
 
     @Autowired
-    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository) {
+    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository) {
         this.sensorRepository = sensorRepository;
         this.valueDataRepository = valueDataRepository;
+        this.recorderRepository = recorderRepository;
     }
 
     public Map<Long, Map<String, List<ChartTimeSeries>>> getRecentDataOfBoundSensors(long expId, long timestamp){
@@ -60,6 +64,26 @@ public class DataService {
                 }
                 map.put(key, list);
                 result.put(sensorId, map);
+            }
+        }
+
+        return result;
+    }
+
+    public Map<Long, Map<Long, List<ChartTimeSeries>>> getContentDataOfExperiment(final long expId){
+        Map<Long, Map<Long, List<ChartTimeSeries>>> result = new HashMap<Long, Map<Long, List<ChartTimeSeries>>>();
+        List<RecorderInfo> recoders = recorderRepository.findByExperiments(new HashSet<Long>(){{
+            add(expId);
+        }});
+        for (RecorderInfo r : recoders){
+            String[] sensorIds = r.getSensorIds().split(",");
+            String[] trackIds = r.getTrackIds().split(",");
+            Date startTime = r.getStartTime();
+            Date endTime = r.getEndTime();
+
+            int length = trackIds.length;
+            for (int i=0; i<length; i++){
+
             }
         }
 

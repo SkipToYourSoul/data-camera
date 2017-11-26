@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Belongs to data-camera-web
@@ -102,5 +100,23 @@ public class BaseInfoService {
     /** RECORDERS **/
     public RecorderInfo getRecorderInfoOfExp(long expId){
         return recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
+    }
+
+    public Map<Long, List<RecorderInfo>> getAllRecordersOfCurrentApp(Map<Long, ExperimentInfo> experiments){
+        Set<Long> expId = experiments.keySet();
+        List<RecorderInfo> recorders = recorderRepository.findByExperiments(expId);
+        Map<Long, List<RecorderInfo>> map = new HashMap<Long, List<RecorderInfo>>();
+        for (RecorderInfo r : recorders){
+            long eid = r.getExpId();
+            List<RecorderInfo> list =  null;
+            if (map.containsKey(eid)){
+                list = map.get(eid);
+            } else {
+                list = new ArrayList<RecorderInfo>();
+            }
+            list.add(r);
+            map.put(eid, list);
+        }
+        return map;
     }
 }

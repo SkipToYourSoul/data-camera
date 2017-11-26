@@ -4,6 +4,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.CommonService;
 import org.slf4j.Logger;
@@ -132,6 +133,10 @@ public class ViewController {
             List<SensorInfo> availableSensor = baseInfoService.getAvailableSensorOfCurrentUser(user);
             model.addAttribute("freeSensors", availableSensor);
             model.addAttribute("boundSensors", boundSensors);
+
+            // --- RECORDER:
+            Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecordersOfCurrentApp(experiments);
+            model.addAttribute("recorders", recorders);
         }
 
         return "app";

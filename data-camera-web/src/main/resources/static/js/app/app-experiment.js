@@ -10,6 +10,13 @@ var exp_newest_timestamp = {};
 var recorder_timestamp = {};
 
 function initResourceOfExperimentPage() {
+    var $loader = $("#app-experiment-loading");
+    $loader.fakeLoader({
+        timeToHide: 10000,
+        spinner:"spinner4",
+        bgColor:"rgba(154, 154, 154, 0.7)"
+    });
+
     // init experiment track and sensors
     for (var exp_id in experiments){
         var experiment = experiments[exp_id];
@@ -100,6 +107,8 @@ function initResourceOfExperimentPage() {
             doInterval(id);
         }
     }
+
+    $loader.fadeOut();
 }
 
 function expMonitor(button){
