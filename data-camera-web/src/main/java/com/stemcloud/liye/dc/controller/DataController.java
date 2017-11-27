@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public class DataController {
         Map result = dataService.getRecentDataOfBoundSensors(Long.parseLong(queryParams.get("exp-id")), Long.parseLong(queryParams.get("timestamp")));
         Long endTime = System.currentTimeMillis();
 
-        logger.info("request latest data: " + (endTime - beginTime));
+        logger.info("request monitor data in {} ms.", (endTime - beginTime));
         return result;
     }
 
@@ -83,12 +84,18 @@ public class DataController {
      */
     @GetMapping("/content")
     Map content(@RequestParam Map<String, String> queryParams){
-        Long beginTime = System.currentTimeMillis();
-        long expId = Long.parseLong(queryParams.get("exp-id"));
-        Map result = dataService.getContentDataOfExperiment(expId);
-        Long endTime = System.currentTimeMillis();
-        logger.info("request latest data: " + (endTime - beginTime));
-
-        return result;
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        try{
+            Long beginTime = System.currentTimeMillis();
+            long expId = Long.parseLong(queryParams.get("exp-id"));
+            map.put("code", "0000");
+            map.put("data", dataService.getContentDataOfExperiment(expId));
+            Long endTime = System.currentTimeMillis();
+            logger.info("request content data in {} ms.", (endTime - beginTime));
+        } catch (Exception e){
+            map.put("code", "1111");
+            logger.error("/content", e);
+        }
+        return map;
     }
 }

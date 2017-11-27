@@ -15,21 +15,13 @@ import java.util.Set;
  */
 public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
     /**
-     * find data by track id
-     * @param trackId
-     * @param time
-     * @return
-     */
-    List<ValueData> findByTrackIdAndCreateTimeGreaterThanEqualOrderByCreateTime(long trackId, Date time);
-
-    /**
-     * find data by track id and sensor id
-     * @param trackId
+     * find data by sensor ids in time range
      * @param sensorId
-     * @param time
+     * @param startTime
+     * @param endTime
      * @return
      */
-    List<ValueData> findByTrackIdAndSensorIdAndCreateTimeGreaterThanEqualOrderByCreateTime(long trackId, long sensorId, Date time);
+    List<ValueData> findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Set<Long> sensorId, Date startTime, Date endTime);
 
     /**
      * find data in sensor ids

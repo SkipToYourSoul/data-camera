@@ -168,14 +168,14 @@
 
     <script>
         if (app != null) {
-            initResourceOfExperimentPage();
+            initResourceOfAnalysisPage();
 
             $('#app-main-tab').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 var page = e.target.getAttribute('href');
                 if (page == "#app-experiment"){
                     initResourceOfExperimentPage();
                 } else {
-                    message_info("Hello", "info");
+                    initResourceOfAnalysisPage();
                 }
             });
         }

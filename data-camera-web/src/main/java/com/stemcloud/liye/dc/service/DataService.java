@@ -37,11 +37,38 @@ public class DataService {
         for (SensorInfo bs: boundSensors){
             boundSensorIds.add(bs.getId());
         }
-        List<ValueData> newData = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds);
-        // sensor_id, (data_key, List<data_value>)
+        return transferChartData(valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds));
+    }
+
+    public Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>> getContentDataOfExperiment(final long expId){
+        Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>> result = new HashMap<Long, Map<Long, Map<String, List<ChartTimeSeries>>>>();
+        List<RecorderInfo> ris = recorderRepository.findByExperiments(new HashSet<Long>(){{
+            add(expId);
+        }});
+        for (RecorderInfo r : ris){
+            long id = r.getId();
+            String[] sensorIds = r.getSensorIds().split(",");
+            Date startTime = r.getStartTime();
+            Date endTime = r.getEndTime();
+            Set<Long> sids = new HashSet<Long>();
+            for (int i=0; i<sensorIds.length; i++){
+                sids.add(Long.parseLong(sensorIds[i]));
+            }
+            Map<Long, Map<String, List<ChartTimeSeries>>> map
+                    = transferChartData(valueDataRepository.findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sids, startTime, endTime));
+            result.put(id, map);
+        }
+
+        return result;
+    }
+
+    /**
+     * sensor_id, (data_key, List<data_value>)
+     */
+    private Map<Long, Map<String, List<ChartTimeSeries>>> transferChartData(List<ValueData> vd){
         Map<Long, Map<String, List<ChartTimeSeries>>> result = new HashMap<Long, Map<String, List<ChartTimeSeries>>>();
 
-        for (ValueData d : newData){
+        for (ValueData d : vd){
             long sensorId = d.getSensorId();
             String key = d.getKey();
             Double value = d.getValue();
@@ -64,26 +91,6 @@ public class DataService {
                 }
                 map.put(key, list);
                 result.put(sensorId, map);
-            }
-        }
-
-        return result;
-    }
-
-    public Map<Long, Map<Long, List<ChartTimeSeries>>> getContentDataOfExperiment(final long expId){
-        Map<Long, Map<Long, List<ChartTimeSeries>>> result = new HashMap<Long, Map<Long, List<ChartTimeSeries>>>();
-        List<RecorderInfo> recoders = recorderRepository.findByExperiments(new HashSet<Long>(){{
-            add(expId);
-        }});
-        for (RecorderInfo r : recoders){
-            String[] sensorIds = r.getSensorIds().split(",");
-            String[] trackIds = r.getTrackIds().split(",");
-            Date startTime = r.getStartTime();
-            Date endTime = r.getEndTime();
-
-            int length = trackIds.length;
-            for (int i=0; i<length; i++){
-
             }
         }
 

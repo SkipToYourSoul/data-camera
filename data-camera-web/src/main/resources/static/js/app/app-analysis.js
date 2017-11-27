@@ -20,7 +20,9 @@ function initExpContentChart(exp_id){
             "exp-id": exp_id
         },
         success: function (response) {
-
+            if (response.code == "0000") {
+                message_info("success" + exp_id, "info");
+            }
         },
         error: function (response) {
             message_info("操作失败，失败原因为：" + response, 'error');
