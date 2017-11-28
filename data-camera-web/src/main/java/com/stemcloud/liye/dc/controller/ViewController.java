@@ -87,8 +87,11 @@ public class ViewController {
             for (Map.Entry<Long, ExperimentInfo> entry : experiments.entrySet()){
                 long expId = entry.getKey();
                 ExperimentInfo exp = entry.getValue();
-                isExperimentMonitor.put(expId, 0);
-                isExperimentRecorder.put(expId, 0);
+                isExperimentMonitor.put(expId, exp.getIsMonitor());
+                isExperimentRecorder.put(expId, exp.getIsRecorder());
+                if (exp.getIsRecorder() == 1){
+                    expRecorderTime.put(expId, baseInfoService.getRecorderInfoOfExp(expId).getStartTime());
+                }
 
                 Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
                 for (TrackInfo track: exp.getTrackInfoList()){
@@ -108,14 +111,6 @@ public class ViewController {
                             }
                             expBoundSensors.add(track.getSensor());
                             boundSensors.put(expId, expBoundSensors);
-
-                            if (track.getSensor().getIsMonitor() == 1){
-                                isExperimentMonitor.put(expId, 1);
-                            }
-                            if (track.getSensor().getIsRecoder() == 1){
-                                isExperimentRecorder.put(expId, 1);
-                                expRecorderTime.put(expId, baseInfoService.getRecorderInfoOfExp(expId).getStartTime());
-                            }
                         }
                     }
                 }

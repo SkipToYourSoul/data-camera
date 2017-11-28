@@ -4,6 +4,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.view.ServerReturnTool;
 import com.stemcloud.liye.dc.service.CommonService;
 import com.stemcloud.liye.dc.service.CrudService;
 import org.slf4j.Logger;
@@ -226,36 +227,30 @@ public class CrudController {
     }
 
     @GetMapping("/monitor")
-    public Integer monitorSensor(@RequestParam Map<String, String> queryParams){
+    public Map monitorSensor(@RequestParam Map<String, String> queryParams){
         Long expId = Long.valueOf(queryParams.get("exp-id"));
-        int action = Integer.parseInt(queryParams.get("action"));
-
-        // action = 0, start monitor, find sensor where is_monitor = 0
-        // action = 1, stop monitor, find sensor where is_monitor = 1
-        int monitorCount = 0;
+        Map<String, Object> map;
         try {
-            monitorCount = crudService.changeSensorsMonitorStatusOfCurrentExperiment(expId, action);
+            int response = crudService.changeSensorsMonitorStatusOfCurrentExperiment(expId);
+            map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
-            e.printStackTrace();
-            return -1;
+            map = ServerReturnTool.serverFailure(e.getMessage());
+            logger.error("/crud/content", e);
         }
-        return monitorCount;
+        return map;
     }
 
     @GetMapping("/recorder")
-    public Integer recorderSensor(@RequestParam Map<String, String> queryParams){
+    public Map recorderSensor(@RequestParam Map<String, String> queryParams){
         Long expId = Long.valueOf(queryParams.get("exp-id"));
-        int action = Integer.parseInt(queryParams.get("action"));
-
-        // action = 0, start recorder, find sensor where is_recorder = 0
-        // action = 1, stop recorder, find sensor where is_recorder = 1
+        Map<String, Object> map;
         try {
-            logger.info("recorder exp {} with action {}", expId, action);
-            crudService.changeSensorsRecorderStatusOfCurrentExperiment(expId, action);
+            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(expId);
+            map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
-            e.printStackTrace();
-            return -1;
+            map = ServerReturnTool.serverFailure(e.getMessage());
+            logger.error("/crud/recorder", e);
         }
-        return 1;
+        return map;
     }
 }

@@ -39,6 +39,28 @@ public interface ExperimentRepository extends CrudRepository<ExperimentInfo, Lon
     List<ExperimentInfo> findByAppAndIsDeleted(AppInfo appInfo, int isDeleted);
 
     /**
+     * monitor/cancle monitor experiment
+     * @param id
+     * @param isMonitor
+     * @return recorder count
+     */
+    @Query(value = "UPDATE ExperimentInfo e SET e.isMonitor = ?2 WHERE e.id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer monitorExp(long id, int isMonitor);
+
+    /**
+     * recorder/cancle recorder experiment
+     * @param id
+     * @param isRecorder
+     * @return recorder count
+     */
+    @Query(value = "UPDATE ExperimentInfo e SET e.isRecorder = ?2 WHERE e.id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer recorderExp(long id, int isRecorder);
+
+    /**
      * delete experiment
      * @param id
      * @return recorder count

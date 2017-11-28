@@ -178,6 +178,12 @@
                     initResourceOfAnalysisPage();
                 }
             });
+
+            $('#app-analysis-tab').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var page = e.target.getAttribute('href');
+                var exp_id = page.split('-')[2];
+                initExpContentChart(exp_id);
+            });
         }
     </script>
 </body>

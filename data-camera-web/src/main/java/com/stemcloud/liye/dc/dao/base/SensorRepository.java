@@ -49,22 +49,12 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
     List<SensorInfo> findByCreatorAndAppIdAndExpIdAndTrackId(String creator, long appId, long expId, long trackId);
 
     /**
-     * find monitor sensors of current exp
+     * find online and bound sensors of current exp
      * @param expId
-     * @param isMonitor
      * @param isDeleted
      * @return
      */
-    List<SensorInfo> findByExpIdAndIsMonitorAndIsDeleted(long expId, int isMonitor, int isDeleted);
-
-    /**
-     * find recorder sensors of current exp
-     * @param expId
-     * @param isRecorder
-     * @param isDeleted
-     * @return
-     */
-    List<SensorInfo> findByExpIdAndIsRecorderAndIsDeleted(long expId, int isRecorder, int isDeleted);
+    List<SensorInfo> findByExpIdAndIsDeleted(long expId, int isDeleted);
 
     /**
      * bound sensor
@@ -88,28 +78,6 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     Integer unboundSensorById(long id);
-
-    /**
-     * change the monitor status
-     * @param ids
-     * @param action
-     * @return
-     */
-    @Query(value = "UPDATE SensorInfo s SET s.isMonitor = ?2 WHERE s.id in ?1")
-    @Modifying
-    @Transactional(rollbackFor = Exception.class)
-    Integer monitorSensorByIds(Set<Long> ids, int action);
-
-    /**
-     * change the recorder status
-     * @param ids
-     * @param action
-     * @return
-     */
-    @Query(value = "UPDATE SensorInfo s SET s.isRecorder = ?2 WHERE s.id in ?1")
-    @Modifying
-    @Transactional(rollbackFor = Exception.class)
-    Integer recorderSensorByIds(Set<Long> ids, int action);
 
     /**
      * delete sensor

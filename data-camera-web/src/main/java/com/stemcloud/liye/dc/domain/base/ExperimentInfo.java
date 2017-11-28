@@ -35,6 +35,14 @@ public class ExperimentInfo {
     private
     Set<TrackInfo> trackInfoList;
 
+    @Column(name = "is_monitor",
+            columnDefinition = "INT DEFAULT 0")
+    private int isMonitor = 0;
+
+    @Column(name = "is_recorder",
+            columnDefinition = "INT DEFAULT 0")
+    private int isRecorder = 0;
+
     @Column(name = "is_deleted",
             columnDefinition = "INT DEFAULT 0")
     private int isDeleted = 0;
@@ -91,6 +99,22 @@ public class ExperimentInfo {
         this.trackInfoList = trackInfoList;
     }
 
+    public int getIsMonitor() {
+        return isMonitor;
+    }
+
+    public void setIsMonitor(int isMonitor) {
+        this.isMonitor = isMonitor;
+    }
+
+    public int getIsRecorder() {
+        return isRecorder;
+    }
+
+    public void setIsRecorder(int isRecorder) {
+        this.isRecorder = isRecorder;
+    }
+
     public int getIsDeleted() {
         return isDeleted;
     }
@@ -105,19 +129,5 @@ public class ExperimentInfo {
 
     public Date getModifyTime() {
         return modifyTime;
-    }
-
-    @Override
-    public String toString() {
-        return "ExperimentInfo{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", app=" + app +
-                ", trackInfoList=" + trackInfoList +
-                ", isDeleted=" + isDeleted +
-                ", createTime=" + createTime +
-                ", modifyTime=" + modifyTime +
-                '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.stemcloud.liye.dc.service;
 
+import com.google.gson.Gson;
 import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
@@ -14,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Belongs to data-camera-web
@@ -155,68 +153,89 @@ public class CrudService {
         logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
     }
 
-    public Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId, int isMonitor) throws Exception {
-        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsMonitorAndIsDeleted(expId, isMonitor, 0);
-        Set<Long> ids = new HashSet<Long>();
-        for (SensorInfo sensor : sensors){
-            ids.add(sensor.getId());
+    /************/
+    /* MONITOR AND RECORDER   */
+    /************/
+    public synchronized Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId) throws Exception {
+        // --- check the monitor status of current exp
+        ExperimentInfo exp = expRepository.findById(expId);
+        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
+        int status = exp.getIsMonitor();
+        int response = -1;
+        if (sensors.size() == 0){
+            logger.warn("NO SENSORS BOUND FOR EXPERIMENT {}, RETURN -1", expId);
+            return response;
         }
 
-        int s = 0;
-        if (ids.size() > 0) {
-            if (isMonitor == 0){
-                s = sensorRepository.monitorSensorByIds(ids, 1);
-            } else if (isMonitor == 1){
-                s = sensorRepository.monitorSensorByIds(ids, 0);
-                changeSensorsRecorderStatusOfCurrentExperiment(expId, 1);
+        if (status == 0){
+            // --- not in monitor state
+            expRepository.monitorExp(expId, 1);
+            response = 1;
+        } else if (status == 1){
+            // --- in monitor state
+            expRepository.monitorExp(expId, 0);
+            // --- end recorder
+            RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
+            if (recorderInfo == null){
+                throw new Exception("end record, but no record info in table");
             }
-
+            recorderRepository.endRecorder(recorderInfo.getId(), new Date());
+            response = 0;
         }
-        logger.info("CHANGE MONITOR STATUS OF SENSOR: " + s);
-        return s;
+        logger.info("CHANGE MONITOR STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
+        return response;
     }
 
-    public Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId, int isRecorder) throws Exception {
-        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, isRecorder, 0);
-        Set<Long> ids = new HashSet<Long>();
-
-        StringBuilder sensorSb = new StringBuilder();
-        StringBuilder trackSb = new StringBuilder();
-
-        for (SensorInfo sensor : sensors){
-            ids.add(sensor.getId());
-            sensorSb.append(sensor.getId());
-            sensorSb.append(",");
-            trackSb.append(sensor.getTrackId());
-            trackSb.append(",");
+    public synchronized Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId) throws Exception {
+        // --- check the recorder status of current exp
+        ExperimentInfo exp = expRepository.findById(expId);
+        int status = exp.getIsRecorder();
+        int response = -1;
+        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
+        if (sensors.size() == 0){
+            logger.warn("NO SENSORS BOUND FOR EXPERIMENT {}, RETURN -1", expId);
+            return response;
         }
 
-        int s = 0;
-        if (ids.size() > 0) {
-            sensorSb.deleteCharAt(sensorSb.length() - 1);
-            trackSb.deleteCharAt(trackSb.length() - 1);
+        if (status == 0){
+            // --- not in recorder state
+            expRepository.recorderExp(expId, 1);
 
-            if (isRecorder == 0){
-                s = sensorRepository.recorderSensorByIds(ids, 1);
-                // start recorder, new a recorder info
-                RecorderInfo recorderInfo = new RecorderInfo();
-                recorderInfo.setExpId(expId);
-                recorderInfo.setSensorIds(sensorSb.toString());
-                recorderInfo.setTrackIds(trackSb.toString());
-                recorderInfo.setStartTime(new Date());
-                recorderRepository.save(recorderInfo);
-            } else if (isRecorder == 1){
-                s = sensorRepository.recorderSensorByIds(ids, 0);
-                // end recorder
-                RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
-                if (recorderInfo == null){
-                    throw new Exception("end record, but no record info in table");
-                }
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date());
+            // --- new a recorder info
+            Map<String, List<Long>> devices = new HashMap<String, List<Long>>(){{
+                put("sensors", new ArrayList<Long>());
+                put("tracks", new ArrayList<Long>());
+            }};
+            for (SensorInfo sensor: sensors){
+                long sensorId = sensor.getId();
+                long trackId = sensor.getTrackId();
+                List<Long> s = devices.get("sensors");
+                s.add(sensorId);
+                devices.put("sensors", s);
+                List<Long> t = devices.get("tracks");
+                t.add(trackId);
+                devices.put("tracks", t);
             }
-        }
-        logger.info("CHANGE RECORDER STATUS OF SENSOR: " + s);
 
-        return s;
+            RecorderInfo recorderInfo = new RecorderInfo();
+            recorderInfo.setExpId(expId);
+            recorderInfo.setStartTime(new Date());
+            recorderInfo.setDevices(new Gson().toJson(devices));
+            recorderRepository.save(recorderInfo);
+
+            response = 1;
+        } else if (status == 1){
+            // --- end recorder
+            RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
+            if (recorderInfo == null){
+                throw new Exception("end record, but no record info in table");
+            }
+            recorderRepository.endRecorder(recorderInfo.getId(), new Date());
+
+            response = 0;
+        }
+
+        logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
+        return response;
     }
 }

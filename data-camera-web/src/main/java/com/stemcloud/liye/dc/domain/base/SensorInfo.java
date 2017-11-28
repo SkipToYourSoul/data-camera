@@ -40,14 +40,6 @@ public class SensorInfo {
     @Column(name = "sensor_description")
     private String description;
 
-    @Column(name = "is_monitor",
-            columnDefinition = "INT DEFAULT 0")
-    private int isMonitor = 0;
-
-    @Column(name = "is_recorder",
-            columnDefinition = "INT DEFAULT 0")
-    private int isRecorder = 0;
-
     @Column(name = "app_id",
             columnDefinition = "BIGINT DEFAULT 0")
     private long appId = 0;
@@ -141,22 +133,6 @@ public class SensorInfo {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public int getIsRecoder() {
-        return isRecorder;
-    }
-
-    public void setIsRecoder(int isRecoder) {
-        this.isRecorder = isRecoder;
-    }
-
-    public int getIsMonitor() {
-        return isMonitor;
-    }
-
-    public void setIsMonitor(int isMonitor) {
-        this.isMonitor = isMonitor;
     }
 
     public long getAppId() {

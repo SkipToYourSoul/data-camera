@@ -125,22 +125,22 @@ function expMonitor(button){
         type: 'get',
         url: crud_address + "/monitor",
         data: {
-            "exp-id": exp_id,
-            "action": isExperimentMonitor[exp_id]
+            "exp-id": exp_id
         },
         success: function (response) {
-            if (response == -1 || response == 0){
-                message_info('操作无效', 'error');
+            if (response.code == "1111"){
+                message_info('操作无效: ', response.data);
                 return;
             }
-            if (isExperimentMonitor[exp_id] == 0){
+            var action = response.data;
+            if (action == "1"){
                 // start monitor
                 isExperimentMonitor[exp_id] = 1;
                 exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在监控');
                 exp_monitor_btn.html('停止监控');
 
                 doInterval(exp_id);
-            } else if (isExperimentMonitor[exp_id] == 1){
+            } else if (action == "0"){
                 // stop monitor
                 pageStopMonitor(exp_id);
             }
@@ -169,8 +169,8 @@ function expRecorder(button) {
             "action": isExperimentRecorder[exp_id]
         },
         success: function (response) {
-            if (response == -1 || response == 0){
-                message_info('操作无效', 'error');
+            if (response.code == "1111"){
+                message_info('操作无效: ', response.data);
                 return;
             }
 
@@ -178,14 +178,20 @@ function expRecorder(button) {
                 recorder_timestamp[exp_id] = [];
             }
 
-            if (recorder_timestamp[exp_id].length % 2 == 0){
+            var action = response.data;
+            if (action == "1"){
+                // start recorder
                 message_info("实验" + exp_id + ": 开始记录");
                 exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
                 exp_recorder_btn.html("停止录制");
-
                 isExperimentRecorder[exp_id] = 1;
-                recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-            } else {
+                if (recorder_timestamp[exp_id].length % 2 == 0){
+                    recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+                } else {
+                    recorder_timestamp[exp_id].pop();
+                    recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+                }
+            } else if (action == "0"){
                 message_info("实验" + exp_id + ": 停止记录");
                 pageStopRecorder(exp_id);
             }
@@ -213,7 +219,9 @@ function pageStopRecorder(exp_id){
     $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-warning').text('非录制');
     $('#experiment-recorder-' + exp_id).html("开始录制");
     isExperimentRecorder[exp_id] = 0;
-    recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+    if (recorder_timestamp[exp_id].length % 2 == 1) {
+        recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+    }
 }
 
 function doInterval(exp_id){

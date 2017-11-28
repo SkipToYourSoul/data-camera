@@ -4,6 +4,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.view.ServerReturnTool;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.DataService;
 import org.slf4j.Logger;
@@ -77,24 +78,23 @@ public class DataController {
     }
 
     /**
-     * Map<Long, Map<Long, List<ChartTimeSeries>>>
-     *      content_id, (track_id, List<data_value>)
+     * Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>>
+     *      content_id, (sensor_id, (data_key, List<data_value>))
      * @param queryParams
      * @return
      */
     @GetMapping("/content")
     Map content(@RequestParam Map<String, String> queryParams){
-        Map<String, Object> map = new HashMap<String, Object>(2);
+        Map<String, Object> map;
         try{
             Long beginTime = System.currentTimeMillis();
             long expId = Long.parseLong(queryParams.get("exp-id"));
-            map.put("code", "0000");
-            map.put("data", dataService.getContentDataOfExperiment(expId));
+            map = ServerReturnTool.serverSuccess(dataService.getContentDataOfExperiment(expId));
             Long endTime = System.currentTimeMillis();
             logger.info("request content data in {} ms.", (endTime - beginTime));
         } catch (Exception e){
-            map.put("code", "1111");
-            logger.error("/content", e);
+            map = ServerReturnTool.serverFailure(e.getMessage());
+            logger.error("/data/content", e);
         }
         return map;
     }

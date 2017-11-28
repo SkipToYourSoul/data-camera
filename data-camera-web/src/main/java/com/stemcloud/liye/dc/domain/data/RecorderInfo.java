@@ -19,11 +19,8 @@ public class RecorderInfo {
     @Column(name = "exp_id", nullable = false)
     private long expId;
 
-    @Column(name = "track_ids", nullable = false)
-    private String trackIds;
-
-    @Column(name = "sensor_ids", nullable = false)
-    private String sensorIds;
+    @Column(name = "devices", nullable = false)
+    private String devices;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_time")
@@ -57,20 +54,12 @@ public class RecorderInfo {
         this.expId = expId;
     }
 
-    public String getTrackIds() {
-        return trackIds;
+    public String getDevices() {
+        return devices;
     }
 
-    public void setTrackIds(String trackIds) {
-        this.trackIds = trackIds;
-    }
-
-    public String getSensorIds() {
-        return sensorIds;
-    }
-
-    public void setSensorIds(String sensorIds) {
-        this.sensorIds = sensorIds;
+    public void setDevices(String devices) {
+        this.devices = devices;
     }
 
     public Date getStartTime() {
