@@ -43,14 +43,16 @@ body{
 .app-exp-track-chart{
     padding-top: 10px;
     padding-bottom: 10px;
-    height: 300px;
+    padding-left: 10px;
+    min-height: 100px;
 }
 
 .app-exp-track-statistics{
     border-radius: 5%;
     background-color: rgba(154, 154, 154, 0.1);
-    min-height: 40px;
-    height: 280px;
+    min-height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .app-exp-track-statistics .title{

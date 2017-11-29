@@ -10,6 +10,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,12 +175,15 @@ public class CrudService {
         } else if (status == 1){
             // --- in monitor state
             expRepository.monitorExp(expId, 0);
-            // --- end recorder
-            RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
-            if (recorderInfo == null){
-                throw new Exception("end record, but no record info in table");
+            if (exp.getIsRecorder() == 1) {
+                // --- end recorder
+                RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
+                if (recorderInfo == null) {
+                    throw new Exception("end record, but no record info in table");
+                }
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date());
+                expRepository.recorderExp(expId, 0);
             }
-            recorderRepository.endRecorder(recorderInfo.getId(), new Date());
             response = 0;
         }
         logger.info("CHANGE MONITOR STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
@@ -202,23 +206,21 @@ public class CrudService {
             expRepository.recorderExp(expId, 1);
 
             // --- new a recorder info
-            Map<String, List<Long>> devices = new HashMap<String, List<Long>>(){{
-                put("sensors", new ArrayList<Long>());
-                put("tracks", new ArrayList<Long>());
-            }};
+            RecorderDevices devices = new RecorderDevices();
+            List<Long> sid = new ArrayList<Long>();
+            List<Long> tid = new ArrayList<Long>();
             for (SensorInfo sensor: sensors){
                 long sensorId = sensor.getId();
                 long trackId = sensor.getTrackId();
-                List<Long> s = devices.get("sensors");
-                s.add(sensorId);
-                devices.put("sensors", s);
-                List<Long> t = devices.get("tracks");
-                t.add(trackId);
-                devices.put("tracks", t);
+                sid.add(sensorId);
+                tid.add(trackId);
             }
+            devices.setSensors(sid);
+            devices.setTracks(tid);
 
             RecorderInfo recorderInfo = new RecorderInfo();
             recorderInfo.setExpId(expId);
+            recorderInfo.setIsRecorder(1);
             recorderInfo.setStartTime(new Date());
             recorderInfo.setDevices(new Gson().toJson(devices));
             recorderRepository.save(recorderInfo);
@@ -231,6 +233,7 @@ public class CrudService {
                 throw new Exception("end record, but no record info in table");
             }
             recorderRepository.endRecorder(recorderInfo.getId(), new Date());
+            expRepository.recorderExp(expId, 0);
 
             response = 0;
         }

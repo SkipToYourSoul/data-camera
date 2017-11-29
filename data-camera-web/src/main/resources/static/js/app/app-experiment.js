@@ -4,9 +4,23 @@
  *  Description:
  */
 
-var chart_object = {};
+/**
+ * key: exp_id
+ * value: exp_interval
+ * @type {{}}
+ */
 var exp_monitor_interval = {};
+/**
+ * key: exp_id
+ * value: timestamp
+ * @type {{}}
+ */
 var exp_newest_timestamp = {};
+/**
+ * key: exp_id
+ * value: 2017-08-17T18:16:31.000+08:00
+ * @type {{}}
+ */
 var recorder_timestamp = {};
 
 function initResourceOfExperimentPage() {
@@ -25,13 +39,20 @@ function initResourceOfExperimentPage() {
         for (var i in experiment['trackInfoList']){
             var track = experiment['trackInfoList'][i];
             var track_id = track['id'];
+            var track_type = track['type'];
 
             // init track chart
             var legend = (null == track['sensor']) ? [] : track['sensor']['sensorConfig']['dimension'].split(';');
             var chart_dom = "experiment-track-" + exp_id + "-" + track_id;
-            var chart = echarts.init(document.getElementById(chart_dom), "", opts = {});
-            chart.setOption(experimentChartOption(legend));
-            chart_object[chart_dom] = chart;
+            if (track_type == 1) {
+                // --- value sensor
+                var chart = echarts.init(document.getElementById(chart_dom), "", opts = {height: 250});
+                chart.setOption(experimentChartOption(legend));
+            } else if (track_type == 2){
+
+            } else if (track_type == 0){
+
+            }
 
             // init track bound sensor
             var $track_bound_dom = $('#track-bound-' + track_id);
@@ -63,14 +84,9 @@ function initResourceOfExperimentPage() {
                 pk: track_id,
                 validate: function (value) {
                     var track_id = $(this)['context']['id'].split('-')[2];
-                    for (var current_id in tracks){
-                        if (current_id + '' != track_id){
-                            continue;
-                        }
-                        var e = tracks[current_id]['experiment']['id'];
-                        if (isExperimentMonitor[e] == 1){
-                            return '数据监控中，不能进行绑定操作';
-                        }
+                    var track_exp_id = tracks[track_id]['experiment']['id'];
+                    if (isExperimentMonitor.hasOwnProperty(track_exp_id) && isExperimentMonitor[track_exp_id] == 1){
+                        return '数据监控中，不能进行绑定操作';
                     }
                 },
                 url: crud_address + '/bound/toggle',
@@ -86,6 +102,10 @@ function initResourceOfExperimentPage() {
 
     // init experiment which is in monitoring state
     for (var id in isExperimentMonitor){
+        if (!isExperimentMonitor.hasOwnProperty(id) || !isExperimentRecorder.hasOwnProperty(id)){
+            continue;
+        }
+
         var exp_monitor_btn = $('#experiment-monitor-' + id);
         var exp_monitor_dom = $('#experiment-es-' + id);
         var exp_recorder_btn = $('#experiment-recorder-' + id);
@@ -108,6 +128,7 @@ function initResourceOfExperimentPage() {
         }
     }
 
+    // complete loading
     $loader.fadeOut();
 }
 
@@ -117,7 +138,7 @@ function expMonitor(button){
     var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
 
     if (!boundSensors.hasOwnProperty(exp_id)){
-        message_info('实验未绑定任何设备', 'error');
+        message_info('实验未绑定任何设备，不能进行监控', 'error');
         return;
     }
 
@@ -129,7 +150,7 @@ function expMonitor(button){
         },
         success: function (response) {
             if (response.code == "1111"){
-                message_info('操作无效: ', response.data);
+                message_info('操作无效: ' + response.data, "error");
                 return;
             }
             var action = response.data;
@@ -157,7 +178,7 @@ function expRecorder(button) {
     var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
     
     if (!isExperimentMonitor.hasOwnProperty(exp_id) || isExperimentMonitor[exp_id] == 0){
-        message_info("实验" + exp_id + "未开始监控，无法记录！");
+        message_info("实验" + exp_id + "未开始监控，无法进行录制！");
         return;
     }
 
@@ -170,7 +191,7 @@ function expRecorder(button) {
         },
         success: function (response) {
             if (response.code == "1111"){
-                message_info('操作无效: ', response.data);
+                message_info('操作无效: ' + response.data, "error");
                 return;
             }
 
@@ -213,6 +234,8 @@ function pageStopMonitor(exp_id){
 
     clearInterval(exp_monitor_interval[exp_id]);
     delete exp_monitor_interval[exp_id];
+
+    $('.app-exp-track-statistics .content-text').html('-');
 }
 
 function pageStopRecorder(exp_id){
@@ -235,59 +258,110 @@ function doInterval(exp_id){
             "exp-id": exp_id,
             "timestamp": exp_newest_timestamp[exp_id]
         }, function (response) {
-            if (isEmptyObject(response)){
-                return;
-            }
             // --- traverse the sensors of this experiment
             for (var index in exp_bound_sensors){
                 var sensor = exp_bound_sensors[index];
-                if (!response.hasOwnProperty(sensor['id'])){
-                    continue;
-                }
-                // --- init
+                var sensor_type = exp_bound_sensors[index]['sensorConfig']['type'];
                 var sensor_id = sensor['id'];
                 var track_id = sensor['trackId'];
                 var chart_dom = "experiment-track-" + exp_id + "-" + track_id;
-                var chart = chart_object[chart_dom];
-                var series = chart.getOption()['series'];
+                var $info_dom_1 = $('#experiment-info-' + exp_id + "-" + track_id + "-1");
+                var $info_dom_2 = $('#experiment-info-' + exp_id + "-" + track_id + "-2");
 
-                // --- update series data
-                var legend = sensor['sensorConfig']['dimension'].split(';');
-                for (var i in legend){
-                    var key = legend[i];
-                    if (!response[sensor_id].hasOwnProperty(key)){
+                if (sensor_type == 1){
+                    if (!response.hasOwnProperty(sensor_id) || echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
                         continue;
                     }
-                    var new_data = response[sensor_id][key];
-                    series[i]['data'].push.apply( series[i]['data'], new_data );
+                    // --- init
+                    var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
+                    var series = chart.getOption()['series'];
 
-                    var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
-                    if (new_time > exp_newest_timestamp[exp_id]){
-                        exp_newest_timestamp[exp_id] = new_time;
+                    // --- update series data
+                    var legend = sensor['sensorConfig']['dimension'].split(';');
+                    var statistics_info = {
+                        "max": "-",
+                        "min": "-"
+                    };
+                    for (var i in legend){
+                        var key = legend[i];
+                        if (!response[sensor_id].hasOwnProperty(key)){
+                            continue;
+                        }
+                        var new_data = response[sensor_id][key];
+                        // -- add new data
+                        series[i]['data'].push.apply( series[i]['data'], new_data );
+                        // -- keep the arr length 50
+                        if (series[i]['data'].length > 10){
+                            series[i]['data'].splice(0, series[i]['data'].length - 10);
+                        }
+                        // -- get statistics info
+                        statistics_info = updateInfo(statistics_info, series[i]['data'], key);
+
+                        // -- update newest data timestamp
+                        var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
+                        if (new_time > exp_newest_timestamp[exp_id]){
+                            exp_newest_timestamp[exp_id] = new_time;
+                        }
+                    }
+                    $info_dom_1.html(statistics_info['max']);
+                    $info_dom_2.html(statistics_info['min']);
+
+                    // --- update series markArea (if recorder)
+                    if (recorder_timestamp.hasOwnProperty(exp_id)){
+                        var mark_list = series[0]['markArea']['data'];
+                        var recorder_length = recorder_timestamp[exp_id].length;
+                        if (recorder_length % 2 == 1){
+                            // - recorder ing
+                            var mark_index = Math.floor(recorder_length/2);
+                            mark_list[mark_index] = [{
+                                xAxis: parseTime(recorder_timestamp[exp_id][recorder_length - 1])
+                            }, {
+                                xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
+                            }];
+                            series[0]['markArea']['data'] = mark_list;
+                        }
+                    }
+
+                    // -- set new option
+                    chart.setOption({
+                        series: series
+                    });
+                } else if (sensor_type == 2){
+                    if (recorder_timestamp.hasOwnProperty(exp_id) && recorder_timestamp[exp_id].length % 2 == 1){
+                        // --- if in recorder state, update info
+                        var start_time = recorder_timestamp[exp_id][recorder_timestamp[exp_id].length - 1];
+                        $info_dom_1.html(parseTime(start_time));
+                        $info_dom_2.html(Math.round((Date.now() - Date.parse(start_time))/1000) + 's');
                     }
                 }
-
-                // --- update series markArea (if recorder)
-                if (recorder_timestamp.hasOwnProperty(exp_id)){
-                    var mark_list = series[0]['markArea']['data'];
-                    var recorder_length = recorder_timestamp[exp_id].length;
-                    if (recorder_length % 2 == 1){
-                        // - recorder ing
-                        var mark_index = Math.floor(recorder_length/2);
-                        mark_list[mark_index] = [{
-                            xAxis: parseTime(recorder_timestamp[exp_id][recorder_length - 1])
-                        }, {
-                            xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
-                        }];
-                        series[0]['markArea']['data'] = mark_list;
-                    }
-                }
-
-                // -- set new option
-                chart_object[chart_dom].setOption({
-                    series: series
-                });
             }
         });
+    }
+
+    function updateInfo(statistics_info, data, key){
+        if (data.length == 0){
+            return statistics_info;
+        }
+        var max_value = -100000, min_value = 100000;
+        for (var i=0; i<data.length; i++){
+            var value = data[i]['value'][1];
+            if (value > max_value){
+                max_value = value;
+            }
+            if (value < min_value){
+                min_value = value;
+            }
+        }
+        if (statistics_info['max'] == '-'){
+            statistics_info['max'] = key + ': ' + max_value + "; ";
+        } else {
+            statistics_info['max'] = statistics_info['max'] + key + ': ' + max_value + "; ";
+        }
+        if (statistics_info['min'] == '-'){
+            statistics_info['min'] = key + ': ' + min_value + "; ";
+        } else {
+            statistics_info['min'] = statistics_info['min'] + key + ': ' + min_value + "; ";
+        }
+        return statistics_info;
     }
 }

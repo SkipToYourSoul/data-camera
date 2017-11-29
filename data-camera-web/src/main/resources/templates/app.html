@@ -88,12 +88,12 @@
                 </div>
                 <div th:if="${param.id}">
                     <ul class="nav nav-pills" role="tablist" id="app-main-tab">
-                        <li role="presentation"><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
-                        <li role="presentation" class="active"><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">分析模式</a></li>
+                        <li role="presentation" class="active"><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
+                        <li role="presentation"><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">分析模式</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
-                        <div th:include="app/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane active in fade app-tab-pane-content"></div>
+                        <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane active in fade app-tab-pane-content"></div>
+                        <div th:include="app/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@
 
     <script>
         if (app != null) {
-            initResourceOfAnalysisPage();
+            initResourceOfExperimentPage();
 
             $('#app-main-tab').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 var page = e.target.getAttribute('href');

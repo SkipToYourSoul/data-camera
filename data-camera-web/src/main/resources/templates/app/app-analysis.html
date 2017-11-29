@@ -13,6 +13,7 @@
             </div>
 
             <div class="col-md-12 col-sm-12">
+                <div id="app-experiment-loading"></div>
                 <div th:if="${not #maps.isEmpty(experiments)}">
                     <ul class="nav nav-tabs" role="tablist" id="app-analysis-tab">
                         <th:block th:each="entry,index:${experiments}">

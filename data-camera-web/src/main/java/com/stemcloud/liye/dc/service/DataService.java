@@ -1,9 +1,11 @@
 package com.stemcloud.liye.dc.service;
 
+import com.google.gson.Gson;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
+import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.ValueData;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
@@ -32,7 +34,7 @@ public class DataService {
     }
 
     public Map<Long, Map<String, List<ChartTimeSeries>>> getRecentDataOfBoundSensors(long expId, long timestamp){
-        List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsMonitorAndIsDeleted(expId, 1, 0);
+        List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         Set<Long> boundSensorIds = new HashSet<Long>();
         for (SensorInfo bs: boundSensors){
             boundSensorIds.add(bs.getId());
@@ -47,13 +49,11 @@ public class DataService {
         }});
         for (RecorderInfo r : ris){
             long id = r.getId();
-            String[] sensorIds = r.getSensorIds().split(",");
+            RecorderDevices devices = new Gson().fromJson(r.getDevices(), RecorderDevices.class);
+
             Date startTime = r.getStartTime();
             Date endTime = r.getEndTime();
-            Set<Long> sids = new HashSet<Long>();
-            for (int i=0; i<sensorIds.length; i++){
-                sids.add(Long.parseLong(sensorIds[i]));
-            }
+            Set<Long> sids = new HashSet<Long>(devices.getSensors());
             Map<Long, Map<String, List<ChartTimeSeries>>> map
                     = transferChartData(valueDataRepository.findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sids, startTime, endTime));
             result.put(id, map);

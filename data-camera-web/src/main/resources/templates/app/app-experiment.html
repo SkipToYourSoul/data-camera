@@ -56,9 +56,19 @@
                             <th:block th:each="track,index:${experiment.value.trackInfoList}">
                                 <div class="app-exp-track-container">
                                     <div class="row">
-                                        <div class="col-xs-8 col-sm-8 col-md-8">
+                                        <div class="col-xs-8 col-sm-8 col-md-8" th:switch="${track.type}">
                                             <div th:id="|experiment-track-${experiment.key}-${track.id}|" class="app-exp-track-chart">
-                                                轨迹加载中，请稍后
+                                                <div th:case="1">
+                                                    <strong>轨迹加载中</strong>
+                                                </div>
+                                                <div th:case="2">
+                                                    <h3 class="text-center" style="margin-bottom: 10px; font-weight: 600">当前轨迹为视频轨迹，视频轨迹在实验状态下无法看到实时数据状态</h3>
+                                                    <h3 class="text-center" style="margin-bottom: 10px; font-weight: 600">录制的视频可以在“分析模式”中看到</h3>
+                                                    <img th:src="@{/img/video.gif}" class="img-responsive center-block" />
+                                                </div>
+                                                <div th:case="0">
+                                                    <h3 class="text-center" style="font-weight: 600">当前轨迹暂未绑定任何传感器</h3>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-xs-4 col-sm-4 col-md-4">
@@ -74,14 +84,12 @@
                                                         <a href="#" th:id="|track-bound-${track.id}|" data-type="select" data-title="绑定设备"></a>
                                                     </div>
                                                     <div th:case="1">
-                                                        <div class="content-title">最大值: <strong class="content-text">-</strong></div>
-                                                        <div class="content-title">最小值: <strong class="content-text">-</strong></div>
-                                                        <div class="content-title">平均值: <strong class="content-text">-</strong></div>
+                                                        <div class="content-title">最大值: <strong class="content-text" th:id="|experiment-info-${experiment.key}-${track.id}-1|">-</strong></div>
+                                                        <div class="content-title">最小值: <strong class="content-text" th:id="|experiment-info-${experiment.key}-${track.id}-2|">-</strong></div>
                                                     </div>
                                                     <div th:case="2">
-                                                        <div class="content-title">录制状态: <strong class="content-text">-</strong></div>
-                                                        <div class="content-title">开始录制时间: <strong class="content-text">-</strong></div>
-                                                        <div class="content-title">结束录制时间: <strong class="content-text">-</strong></div>
+                                                        <div class="content-title">开始录制时间: <strong class="content-text" th:id="|experiment-info-${experiment.key}-${track.id}-1|">-</strong></div>
+                                                        <div class="content-title">录制持续时间: <strong class="content-text" th:id="|experiment-info-${experiment.key}-${track.id}-2|">-</strong></div>
                                                     </div>
                                                 </div>
                                             </div>

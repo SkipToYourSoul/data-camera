@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Belongs to data-camera-web
  * Description:
- *  dc_value_data
+ *  dc_data_value_data
  * @author liye on 2017/11/16
  */
 @Entity

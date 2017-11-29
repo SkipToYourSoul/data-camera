@@ -20,6 +20,7 @@ public class RandomGenerator {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private Random rand = new Random(System.currentTimeMillis());
     private DecimalFormat df = new DecimalFormat("#.00");
+    private final int interval = 5000;
 
     private double randomDouble(int range, int min){
         double r = rand.nextDouble() * range + min;
@@ -34,6 +35,7 @@ public class RandomGenerator {
         long time = System.currentTimeMillis();
         while (true){
             int monitor = 0;
+            int recorders = 0;
             for (Map.Entry<String, Integer> entry : GlobalVariables.sensorMonitorStatus.entrySet()){
                 if (entry.getValue() == 1){
                     String[] value = GlobalVariables.sensorInfo.get(entry.getKey()).split("_");
@@ -44,17 +46,20 @@ public class RandomGenerator {
                         continue;
                     }
                     List<String> dimensions = GlobalVariables.sensorConfigMap.get(configId).getDimension();
-                    for (String dimension : dimensions){
-                        DbTools.saveValueData(sensorId, trackId, dimension, randomDouble(10, 15));
+                    int type = GlobalVariables.sensorConfigMap.get(configId).getType();
+                    if (type == 1) {
+                        for (String dimension : dimensions) {
+                            recorders += DbTools.saveValueData(sensorId, trackId, dimension, randomDouble(10, 15));
+                        }
+                        monitor ++;
                     }
-                    monitor ++;
                 }
             }
 
             long cost = System.currentTimeMillis() - time;
-            if (cost < 2000){
-                Thread.sleep(2000 - cost);
-                logger.info("generate data of {} sensors, cost {} millis", monitor, cost);
+            if (cost < interval){
+                Thread.sleep(interval - cost);
+                logger.info("generate {} data of {} sensors, cost {} millis", recorders, monitor, cost);
             }
             time = System.currentTimeMillis();
         }

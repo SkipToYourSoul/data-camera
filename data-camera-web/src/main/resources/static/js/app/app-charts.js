@@ -64,10 +64,9 @@ var experimentChartOption = function (legend) {
                 silent: true,
                 data: []
             },
-            markPoint: {
+            markLine: {
                 data: [
-                    {type: 'max', name: '最大值'},
-                    {type: 'min', name: '最小值'}
+                    {type: 'average', name: '平均值'}
                 ]
             },
             data: []
@@ -128,7 +127,7 @@ var experimentChartOption = function (legend) {
                 splitArea: {
                     show: true
                 },
-                boundaryGap: ['0%', '0%']
+                boundaryGap: true
             }
         ],
         series: series
@@ -149,7 +148,7 @@ var analysisChartOption = function (data){
     for (var index = 0; index < grid_count; index ++){
         var my_grid_top_position = index * (my_grid_height + my_grid_space) + 25;
         my_grid.push({
-            left: 20,
+            left: 30,
             right: 40,
             top: my_grid_top_position,
             height: my_grid_height
@@ -188,6 +187,17 @@ var analysisChartOption = function (data){
                     hoverAnimation: false,
                     xAxisIndex: series_index,
                     yAxisIndex: series_index,
+                    markPoint: {
+                        data: [
+                            {type: 'max', name: '最大值'},
+                            {type: 'min', name: '最小值'}
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            {type: 'average', name: '平均值'}
+                        ]
+                    },
                     data: sensor_data[legend]
                 });
             }

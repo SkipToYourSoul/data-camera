@@ -29,25 +29,29 @@ public class SensorMonitorJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
             long beginTime = System.currentTimeMillis();
-            doJob();
+            int count = doJob();
             long endTime = System.currentTimeMillis();
-            logger.info("do sensor monitor job, cost {} ms", (endTime - beginTime));
+            logger.info("do sensor monitor job, get {} recorders, cost {} ms", count, (endTime - beginTime));
         } catch (SQLException e) {
             logger.error("sensor monitor job", e);
         }
     }
 
-    private void doJob() throws SQLException {
+    private int doJob() throws SQLException {
         Set<String> onlineSensors = new HashSet<String>();
-        String sql = "SELECT sensor_code, is_monitor, id, track_id, sensor_config_id FROM dc_base_sensor_info WHERE is_deleted = 0";
+        String sql = "SELECT a.sensor_code, b.is_monitor, a.id, a.track_id, a.sensor_config_id " +
+                "FROM dc_base_sensor_info a, dc_base_experiment_info b " +
+                "WHERE a.exp_id = b.id AND a.is_deleted = 0";
 
         DruidPooledConnection conn = DbConnectionPool.getInstance().getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
+        int count = 0;
         while (rs.next()){
             GlobalVariables.sensorMonitorStatus.put(rs.getString(1), rs.getInt(2));
             GlobalVariables.sensorInfo.put(rs.getString(1), String.format("%d_%d_%d", rs.getLong(3), rs.getLong(4), rs.getLong(5)));
             onlineSensors.add(rs.getString(1));
+            count ++;
         }
         for (Map.Entry<String, Integer> entry : GlobalVariables.sensorMonitorStatus.entrySet()){
             if (!onlineSensors.contains(entry.getKey())){
@@ -59,5 +63,7 @@ public class SensorMonitorJob implements Job {
         rs.close();
         ps.close();
         conn.close();
+
+        return count;
     }
 }
