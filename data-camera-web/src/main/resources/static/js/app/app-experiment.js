@@ -182,45 +182,94 @@ function expRecorder(button) {
         return;
     }
 
+    // -- get recorder status
     $.ajax({
         type: 'get',
-        url: crud_address + "/recorder",
+        url: crud_address + "/isRecorder",
         data: {
-            "exp-id": exp_id,
-            "action": isExperimentRecorder[exp_id]
+            "exp-id": exp_id
         },
         success: function (response) {
             if (response.code == "1111"){
                 message_info('操作无效: ' + response.data, "error");
                 return;
             }
-
-            if (!recorder_timestamp.hasOwnProperty(exp_id)){
-                recorder_timestamp[exp_id] = [];
-            }
-
-            var action = response.data;
-            if (action == "1"){
-                // start recorder
-                message_info("实验" + exp_id + ": 开始记录");
-                exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
-                exp_recorder_btn.html("停止录制");
-                isExperimentRecorder[exp_id] = 1;
-                if (recorder_timestamp[exp_id].length % 2 == 0){
-                    recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-                } else {
-                    recorder_timestamp[exp_id].pop();
-                    recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-                }
-            } else if (action == "0"){
-                message_info("实验" + exp_id + ": 停止记录");
-                pageStopRecorder(exp_id);
+            var recorder_status = response.data;
+            if (recorder_status == "1"){
+                // -- end recorder, confirm to save the data
+                bootbox.confirm({
+                    title: "保存录制数据?",
+                    message: "需要保存录制的数据吗?",
+                    async: false,
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> 取消'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> 保存'
+                        }
+                    },
+                    callback: function (result) {
+                        submitToServer(result?1:0);
+                    }
+                });
+            } else if (recorder_status == "0"){
+                // -- begin recorder
+                submitToServer(0);
             }
         },
         error: function (response) {
             message_info("操作失败，失败原因为：" + response, 'error');
         }
     });
+
+    function submitToServer(is_save_recorder){
+        // --- change recorder status on server
+        $.ajax({
+            type: 'get',
+            url: crud_address + "/recorder",
+            data: {
+                "exp-id": exp_id,
+                "is-save": is_save_recorder
+            },
+            success: function (response) {
+                if (response.code == "1111"){
+                    message_info('操作无效: ' + response.data, "error");
+                    return;
+                }
+
+                if (!recorder_timestamp.hasOwnProperty(exp_id)){
+                    recorder_timestamp[exp_id] = [];
+                }
+
+                var action = response.data;
+                if (action == "1"){
+                    // start recorder
+                    message_info("实验" + exp_id + ": 开始记录");
+                    exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
+                    exp_recorder_btn.html("停止录制");
+                    isExperimentRecorder[exp_id] = 1;
+                    if (recorder_timestamp[exp_id].length % 2 == 0){
+                        recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+                    } else {
+                        recorder_timestamp[exp_id].pop();
+                        recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+                    }
+                } else if (action == "0"){
+                    if (is_save_recorder == 1){
+                        // save recorder, refresh page
+                        window.location.href = current_address + "?id=" + app['id'];
+                    } else {
+                        message_info("实验" + exp_id + ": 停止记录");
+                        pageStopRecorder(exp_id);
+                    }
+                }
+            },
+            error: function (response) {
+                message_info("操作失败，失败原因为：" + response, 'error');
+            }
+        });
+    }
 }
 
 function pageStopMonitor(exp_id){

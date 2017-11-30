@@ -40,10 +40,10 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
      * @param endTime
      * @return
      */
-    @Query(value = "UPDATE RecorderInfo r SET r.endTime = ?2, r.isRecorder = 0 WHERE id = ?1")
+    @Query(value = "UPDATE RecorderInfo r SET r.endTime = ?2, r.isRecorder = 0, r.isDeleted = ?3 WHERE id = ?1")
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    Integer endRecorder(long id, Date endTime);
+    Integer endRecorder(long id, Date endTime, int isDeleted);
 
     /**
      * delete content

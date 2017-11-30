@@ -4,11 +4,14 @@ import com.google.gson.Gson;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
+import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.ValueData;
+import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
+import com.stemcloud.liye.dc.domain.view.SensorType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +28,14 @@ public class DataService {
     private final SensorRepository sensorRepository;
     private final ValueDataRepository valueDataRepository;
     private final RecorderRepository recorderRepository;
+    private final VideoDataRepository videoDataRepository;
 
     @Autowired
-    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository) {
+    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
         this.sensorRepository = sensorRepository;
         this.valueDataRepository = valueDataRepository;
         this.recorderRepository = recorderRepository;
+        this.videoDataRepository = videoDataRepository;
     }
 
     public Map<Long, Map<String, List<ChartTimeSeries>>> getRecentDataOfBoundSensors(long expId, long timestamp){
@@ -42,20 +47,38 @@ public class DataService {
         return transferChartData(valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds));
     }
 
-    public Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>> getContentDataOfExperiment(final long expId){
-        Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>> result = new HashMap<Long, Map<Long, Map<String, List<ChartTimeSeries>>>>();
+    /**
+     * get content data of experiment
+     * @param expId
+     * @return Map<Long, Map>
+     *     key: content_id
+     *     value: SensorType, Map<SensorId, data>
+     */
+    public Map<Long, Map> getContentDataOfExperiment(final long expId){
+        Map<Long, Map> result = new HashMap<Long, Map>(16);
         List<RecorderInfo> ris = recorderRepository.findByExperiments(new HashSet<Long>(){{
             add(expId);
         }});
+        // traverse content
         for (RecorderInfo r : ris){
             long id = r.getId();
             RecorderDevices devices = new Gson().fromJson(r.getDevices(), RecorderDevices.class);
-
             Date startTime = r.getStartTime();
             Date endTime = r.getEndTime();
             Set<Long> sids = new HashSet<Long>(devices.getSensors());
-            Map<Long, Map<String, List<ChartTimeSeries>>> map
+
+            // -- video data
+            List<VideoData> videos = videoDataRepository.findByRecorderInfo(r);
+            Map<Long, String> videoMap = transferVideoData(videos);
+
+            // -- value data for chart
+            Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
                     = transferChartData(valueDataRepository.findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sids, startTime, endTime));
+
+            Map<String, Map> map = new HashMap<String, Map>(2);
+            map.put(SensorType.CHART.toString(), chartMap);
+            map.put(SensorType.VIDEO.toString(), videoMap);
+
             result.put(id, map);
         }
 
@@ -95,5 +118,18 @@ public class DataService {
         }
 
         return result;
+    }
+
+    /**
+     * sensor_id, video_path
+     */
+    private Map<Long, String> transferVideoData(List<VideoData> videos){
+        Map<Long, String> map = new HashMap<Long, String>();
+        for (VideoData v : videos){
+            long sensorId = v.getSensorId();
+            String vPath = v.getVideoPath();
+            map.put(sensorId, vPath);
+        }
+        return map;
     }
 }

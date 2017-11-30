@@ -6,12 +6,15 @@ import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
+import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
+import com.stemcloud.liye.dc.domain.data.VideoData;
+import com.stemcloud.liye.dc.domain.view.SensorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,13 +36,15 @@ public class CrudService {
     private final TrackRepository trackRepository;
     private final SensorRepository sensorRepository;
     private final RecorderRepository recorderRepository;
+    private final VideoDataRepository videoDataRepository;
 
-    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, RecorderRepository recorderRepository) {
+    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
         this.appRepository = appRepository;
         this.expRepository = expRepository;
         this.trackRepository = trackRepository;
         this.sensorRepository = sensorRepository;
         this.recorderRepository = recorderRepository;
+        this.videoDataRepository = videoDataRepository;
     }
 
     /*************/
@@ -155,6 +160,26 @@ public class CrudService {
     }
 
     /************/
+    /* VIDEO   */
+    /************/
+    private void saveVideo(RecorderInfo recorderInfo){
+        String devices = recorderInfo.getDevices();
+        RecorderDevices rd = new Gson().fromJson(devices, RecorderDevices.class);
+        for (int i = 0; i < rd.getTracks().size(); i ++){
+            long trackId = rd.getTracks().get(i);
+            long sensorId = rd.getSensors().get(i);
+            if (findSensor(sensorId).getSensorConfig().getType() == SensorType.VIDEO.getValue()){
+                VideoData videoData = new VideoData();
+                videoData.setSensorId(sensorId);
+                videoData.setTrackId(trackId);
+                videoData.setRecorderInfo(recorderInfo);
+                videoDataRepository.save(videoData);
+                logger.info("SAVE VIDEO DATA, SENSOR ID IS {}, TRACK ID IS {}, RECORDER IS {}", sensorId, trackId, recorderInfo.getId());
+            }
+        }
+    }
+
+    /************/
     /* MONITOR AND RECORDER   */
     /************/
     public synchronized Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId) throws Exception {
@@ -181,7 +206,7 @@ public class CrudService {
                 if (recorderInfo == null) {
                     throw new Exception("end record, but no record info in table");
                 }
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date());
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1);
                 expRepository.recorderExp(expId, 0);
             }
             response = 0;
@@ -190,7 +215,7 @@ public class CrudService {
         return response;
     }
 
-    public synchronized Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId) throws Exception {
+    public synchronized Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId, int isSave) throws Exception {
         // --- check the recorder status of current exp
         ExperimentInfo exp = expRepository.findById(expId);
         int status = exp.getIsRecorder();
@@ -232,8 +257,17 @@ public class CrudService {
             if (recorderInfo == null){
                 throw new Exception("end record, but no record info in table");
             }
-            recorderRepository.endRecorder(recorderInfo.getId(), new Date());
             expRepository.recorderExp(expId, 0);
+
+            if (isSave == 1){
+                // save data
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 0);
+                // save video if have
+                saveVideo(recorderInfo);
+            } else {
+                // not save data, delete recorder
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1);
+            }
 
             response = 0;
         }

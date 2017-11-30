@@ -240,12 +240,27 @@ public class CrudController {
         return map;
     }
 
-    @GetMapping("/recorder")
-    public Map recorderSensor(@RequestParam Map<String, String> queryParams){
+    @GetMapping("/isRecorder")
+    public Map isRecorder(@RequestParam Map<String, String> queryParams){
         Long expId = Long.valueOf(queryParams.get("exp-id"));
         Map<String, Object> map;
         try {
-            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(expId);
+            ExperimentInfo exp = crudService.findExp(expId);
+            map = ServerReturnTool.serverSuccess(exp.getIsRecorder());
+        } catch (Exception e){
+            map = ServerReturnTool.serverFailure(e.getMessage());
+            logger.error("/crud/isRecorder", e);
+        }
+        return map;
+    }
+
+    @GetMapping("/recorder")
+    public Map recorderSensor(@RequestParam Map<String, String> queryParams){
+        Long expId = Long.valueOf(queryParams.get("exp-id"));
+        int isSave = Integer.parseInt(queryParams.get("is-save"));
+        Map<String, Object> map;
+        try {
+            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(expId, isSave);
             map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());

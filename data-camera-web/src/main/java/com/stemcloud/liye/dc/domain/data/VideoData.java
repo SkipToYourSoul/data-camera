@@ -63,4 +63,15 @@ public class VideoData {
     public void setVideoPath(String videoPath) {
         this.videoPath = videoPath;
     }
+
+    @Override
+    public String toString() {
+        return "VideoData{" +
+                "id=" + id +
+                ", trackId=" + trackId +
+                ", sensorId=" + sensorId +
+                ", recorderInfo=" + recorderInfo.getId() +
+                ", videoPath='" + videoPath + '\'' +
+                '}';
+    }
 }
