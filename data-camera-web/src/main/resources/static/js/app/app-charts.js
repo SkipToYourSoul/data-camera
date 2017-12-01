@@ -137,6 +137,7 @@ var experimentChartOption = function (legend) {
 var analysisChartOption = function (data){
     var grid_count = getObjectLength(data);
     var my_grid = [];
+    var my_grid_top_height = 30;
     var my_grid_space = 30;
     var my_grid_height = 100;
     var my_dataZoom_index = [];
@@ -146,7 +147,7 @@ var analysisChartOption = function (data){
     var my_series = [];
 
     for (var index = 0; index < grid_count; index ++){
-        var my_grid_top_position = index * (my_grid_height + my_grid_space) + 25;
+        var my_grid_top_position = index * (my_grid_height + my_grid_space) + my_grid_top_height;
         my_grid.push({
             left: 30,
             right: 40,

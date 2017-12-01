@@ -28,40 +28,56 @@ function initExpContentChart(exp_id){
         },
         success: function (response) {
             if (response.code == "0000") {
-                message_info("enter the exp: " + exp_id, "info");
                 var content_data = response.data;
                 for (var content_id in content_data){
+                    if (!content_data.hasOwnProperty(content_id)){
+                        continue;
+                    }
+                    var chart_data = content_data[content_id]['CHART'];
+                    var video_data = content_data[content_id]['VIDEO'];
+                    if (isEmptyObject(chart_data) && isEmptyObject(video_data)){
+                        $('#analysis-info-' + exp_id + '-' + content_id).html('<strong>该内容段暂未查到相关数据</strong>');
+                        continue;
+                    }
+
                     // --- chart
-                    if (content_data.hasOwnProperty(content_id) && content_data[content_id].hasOwnProperty("CHART")){
-                        var content_dom = 'analysis-chart-' + exp_id + '-' + content_id;
-                        var chart_data = content_data[content_id]['CHART'];
-                        if (isEmptyObject(chart_data)){
-                            $('#' + content_dom).html('<strong>该内容段暂未查到相关数据</strong>');
-                            continue;
-                        }
-                        if (echarts.getInstanceByDom(document.getElementById(content_dom)) == null){
-                            var chart_height = getObjectLength(chart_data) * (100 + 30) + (25 + 40);
-                            var chart = echarts.init(document.getElementById(content_dom), "", opts = {
+                    if (!isEmptyObject(chart_data)){
+                        var chart_dom = 'analysis-chart-' + exp_id + '-' + content_id;
+                        if (echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
+                            var chart_height = getObjectLength(chart_data) * (100 + 30) + (30 + 40);
+                            var chart = echarts.init(document.getElementById(chart_dom), "", opts = {
                                 height: chart_height
                             });
                             chart.setOption(analysisChartOption(chart_data));
                         } else {
-                            echarts.getInstanceByDom(document.getElementById(content_dom)).setOption(analysisChartOption(chart_data));
+                            echarts.getInstanceByDom(document.getElementById(chart_dom)).setOption(analysisChartOption(chart_data));
                         }
                     }
 
                     // --- video
-                    if (content_data.hasOwnProperty(content_id) && content_data[content_id].hasOwnProperty("VIDEO")){
-                        var content_dom = 'analysis-video-' + exp_id + '-' + content_id;
-                        var video_data = content_data[content_id]['VIDEO'];
-                        var video_html = "";
+                    if (!isEmptyObject(video_data)){
+                        var $video_dom = $('#analysis-video-' + exp_id + '-' + content_id);
+                        $video_dom.addClass('app-analysis-video');
                         for (var sid in video_data){
-                            video_html += '<p>' + sid + '</p>';
-                            if (null != video_data[sid]){
-                                video_html += '<p>' + video_data[sid] + '</p>';
+                            var video_option = video_data[sid]['option'];
+                            var video_id = 'video-' + content_id + '-' + sid;
+                            var video_div_dom_id = 'video-dom-' + content_id + '-' + sid;
+                            // -- current dom not exists
+                            if ($('#' + video_div_dom_id).length == 0){
+                                if (video_option['sources'] != null){
+                                    $video_dom.append('<div id=' + video_div_dom_id + '> <video id="' + video_id + '"' +
+                                        'class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video> </div>');
+                                    console.log(videojs(video_id, video_option, function () {
+                                        videojs.log('The video player ' + video_id + ' is ready');
+                                    }));
+                                } else {
+                                    var progress_bar = '<div class="progress">' +
+                                        '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">' +
+                                        '<span class="sr-only">45% Complete</span></div></div>';
+                                    $video_dom.append('<div id=' + video_div_dom_id + '> <p class="text-center">视频来自设备(编号：' + sid + ')，上传中</p>' + progress_bar + '</div>');
+                                }
                             }
                         }
-                        $('#' + content_dom).html(video_html);
                     }
                 }
 

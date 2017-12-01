@@ -1,4 +1,4 @@
-package com.stemcloud.liye.dc.domain.view;
+package com.stemcloud.liye.dc.domain.common;
 
 import java.util.HashMap;
 import java.util.Map;

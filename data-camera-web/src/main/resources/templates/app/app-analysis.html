@@ -42,15 +42,14 @@
                                         <div class="panel-body">
                                             <div class="row">
                                                 <div class="col-xs-8 col-sm-8 col-md-8">
-                                                    <div th:id="|analysis-chart-${entry.key}-${recorder.id}|">
-                                                        这里是数据图
-                                                    </div>
-                                                    <div th:id="|analysis-video-${entry.key}-${recorder.id}|">
-                                                        这里是视频图
-                                                    </div>
+                                                    <div th:id="|analysis-info-${entry.key}-${recorder.id}|"></div>
+                                                    <div th:id="|analysis-chart-${entry.key}-${recorder.id}|"></div>
+                                                    <div th:id="|analysis-video-${entry.key}-${recorder.id}|"></div>
                                                 </div>
                                                 <div class="col-xs-4 col-sm-4 col-md-4">
-                                                    一些操作
+                                                    <div class="app-analysis-operation">
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

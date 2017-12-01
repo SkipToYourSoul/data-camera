@@ -14,7 +14,7 @@ import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
-import com.stemcloud.liye.dc.domain.view.SensorType;
+import com.stemcloud.liye.dc.domain.common.SensorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -11,7 +11,8 @@ import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.ValueData;
 import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
-import com.stemcloud.liye.dc.domain.view.SensorType;
+import com.stemcloud.liye.dc.domain.common.SensorType;
+import com.stemcloud.liye.dc.domain.view.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +70,7 @@ public class DataService {
 
             // -- video data
             List<VideoData> videos = videoDataRepository.findByRecorderInfo(r);
-            Map<Long, String> videoMap = transferVideoData(videos);
+            Map<Long, Video> videoMap = transferVideoData(videos);
 
             // -- value data for chart
             Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
@@ -123,12 +124,14 @@ public class DataService {
     /**
      * sensor_id, video_path
      */
-    private Map<Long, String> transferVideoData(List<VideoData> videos){
-        Map<Long, String> map = new HashMap<Long, String>();
+    private Map<Long, Video> transferVideoData(List<VideoData> videos){
+        Map<Long, Video> map = new HashMap<Long, Video>();
         for (VideoData v : videos){
             long sensorId = v.getSensorId();
-            String vPath = v.getVideoPath();
-            map.put(sensorId, vPath);
+            Video video = new Video();
+            video.setOption(v.getVideoPost(), v.getVideoPath());
+            video.setRecorderId(v.getRecorderInfo().getId());
+            map.put(sensorId, video);
         }
         return map;
     }

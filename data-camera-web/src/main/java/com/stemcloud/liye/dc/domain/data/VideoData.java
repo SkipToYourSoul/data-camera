@@ -28,6 +28,9 @@ public class VideoData {
     @Column(name = "video_path")
     private String videoPath;
 
+    @Column(name = "video_poster")
+    private String videoPost;
+
     public long getId() {
         return id;
     }
@@ -62,6 +65,18 @@ public class VideoData {
 
     public void setVideoPath(String videoPath) {
         this.videoPath = videoPath;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getVideoPost() {
+        return videoPost;
+    }
+
+    public void setVideoPost(String videoPost) {
+        this.videoPost = videoPost;
     }
 
     @Override

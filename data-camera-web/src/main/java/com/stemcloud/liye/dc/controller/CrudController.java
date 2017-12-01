@@ -4,7 +4,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
-import com.stemcloud.liye.dc.domain.view.ServerReturnTool;
+import com.stemcloud.liye.dc.domain.common.ServerReturnTool;
 import com.stemcloud.liye.dc.service.CommonService;
 import com.stemcloud.liye.dc.service.CrudService;
 import org.slf4j.Logger;
