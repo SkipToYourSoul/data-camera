@@ -26,7 +26,7 @@ $('#table').bootstrapTable({
         align: 'center',
         title: '设备编号(唯一)'
     }, {
-        field: 'type',
+        field: 'sensorConfig',
         sortable: 'true',
         align: 'center',
         title: '设备类型',
@@ -68,7 +68,7 @@ function deviceTypeFormatter(value) {
         1: "数值型传感器",
         2: "摄像头"
     };
-    return type[value];
+    return type[value['type']];
 }
 
 function deviceBelongFormatter(value) {
@@ -87,79 +87,82 @@ function deviceBelongStyle(value, row, index){
 }
 
 // --- sensor operations
+var new_device_text = "确认创建";
+var edit_device_text = "确认修改";
+var $sensor_modal = $('#sensor-modal');
+var $edit_sensor_form = $('#edit-sensor-form');
+var current_sensor_id = -1;
 // --- new, edit and delete sensor
-$new_sensor_form = $('#new-sensor-form');
-$new_sensor_form.formValidation({
+$edit_sensor_form.formValidation({
     framework: 'bootstrap',
     icon: {
         valid: 'glyphicon glyphicon-ok',
         invalid: 'glyphicon glyphicon-remove'
     },
     fields: {
-        'new-sensor-name': {validators: {notEmpty: {message: '传感器名称不能为空'}}},
-        'new-sensor-description': {validators: {notEmpty: {message: '传感器描述不能为空'}}},
-        'new-sensor-code': {validators: {notEmpty: {message: '传感器编号不能为空'}}}
+        'sensor-name': {validators: {notEmpty: {message: '设备名不能为空'}}},
+        'sensor-code': {validators: {notEmpty: {message: '设备编号不能为空'}}},
+        'sensor-desc': {validators: {notEmpty: {message: '设备描述不能为空'}}}
     }
 }).on('success.form.fv', function (evt){
     evt.preventDefault();
+    var action = $('#sensor-confirm-btn').text();
+    var url = crud_address + '/sensor/update';
+    var data = edit_device_text == action?$(this).serialize() + "&sensor-id=" + current_sensor_id:$(this).serialize();
     $.ajax({
         type: 'post',
-        url: current_address + '/new/sensor',
-        data: $(this).serialize() + "&sensorId=" + $('#is-new-sensor').attr('sensor-id'),
-        success: function (id) {
-            location.replace(location.href);
+        url: url,
+        data: data,
+        success: function (response) {
+            if (response.code == "0000"){
+                window.location.href = current_address;
+            } else if (response.code == "1111") {
+                message_info('操作无效: ' + response.data, "error");
+            }
         },
-        error: function (id) {
-            message_info("操作传感器失败", 'error');
+        error: function (response) {
+            message_info("操作失败，失败原因为：" + response, 'error');
         }
     });
 }).on('err.form.fv', function (evt) {
-    message_info("提交失败", 'error');
+    message_info("应用表单提交失败", 'error');
 });
 
-$new_sensor_modal = $('#new-sensor-modal');
-$new_sensor_modal.on('shown.bs.modal', function (event) {
+$sensor_modal.on('shown.bs.modal', function (event) {
     var button = $(event.relatedTarget);
-    var action = button.attr('action');
-    var modal = $(this);
+    var action = button.attr('todo');
 
     if (action == "new"){
         // new sensor
-        modal.find('.modal-title').text('新增设备');
-        $('#sensor-confirm-btn').text("新增设备");
-        $('#is-new-sensor').attr('value', 1);
-
-        $('#new-sensor-name').val("");
-        $('#new-sensor-code').val("");
-        $('#new-sensor-description').val("");
+        $('#sensor-confirm-btn').text(new_device_text);
+        $('#sensor-name').val("");
+        $('#sensor-code').val("").removeAttr("disabled");
+        $('#sensor-desc').val("");
     } else if (action == "edit") {
         var selectRow = $('#table').bootstrapTable('getSelections');
         if (selectRow.length == 0){
-            $new_sensor_modal.modal('hide');
+            $sensor_modal.modal('hide');
             message_info("请先在表格中选中设备", "info");
             return;
         }
 
         // edit sensor
-        modal.find('.modal-title').text('编辑设备');
-        $('#sensor-confirm-btn').text("确认修改");
-        $('#is-new-sensor').attr('value', 0).attr('sensor-id', selectRow[0].id);
-
-        $('#new-sensor-name').val(selectRow[0]['name']);
-        $('#new-sensor-code').val(selectRow[0]['code']);
-        $('#new-sensor-description').val(selectRow[0]['description']);
+        $('#sensor-confirm-btn').text(edit_device_text);
+        $('#sensor-name').val(selectRow[0]['name']);
+        $('#sensor-code').val(selectRow[0]['code']).attr("disabled", "disabled");
+        $('#sensor-desc').val(selectRow[0]['description']);
+        current_sensor_id = selectRow[0].id;
     }
 });
 
 function deleteSensor() {
     var selectRow = $('#table').bootstrapTable('getSelections');
     if (selectRow.length == 0){
-        $new_sensor_modal.modal('hide');
+        $sensor_modal.modal('hide');
         message_info("请先在表格中选中设备", "info");
         return;
     }
 
-    var id = selectRow[0]['id'];
     bootbox.confirm({
         title: "删除设备?",
         message: "确认删除设备吗? 设备相关数据也会被删除.",
@@ -175,12 +178,20 @@ function deleteSensor() {
             if (result){
                 $.ajax({
                     type: 'get',
-                    url: current_address + '/delete/sensor?id=' + id,
-                    success: function (id) {
-                        location.replace(location.href);
+                    url: crud_address + '/sensor/delete',
+                    data: {
+                        'sensor-id': selectRow[0]['id'],
+                        'sensor-code': selectRow[0]['code']
                     },
-                    error: function (id) {
-                        message_info("操作失败", 'error');
+                    success: function (response) {
+                        if (response.code == "0000"){
+                            window.location.href = current_address;
+                        } else if (response.code == "1111") {
+                            message_info('操作无效: ' + response.data, "error");
+                        }
+                    },
+                    error: function (response) {
+                        message_info("操作失败，失败原因为：" + response, 'error');
                     }
                 });
             }

@@ -130,7 +130,10 @@ public class ViewController {
             model.addAttribute("boundSensors", boundSensors);
 
             // --- RECORDER:
-            Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecordersOfCurrentApp(experiments);
+            Map<Long, List<RecorderInfo>> recorders = new HashMap<Long, List<RecorderInfo>>();
+            if (!experiments.isEmpty()) {
+                recorders = baseInfoService.getAllRecordersOfCurrentApp(experiments);
+            }
             model.addAttribute("recorders", recorders);
         }
 

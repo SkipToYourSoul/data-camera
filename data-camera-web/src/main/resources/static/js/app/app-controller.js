@@ -34,11 +34,15 @@ $edit_app_form.formValidation({
         type: 'post',
         url: url,
         data: data,
-        success: function (id) {
-            window.location.href = current_address + "?id=" + app['id'];
+        success: function (response) {
+            if (response.code == "0000"){
+                window.location.href = current_address + "?id=" + response.data;
+            } else if (response.code == "1111") {
+                message_info('操作无效: ' + response.data, "error");
+            }
         },
-        error: function (id) {
-            message_info("操作应用失败，失败ID为：" + id, 'error');
+        error: function (response) {
+            message_info("操作失败，失败原因为：" + response, 'error');
         }
     });
 }).on('err.form.fv', function (evt) {
@@ -78,8 +82,12 @@ function deleteApp(){
                 $.ajax({
                     type: 'get',
                     url: crud_address + '/app/delete?app-id=' + app['id'],
-                    success: function (id) {
-                        location.replace(current_address);
+                    success: function (response) {
+                        if (response.code == "0000"){
+                            location.replace(current_address);
+                        } else if (response.code == "1111") {
+                            message_info('操作无效: ' + response.data, "error");
+                        }
                     },
                     error: function (id) {
                         message_info("删除应用失败", 'error');
@@ -131,11 +139,15 @@ $edit_exp_form.formValidation({
         type: 'post',
         url: url,
         data: data,
-        success: function (id) {
-            window.location.href = current_address + "?id=" + app['id'];
+        success: function (response) {
+            if (response.code == "0000"){
+                window.location.href = current_address + "?id=" + app['id'];
+            } else if (response.code == "1111") {
+                message_info('操作无效: ' + response.data, "error");
+            }
         },
-        error: function (id) {
-            message_info("操作应用失败，失败ID为：" + id, 'error');
+        error: function (response) {
+            message_info("编辑实验失败", 'error');
         }
     });
 }).on('err.form.fv', function (evt) {
@@ -184,11 +196,15 @@ function deleteExp(evt) {
                 $.ajax({
                     type: 'get',
                     url: crud_address + '/exp/delete?exp-id=' + exp_id,
-                    success: function (id) {
-                        window.location.href = current_address + "?id=" + app['id'];
+                    success: function (response) {
+                        if (response.code == "0000"){
+                            window.location.href = current_address + "?id=" + app['id'];
+                        } else if (response.code == "1111") {
+                            message_info('操作无效: ' + response.data, "error");
+                        }
                     },
                     error: function (id) {
-                        message_info("删除应用失败", 'error');
+                        message_info("删除实验失败", 'error');
                     }
                 });
             }

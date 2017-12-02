@@ -5,12 +5,14 @@ import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
+import com.stemcloud.liye.dc.dao.config.SensorRegisterRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.config.SensorRegister;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
@@ -35,14 +37,16 @@ public class CrudService {
     private final ExperimentRepository expRepository;
     private final TrackRepository trackRepository;
     private final SensorRepository sensorRepository;
+    private final SensorRegisterRepository sensorRegisterRepository;
     private final RecorderRepository recorderRepository;
     private final VideoDataRepository videoDataRepository;
 
-    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
+    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, SensorRegisterRepository sensorRegisterRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
         this.appRepository = appRepository;
         this.expRepository = expRepository;
         this.trackRepository = trackRepository;
         this.sensorRepository = sensorRepository;
+        this.sensorRegisterRepository = sensorRegisterRepository;
         this.recorderRepository = recorderRepository;
         this.videoDataRepository = videoDataRepository;
     }
@@ -134,8 +138,9 @@ public class CrudService {
         return sensorRepository.save(sensor).getId();
     }
 
-    public int deleteSensor(Long id){
-        return sensorRepository.deleteSensor(id);
+    public void deleteSensor(Long id, String code){
+        sensorRepository.deleteSensor(id);
+        sensorRegisterRepository.register(0, code);
     }
 
     public SensorInfo findSensor(Long id){
@@ -157,6 +162,14 @@ public class CrudService {
         long appId = trackInfo.getExperiment().getApp().getId();
         sensorRepository.boundSensor(sensorId, appId, expId, trackId);
         logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
+    }
+
+    public SensorRegister findRegister(String code){
+        return sensorRegisterRepository.findByCode(code);
+    }
+
+    public void registerSensor(int action, String code){
+        sensorRegisterRepository.register(action, code);
     }
 
     /************/

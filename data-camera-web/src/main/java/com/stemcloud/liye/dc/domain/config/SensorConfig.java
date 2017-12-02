@@ -1,4 +1,4 @@
-package com.stemcloud.liye.dc.domain.base;
+package com.stemcloud.liye.dc.domain.config;
 
 import javax.persistence.*;
 

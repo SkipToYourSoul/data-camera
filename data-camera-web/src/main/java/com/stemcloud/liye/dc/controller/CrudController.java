@@ -5,6 +5,7 @@ import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.domain.common.ServerReturnTool;
+import com.stemcloud.liye.dc.domain.config.SensorRegister;
 import com.stemcloud.liye.dc.service.CommonService;
 import com.stemcloud.liye.dc.service.CrudService;
 import org.slf4j.Logger;
@@ -40,100 +41,119 @@ public class CrudController {
 
     /* new or modify app */
     @PostMapping("/app/update")
-    public Long updateApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        String appId = "app-id";
-        String appName = "app-name";
-        String appDesc = "app-desc";
+    public Map updateApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         AppInfo appInfo = null;
-        String user = commonService.getCurrentLoginUser(request);
-        if (!queryParams.containsKey(appId)){
-            appInfo = new AppInfo();
-        } else {
-            Long id = Long.parseLong(queryParams.get("app-id"));
-            appInfo = crudService.findApp(id);
-        }
-        if (null == appInfo){
-            throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE APP");
+        try {
+            String appId = "app-id";
+            String appName = "app-name";
+            String appDesc = "app-desc";
+            String user = commonService.getCurrentLoginUser(request);
+            if (!queryParams.containsKey(appId)){
+                appInfo = new AppInfo();
+            } else {
+                Long id = Long.parseLong(queryParams.get("app-id"));
+                appInfo = crudService.findApp(id);
+                if (null == appInfo){
+                    return ServerReturnTool.serverFailure("参数错误");
+                }
+            }
+
+            appInfo.setCreator(user);
+            if (queryParams.containsKey(appName) && !queryParams.get(appName).trim().isEmpty()) {
+                appInfo.setName(queryParams.get(appName));
+            }
+            if (queryParams.containsKey(appDesc) && !queryParams.get(appDesc).trim().isEmpty()) {
+                appInfo.setDescription(queryParams.get(appDesc));
+            }
+            Long id = crudService.saveApp(appInfo);
+            logger.info("USER " + user + " UPDATE APP " + id);
+        } catch (Exception e){
+            logger.error("EDIT APP", e);
+            return ServerReturnTool.serverFailure("后台数据错误");
         }
 
-        appInfo.setCreator(user);
-        if (queryParams.containsKey(appName) && !queryParams.get(appName).trim().isEmpty()) {
-            appInfo.setName(queryParams.get(appName));
-        }
-        if (queryParams.containsKey(appDesc) && !queryParams.get(appDesc).trim().isEmpty()) {
-            appInfo.setDescription(queryParams.get(appDesc));
-        }
-        Long id = crudService.saveApp(appInfo);
-        logger.info("USER " + user + " UPDATE APP " + id);
-
-        return id;
+        return ServerReturnTool.serverSuccess(appInfo.getId());
     }
 
     /* delete app */
     @GetMapping("/app/delete")
-    public String deleteApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        Long id = Long.parseLong(queryParams.get("app-id"));
-        String user = commonService.getCurrentLoginUser(request);
-        if (id <= 0){
-            throw new IllegalArgumentException("ERROR PARAMETERS WHEN DELETE APP");
+    public Map deleteApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        if (!queryParams.containsKey("app-id") || Long.parseLong(queryParams.get("app-id")) < 0){
+            return ServerReturnTool.serverFailure("参数错误");
         }
-        logger.info("USER " + user + " DELETE APP " + id);
-        crudService.deleteApp(id);
-        return "SUCCESS";
+        try {
+            Long id = Long.parseLong(queryParams.get("app-id"));
+            String user = commonService.getCurrentLoginUser(request);
+            logger.info("USER " + user + " DELETE APP " + id);
+            crudService.deleteApp(id);
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+
+        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("app-id")));
     }
 
     /* new or modify experiment */
     @PostMapping("/exp/update")
-    public String updateExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select") List<String> sensors, HttpServletRequest request){
-        String expId = "exp-id";
-        String expName = "exp-name";
-        String expDesc = "exp-desc";
+    public Map updateExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select") List<String> sensors, HttpServletRequest request){
         ExperimentInfo expInfo = null;
-        String user = commonService.getCurrentLoginUser(request);
+        try {
+            String expId = "exp-id";
+            String expName = "exp-name";
+            String expDesc = "exp-desc";
+            String user = commonService.getCurrentLoginUser(request);
 
-        if (!queryParams.containsKey(expId)){
-            expInfo = new ExperimentInfo();
-        } else {
-            Long id = Long.parseLong(queryParams.get("exp-id"));
-            expInfo = crudService.findExp(id);
-        }
-        if (null == expInfo){
-            throw new IllegalArgumentException("ERROR PARAMETERS WHEN UPDATE EXPERIMENT");
-        }
-
-        expInfo.setApp(crudService.findApp(Long.valueOf(queryParams.get("app-id"))));
-        if (queryParams.containsKey(expName) && !queryParams.get(expName).trim().isEmpty()) {
-            expInfo.setName(queryParams.get(expName));
-        }
-        if (queryParams.containsKey(expDesc) && !queryParams.get(expDesc).trim().isEmpty()) {
-            expInfo.setDescription(queryParams.get(expDesc));
-        }
-        ExperimentInfo newExpInfo = crudService.saveExp(expInfo);
-
-        // add sensor on experiment
-        if (sensors.size() > 0){
-            for (String s: sensors){
-                long sensorId = Long.parseLong(s);
-                crudService.newTrackAndBoundSensor(newExpInfo, crudService.findSensor(sensorId));
+            if (!queryParams.containsKey(expId)){
+                expInfo = new ExperimentInfo();
+            } else {
+                Long id = Long.parseLong(queryParams.get("exp-id"));
+                expInfo = crudService.findExp(id);
+                if (null == expInfo){
+                    return ServerReturnTool.serverFailure("参数错误");
+                }
             }
-        }
-        logger.info("USER " + user + " UPDATE EXP " + newExpInfo.getId() + ", ADD " + sensors.size() + " SENSORS TO THE EXP.");
 
-        return "SUCCESS";
+            expInfo.setApp(crudService.findApp(Long.valueOf(queryParams.get("app-id"))));
+            if (queryParams.containsKey(expName) && !queryParams.get(expName).trim().isEmpty()) {
+                expInfo.setName(queryParams.get(expName));
+            }
+            if (queryParams.containsKey(expDesc) && !queryParams.get(expDesc).trim().isEmpty()) {
+                expInfo.setDescription(queryParams.get(expDesc));
+            }
+            ExperimentInfo newExpInfo = crudService.saveExp(expInfo);
+
+            // add sensor on experiment
+            if (sensors.size() > 0){
+                for (String s: sensors){
+                    long sensorId = Long.parseLong(s);
+                    crudService.newTrackAndBoundSensor(newExpInfo, crudService.findSensor(sensorId));
+                }
+            }
+            logger.info("USER " + user + " UPDATE EXP " + newExpInfo.getId() + ", ADD " + sensors.size() + " SENSORS TO THE EXP.");
+        }catch (Exception e){
+            logger.error("EDIT EXP", e);
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+
+        return ServerReturnTool.serverSuccess(expInfo.getId());
     }
 
     /* delete experiment */
     @GetMapping("/exp/delete")
-    public String deleteExp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        Long id = Long.parseLong(queryParams.get("exp-id"));
-        String user = commonService.getCurrentLoginUser(request);
-        if (id <= 0){
-            throw new IllegalArgumentException("ERROR PARAMETERS WHEN DELETE EXPERIMENT");
+    public Map deleteExp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        if (!queryParams.containsKey("exp-id") || Long.parseLong(queryParams.get("exp-id")) < 0){
+            return ServerReturnTool.serverFailure("参数错误");
         }
-        logger.info("USER " + user + " DELETE EXP " + id);
-        crudService.deleteExp(id);
+        try {
+            Long id = Long.parseLong(queryParams.get("exp-id"));
+            String user = commonService.getCurrentLoginUser(request);
+            logger.info("USER " + user + " DELETE EXP " + id);
+            crudService.deleteExp(id);
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
 
-        return "SUCCESS";
+        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("exp-id")));
     }
 
     /* bound/unbound sensor on track */
@@ -178,52 +198,75 @@ public class CrudController {
         return "SUCCESS";
     }
 
-    @GetMapping("/sensor/new")
-    public Long newSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        SensorInfo sensor = new SensorInfo();
-        String user = commonService.getCurrentLoginUser(request);
+    @PostMapping("/sensor/update")
+    public Map newSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        SensorInfo sensor = null;
+        try {
+            String user = commonService.getCurrentLoginUser(request);
+            String sensorId = "sensor-id";
+            String sensorName = "sensor-name";
+            String sensorCode = "sensor-code";
+            String sensorDesc = "sensor-desc";
+            if (!queryParams.containsKey(sensorId)){
+                sensor = new SensorInfo();
+                SensorRegister sensorRegister = crudService.findRegister(queryParams.get(sensorCode));
+                if (sensorRegister == null){
+                    return ServerReturnTool.serverFailure("传感器编号错误，系统未能识别该编号");
+                } else if (sensorRegister.getIsRegistered() == 1){
+                    return ServerReturnTool.serverFailure("该编号已被绑定，无法再次新建");
+                }
+                sensor.setCode(queryParams.get(sensorCode));
+                sensor.setSensorConfig(sensorRegister.getSensorConfig());
+                crudService.registerSensor(1, queryParams.get(sensorCode));
+            } else {
+                Long id = Long.parseLong(queryParams.get(sensorId));
+                sensor = crudService.findSensor(id);
+                if (sensor == null){
+                    return ServerReturnTool.serverFailure("参数错误");
+                }
+            }
 
-        String sensorName = "sensor-name";
-        String sensorCode = "sensor-code";
-        if (!queryParams.containsKey(sensorName) || !queryParams.containsKey(sensorCode)){
-            throw new IllegalArgumentException("ERROR PARAMETERS WHEN NEW SENSOR");
+            sensor.setCreator(user);
+            sensor.setName(queryParams.get(sensorName));
+            sensor.setDescription(queryParams.get(sensorDesc));
+
+            String city = "city";
+            String latitude = "latitude";
+            String longitude = "longitude";
+            if (queryParams.containsKey(latitude)){
+                sensor.setLatitude(Double.valueOf(queryParams.get(latitude)));
+            }
+            if (queryParams.containsKey(longitude)){
+                sensor.setLatitude(Double.valueOf(queryParams.get(longitude)));
+            }
+            if (queryParams.containsKey(city)){
+                sensor.setCity(queryParams.get(city));
+            }
+
+            Long id = crudService.saveSensor(sensor);
+            logger.info("USER " + user + " UPDATE SENSOR " + id);
+        } catch (Exception e){
+            logger.error("EDIT SENSOR", e);
+            return ServerReturnTool.serverFailure("后台数据错误");
         }
 
-        sensor.setCreator(user);
-        sensor.setName(queryParams.get(sensorName));
-        sensor.setCode(queryParams.get(sensorCode));
-
-        String city = "city";
-        String latitude = "latitude";
-        String longitude = "longitude";
-        String description = "description";
-        if (queryParams.containsKey(latitude)){
-            sensor.setLatitude(Double.valueOf(queryParams.get(latitude)));
-        }
-        if (queryParams.containsKey(longitude)){
-            sensor.setLatitude(Double.valueOf(queryParams.get(longitude)));
-        }
-        if (queryParams.containsKey(city)){
-            sensor.setCity(queryParams.get(city));
-        }
-        if (queryParams.containsKey(description)){
-            sensor.setDescription(description);
-        }
-
-        Long id = crudService.saveSensor(sensor);
-        logger.info("USER " + user + " NEW SENSOR " + id);
-        return id;
+        return ServerReturnTool.serverSuccess(sensor.getId());
     }
 
     @GetMapping("/sensor/delete")
-    public Integer deleteSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        String user = commonService.getCurrentLoginUser(request);
-        Long sensorId = Long.parseLong(queryParams.get("sensor-id"));
-        if (sensorId <= 0){
-            throw new IllegalArgumentException("ERROR PARAMETERS WHEN DELETE SENSOR");
+    public Map deleteSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        if (!queryParams.containsKey("sensor-id") || Long.parseLong(queryParams.get("sensor-id")) < 0){
+            return ServerReturnTool.serverFailure("参数错误");
         }
-        logger.info("USER " + user + " DELETE TRACK " + sensorId);
-        return crudService.deleteSensor(sensorId);
+        try {
+            String user = commonService.getCurrentLoginUser(request);
+            Long sensorId = Long.parseLong(queryParams.get("sensor-id"));
+            logger.info("USER " + user + " DELETE TRACK " + sensorId);
+            crudService.deleteSensor(sensorId, queryParams.get("sensor-code"));
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("sensor-id")));
     }
 
     @GetMapping("/monitor")
