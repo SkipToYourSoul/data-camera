@@ -34,10 +34,31 @@ function initExpContentChart(exp_id){
                     if (!content_data.hasOwnProperty(content_id)){
                         continue;
                     }
+                    // --- edit able
+                    var $content_name_dom = $('#analysis-content-name-' + content_id);
+                    $content_name_dom.editable({
+                        type: 'text',
+                        pk: content_id,
+                        url: crud_address + '/content/name',
+                        title: '输入标题',
+                        success: function(response) {
+                            if (response.code == "1111"){
+                                message_info('操作无效: ' + response.data, "error");
+                            } else if (response.code == "0000"){
+                                message_info(response.data, 'success');
+                            }
+                        },
+                        error: function (response) {
+                            message_info('修改失败', 'error');
+                        }
+                    });
+
+
                     var chart_data = content_data[content_id]['CHART'];
                     var video_data = content_data[content_id]['VIDEO'];
                     if (isEmptyObject(chart_data) && isEmptyObject(video_data)){
                         $('#analysis-info-' + exp_id + '-' + content_id).html('<strong>该内容段暂未查到相关数据</strong>');
+                        // -- hide content
                         $('#collapse-' + content_id).removeClass('in');
                         continue;
                     }

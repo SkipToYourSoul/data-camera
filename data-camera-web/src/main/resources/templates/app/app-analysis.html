@@ -51,11 +51,11 @@
                                                         <div class="app-analysis-content-info">
                                                             <div class="info">
                                                                 <div class="title" th:text="|基本信息|"></div>
-                                                                <div class="content" th:text="|名称: content name|"></div>
-                                                                <div class="content" th:text="|描述: content desc|"></div>
+                                                                <div class="content">名称（点击可修改）： <a href="#" th:id="|analysis-content-name-${recorder.id}|" data-type="text" th:text="${recorder.name}"></a></div>
+                                                                <div class="content" th:text="|描述： ${recorder.description}|"></div>
                                                             </div>
                                                             <div class="my-container">
-                                                                <div class="title">内容回放</div>
+                                                                <div class="title">内容回放（回放功能应放置在内容页）</div>
                                                                 <div class="btn-group">
                                                                     <button id="play-btn" class="btn btn-success" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
                                                                     <button id="pause-btn" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>

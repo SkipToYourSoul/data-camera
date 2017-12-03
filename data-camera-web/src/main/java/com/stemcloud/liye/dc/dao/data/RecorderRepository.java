@@ -38,12 +38,24 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
      * end recorder, update end time
      * @param id
      * @param endTime
+     * @param isDeleted
      * @return
      */
     @Query(value = "UPDATE RecorderInfo r SET r.endTime = ?2, r.isRecorder = 0, r.isDeleted = ?3 WHERE id = ?1")
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     Integer endRecorder(long id, Date endTime, int isDeleted);
+
+    /**
+     * update name
+     * @param id
+     * @param name
+     * @return
+     */
+    @Query(value = "UPDATE RecorderInfo r SET r.name = ?2 WHERE id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer updateName(long id, String name);
 
     /**
      * delete content

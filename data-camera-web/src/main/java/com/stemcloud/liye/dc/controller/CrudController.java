@@ -311,4 +311,19 @@ public class CrudController {
         }
         return map;
     }
+
+    @PostMapping("/content/name")
+    public Map modifyContentName(@RequestParam Map<String, String> queryParams){
+        String result = "";
+        try {
+            long contentId = Long.parseLong(queryParams.get("pk"));
+            String name = queryParams.get("value");
+            crudService.updateContentName(contentId, name);
+            result = "内容名称变更为：" + name;
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+
+        return ServerReturnTool.serverSuccess(result);
+    }
 }

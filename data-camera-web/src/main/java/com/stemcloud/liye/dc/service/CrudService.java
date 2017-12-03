@@ -110,19 +110,19 @@ public class CrudService {
         long expId = trackInfo.getExperiment().getId();
         long appId = trackInfo.getExperiment().getApp().getId();
         sensorRepository.boundSensor(sensorId, appId, expId, trackId);
-        logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
+        logger.info("BOUND SENSOR {} ON TRACK {}.", sensorId, trackId);
     }
 
     public void deleteTrack(Long id){
         int t = trackRepository.deleteTrack(id);
-        logger.info("DELETE TRACK " + id);
+        logger.info("DELETE TRACK {}", id);
         TrackInfo track = trackRepository.findById(id);
         // unbound sensor
         if (null != track.getSensor()){
             long sensorId = track.getSensor().getId();
             if (track.getSensor().getIsDeleted() == 0) {
                 int s = sensorRepository.unboundSensorById(sensorId);
-                logger.info("UNBOUND SENSOR " + sensorId);
+                logger.info("UNBOUND SENSOR {}", sensorId);
             }
         }
     }
@@ -150,7 +150,7 @@ public class CrudService {
     public void unboundSensor(long sensorId, long trackId){
         trackRepository.unboundSensor(trackId);
         sensorRepository.unboundSensorById(sensorId);
-        logger.info("UNBOUND SENSOR " + sensorId + " ON TRACK " + trackId);
+        logger.info("UNBOUND SENSOR {} ON TRACK {}.", sensorId, trackId);
     }
 
     public void boundSensor(long sensorId, long trackId){
@@ -161,7 +161,7 @@ public class CrudService {
         long expId = trackInfo.getExperiment().getId();
         long appId = trackInfo.getExperiment().getApp().getId();
         sensorRepository.boundSensor(sensorId, appId, expId, trackId);
-        logger.info("BOUND SENSOR " + sensorId + " ON TRACK " + trackId);
+        logger.info("BOUND SENSOR {} ON TRACK {}.", sensorId, trackId);
     }
 
     public SensorRegister findRegister(String code){
@@ -190,6 +190,13 @@ public class CrudService {
                 logger.info("SAVE VIDEO DATA, SENSOR ID IS {}, TRACK ID IS {}, RECORDER IS {}", sensorId, trackId, recorderInfo.getId());
             }
         }
+    }
+
+    /************/
+    /* CONTENT  */
+    /************/
+    public void updateContentName(long id, String name){
+        recorderRepository.updateName(id, name);
     }
 
     /************/
@@ -261,6 +268,8 @@ public class CrudService {
             recorderInfo.setIsRecorder(1);
             recorderInfo.setStartTime(new Date());
             recorderInfo.setDevices(new Gson().toJson(devices));
+            recorderInfo.setName("实验" + expId + "的记录");
+            recorderInfo.setDescription("实验" + expId + "的记录描述");
             recorderRepository.save(recorderInfo);
 
             response = 1;

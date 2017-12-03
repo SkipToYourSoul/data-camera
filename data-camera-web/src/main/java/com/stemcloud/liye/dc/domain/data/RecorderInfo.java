@@ -22,6 +22,12 @@ public class RecorderInfo {
     @Column(name = "devices", nullable = false)
     private String devices;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "description")
+    private String description;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_time")
     private Date startTime;
@@ -60,6 +66,22 @@ public class RecorderInfo {
 
     public void setDevices(String devices) {
         this.devices = devices;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Date getStartTime() {

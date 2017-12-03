@@ -153,15 +153,29 @@ public class ViewController {
         // --- get the devices of user
         List<SensorInfo> sensors = baseInfoService.getOnlineSensor(currentUser);
         model.addAttribute("sensors", sensors);
-
         model.addAttribute("inDevice", true);
 
         return "device";
     }
 
+    @GetMapping("/content")
+    public String content(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // --- get login user name
+        String currentUser = commonService.getCurrentLoginUser(request);
+        if (currentUser == null) {
+            logger.warn("No login user");
+            response.sendRedirect(request.getContextPath() + "/index");
+            return "index";
+        }
+
+        model.addAttribute("inContent", true);
+
+        return "content";
+    }
+
     @GetMapping("/denied")
     public String denied(HttpServletRequest request) {
-        logger.warn("denied: " + request.getContextPath());
+        logger.warn("denied: " + request.toString());
         return "denied";
     }
 
