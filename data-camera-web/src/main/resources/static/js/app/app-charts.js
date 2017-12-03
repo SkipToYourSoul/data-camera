@@ -82,10 +82,10 @@ var experimentChartOption = function (legend) {
         },
         grid: [{
             borderWidth: 0,
-            top: '10%',
+            top: 30,
             bottom: '20%',
-            left: '50px',
-            right: '50px',
+            left: 50,
+            right: 50,
             textStyle: {
                 color: "#fff"
             }
@@ -94,13 +94,8 @@ var experimentChartOption = function (legend) {
         toolbox: {
             show: true,
             feature: {
-                dataView: {readOnly: false},
-                magicType : {show: true, type: ['line', 'bar']},
-                restore: {},
-                saveAsImage: {},
-                brush: {
-                    type: ['lineX', 'clear']
-                }
+                dataView: {readOnly: true},
+                magicType : {show: true, type: ['line', 'bar']}
             },
             right: 20
         },

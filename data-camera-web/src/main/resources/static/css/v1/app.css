@@ -24,14 +24,14 @@ body{
 
 .app-exp-status-container{
     padding-left: 5px;
-    padding-right: 20px;
+    padding-right: 0;
     font-size: 14px;
     font-weight: 600;
     border-left: 3px solid #9d9d9d;
 }
 
 .app-exp-status-container span{
-    margin-right: 20px;
+    margin-right: 10px;
 }
 
 .app-exp-track-container{
@@ -58,7 +58,7 @@ body{
 .app-exp-track-statistics .title{
     padding: 15px 10px 5px 10px;
     margin-bottom: 5px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     border-bottom: 1px solid #9d9d9d;
 }
@@ -85,21 +85,18 @@ body{
     color: #5c5b5b;
 }
 
-.recorder-button {
-    text-align: center;
-    margin-top: 10px;
+.app-exp-button{
+    padding-right: 0;
 }
 
-.recorder-button .btn{
+.app-exp-button .btn{
     text-transform: uppercase;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
-    margin-right: 20px;
-    height: 40px;
-    width: 100px;
-    -webkit-border-radius: 50% !important;
+    margin-right: 5px;
+    /*-webkit-border-radius: 50% !important;
     -moz-border-radius: 50% !important;
-    border-radius: 50% !important;
+    border-radius: 50% !important;*/
 }
 
 /** app-analysis.html **/
@@ -109,8 +106,29 @@ body{
 .app-analysis-video{
     padding: 10px 30px 0 20px;
 }
-.app-analysis-operation{
+.app-analysis-content-info{
     border-radius: 5%;
     background-color: rgba(154, 154, 154, 0.1);
     min-height: 100px;
+}
+
+.app-analysis-content-info .title{
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.app-analysis-content-info .info{
+    padding: 15px 10px 5px 10px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #9d9d9d;
+}
+
+.app-analysis-content-info .info .content{
+    font-weight: 500;
+}
+
+.app-analysis-content-info .my-container{
+    padding: 5px 10px 5px 10px;
+    margin-bottom: 5px;
 }

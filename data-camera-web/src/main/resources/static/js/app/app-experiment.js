@@ -46,7 +46,7 @@ function initResourceOfExperimentPage() {
             var chart_dom = "experiment-track-" + exp_id + "-" + track_id;
             if (track_type == 1) {
                 // --- value sensor
-                var chart = echarts.init(document.getElementById(chart_dom), "", opts = {height: 250});
+                var chart = echarts.init(document.getElementById(chart_dom), "", opts = {height: 200});
                 chart.setOption(experimentChartOption(legend));
             } else if (track_type == 2){
 
@@ -112,11 +112,11 @@ function initResourceOfExperimentPage() {
         var exp_recorder_dom = $('#experiment-rs-' + id);
 
         if (isExperimentMonitor[id] == 1){
-            exp_monitor_dom.removeClass('label-warning').addClass('label-success').text('正在监控');
+            exp_monitor_dom.removeClass('label-default').addClass('label-success').text('正在监控');
             exp_monitor_btn.html('停止监控');
 
             if (isExperimentRecorder[id] == 1){
-                exp_recorder_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
+                exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
                 exp_recorder_btn.html("停止录制");
 
                 recorder_timestamp[id] = [];
@@ -157,7 +157,7 @@ function expMonitor(button){
             if (action == "1"){
                 // start monitor
                 isExperimentMonitor[exp_id] = 1;
-                exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在监控');
+                exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
                 exp_monitor_btn.html('停止监控');
 
                 doInterval(exp_id);
@@ -246,7 +246,7 @@ function expRecorder(button) {
                 if (action == "1"){
                     // start recorder
                     message_info("实验" + exp_id + ": 开始记录");
-                    exp_state_dom.removeClass('label-warning').addClass('label-success').text('正在录制');
+                    exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
                     exp_recorder_btn.html("停止录制");
                     isExperimentRecorder[exp_id] = 1;
                     if (recorder_timestamp[exp_id].length % 2 == 0){
@@ -278,7 +278,7 @@ function pageStopMonitor(exp_id){
     }
 
     isExperimentMonitor[exp_id] = 0;
-    $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-warning').text('非监控');
+    $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-default').text('非监控');
     $('#experiment-monitor-' + exp_id).html('开始监控');
 
     clearInterval(exp_monitor_interval[exp_id]);
@@ -288,7 +288,7 @@ function pageStopMonitor(exp_id){
 }
 
 function pageStopRecorder(exp_id){
-    $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-warning').text('非录制');
+    $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-default').text('非录制');
     $('#experiment-recorder-' + exp_id).html("开始录制");
     isExperimentRecorder[exp_id] = 0;
     if (recorder_timestamp[exp_id].length % 2 == 1) {

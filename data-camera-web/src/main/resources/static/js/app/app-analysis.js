@@ -19,6 +19,7 @@ function initExpContentChart(exp_id){
         spinner:"spinner4",
         bgColor:"rgba(154, 154, 154, 0.7)"
     });
+
     $.ajax({
         type: 'get',
         url: data_addrss + "/content",
@@ -37,6 +38,7 @@ function initExpContentChart(exp_id){
                     var video_data = content_data[content_id]['VIDEO'];
                     if (isEmptyObject(chart_data) && isEmptyObject(video_data)){
                         $('#analysis-info-' + exp_id + '-' + content_id).html('<strong>该内容段暂未查到相关数据</strong>');
+                        $('#collapse-' + content_id).removeClass('in');
                         continue;
                     }
 
@@ -80,13 +82,13 @@ function initExpContentChart(exp_id){
                         }
                     }
                 }
-
-                // complete loading
-                $loader.fadeOut();
             }
         },
         error: function (response) {
             message_info("操作失败，失败原因为：" + response, 'error');
         }
     });
+
+    // complete loading
+    $loader.fadeOut();
 }

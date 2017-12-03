@@ -35,20 +35,44 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
                                             <div class="panel-title">
-                                                <strong th:text="|实验片段${index.count},
-                                                数据时间: ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></strong>
+                                                <a role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}" aria-expanded="true" aria-controls="collapseOne" th:text="|原生实验片段${index.count},
+                                                数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></a>
                                             </div>
                                         </div>
-                                        <div class="panel-body">
-                                            <div class="row">
-                                                <div class="col-xs-8 col-sm-8 col-md-8">
-                                                    <div th:id="|analysis-info-${entry.key}-${recorder.id}|"></div>
-                                                    <div th:id="|analysis-chart-${entry.key}-${recorder.id}|"></div>
-                                                    <div th:id="|analysis-video-${entry.key}-${recorder.id}|"></div>
-                                                </div>
-                                                <div class="col-xs-4 col-sm-4 col-md-4">
-                                                    <div class="app-analysis-operation">
-
+                                        <div th:id="|collapse-${recorder.id}|" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-xs-8 col-sm-8 col-md-8">
+                                                        <div th:id="|analysis-info-${entry.key}-${recorder.id}|"></div>
+                                                        <div th:id="|analysis-chart-${entry.key}-${recorder.id}|"></div>
+                                                        <div th:id="|analysis-video-${entry.key}-${recorder.id}|"></div>
+                                                    </div>
+                                                    <div class="col-xs-4 col-sm-4 col-md-4">
+                                                        <div class="app-analysis-content-info">
+                                                            <div class="info">
+                                                                <div class="title" th:text="|基本信息|"></div>
+                                                                <div class="content" th:text="|名称: content name|"></div>
+                                                                <div class="content" th:text="|描述: content desc|"></div>
+                                                            </div>
+                                                            <div class="my-container">
+                                                                <div class="title">内容回放</div>
+                                                                <div class="btn-group">
+                                                                    <button id="play-btn" class="btn btn-success" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
+                                                                    <button id="pause-btn" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>
+                                                                    <button id="reset-btn" class="btn btn-danger" onclick="recorderReset()"><i class="fa fa-reply"></i>&nbsp;重置</button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="my-container">
+                                                                <div class="title">内容修改</div>
+                                                                <button class="btn btn-default">
+                                                                    <i class="fa fa-area-chart"></i>&nbsp;截图生成新内容</button>
+                                                                <button class="btn btn-default">
+                                                                    <i class="fa fa-trash"></i>&nbsp;删除当前内容</button>
+                                                            </div>
+                                                            <div class="my-container">
+                                                                <div class="title">内容标注</div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

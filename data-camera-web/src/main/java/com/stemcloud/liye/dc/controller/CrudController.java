@@ -95,7 +95,7 @@ public class CrudController {
 
     /* new or modify experiment */
     @PostMapping("/exp/update")
-    public Map updateExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select") List<String> sensors, HttpServletRequest request){
+    public Map updateExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select", required = false) List<String> sensors, HttpServletRequest request){
         ExperimentInfo expInfo = null;
         try {
             String expId = "exp-id";
@@ -123,13 +123,13 @@ public class CrudController {
             ExperimentInfo newExpInfo = crudService.saveExp(expInfo);
 
             // add sensor on experiment
-            if (sensors.size() > 0){
+            if (null != sensors && sensors.size() > 0){
                 for (String s: sensors){
                     long sensorId = Long.parseLong(s);
                     crudService.newTrackAndBoundSensor(newExpInfo, crudService.findSensor(sensorId));
                 }
             }
-            logger.info("USER " + user + " UPDATE EXP " + newExpInfo.getId() + ", ADD " + sensors.size() + " SENSORS TO THE EXP.");
+            logger.info("USER " + user + " UPDATE EXP " + newExpInfo.getId());
         }catch (Exception e){
             logger.error("EDIT EXP", e);
             return ServerReturnTool.serverFailure("后台数据错误");

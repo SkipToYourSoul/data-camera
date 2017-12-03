@@ -2,7 +2,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 
     <div th:fragment="nav">
-        <nav class="navbar navbar-default navbar-fixed-top">
+        <nav th:class="${inIndex}?'navbar navbar-default':'navbar navbar-default navbar-fixed-top'">
             <!-- navbar header -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -19,8 +19,9 @@
                     <!-- nav bar -->
                     <ul class="nav navbar-nav">
                         <li><a th:href="@{/index}">首页</a></li>
-                        <li th:class="${inApp}?'active':''"><a th:href="@{/app}">应用管理</a></li>
-                        <li th:class="${inDevice}?'active':''"><a th:href="@{/device}">设备管理</a></li>
+                        <li th:class="${inApp}?'active':''"><a th:href="@{/app}">我的应用</a></li>
+                        <li th:class="${inDevice}?'active':''"><a th:href="@{/device}">我的设备</a></li>
+                        <li th:class="${inContent}?'active':''"><a th:href="@{/content}">我的内容</a></li>
                     </ul>
                 </th:block>
 
