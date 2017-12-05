@@ -113,3 +113,13 @@ function initExpContentChart(exp_id){
     // complete loading
     $loader.fadeOut();
 }
+
+
+/**
+ * operation of exp content
+ */
+function generateNewRecorder(button) {
+    var button_content = button.getAttribute('data');
+    var exp_id = button_content.split("-")[0];
+    var content_id = button_content.split("-")[1];
+}
