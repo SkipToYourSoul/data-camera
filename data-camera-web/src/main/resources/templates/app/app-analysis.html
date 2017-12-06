@@ -14,6 +14,8 @@
 
             <div class="col-md-12 col-sm-12">
                 <div id="app-experiment-loading"></div>
+                <div th:if="${#maps.isEmpty(experiments)}"
+                     class="alert alert-info" role="alert">TIPS: 应用中暂无实验记录，请先在实验模式下新建实验并记录数据吧:)</div>
                 <div th:if="${not #maps.isEmpty(experiments)}">
                     <ul class="nav nav-tabs" role="tablist" id="app-analysis-tab">
                         <th:block th:each="entry,index:${experiments}">
@@ -28,9 +30,9 @@
                             <div th:id="|tab-experiment-${entry.key}|" role="tabpanel"
                                  th:class="${index.count eq 1}?'tab-pane active fade in':'tab-pane fade'">
                                 <!-- contents -->
-                                <th:block th:if="${#lists.isEmpty(recorders[entry.key])}">
-                                    <h3 style="margin-bottom: 50px">该实验下暂无内容，可在实验模式下录制数据内容</h3>
-                                </th:block>
+                                <div th:if="${not #maps.containsKey(recorders, entry.key)}"
+                                     class="alert alert-info" role="alert">TIPS: 还没有已生成的实验内容，请先在实验模式下记录数据吧:)</div>
+
                                 <th:block th:each="recorder,index:${recorders[entry.key]}">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
@@ -73,6 +75,7 @@
                                                                 <div class="title">实验片段标注</div>
                                                             </div>
                                                             <div class="my-container">
+                                                                <div class="title">内容生成</div>
                                                                 <button class="btn btn-success">
                                                                     <i class="fa fa-save"></i>&nbsp;保存为用户内容</button>
                                                             </div>

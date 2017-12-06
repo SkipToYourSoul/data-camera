@@ -130,5 +130,31 @@ function generateNewContent(button) {
         var start = option['dataZoom'][0]['start'];
         var end = option['dataZoom'][0]['end'];
         var data = option['series'][0]['data'];
+        var legend = option['legend'][0]['data'];
     }
+
+    var dialog_message = '<p>数据起始时间：' + start + '</p>';
+    dialog_message += '<p>数据结束时间：' + end + '</p>';
+    dialog_message += '<p>数据维度：' + legend + '</p>';
+
+    var dialog = bootbox.dialog({
+        title: '即将生成新的实验数据段，记录如下',
+        message: dialog_message,
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i>取消',
+                className: 'btn-danger',
+                callback: function(){
+                    message_info('Custom cancel clicked', 'info');
+                }
+            },
+            ok: {
+                label: '<i class="fa fa-check"></i>确认生成',
+                className: 'btn-info',
+                callback: function(){
+                    message_info('Custom OK clicked', 'info');
+                }
+            }
+        }
+    });
 }

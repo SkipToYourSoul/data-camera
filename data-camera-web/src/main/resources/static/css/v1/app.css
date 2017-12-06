@@ -110,6 +110,7 @@ body{
     border-radius: 5%;
     background-color: rgba(154, 154, 154, 0.1);
     min-height: 100px;
+    padding: 10px 0 10px 0;
 }
 
 .app-analysis-content-info .title{
