@@ -2,22 +2,12 @@
 <body>
     <div th:fragment="app-analysis">
         <div class="row">
-            <!-- 页面说明 -->
-            <div class="app-page-introduction">
-                <p>
-                    <i class="fa fa-info-circle"></i>&nbsp;在数据分析模式中，你能够分析之前所录制的实验数据
-                </p>
-                <p>
-                    <i class="fa fa-info-circle"></i>&nbsp;你可以任意编辑你所记录的数据，并以回放的方式来重现数据
-                </p>
-            </div>
-
             <div class="col-md-12 col-sm-12">
                 <div id="app-experiment-loading"></div>
                 <div th:if="${#maps.isEmpty(experiments)}"
                      class="alert alert-info" role="alert">TIPS: 应用中暂无实验记录，请先在实验模式下新建实验并记录数据吧:)</div>
                 <div th:if="${not #maps.isEmpty(experiments)}">
-                    <ul class="nav nav-tabs" role="tablist" id="app-analysis-tab">
+                    <ul class="nav nav-pills" role="tablist" id="app-analysis-tab">
                         <th:block th:each="entry,index:${experiments}">
                             <li role="presentation" th:class="${index.count eq 1}?'active':''">
                                 <a th:href="|#tab-experiment-${entry.key}|"

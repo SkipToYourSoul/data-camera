@@ -3,19 +3,32 @@
 <body>
     <div th:fragment="app-experiment">
         <div class="row">
-            <!-- 页面说明 -->
-            <div class="app-page-introduction">
-                <p>
-                    <i class="fa fa-info-circle"></i>&nbsp;在实验模式中，你能够随时监控传感器的数据，并且根据你的需要录制数据，录制的数据会被保存，你可以在“数据分析模式”下分析这些数据。
-                </p>
-                <p><i class="fa fa-info-circle"></i>&nbsp;点击“监控”按钮，让数据动起来，此时传感器数据会被保存到数据库中；点击“录制”按钮，录制并保存你想要的实验数据</p>
-            </div>
-
             <!-- 实验操作按钮 -->
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="app-exp-button-group">
                     <button class="btn btn-success" data-toggle="modal" data-target="#exp-modal" todo="new">
                         <i class="fa fa-plus-circle"></i>&nbsp;添加新实验</button>
+                    <button class="btn btn-default" type="button"
+                            data-toggle="collapse" data-target="#exp-help" aria-expanded="false" aria-controls="exp-help">
+                        <i class="fa fa-question"></i>&nbsp;获取帮助
+                    </button>
+                </div>
+                <div class="collapse" id="exp-help">
+                    <!-- 页面说明 -->
+                    <div class="app-page-introduction">
+                        <p>
+                            <i class="fa fa-info-circle"></i>&nbsp;在实验模式中，你能够随时监控传感器的数据，并且根据你的需要录制数据，录制的数据会被保存，你可以在“数据分析模式”下分析这些数据
+                        </p>
+                        <p>
+                            <i class="fa fa-info-circle"></i>&nbsp;点击“监控”按钮，让数据动起来，此时传感器数据会被保存到数据库中；点击“录制”按钮，录制并保存你想要的实验数据
+                        </p>
+                        <p>
+                            <i class="fa fa-info-circle"></i>&nbsp;在数据分析模式中，你能够分析之前所录制的实验数据
+                        </p>
+                        <p>
+                            <i class="fa fa-info-circle"></i>&nbsp;你可以任意编辑你所记录的数据，并以回放的方式来重现数据
+                        </p>
+                    </div>
                 </div>
             </div>
 

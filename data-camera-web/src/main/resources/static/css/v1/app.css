@@ -19,6 +19,7 @@ body{
 
 /** app-experiment.html **/
 .app-exp-button-group{
+    margin-top: 10px;
     margin-bottom: 10px;
 }
 
