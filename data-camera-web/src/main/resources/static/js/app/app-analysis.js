@@ -118,8 +118,17 @@ function initExpContentChart(exp_id){
 /**
  * operation of exp content
  */
-function generateNewRecorder(button) {
+function generateNewContent(button) {
     var button_content = button.getAttribute('data');
     var exp_id = button_content.split("-")[0];
     var content_id = button_content.split("-")[1];
+    
+    var chart_dom = 'analysis-chart-' + exp_id + '-' + content_id;
+    var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
+    if (chart != null){
+        var option = chart.getOption();
+        var start = option['dataZoom'][0]['start'];
+        var end = option['dataZoom'][0]['end'];
+        var data = option['series'][0]['data'];
+    }
 }
