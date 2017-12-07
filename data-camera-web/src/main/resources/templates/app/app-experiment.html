@@ -10,7 +10,7 @@
                         <i class="fa fa-plus-circle"></i>&nbsp;添加新实验</button>
                     <button class="btn btn-default" type="button"
                             data-toggle="collapse" data-target="#exp-help" aria-expanded="false" aria-controls="exp-help">
-                        <i class="fa fa-question"></i>&nbsp;获取帮助
+                        <i class="fa fa-question-circle"></i>&nbsp;获取帮助
                     </button>
                 </div>
                 <div class="collapse" id="exp-help">
@@ -87,12 +87,19 @@
                                                     <strong>轨迹加载中</strong>
                                                 </div>
                                                 <div th:case="2">
-                                                    <h3 class="text-center" style="margin-bottom: 10px; font-weight: 600">当前轨迹为视频轨迹，视频轨迹在实验状态下无法看到实时数据状态</h3>
-                                                    <h3 class="text-center" style="margin-bottom: 10px; font-weight: 600">录制的视频可以在“分析模式”中看到</h3>
-                                                    <img th:src="@{/img/video-loading.gif}" class="img-responsive center-block" />
+                                                    <div class="alert alert-info" role="alert" style="font-weight: 600; font-size: 16px">
+                                                        TIPS: 视频轨迹在实验状态下无法看到实时数据状态，录制结束后可在“分析模式”中看到</div>
+                                                    <div class="progress progress-striped active">
+                                                        <div class="progress-bar progress-bar-info" role="progressbar"
+                                                             aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                                                             style="width: 60%;">
+                                                            <span class="sr-only">60% 完成（成功）</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div th:case="0">
-                                                    <h3 class="text-center" style="font-weight: 600">当前轨迹暂未绑定任何传感器</h3>
+                                                    <div class="alert alert-warning" role="alert" style="font-weight: 600; font-size: 16px">
+                                                        TIPS: 当前轨迹暂未绑定任何传感器，将不会产生数据</div>
                                                 </div>
                                             </div>
                                         </div>

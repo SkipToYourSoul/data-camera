@@ -48,11 +48,10 @@
                                                     <div class="col-xs-4 col-sm-4 col-md-4">
                                                         <div class="app-analysis-content-info">
                                                             <div class="info">
-                                                                <div class="title" th:text="|基本信息|"></div>
-                                                                <div class="content">名称（点击可修改）： <a href="#" th:id="|analysis-content-name-${recorder.id}|" data-type="text" th:text="${recorder.name}"></a></div>
+                                                                <div class="title">实验片段： <a href="#" th:id="|analysis-content-name-${recorder.id}|" data-type="text" th:text="${recorder.name}"></a></div>
                                                             </div>
                                                             <div class="my-container">
-                                                                <div class="title">内容回放（回放功能应放置在内容页）</div>
+                                                                <div class="title">片段回放（回放功能应放置在内容页）</div>
                                                                 <div class="btn-group">
                                                                     <button id="play-btn" class="btn btn-success" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
                                                                     <button id="pause-btn" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>
@@ -68,6 +67,17 @@
                                                             </div>
                                                             <div class="my-container">
                                                                 <div class="title">实验片段标注</div>
+                                                                <select class="selectpicker"
+                                                                        multiple="multiple"
+                                                                        id="recorder-mark-select"
+                                                                        title="选取标注片段"
+                                                                        data-selected-text-format="count > 3"
+                                                                        data-actions-box="true">
+                                                                    <option>标注片段1</option>
+                                                                    <option>标注片段2</option>
+                                                                </select>
+                                                                <button class="btn btn-default">
+                                                                    <i class="fa fa-pencil"></i>&nbsp;标注片段</button>
                                                             </div>
                                                             <div class="my-container">
                                                                 <div class="title">内容生成</div>

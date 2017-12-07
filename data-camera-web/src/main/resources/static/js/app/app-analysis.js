@@ -34,13 +34,14 @@ function initExpContentChart(exp_id){
                     if (!content_data.hasOwnProperty(content_id)){
                         continue;
                     }
+
                     // --- edit able
                     var $content_name_dom = $('#analysis-content-name-' + content_id);
                     var $content_desc_dom = $('#analysis-content-desc-' + content_id);
                     $content_name_dom.editable({
                         type: 'text',
                         pk: content_id,
-                        url: crud_address + '/content/name',
+                        url: crud_address + '/recorder/name',
                         title: '输入标题',
                         success: function(response) {
                             if (response.code == "1111"){
@@ -56,10 +57,20 @@ function initExpContentChart(exp_id){
                     $content_desc_dom.editable({
                         title: '输入描述',
                         rows: 10,
-                        placeholder: '在这里输入描述'
+                        placeholder: '在这里输入描述',
+                        pk: content_id,
+                        url: crud_address + '/recorder/desc',
+                        success: function(response) {
+                            if (response.code == "1111"){
+                                message_info('操作无效: ' + response.data, "error");
+                            } else if (response.code == "0000"){
+                                message_info(response.data, 'success');
+                            }
+                        },
+                        error: function (response) {
+                            message_info('修改失败', 'error');
+                        }
                     });
-
-
 
                     var chart_data = content_data[content_id]['CHART'];
                     var video_data = content_data[content_id]['VIDEO'];

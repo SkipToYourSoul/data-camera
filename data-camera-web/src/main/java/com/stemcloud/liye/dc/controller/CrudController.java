@@ -283,8 +283,8 @@ public class CrudController {
         return map;
     }
 
-    @GetMapping("/isRecorder")
-    public Map isRecorder(@RequestParam Map<String, String> queryParams){
+    @GetMapping("/isRecord")
+    public Map isRecord(@RequestParam Map<String, String> queryParams){
         Long expId = Long.valueOf(queryParams.get("exp-id"));
         Map<String, Object> map;
         try {
@@ -297,8 +297,8 @@ public class CrudController {
         return map;
     }
 
-    @GetMapping("/recorder")
-    public Map recorderSensor(@RequestParam Map<String, String> queryParams){
+    @GetMapping("/record")
+    public Map recordSensor(@RequestParam Map<String, String> queryParams){
         Long expId = Long.valueOf(queryParams.get("exp-id"));
         int isSave = Integer.parseInt(queryParams.get("is-save"));
         Map<String, Object> map;
@@ -312,14 +312,29 @@ public class CrudController {
         return map;
     }
 
-    @PostMapping("/content/name")
-    public Map modifyContentName(@RequestParam Map<String, String> queryParams){
+    @PostMapping("/recorder/name")
+    public Map modifySegmentName(@RequestParam Map<String, String> queryParams){
         String result = "";
         try {
             long contentId = Long.parseLong(queryParams.get("pk"));
             String name = queryParams.get("value");
-            crudService.updateContentName(contentId, name);
-            result = "内容名称变更为：" + name;
+            crudService.updateRecorderName(contentId, name);
+            result = "实验记录名称变更为：" + name;
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+
+        return ServerReturnTool.serverSuccess(result);
+    }
+
+    @PostMapping("/recorder/desc")
+    public Map modifySegmentDesc(@RequestParam Map<String, String> queryParams){
+        String result = "";
+        try {
+            long contentId = Long.parseLong(queryParams.get("pk"));
+            String desc = queryParams.get("value");
+            crudService.updateRecorderDescription(contentId, desc);
+            result = "实验记录描述变更为：" + desc;
         } catch (Exception e){
             return ServerReturnTool.serverFailure("后台数据错误");
         }

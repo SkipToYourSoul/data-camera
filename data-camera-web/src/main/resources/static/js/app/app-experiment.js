@@ -185,7 +185,7 @@ function expRecorder(button) {
     // -- get recorder status
     $.ajax({
         type: 'get',
-        url: crud_address + "/isRecorder",
+        url: crud_address + "/isRecord",
         data: {
             "exp-id": exp_id
         },
@@ -227,7 +227,7 @@ function expRecorder(button) {
         // --- change recorder status on server
         $.ajax({
             type: 'get',
-            url: crud_address + "/recorder",
+            url: crud_address + "/record",
             data: {
                 "exp-id": exp_id,
                 "is-save": is_save_recorder

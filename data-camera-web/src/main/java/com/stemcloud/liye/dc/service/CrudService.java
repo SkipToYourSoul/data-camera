@@ -193,11 +193,16 @@ public class CrudService {
     }
 
     /************/
-    /* CONTENT  */
+    /* RECORDER  */
     /************/
-    public void updateContentName(long id, String name){
+    public void updateRecorderName(long id, String name){
         recorderRepository.updateName(id, name);
     }
+
+    public void updateRecorderDescription(long id, String description){
+        recorderRepository.updateDescription(id, description);
+    }
+
 
     /************/
     /* MONITOR AND RECORDER   */

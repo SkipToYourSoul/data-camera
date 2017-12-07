@@ -78,6 +78,10 @@
     </dependencies>
 
     <build>
+        <finalName>
+            tag-checker-test
+        </finalName>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
