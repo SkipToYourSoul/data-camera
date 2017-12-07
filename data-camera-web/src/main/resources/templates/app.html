@@ -38,13 +38,21 @@
                     <!-- END SIDEBAR USERPIC -->
                     <!-- SIDEBAR USER TITLE -->
                     <div class="profile-app-info">
-                        <div class="info-title" th:text="${param.id}?${app.name}:'欢迎来到应用管理页面'">
+                        <div th:if="!${param.id}" class="info-title">
+                            欢迎来到应用管理页面
+                        </div>
+                        <div th:if="${param.id}" class="info-title">
+                            <div th:text="|应用：${app.name}|"></div>
+                            <a data-toggle="collapse" href="#app-info"
+                               aria-expanded="false" aria-controls="app-info">
+                                查看详情
+                            </a>
                         </div>
                         <div class="info-description">
                             <div th:if="!${param.id}">
                                 在这里可以看到你账户下的设备及应用的相关统计
                             </div>
-                            <div th:if="${param.id}">
+                            <div th:if="${param.id}" class="collapse" id="app-info">
                                 <div th:text="|应用编号: ${app.id}|"></div>
                                 <div th:text="|创建时间: ${#dates.format(app.createTime, 'yyyy-MM-dd HH:mm:ss')}|"></div>
                                 <div th:text="|应用描述: ${app.description}|"></div>

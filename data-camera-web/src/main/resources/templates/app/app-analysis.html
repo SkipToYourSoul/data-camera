@@ -38,13 +38,18 @@
                                                         <div th:id="|analysis-info-${entry.key}-${recorder.id}|"></div>
                                                         <div th:id="|analysis-chart-${entry.key}-${recorder.id}|"></div>
                                                         <div th:id="|analysis-video-${entry.key}-${recorder.id}|"></div>
+                                                        <div class="app-analysis-content-desc">
+                                                            <div class="title">实验片段描述</div>
+                                                            <div class="content">
+                                                                <a href="#" th:id="|analysis-content-desc-${recorder.id}|" data-type="textarea" th:text="${recorder.description}"></a>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="col-xs-4 col-sm-4 col-md-4">
                                                         <div class="app-analysis-content-info">
                                                             <div class="info">
                                                                 <div class="title" th:text="|基本信息|"></div>
                                                                 <div class="content">名称（点击可修改）： <a href="#" th:id="|analysis-content-name-${recorder.id}|" data-type="text" th:text="${recorder.name}"></a></div>
-                                                                <div class="content" th:text="|描述： ${recorder.description}|"></div>
                                                             </div>
                                                             <div class="my-container">
                                                                 <div class="title">内容回放（回放功能应放置在内容页）</div>

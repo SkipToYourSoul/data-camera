@@ -36,6 +36,7 @@ function initExpContentChart(exp_id){
                     }
                     // --- edit able
                     var $content_name_dom = $('#analysis-content-name-' + content_id);
+                    var $content_desc_dom = $('#analysis-content-desc-' + content_id);
                     $content_name_dom.editable({
                         type: 'text',
                         pk: content_id,
@@ -52,6 +53,12 @@ function initExpContentChart(exp_id){
                             message_info('修改失败', 'error');
                         }
                     });
+                    $content_desc_dom.editable({
+                        title: '输入描述',
+                        rows: 10,
+                        placeholder: '在这里输入描述'
+                    });
+
 
 
                     var chart_data = content_data[content_id]['CHART'];

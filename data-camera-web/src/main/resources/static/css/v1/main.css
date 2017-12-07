@@ -55,10 +55,16 @@
 }
 
 .profile-app-info .info-title {
-    color: #5a7391;
+    color: #5b9bd1;
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 7px;
+}
+
+.profile-app-info .info-title a{
+    color: #9d9d9d;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .profile-app-info .info-description {
