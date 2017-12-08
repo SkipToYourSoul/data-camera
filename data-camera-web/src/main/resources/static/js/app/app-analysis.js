@@ -3,6 +3,7 @@
  *  Author: liye on 2017/11/25
  *  Description:
  */
+var analysis_chart_legend_selected = {};
 
 function initResourceOfAnalysisPage(){
     // init the first exp content charts
@@ -90,6 +91,11 @@ function initExpContentChart(exp_id){
                                 height: chart_height
                             });
                             chart.setOption(analysisChartOption(chart_data));
+                            chart.on('legendselectchanged', function (params) {
+                                console.log(params);
+                                console.log(this['dom']);
+                                analysis_chart_legend_selected[this['dom']] = params.selected;
+                            }, {'dom': chart_dom});
                         } else {
                             echarts.getInstanceByDom(document.getElementById(chart_dom)).setOption(analysisChartOption(chart_data));
                         }
