@@ -4,6 +4,7 @@
  *  Description:
  */
 var analysis_chart_legend_selected = {};
+var analysis_chart_data_zoom = {};
 
 function initResourceOfAnalysisPage(){
     // init the first exp content charts
@@ -91,10 +92,26 @@ function initExpContentChart(exp_id){
                                 height: chart_height
                             });
                             chart.setOption(analysisChartOption(chart_data));
+                            // -- bound event
                             chart.on('legendselectchanged', function (params) {
                                 console.log(params);
-                                console.log(this['dom']);
-                                analysis_chart_legend_selected[this['dom']] = params.selected;
+                                var current_legend = "";
+                                for (var key in params.selected){
+                                    if (params.selected[key] == true){
+                                        current_legend += key + ',';
+                                    }
+                                }
+                                if (current_legend.length > 0){
+                                    current_legend = current_legend.slice(0, current_legend.length - 1);
+                                }
+                                analysis_chart_legend_selected[this.dom] = current_legend;
+                            }, {'dom': chart_dom});
+                            chart.on('datazoom', function (params) {
+                                console.log(params);
+                                analysis_chart_data_zoom[this.dom] = {
+                                    'start': Math.round(params.start),
+                                    'end': Math.round(params.end)
+                                }
                             }, {'dom': chart_dom});
                         } else {
                             echarts.getInstanceByDom(document.getElementById(chart_dom)).setOption(analysisChartOption(chart_data));
@@ -151,15 +168,22 @@ function generateNewContent(button) {
     var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
     if (chart != null){
         var option = chart.getOption();
-        var start = option['dataZoom'][0]['start'];
-        var end = option['dataZoom'][0]['end'];
-        var data = option['series'][0]['data'];
-        var legend = option['legend'][0]['data'];
+        if (!analysis_chart_data_zoom.hasOwnProperty(chart_dom)){
+            analysis_chart_data_zoom[chart_dom] = {
+                'start': Math.round(option['dataZoom'][0]['start']),
+                'end': Math.round(option['dataZoom'][0]['end'])
+            }
+        }
+        if (!analysis_chart_legend_selected.hasOwnProperty(chart_dom)){
+            analysis_chart_legend_selected[chart_dom] = option['legend'][0]['data'];
+        }
+    } else {
+        return;
     }
 
-    var dialog_message = '<p>数据起始时间：' + start + '</p>';
-    dialog_message += '<p>数据结束时间：' + end + '</p>';
-    dialog_message += '<p>数据维度：' + legend + '</p>';
+    var dialog_message = '<p>数据起始时间：' + analysis_chart_data_zoom[chart_dom]['start'] + '</p>';
+    dialog_message += '<p>数据结束时间：' + analysis_chart_data_zoom[chart_dom]['end'] + '</p>';
+    dialog_message += '<p>数据维度：' + analysis_chart_legend_selected[chart_dom] + '</p>';
 
     var dialog = bootbox.dialog({
         title: '即将生成新的实验数据段，记录如下',
