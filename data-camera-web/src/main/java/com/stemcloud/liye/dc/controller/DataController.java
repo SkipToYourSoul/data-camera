@@ -7,6 +7,7 @@ import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.domain.common.ServerReturnTool;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.DataService;
+import com.stemcloud.liye.dc.util.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +62,8 @@ public class DataController {
     }
 
     /**
+     * 获取更新的监控数据
+     *
      * Map<Long, Map<String, List<ChartTimeSeries>>>
      *     sensor_id, (data_key, List<data_value>)
      * @param queryParams
@@ -77,12 +81,14 @@ public class DataController {
     }
 
     /**
+     * 获取原始实验片段数据，并返回
+     *
      * Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>>
      *      content_id, (sensor_id, (data_key, List<data_value>))
      * @param queryParams
      * @return
      */
-    @GetMapping("/content")
+    @GetMapping("/origin-content")
     Map content(@RequestParam Map<String, String> queryParams){
         Map<String, Object> map;
         try{
@@ -95,6 +101,24 @@ public class DataController {
             map = ServerReturnTool.serverFailure(e.getMessage());
             logger.error("/data/content", e);
         }
+        return map;
+    }
+
+    /**
+     * 生成用户自定义的实验片段
+     *
+     * @param queryParams
+     * @return
+     */
+    @GetMapping("/new-content")
+    Map newContent(@RequestParam Map<String, String> queryParams){
+        Map<String, Object> map = ServerReturnTool.serverSuccess("success");
+        long contentId = Long.parseLong(queryParams.get("content-id"));
+        int start = Integer.parseInt(queryParams.get("start"));
+        int end = Integer.parseInt(queryParams.get("end"));
+        List<String> legend = Arrays.asList(queryParams.get("legend").split(";"));
+        dataService.generateUserContent(contentId, start, end, legend);
+
         return map;
     }
 }

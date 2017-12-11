@@ -69,7 +69,7 @@ body{
 }
 
 .app-exp-track-statistics .content-text{
-    background-color: white;
+    background-color: rgba(154, 154, 154, 0.1);
 }
 
 .app-exp-track-statistics .content-sub-text{

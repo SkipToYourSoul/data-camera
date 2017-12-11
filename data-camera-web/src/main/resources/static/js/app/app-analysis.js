@@ -24,7 +24,7 @@ function initExpContentChart(exp_id){
 
     $.ajax({
         type: 'get',
-        url: data_addrss + "/content",
+        url: data_addrss + "/origin-content",
         async: false,
         data: {
             "exp-id": exp_id
@@ -98,7 +98,7 @@ function initExpContentChart(exp_id){
                                 var current_legend = "";
                                 for (var key in params.selected){
                                     if (params.selected[key] == true){
-                                        current_legend += key + ',';
+                                        current_legend += key + ';';
                                     }
                                 }
                                 if (current_legend.length > 0){
@@ -179,6 +179,7 @@ function generateNewContent(button) {
             analysis_chart_legend_selected[chart_dom] = option['legend'][0]['data'];
         }
     } else {
+        message_info("图表中暂无数据，不能生成新的内容", 'error');
         return;
     }
 
@@ -192,16 +193,31 @@ function generateNewContent(button) {
         buttons: {
             cancel: {
                 label: '<i class="fa fa-times"></i>取消',
-                className: 'btn-danger',
-                callback: function(){
-                    message_info('Custom cancel clicked', 'info');
-                }
+                className: 'btn-danger'
             },
             ok: {
                 label: '<i class="fa fa-check"></i>确认生成',
                 className: 'btn-info',
                 callback: function(){
-                    message_info('Custom OK clicked', 'info');
+                    message_info('内容生成中', 'info');
+                    $.ajax({
+                        type: 'get',
+                        url: data_addrss + "/new-content",
+                        async: false,
+                        data: {
+                            "exp-id": exp_id,
+                            "content-id": content_id,
+                            "start": analysis_chart_data_zoom[chart_dom]['start'],
+                            "end": analysis_chart_data_zoom[chart_dom]['end'],
+                            "legend": analysis_chart_legend_selected[chart_dom]
+                        },
+                        success: function (response) {
+
+                        },
+                        error: function (response) {
+
+                        }
+                    });
                 }
             }
         }

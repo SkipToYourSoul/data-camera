@@ -175,7 +175,7 @@ public class ViewController {
 
     @GetMapping("/denied")
     public String denied(HttpServletRequest request) {
-        logger.warn("denied: " + request.toString());
+        logger.warn("denied: " + request.getRequestURL().toString());
         return "denied";
     }
 

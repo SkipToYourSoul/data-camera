@@ -39,6 +39,13 @@ public class DataService {
         this.videoDataRepository = videoDataRepository;
     }
 
+    /**
+     * 获取实验最新的传感器数据
+     *
+     * @param expId 给定的实验id
+     * @param timestamp 时间戳下限
+     * @return sensor_id, (data_key, List<data_value>)
+     */
     public Map<Long, Map<String, List<ChartTimeSeries>>> getRecentDataOfBoundSensors(long expId, long timestamp){
         List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         Set<Long> boundSensorIds = new HashSet<Long>();
@@ -49,8 +56,9 @@ public class DataService {
     }
 
     /**
-     * get content data of experiment
-     * @param expId
+     * 获取实验片段数据
+     *
+     * @param expId 给定的实验id
      * @return Map<Long, Map>
      *     key: content_id
      *     value: SensorType, Map<SensorId, data>
@@ -86,7 +94,21 @@ public class DataService {
         return result;
     }
 
+
+    public void generateUserContent(long contentId, int start, int end, List<String> legend){
+        RecorderInfo recorder = recorderRepository.findOne(contentId);
+        Date startTime = recorder.getStartTime();
+        Date endTime = recorder.getEndTime();
+        RecorderDevices devices = new Gson().fromJson(recorder.getDevices(), RecorderDevices.class);
+        Set<Long> sids = new HashSet<Long>(devices.getSensors());
+
+        List<ValueData> values = valueDataRepository.findBySensorIdInAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sids, legend, startTime, endTime);
+
+    }
+
     /**
+     * 将valueData转换成为echart需要的时间数据格式
+     *
      * sensor_id, (data_key, List<data_value>)
      */
     private Map<Long, Map<String, List<ChartTimeSeries>>> transferChartData(List<ValueData> vd){
@@ -122,6 +144,8 @@ public class DataService {
     }
 
     /**
+     * 将videoData转换成为video.js需要的数据格式
+     *
      * sensor_id, video_path
      */
     private Map<Long, Video> transferVideoData(List<VideoData> videos){
