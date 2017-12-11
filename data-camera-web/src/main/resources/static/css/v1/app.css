@@ -68,22 +68,28 @@ body{
     padding: 5px 10px 5px 10px;
 }
 
-.app-exp-track-statistics .content-title{
-    margin: 0 auto 10px;
+.app-exp-track-statistics .content-text{
+    background-color: white;
+}
+
+.app-exp-track-statistics .content-sub-text{
+    font-size: 12px;
+    color: #5c5b5b;
+}
+
+.app-exp-track-statistics .content-now-text{
+    padding-left: 50px;
+    font-size: 28px;
+    color: #d43f3a;
+    font-weight: 600;
+}
+
+.app-exp-track-statistics .content-bound-sensor{
+    margin: 10px auto 10px;
     font-size: 16px;
     font-weight: 600;
     color: #9d9d9d;
     text-align: left;
-}
-
-.app-exp-track-statistics .content-text{
-    font-size: 20px;
-    color: #ff5a00;
-}
-
-.app-exp-track-statistics .content-threshold-text{
-    font-size: 20px;
-    color: #5c5b5b;
 }
 
 .app-exp-button{

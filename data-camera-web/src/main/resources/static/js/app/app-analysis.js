@@ -113,6 +113,7 @@ function initExpContentChart(exp_id){
                                     'end': Math.round(params.end)
                                 }
                             }, {'dom': chart_dom});
+                            chart.resize({height: chart_height});
                         } else {
                             echarts.getInstanceByDom(document.getElementById(chart_dom)).setOption(analysisChartOption(chart_data));
                         }

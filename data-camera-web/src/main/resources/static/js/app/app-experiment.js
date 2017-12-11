@@ -113,11 +113,11 @@ function initResourceOfExperimentPage() {
 
         if (isExperimentMonitor[id] == 1){
             exp_monitor_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-            exp_monitor_btn.html('停止监控');
+            exp_monitor_btn.html('<i class="fa fa-eye"></i>&nbsp;停止监控');
 
             if (isExperimentRecorder[id] == 1){
                 exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-                exp_recorder_btn.html("停止录制");
+                exp_recorder_btn.html('<i class="fa fa-camera-retro"></i>&nbsp;停止录制');
 
                 recorder_timestamp[id] = [];
                 recorder_timestamp[id].push(expRecorderTime[id]);
@@ -158,7 +158,7 @@ function expMonitor(button){
                 // start monitor
                 isExperimentMonitor[exp_id] = 1;
                 exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-                exp_monitor_btn.html('停止监控');
+                exp_monitor_btn.html('<i class="fa fa-eye"></i>&nbsp;停止监控');
 
                 doInterval(exp_id);
             } else if (action == "0"){
@@ -247,7 +247,7 @@ function expRecorder(button) {
                     // start recorder
                     message_info("实验" + exp_id + ": 开始记录");
                     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-                    exp_recorder_btn.html("停止录制");
+                    exp_recorder_btn.html('<i class="fa fa-camera-retro"></i>&nbsp;停止录制');
                     isExperimentRecorder[exp_id] = 1;
                     if (recorder_timestamp[exp_id].length % 2 == 0){
                         recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
@@ -279,17 +279,17 @@ function pageStopMonitor(exp_id){
 
     isExperimentMonitor[exp_id] = 0;
     $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-default').text('非监控');
-    $('#experiment-monitor-' + exp_id).html('开始监控');
+    $('#experiment-monitor-' + exp_id).html('<i class="fa fa-eye"></i>&nbsp;开始监控');
 
     clearInterval(exp_monitor_interval[exp_id]);
     delete exp_monitor_interval[exp_id];
 
-    $('.app-exp-track-statistics .content-text').html('-');
+    $('.app-exp-track-statistics .content-value').html('-');
 }
 
 function pageStopRecorder(exp_id){
     $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-default').text('非录制');
-    $('#experiment-recorder-' + exp_id).html("开始录制");
+    $('#experiment-recorder-' + exp_id).html('<i class="fa fa-camera-retro"></i>&nbsp;开始录制');
     isExperimentRecorder[exp_id] = 0;
     if (recorder_timestamp[exp_id].length % 2 == 1) {
         recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
@@ -314,8 +314,6 @@ function doInterval(exp_id){
                 var sensor_id = sensor['id'];
                 var track_id = sensor['trackId'];
                 var chart_dom = "experiment-track-" + exp_id + "-" + track_id;
-                var $info_dom_1 = $('#experiment-info-' + exp_id + "-" + track_id + "-1");
-                var $info_dom_2 = $('#experiment-info-' + exp_id + "-" + track_id + "-2");
 
                 if (sensor_type == 1){
                     if (!response.hasOwnProperty(sensor_id) || echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
@@ -327,11 +325,13 @@ function doInterval(exp_id){
 
                     // --- update series data
                     var legend = sensor['sensorConfig']['dimension'].split(';');
+                    var unit = sensor['sensorConfig']['unit'].split(';');
                     var statistics_info = {
                         "max": "-",
-                        "min": "-"
+                        "min": "-",
+                        "now": "-"
                     };
-                    for (var i in legend){
+                    for (var i = 0; i < legend.length; i++){
                         var key = legend[i];
                         if (!response[sensor_id].hasOwnProperty(key)){
                             continue;
@@ -345,6 +345,9 @@ function doInterval(exp_id){
                         }
                         // -- get statistics info
                         statistics_info = updateInfo(statistics_info, series[i]['data'], key);
+                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + (i+1) + "-1").html(statistics_info['max']);
+                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + (i+1) + "-2").html(statistics_info['min']);
+                        $('#experiment-now-' + exp_id + "-" + track_id + "-" + (i+1)).html(statistics_info['now']);
 
                         // -- update newest data timestamp
                         var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
@@ -352,8 +355,6 @@ function doInterval(exp_id){
                             exp_newest_timestamp[exp_id] = new_time;
                         }
                     }
-                    $info_dom_1.html(statistics_info['max']);
-                    $info_dom_2.html(statistics_info['min']);
 
                     // --- update series markArea (if recorder)
                     if (recorder_timestamp.hasOwnProperty(exp_id)){
@@ -379,8 +380,8 @@ function doInterval(exp_id){
                     if (recorder_timestamp.hasOwnProperty(exp_id) && recorder_timestamp[exp_id].length % 2 == 1){
                         // --- if in recorder state, update info
                         var start_time = recorder_timestamp[exp_id][recorder_timestamp[exp_id].length - 1];
-                        $info_dom_1.html(parseTime(start_time));
-                        $info_dom_2.html(Math.round((Date.now() - Date.parse(start_time))/1000) + 's');
+                        $('#experiment-info-' + exp_id + "-" + track_id + "-1").html(parseTime(start_time));
+                        $('#experiment-now-' + exp_id + "-" + track_id + "-1").html(Math.round((Date.now() - Date.parse(start_time))/1000));
                     }
                 }
             }
@@ -392,16 +393,21 @@ function doInterval(exp_id){
             return statistics_info;
         }
         var max_value = -100000, min_value = 100000;
+        var now = 0;
         for (var i=0; i<data.length; i++){
-            var value = data[i]['value'][1];
-            if (value > max_value){
-                max_value = value;
+            now = data[i]['value'][1];
+            if (now > max_value){
+                max_value = now;
             }
-            if (value < min_value){
-                min_value = value;
+            if (now < min_value){
+                min_value = now;
             }
         }
-        if (statistics_info['max'] == '-'){
+        statistics_info['max'] = max_value;
+        statistics_info['min'] = min_value;
+        statistics_info['now'] = now;
+
+        /*if (statistics_info['max'] == '-'){
             statistics_info['max'] = key + ': ' + max_value + "; ";
         } else {
             statistics_info['max'] = statistics_info['max'] + key + ': ' + max_value + "; ";
@@ -410,7 +416,7 @@ function doInterval(exp_id){
             statistics_info['min'] = key + ': ' + min_value + "; ";
         } else {
             statistics_info['min'] = statistics_info['min'] + key + ': ' + min_value + "; ";
-        }
+        }*/
         return statistics_info;
     }
 }
