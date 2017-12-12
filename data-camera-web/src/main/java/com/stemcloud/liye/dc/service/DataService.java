@@ -95,15 +95,41 @@ public class DataService {
     }
 
 
-    public void generateUserContent(long contentId, int start, int end, List<String> legend){
+    public void generateUserContent(long expId, long contentId, int start, int end, List<String> legend){
         RecorderInfo recorder = recorderRepository.findOne(contentId);
         Date startTime = recorder.getStartTime();
         Date endTime = recorder.getEndTime();
         RecorderDevices devices = new Gson().fromJson(recorder.getDevices(), RecorderDevices.class);
         Set<Long> sids = new HashSet<Long>(devices.getSensors());
 
-        List<ValueData> values = valueDataRepository.findBySensorIdInAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sids, legend, startTime, endTime);
+        // 遍历选中的几个数据段，找出最低和最高时间
+        Date minTime = endTime, maxTime = startTime;
+        for (String index : legend) {
+            long sensorId = Long.parseLong(index.split("-")[0]);
+            String key = index.split("-")[1];
+            List<ValueData> values = valueDataRepository.findBySensorIdAndKeyAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                    sensorId, key, startTime, endTime);
+            int lowerIndex = (int) Math.ceil((double) start/100 * values.size()) - 1;
+            int higherIndex = (int) Math.floor((double) end/100 * values.size()) - 1;
+            Date lowerTime = values.get(lowerIndex).getCreateTime();
+            Date higherTime = values.get(higherIndex).getCreateTime();
+            if (lowerTime.compareTo(minTime) < 0){
+                minTime = lowerTime;
+            }
+            if (higherTime.compareTo(maxTime) > 0){
+                maxTime = higherTime;
+            }
+        }
 
+        // 保存新的实验记录
+        RecorderInfo newRecorder = new RecorderInfo();
+        newRecorder.setName("用户生成的新记录");
+        newRecorder.setDescription("用户新纪录描述");
+        newRecorder.setStartTime(minTime);
+        newRecorder.setEndTime(maxTime);
+        newRecorder.setExpId(expId);
+        newRecorder.setDevices(new Gson().toJson(devices));
+        recorderRepository.save(newRecorder);
     }
 
     /**
@@ -116,7 +142,7 @@ public class DataService {
 
         for (ValueData d : vd){
             long sensorId = d.getSensorId();
-            String key = d.getKey();
+            String key = sensorId + "-" + d.getKey();
             Double value = d.getValue();
             Date time = d.getCreateTime();
 

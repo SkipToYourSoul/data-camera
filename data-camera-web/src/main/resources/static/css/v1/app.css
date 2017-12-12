@@ -59,7 +59,7 @@ body{
 .app-exp-track-statistics .title{
     padding: 15px 10px 5px 10px;
     margin-bottom: 5px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     border-bottom: 1px solid #9d9d9d;
 }
@@ -69,7 +69,7 @@ body{
 }
 
 .app-exp-track-statistics .content-text{
-    background-color: rgba(154, 154, 154, 0.1);
+
 }
 
 .app-exp-track-statistics .content-sub-text{
@@ -86,7 +86,7 @@ body{
 
 .app-exp-track-statistics .content-bound-sensor{
     margin: 10px auto 10px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #9d9d9d;
     text-align: left;

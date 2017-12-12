@@ -35,11 +35,12 @@ public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
 
     /**
      * 找到当前设备和维度下，在给定时间戳范围内的数据
+     *
      * @param sensorId 设备编号
      * @param key 数据维度
      * @param startTime 时间戳下限
      * @param endTime 时间戳上线
      * @return
      */
-    List<ValueData> findBySensorIdInAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Set<Long> sensorId, List<String> key, Date startTime, Date endTime);
+    List<ValueData> findBySensorIdAndKeyAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, String key, Date startTime, Date endTime);
 }

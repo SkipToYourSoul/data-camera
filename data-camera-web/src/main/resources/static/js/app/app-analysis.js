@@ -176,7 +176,7 @@ function generateNewContent(button) {
             }
         }
         if (!analysis_chart_legend_selected.hasOwnProperty(chart_dom)){
-            analysis_chart_legend_selected[chart_dom] = option['legend'][0]['data'];
+            analysis_chart_legend_selected[chart_dom] = option['legend'][0]['data'].join(';');
         }
     } else {
         message_info("图表中暂无数据，不能生成新的内容", 'error');

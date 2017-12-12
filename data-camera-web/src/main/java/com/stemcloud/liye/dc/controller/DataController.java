@@ -113,11 +113,12 @@ public class DataController {
     @GetMapping("/new-content")
     Map newContent(@RequestParam Map<String, String> queryParams){
         Map<String, Object> map = ServerReturnTool.serverSuccess("success");
+        long expId = Long.parseLong(queryParams.get("exp-id"));
         long contentId = Long.parseLong(queryParams.get("content-id"));
         int start = Integer.parseInt(queryParams.get("start"));
         int end = Integer.parseInt(queryParams.get("end"));
         List<String> legend = Arrays.asList(queryParams.get("legend").split(";"));
-        dataService.generateUserContent(contentId, start, end, legend);
+        dataService.generateUserContent(expId, contentId, start, end, legend);
 
         return map;
     }
