@@ -15,14 +15,15 @@ import java.util.Set;
  */
 public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
     /**
-     * 找到当前设备下，在给定时间戳范围内的数据
+     * 找到当前设备下维度(1或者多个)下，在给定时间戳范围内的数据
      *
      * @param sensorId 设备编号
+     * @param key 数据维度
      * @param startTime 时间戳下限
      * @param endTime 时间戳上线
      * @return
      */
-    List<ValueData> findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Set<Long> sensorId, Date startTime, Date endTime);
+    List<ValueData> findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, List<String> key, Date startTime, Date endTime);
 
     /**
      * 找到当前设备下，比给定时间戳更新的数据

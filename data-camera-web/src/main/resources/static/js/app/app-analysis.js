@@ -212,10 +212,14 @@ function generateNewContent(button) {
                             "legend": analysis_chart_legend_selected[chart_dom]
                         },
                         success: function (response) {
-
+                            if (response.code == "1111"){
+                                message_info('操作无效: ' + response.data, "error");
+                            } else if (response.code == "0000"){
+                                window.location.href = current_address + "?id=" + app['id'];
+                            }
                         },
                         error: function (response) {
-
+                            message_info('操作无效', "error");
                         }
                     });
                 }

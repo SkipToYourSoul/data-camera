@@ -1,6 +1,7 @@
 package com.stemcloud.liye.dc.service;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
@@ -71,18 +72,27 @@ public class DataService {
         // traverse content
         for (RecorderInfo r : ris){
             long id = r.getId();
-            RecorderDevices devices = new Gson().fromJson(r.getDevices(), RecorderDevices.class);
+            List<RecorderDevices> devices = new Gson().fromJson(r.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
             Date startTime = r.getStartTime();
             Date endTime = r.getEndTime();
-            Set<Long> sids = new HashSet<Long>(devices.getSensors());
 
             // -- video data
             List<VideoData> videos = videoDataRepository.findByRecorderInfo(r);
             Map<Long, Video> videoMap = transferVideoData(videos);
 
             // -- value data for chart
+            List<ValueData> chartValues = new ArrayList<ValueData>();
+            for (RecorderDevices device: devices){
+                long sensorId = device.getSensor();
+                List<String> legends = device.getLegends();
+                if (sensorRepository.findOne(sensorId).getSensorConfig().getType() == 1) {
+                    chartValues.addAll(valueDataRepository.findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                            sensorId, legends, startTime, endTime
+                    ));
+                }
+            }
             Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
-                    = transferChartData(valueDataRepository.findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sids, startTime, endTime));
+                    = transferChartData(chartValues);
 
             Map<String, Map> map = new HashMap<String, Map>(2);
             map.put(SensorType.CHART.toString(), chartMap);
@@ -94,16 +104,24 @@ public class DataService {
         return result;
     }
 
-
+    /**
+     * 新生成一条用户自定义的实验片段
+     *
+     * @param expId 实验id
+     * @param contentId 片段id
+     * @param start 数据截取起点
+     * @param end 数据截取终点
+     * @param legend 留下的数据维度
+     */
     public void generateUserContent(long expId, long contentId, int start, int end, List<String> legend){
         RecorderInfo recorder = recorderRepository.findOne(contentId);
         Date startTime = recorder.getStartTime();
         Date endTime = recorder.getEndTime();
-        RecorderDevices devices = new Gson().fromJson(recorder.getDevices(), RecorderDevices.class);
-        Set<Long> sids = new HashSet<Long>(devices.getSensors());
+        List<RecorderDevices> devices = new Gson().fromJson(recorder.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
 
         // 遍历选中的几个数据段，找出最低和最高时间
         Date minTime = endTime, maxTime = startTime;
+        Map<Long, List<String>> sensorLegend = new HashMap<Long, List<String>>();
         for (String index : legend) {
             long sensorId = Long.parseLong(index.split("-")[0]);
             String key = index.split("-")[1];
@@ -119,6 +137,12 @@ public class DataService {
             if (higherTime.compareTo(maxTime) > 0){
                 maxTime = higherTime;
             }
+            List<String> ls = new ArrayList<String>();
+            if (sensorLegend.containsKey(sensorId)){
+                ls = sensorLegend.get(sensorId);
+            }
+            ls.add(key);
+            sensorLegend.put(sensorId, ls);
         }
 
         // 保存新的实验记录
@@ -128,6 +152,14 @@ public class DataService {
         newRecorder.setStartTime(minTime);
         newRecorder.setEndTime(maxTime);
         newRecorder.setExpId(expId);
+        newRecorder.setIsRecorder(0);
+        for (RecorderDevices device: devices){
+            if (sensorLegend.containsKey(device.getSensor())){
+                device.setLegends(sensorLegend.get(device.getSensor()));
+            } else {
+                devices.remove(device);
+            }
+        }
         newRecorder.setDevices(new Gson().toJson(devices));
         recorderRepository.save(newRecorder);
     }

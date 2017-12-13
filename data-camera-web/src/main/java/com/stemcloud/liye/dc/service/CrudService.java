@@ -1,6 +1,7 @@
 package com.stemcloud.liye.dc.service;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
@@ -12,6 +13,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.common.RecordState;
 import com.stemcloud.liye.dc.domain.config.SensorRegister;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
@@ -20,6 +22,7 @@ import com.stemcloud.liye.dc.domain.common.SensorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -173,26 +176,6 @@ public class CrudService {
     }
 
     /************/
-    /* VIDEO   */
-    /************/
-    private void saveVideo(RecorderInfo recorderInfo){
-        String devices = recorderInfo.getDevices();
-        RecorderDevices rd = new Gson().fromJson(devices, RecorderDevices.class);
-        for (int i = 0; i < rd.getTracks().size(); i ++){
-            long trackId = rd.getTracks().get(i);
-            long sensorId = rd.getSensors().get(i);
-            if (findSensor(sensorId).getSensorConfig().getType() == SensorType.VIDEO.getValue()){
-                VideoData videoData = new VideoData();
-                videoData.setSensorId(sensorId);
-                videoData.setTrackId(trackId);
-                videoData.setRecorderInfo(recorderInfo);
-                videoDataRepository.save(videoData);
-                logger.info("SAVE VIDEO DATA, SENSOR ID IS {}, TRACK ID IS {}, RECORDER IS {}", sensorId, trackId, recorderInfo.getId());
-            }
-        }
-    }
-
-    /************/
     /* RECORDER  */
     /************/
     public void updateRecorderName(long id, String name){
@@ -205,8 +188,9 @@ public class CrudService {
 
 
     /************/
-    /* MONITOR AND RECORDER   */
+    /* MONIT AND RECORD   */
     /************/
+    @Transactional(rollbackFor = Exception.class)
     public synchronized Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId) throws Exception {
         // --- check the monitor status of current exp
         ExperimentInfo exp = expRepository.findById(expId);
@@ -240,33 +224,44 @@ public class CrudService {
         return response;
     }
 
+    /**
+     *  录制操作，开始录制时，新建片段信息；结束操作时，为当前片段信息加上结束时间
+     * @param expId 实验id
+     * @param isSave 是否保存实验片段
+     * @return {
+     *     -1：实验没有绑定传感器
+     *     1：开始录制
+     *     0：结束录制
+     * }
+     * @throws Exception 若抛出异常，则回滚
+     */
+    @Transactional(rollbackFor = Exception.class)
     public synchronized Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId, int isSave) throws Exception {
         // --- check the recorder status of current exp
         ExperimentInfo exp = expRepository.findById(expId);
         int status = exp.getIsRecorder();
-        int response = -1;
         List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         if (sensors.size() == 0){
             logger.warn("NO SENSORS BOUND FOR EXPERIMENT {}, RETURN -1", expId);
-            return response;
+            return RecordState.ERR.getValue();
         }
 
-        if (status == 0){
+        if (status == RecordState.END.getValue()){
             // --- not in recorder state
-            expRepository.recorderExp(expId, 1);
+            expRepository.recorderExp(expId, RecordState.ING.getValue());
 
             // --- new a recorder info
-            RecorderDevices devices = new RecorderDevices();
-            List<Long> sid = new ArrayList<Long>();
-            List<Long> tid = new ArrayList<Long>();
+            List<RecorderDevices> devices = new ArrayList<RecorderDevices>();
             for (SensorInfo sensor: sensors){
+                RecorderDevices device = new RecorderDevices();
                 long sensorId = sensor.getId();
                 long trackId = sensor.getTrackId();
-                sid.add(sensorId);
-                tid.add(trackId);
+                List<String> legend = Arrays.asList(sensor.getSensorConfig().getDimension().split(";"));
+                device.setSensor(sensorId);
+                device.setTrack(trackId);
+                device.setLegends(legend);
+                devices.add(device);
             }
-            devices.setSensors(sid);
-            devices.setTracks(tid);
 
             RecorderInfo recorderInfo = new RecorderInfo();
             recorderInfo.setExpId(expId);
@@ -277,8 +272,9 @@ public class CrudService {
             recorderInfo.setDescription("实验" + expId + "的记录描述");
             recorderRepository.save(recorderInfo);
 
-            response = 1;
-        } else if (status == 1){
+            logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
+            return RecordState.ING.getValue();
+        } else if (status == RecordState.ING.getValue()){
             // --- end recorder
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo == null){
@@ -296,10 +292,35 @@ public class CrudService {
                 recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1);
             }
 
-            response = 0;
+            logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
+            return RecordState.END.getValue();
         }
+        return -1;
+    }
 
-        logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
-        return response;
+    /**-------**/
+    /* VIDEO   */
+    /**-------**/
+
+    /**
+     * 在录制结束时，保存视频记录
+     *
+     * @param recorderInfo 录制的片段信息
+     */
+    private void saveVideo(RecorderInfo recorderInfo){
+        String devicesStr = recorderInfo.getDevices();
+        List<RecorderDevices> devices = new Gson().fromJson(devicesStr, new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+        for (RecorderDevices d : devices){
+            long trackId = d.getTrack();
+            long sensorId = d.getSensor();
+            if (findSensor(sensorId).getSensorConfig().getType() == SensorType.VIDEO.getValue()){
+                VideoData videoData = new VideoData();
+                videoData.setSensorId(sensorId);
+                videoData.setTrackId(trackId);
+                videoData.setRecorderInfo(recorderInfo);
+                videoDataRepository.save(videoData);
+                logger.info("SAVE VIDEO DATA, SENSOR ID IS {}, TRACK ID IS {}, RECORDER IS {}", sensorId, trackId, recorderInfo.getId());
+            }
+        }
     }
 }

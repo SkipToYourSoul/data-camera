@@ -113,7 +113,7 @@
                                                     <button class="btn btn-default btn-xs pull-right" th:data="${track.id}" onclick="deleteTrack(this)"><i class="fa fa-close"></i></button>
                                                 </div>
                                                 <div class="content">
-                                                    <div class="content-text">
+                                                    <div th:if="${track.sensor != null}" class="content-text">
                                                         <th:block th:each="myunit,index:${#strings.listSplit(track.sensor.sensorConfig.unit,';')}">
                                                             <div class="content-sub-text" th:switch="${track.type}">
                                                                 <div th:case="1">
