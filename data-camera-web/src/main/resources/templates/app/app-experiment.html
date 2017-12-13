@@ -13,6 +13,13 @@
                             data-toggle="collapse" data-target="#exp-help" aria-expanded="false" aria-controls="exp-help">
                         <i class="fa fa-question-circle"></i>&nbsp;获取帮助
                     </button>
+
+                    <span class="pull-right">
+                        <button class="btn btn-warning" onclick="allMonitor()">
+                        <i class="fa fa-eye"></i>&nbsp;全局监控</button>
+                    <button class="btn btn-danger" onclick="allMonitor()">
+                        <i class="fa fa-camera-retro"></i>&nbsp;全局录制</button>
+                    </span>
                 </div>
                 <div class="collapse" id="exp-help">
                     <!-- 页面说明 -->
@@ -90,12 +97,8 @@
                                                 <div th:case="2">
                                                     <div class="alert alert-info" role="alert" style="font-weight: 600; font-size: 16px">
                                                         TIPS: 视频轨迹在实验状态下无法看到实时数据状态，录制结束后可在“分析模式”中看到</div>
-                                                    <div class="progress progress-striped active">
-                                                        <div class="progress-bar progress-bar-info" role="progressbar"
-                                                             aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                                             style="width: 60%;">
-                                                            <span class="sr-only">60% 完成（成功）</span>
-                                                        </div>
+                                                    <div class="text-center">
+                                                        <h1 style="color: #ac2925" class="shake-slow shake-constant">REC</h1>
                                                     </div>
                                                 </div>
                                                 <div th:case="0">

@@ -19,6 +19,7 @@
     <link rel="stylesheet" th:href="@{source/timeline/timeline.css}"/>
     <link rel="stylesheet" th:href="@{source/datepicker/bootstrap-datetimepicker.min.css}"/>
     <link rel="stylesheet" th:href="@{source/table/bootstrap-editable.css}"/>
+    <link rel="stylesheet" th:href="@{source/shake/csshake.min.css}"/>
 
     <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
     <link rel="stylesheet" th:href="@{css/v1/app.css}"/>
@@ -170,20 +171,19 @@
 
     <script th:src="@{js/common.js}"></script>
     <script th:src="@{js/app/app-controller.js}"></script>
+    <script th:src="@{js/app/app-common.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-charts.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-experiment.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis.js}"></script>
 
     <script>
         if (app != null) {
-            initResourceOfExperimentPage();
-            // initResourceOfAnalysisPage();
-
+            inAppPage();
             $('#app-main-tab').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 var page = e.target.getAttribute('href');
                 if (page == "#app-experiment"){
                     initResourceOfExperimentPage();
-                } else {
+                } else if (page == "#app-analysis") {
                     initResourceOfAnalysisPage();
                 }
             });

@@ -114,8 +114,10 @@ function initExpContentChart(exp_id){
                                 }
                             }, {'dom': chart_dom});
                             chart.resize({height: chart_height});
+                            console.log("first time to init chart");
                         } else {
                             echarts.getInstanceByDom(document.getElementById(chart_dom)).setOption(analysisChartOption(chart_data));
+                            console.log("not first time to init chart");
                         }
                     }
 
@@ -215,7 +217,7 @@ function generateNewContent(button) {
                             if (response.code == "1111"){
                                 message_info('操作无效: ' + response.data, "error");
                             } else if (response.code == "0000"){
-                                window.location.href = current_address + "?id=" + app['id'];
+                                window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
                             }
                         },
                         error: function (response) {
@@ -223,6 +225,37 @@ function generateNewContent(button) {
                         }
                     });
                 }
+            }
+        }
+    });
+}
+
+function deleteContent(button) {
+    var content_id = button.getAttribute('data');
+    bootbox.confirm({
+        title: "删除实验片段?",
+        message: "确认删除实验片段吗? ",
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i> 取消'
+            },
+            confirm: {
+                label: '<i class="fa fa-check"></i> 确认删除'
+            }
+        },
+        callback: function (result) {
+            if (result){
+                $.ajax({
+                    type: 'get',
+                    url: crud_address + '/recorder/delete?content-id=' + content_id,
+                    success: function (id) {
+                        window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
+                        $('#app-main-tab').find('li:eq(1) a').tab('show');
+                    },
+                    error: function (id) {
+                        message_info("删除实验片段失败", 'error');
+                    }
+                });
             }
         }
     });

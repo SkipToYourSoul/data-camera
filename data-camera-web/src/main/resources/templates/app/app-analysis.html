@@ -62,7 +62,7 @@
                                                                 <div class="title">实验片段修改</div>
                                                                 <button class="btn btn-default" th:data="|${entry.key}-${recorder.id}|" onclick="generateNewContent(this)">
                                                                     <i class="fa fa-area-chart"></i>&nbsp;生成新的实验片段</button>
-                                                                <button class="btn btn-default">
+                                                                <button class="btn btn-default" th:data="|${recorder.id}|" onclick="deleteContent(this)">
                                                                     <i class="fa fa-trash"></i>&nbsp;删除当前实验片段</button>
                                                             </div>
                                                             <div class="my-container">

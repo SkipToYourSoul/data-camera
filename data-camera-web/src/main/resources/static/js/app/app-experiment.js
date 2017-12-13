@@ -420,3 +420,15 @@ function doInterval(exp_id){
         return statistics_info;
     }
 }
+
+function allMonitor() {
+    console.log(getQueryString('id'));
+}
+
+function initPage() {
+    var tab = getQueryString("tab");
+    if (tab != null && tab == 2){
+        $('#app-main-tab').find('li:eq(1) a').tab('show');
+        initResourceOfAnalysisPage();
+    }
+}

@@ -292,7 +292,7 @@ public class CrudController {
             map = ServerReturnTool.serverSuccess(exp.getIsRecorder());
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/isRecorder", e);
+            logger.error("/crud/isRecord", e);
         }
         return map;
     }
@@ -307,7 +307,7 @@ public class CrudController {
             map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/recorder", e);
+            logger.error("/crud/record", e);
         }
         return map;
     }
@@ -340,5 +340,28 @@ public class CrudController {
         }
 
         return ServerReturnTool.serverSuccess(result);
+    }
+
+    /**
+     * 删除实验片段
+     *
+     * @param queryParams 参数
+     * @param request http请求
+     * @return
+     */
+    @GetMapping("/recorder/delete")
+    public Map deleteRecorder(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        if (!queryParams.containsKey("content-id") || Long.parseLong(queryParams.get("content-id")) < 0){
+            return ServerReturnTool.serverFailure("参数错误");
+        }
+        try {
+            String user = commonService.getCurrentLoginUser(request);
+            Long contentId = Long.parseLong(queryParams.get("content-id"));
+            logger.info("USER " + user + " DELETE RECORDER " + contentId);
+            crudService.deleteRecorder(contentId);
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("content-id")));
     }
 }

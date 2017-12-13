@@ -186,6 +186,10 @@ public class CrudService {
         recorderRepository.updateDescription(id, description);
     }
 
+    public void deleteRecorder(long id){
+        recorderRepository.deleteRecorder(id);
+    }
+
 
     /************/
     /* MONIT AND RECORD   */
