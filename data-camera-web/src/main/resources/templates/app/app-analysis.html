@@ -23,7 +23,7 @@
                                      class="alert alert-info" role="alert">TIPS: 还没有已生成的实验内容，请先在实验模式下记录数据吧:)</div>
 
                                 <th:block th:each="recorder,index:${recorders[entry.key]}">
-                                    <div class="panel panel-default">
+                                    <div th:class="|panel panel-default exp-recorder-panel-${entry.key}|">
                                         <div class="panel-heading">
                                             <div class="panel-title">
                                                 <a role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}" aria-expanded="true" aria-controls="collapseOne" th:text="|原生实验片段${index.count},

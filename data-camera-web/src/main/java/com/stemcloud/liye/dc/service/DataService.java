@@ -57,7 +57,12 @@ public class DataService {
         for (SensorInfo bs: boundSensors){
             boundSensorIds.add(bs.getId());
         }
-        return transferChartData(valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds));
+
+        Date time = new Date(timestamp);
+        List<ValueData> data = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(time, boundSensorIds);
+
+        logger.info("request {} data, time is {}", data.size(), time.toString());
+        return transferChartData(data);
     }
 
     /**

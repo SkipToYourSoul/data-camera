@@ -322,7 +322,7 @@ function doInterval(exp_id){
                         "now": "-"
                     };
                     for (var i = 0; i < legend.length; i++){
-                        var key = legend[i];
+                        var key = sensor_id + '-' + legend[i];
                         if (!response[sensor_id].hasOwnProperty(key)){
                             continue;
                         }

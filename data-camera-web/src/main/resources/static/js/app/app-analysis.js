@@ -15,14 +15,16 @@ function initResourceOfAnalysisPage(){
 }
 
 function initExpContentChart(exp_id){
+    if ( $(".exp-recorder-panel-" + exp_id).length == 0 ){
+        // message_info("暂无实验内容", 'info');
+        return;
+    }
+
     for (var i = 0; i < recorders[exp_id].length; i++){
         var chart_dom = '#analysis-chart-' + exp_id + '-' + recorders[exp_id][i]['id'];
         var video_dom = '#analysis-video-' + exp_id + '-' + recorders[exp_id][i]['id'];
-        if ($(chart_dom).length == 0){
-            
-        }
         if ( ($(chart_dom).length > 0 && $(chart_dom).html().length > 0) || ($(video_dom).length > 0 && $(video_dom).html().length > 0) ){
-            message_info("数据已加载", 'info');
+            // message_info("数据已加载", 'info');
             return;
         }
     }
