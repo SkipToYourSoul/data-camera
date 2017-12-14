@@ -3,7 +3,6 @@
     <div th:fragment="app-analysis">
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                <div id="app-experiment-loading"></div>
                 <div th:if="${#maps.isEmpty(experiments)}"
                      class="alert alert-info" role="alert">TIPS: 应用中暂无实验记录，请先在实验模式下新建实验并记录数据吧:)</div>
                 <div th:if="${not #maps.isEmpty(experiments)}">

@@ -24,13 +24,6 @@ var exp_newest_timestamp = {};
 var recorder_timestamp = {};
 
 function initResourceOfExperimentPage() {
-    var $loader = $("#app-experiment-loading");
-    $loader.fakeLoader({
-        timeToHide: 10000,
-        spinner:"spinner4",
-        bgColor:"rgba(154, 154, 154, 0.7)"
-    });
-
     // init experiment track and sensors
     for (var exp_id in experiments){
         var experiment = experiments[exp_id];
@@ -127,9 +120,6 @@ function initResourceOfExperimentPage() {
             doInterval(id);
         }
     }
-
-    // complete loading
-    $loader.fadeOut();
 }
 
 function expMonitor(button){
@@ -407,28 +397,10 @@ function doInterval(exp_id){
         statistics_info['min'] = min_value;
         statistics_info['now'] = now;
 
-        /*if (statistics_info['max'] == '-'){
-            statistics_info['max'] = key + ': ' + max_value + "; ";
-        } else {
-            statistics_info['max'] = statistics_info['max'] + key + ': ' + max_value + "; ";
-        }
-        if (statistics_info['min'] == '-'){
-            statistics_info['min'] = key + ': ' + min_value + "; ";
-        } else {
-            statistics_info['min'] = statistics_info['min'] + key + ': ' + min_value + "; ";
-        }*/
         return statistics_info;
     }
 }
 
 function allMonitor() {
     console.log(getQueryString('id'));
-}
-
-function initPage() {
-    var tab = getQueryString("tab");
-    if (tab != null && tab == 2){
-        $('#app-main-tab').find('li:eq(1) a').tab('show');
-        initResourceOfAnalysisPage();
-    }
 }

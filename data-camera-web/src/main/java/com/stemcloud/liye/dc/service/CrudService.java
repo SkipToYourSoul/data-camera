@@ -29,6 +29,7 @@ import java.util.*;
 /**
  * Belongs to data-camera-web
  * Description:
+ *  增、删、改、查
  *  crud operation of app, exp, track and sensor
  * @author liye on 2017/11/7
  */
@@ -65,15 +66,15 @@ public class CrudService {
         // delete app
         int a = appRepository.deleteApp(id);
         logger.info("DELETE APP " + id);
-        AppInfo app = appRepository.findById(id);
-        List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeleted(app, 0);
+        AppInfo app = appRepository.findOne(id);
+        List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeletedOrderByCreateTime(app, 0);
         for (ExperimentInfo exp : experiments){
             deleteExp(exp.getId());
         }
     }
 
     public AppInfo findApp(Long id){
-        return appRepository.findById(id);
+        return appRepository.findOne(id);
     }
 
     /**************/

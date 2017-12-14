@@ -1,6 +1,7 @@
 package com.stemcloud.liye.dc.dao.data;
 
 import com.stemcloud.liye.dc.domain.data.ValueData;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Date;

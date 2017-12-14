@@ -15,17 +15,21 @@ function initResourceOfAnalysisPage(){
 }
 
 function initExpContentChart(exp_id){
-    var $loader = $("#app-analysis-loading");
-    $loader.fakeLoader({
-        timeToHide: 10000,
-        spinner:"spinner4",
-        bgColor:"rgba(154, 154, 154, 0.7)"
-    });
+    for (var i = 0; i < recorders[exp_id].length; i++){
+        var chart_dom = '#analysis-chart-' + exp_id + '-' + recorders[exp_id][i]['id'];
+        var video_dom = '#analysis-video-' + exp_id + '-' + recorders[exp_id][i]['id'];
+        if ($(chart_dom).length == 0){
+            
+        }
+        if ( ($(chart_dom).length > 0 && $(chart_dom).html().length > 0) || ($(video_dom).length > 0 && $(video_dom).html().length > 0) ){
+            message_info("数据已加载", 'info');
+            return;
+        }
+    }
 
     $.ajax({
         type: 'get',
-        url: data_addrss + "/origin-content",
-        async: false,
+        url: data_addrss + "/exp-content",
         data: {
             "exp-id": exp_id
         },
@@ -147,15 +151,14 @@ function initExpContentChart(exp_id){
                         }
                     }
                 }
+            } else {
+                message_info("加载数据失败，失败原因为：" + response.data, 'error');
             }
         },
         error: function (response) {
             message_info("操作失败，失败原因为：" + response, 'error');
         }
     });
-
-    // complete loading
-    $loader.fadeOut();
 }
 
 

@@ -25,6 +25,7 @@
     <link rel="stylesheet" th:href="@{css/v1/app.css}"/>
 </head>
 <body>
+    <div id="app-loading"></div>
     <div class="navbar-wrapper" th:include="module/common::nav">
     </div>
 
@@ -152,7 +153,7 @@
         var recorders = [[${recorders}]];
     </script>
 
-    <script th:src="@{source/loading/fakeLoader.min.js}"></script>
+    <script th:src="@{source/loading/fakeLoader.js}"></script>
 
     <script th:src="@{source/messenger/messenger.min.js}"></script>
     <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
@@ -176,23 +177,9 @@
     <script th:if="${param.id}" th:src="@{js/app/app-experiment.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis.js}"></script>
 
-    <script>
+    <script type="text/javascript">
         if (app != null) {
             inAppPage();
-            $('#app-main-tab').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                var page = e.target.getAttribute('href');
-                if (page == "#app-experiment"){
-                    initResourceOfExperimentPage();
-                } else if (page == "#app-analysis") {
-                    initResourceOfAnalysisPage();
-                }
-            });
-
-            $('#app-analysis-tab').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                var page = e.target.getAttribute('href');
-                var exp_id = page.split('-')[2];
-                initExpContentChart(exp_id);
-            });
         }
     </script>
 </body>

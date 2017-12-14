@@ -13,7 +13,6 @@ import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -43,66 +42,104 @@ public class BaseInfoService {
         this.recorderRepository = recorderRepository;
     }
 
-    /** APPS **/
+    // --- APPS
+    /**
+     * 获取用户当前的应用，按创建时间排序
+     * @param user 当前用户
+     * @return Map
+     */
     public Map<Long, AppInfo> getOnlineApps(String user){
-        List<AppInfo> apps = appRepository.findByCreatorAndIsDeletedOrderByCreateTime(user, 0);
-        Map<Long, AppInfo> map = new HashMap<Long, AppInfo>(apps.size());
+        List<AppInfo> apps = appRepository.findByCreatorAndIsDeletedOrderByCreateTimeDesc(user, 0);
+        Map<Long, AppInfo> map = new LinkedHashMap<Long, AppInfo>(apps.size());
         for (AppInfo app: apps){
             map.put(app.getId(), app);
         }
         return map;
     }
 
+    /**
+     * 判断当前用户是否拥有访问的应用页面的权限
+     * @param id 应用id
+     * @param user 用户
+     * @return true or false
+     */
+    public Boolean isAppBelongUser(long id, String user) {
+        AppInfo app = appRepository.findOne(id);
+        if (app == null){
+            logger.warn("Null app {}, return false", id);
+            return false;
+        }
+        logger.info("Compare user {} with app creator {}", user, app.getCreator());
+        return app.getIsDeleted() == 0 && user.equals(app.getCreator());
+    }
+
+    /** EXPERIMENT **/
+    /**
+     * 获取当前应用下的在线实验数据，按创建时间排序
+     * @param id 应用id
+     * @return Map
+     */
     public Map<Long, ExperimentInfo> getOnlineExpOfApp(long id){
-        AppInfo app = appRepository.findById(id);
-        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeleted(app, 0);
-        Map<Long, ExperimentInfo> map = new HashMap<Long, ExperimentInfo>(experiments.size());
+        AppInfo app = appRepository.findOne(id);
+        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(app, 0);
+        Map<Long, ExperimentInfo> map = new LinkedHashMap<Long, ExperimentInfo>(experiments.size());
         for (ExperimentInfo exp : experiments){
             map.put(exp.getId(), exp);
         }
         return map;
     }
 
-    public Boolean isAppBelongUser(long id, String user) {
-        AppInfo app = appRepository.findById(id);
-        if (app == null){
-            logger.warn("null app " + id);
-            return false;
-        }
-        logger.info("compare user " + user + " with app creator " + app.getCreator());
-        return app.getIsDeleted() == 0 && user.equals(app.getCreator());
-    }
-
-    public AppInfo getCurrentApp(long id){
-        return appRepository.findById(id);
-    }
-
-    /** SENSORS **/
-    public List<SensorInfo> getOnlineSensor(String user){
-        return sensorRepository.findByCreatorAndIsDeletedOrderByCreateTime(user, 0);
-    }
-
+    /**
+     * 获取有效的实验数据
+     * @return
+     */
     public List<ExperimentInfo> getOnlineExp(){
         return experimentRepository.findByIsDeletedOrderByCreateTime(0);
     }
 
-    public List<TrackInfo> getOnlineTrack(){
-        return trackRepository.findByIsDeletedOrderByCreateTime(0);
+    // --- SENSORS
+    /**
+     * 获取有效的设备数据
+     * @param user
+     * @return
+     */
+    public List<SensorInfo> getOnlineSensor(String user){
+        return sensorRepository.findByCreatorAndIsDeletedOrderByCreateTime(user, 0);
     }
 
+    /**
+     * 获取当前用户下未被绑定的设备
+     * @param user 用户
+     * @return
+     */
     public List<SensorInfo> getAvailableSensorOfCurrentUser(String user){
         return sensorRepository.findByCreatorAndAppIdAndExpIdAndTrackId(user, 0, 0, 0);
     }
 
-    public List<SensorInfo> getSensorsOfCurrentApp(long appId){
-        return sensorRepository.findByAppId(appId);
+    // --- TRACK
+    /**
+     * 获取有效的轨迹数据
+     * @return
+     */
+    public List<TrackInfo> getOnlineTrack(){
+        return trackRepository.findByIsDeletedOrderByCreateTime(0);
     }
 
-    /** RECORDERS **/
+    // --- RECORDERS
+    /**
+     * 获取正在录制的实验的录制信息（一个实验最多只有一条正在录制的信息）
+     * @param expId 实验ID
+     * @return recorder
+     */
     public RecorderInfo getRecorderInfoOfExp(long expId){
         return recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
     }
 
+    /**
+     * 获取当前应用下的所有实验记录
+     * @param experiments 应用中的实验
+     * @return Map
+     */
     public Map<Long, List<RecorderInfo>> getAllRecordersOfCurrentApp(Map<Long, ExperimentInfo> experiments){
         Set<Long> expId = experiments.keySet();
         List<RecorderInfo> recorders = recorderRepository.findByExperiments(expId);

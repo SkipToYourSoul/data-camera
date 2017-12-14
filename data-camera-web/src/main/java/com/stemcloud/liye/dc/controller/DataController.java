@@ -81,14 +81,14 @@ public class DataController {
     }
 
     /**
-     * 获取原始实验片段数据，并返回
+     * 获取实验片段数据，并返回
      *
      * Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>>
      *      content_id, (sensor_id, (data_key, List<data_value>))
      * @param queryParams
      * @return
      */
-    @GetMapping("/origin-content")
+    @GetMapping("/exp-content")
     Map content(@RequestParam Map<String, String> queryParams){
         Map<String, Object> map;
         try{
@@ -96,10 +96,10 @@ public class DataController {
             long expId = Long.parseLong(queryParams.get("exp-id"));
             map = ServerReturnTool.serverSuccess(dataService.getContentDataOfExperiment(expId));
             Long endTime = System.currentTimeMillis();
-            logger.info("request content data in {} ms.", (endTime - beginTime));
+            logger.info("[/data/exp-content] request content data in {} ms.", (endTime - beginTime));
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/data/content", e);
+            logger.error("[/data/exp-content]", e);
         }
         return map;
     }

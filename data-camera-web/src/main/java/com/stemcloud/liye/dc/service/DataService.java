@@ -14,6 +14,8 @@ import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
 import com.stemcloud.liye.dc.domain.common.SensorType;
 import com.stemcloud.liye.dc.domain.view.Video;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import java.util.*;
  */
 @Service
 public class DataService {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final SensorRepository sensorRepository;
     private final ValueDataRepository valueDataRepository;
     private final RecorderRepository recorderRepository;
@@ -71,6 +75,7 @@ public class DataService {
         }});
         // traverse content
         for (RecorderInfo r : ris){
+            long beginMillis = System.currentTimeMillis();
             long id = r.getId();
             List<RecorderDevices> devices = new Gson().fromJson(r.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
             Date startTime = r.getStartTime();
@@ -85,11 +90,9 @@ public class DataService {
             for (RecorderDevices device: devices){
                 long sensorId = device.getSensor();
                 List<String> legends = device.getLegends();
-                if (sensorRepository.findOne(sensorId).getSensorConfig().getType() == 1) {
-                    chartValues.addAll(valueDataRepository.findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
-                            sensorId, legends, startTime, endTime
-                    ));
-                }
+                chartValues.addAll(valueDataRepository.findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                        sensorId, legends, startTime, endTime
+                ));
             }
             Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
                     = transferChartData(chartValues);
@@ -99,6 +102,8 @@ public class DataService {
             map.put(SensorType.VIDEO.toString(), videoMap);
 
             result.put(id, map);
+            long endMillis = System.currentTimeMillis();
+            logger.info("Get content {}'s data in {} ms.", id, (endMillis - beginMillis));
         }
 
         return result;

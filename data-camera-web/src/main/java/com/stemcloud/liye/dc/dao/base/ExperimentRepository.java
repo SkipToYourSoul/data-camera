@@ -36,7 +36,7 @@ public interface ExperimentRepository extends CrudRepository<ExperimentInfo, Lon
      * @param isDeleted
      * @return list exp
      */
-    List<ExperimentInfo> findByAppAndIsDeleted(AppInfo appInfo, int isDeleted);
+    List<ExperimentInfo> findByAppAndIsDeletedOrderByCreateTime(AppInfo appInfo, int isDeleted);
 
     /**
      * monitor/cancle monitor experiment
