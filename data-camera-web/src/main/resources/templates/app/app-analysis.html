@@ -3,8 +3,10 @@
     <div th:fragment="app-analysis">
         <div class="row">
             <div class="col-md-12 col-sm-12">
+                <!-- 实验中没有片段记录数据 -->
                 <div th:if="${#maps.isEmpty(experiments)}"
                      class="alert alert-info" role="alert">TIPS: 应用中暂无实验记录，请先在实验模式下新建实验并记录数据吧:)</div>
+                <!-- 遍历实验片段记录数据 -->
                 <div th:if="${not #maps.isEmpty(experiments)}">
                     <ul class="nav nav-pills" role="tablist" id="app-analysis-tab">
                         <th:block th:each="entry,index:${experiments}">

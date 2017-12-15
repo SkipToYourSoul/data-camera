@@ -29,7 +29,7 @@ import java.util.*;
  */
 @Service
 public class DataService {
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final SensorRepository sensorRepository;
     private final ValueDataRepository valueDataRepository;
@@ -61,7 +61,7 @@ public class DataService {
         Date time = new Date(timestamp);
         List<ValueData> data = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(time, boundSensorIds);
 
-        logger.info("request {} data, time is {}", data.size(), time.toString());
+        logger.info("Request data size={}, time={}", data.size(), time.toString());
         return transferChartData(data);
     }
 
@@ -108,7 +108,7 @@ public class DataService {
 
             result.put(id, map);
             long endMillis = System.currentTimeMillis();
-            logger.info("Get content {}'s data in {} ms.", id, (endMillis - beginMillis));
+            logger.info("Get content data, id={}, cost time={} ms.", id, (endMillis - beginMillis));
         }
 
         return result;
@@ -163,6 +163,7 @@ public class DataService {
         newRecorder.setEndTime(maxTime);
         newRecorder.setExpId(expId);
         newRecorder.setIsRecorder(0);
+        newRecorder.setIsUserGen(1);
         for (RecorderDevices device: devices){
             if (sensorLegend.containsKey(device.getSensor())){
                 device.setLegends(sensorLegend.get(device.getSensor()));
@@ -172,15 +173,17 @@ public class DataService {
         }
         newRecorder.setDevices(new Gson().toJson(devices));
         recorderRepository.save(newRecorder);
+        logger.info("Generate new recorder, exp-id={}", expId);
     }
 
     /**
      * 将valueData转换成为echart需要的时间数据格式
      *
-     * sensor_id, (data_key, List<data_value>)
+     * @param vd
+     * @return sensor_id, (data_key, List<data_value>)
      */
     private Map<Long, Map<String, List<ChartTimeSeries>>> transferChartData(List<ValueData> vd){
-        Map<Long, Map<String, List<ChartTimeSeries>>> result = new HashMap<Long, Map<String, List<ChartTimeSeries>>>();
+        Map<Long, Map<String, List<ChartTimeSeries>>> result = new HashMap<Long, Map<String, List<ChartTimeSeries>>>(16);
 
         for (ValueData d : vd){
             long sensorId = d.getSensorId();
@@ -207,14 +210,14 @@ public class DataService {
                 result.put(sensorId, map);
             }
         }
-
         return result;
     }
 
     /**
      * 将videoData转换成为video.js需要的数据格式
      *
-     * sensor_id, video_path
+     * @param videos
+     * @return sensor_id, Video
      */
     private Map<Long, Video> transferVideoData(List<VideoData> videos){
         Map<Long, Video> map = new HashMap<Long, Video>();

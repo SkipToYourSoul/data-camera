@@ -44,6 +44,10 @@ public class RecorderInfo {
             columnDefinition = "INT DEFAULT 0")
     private int isDeleted = 0;
 
+    @Column(name = "is_user_generate", columnDefinition = "INT DEFAULT 0")
+    private int isUserGen = 0;
+
+
     public long getId() {
         return id;
     }
@@ -114,5 +118,13 @@ public class RecorderInfo {
 
     public void setIsDeleted(int isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public int getIsUserGen() {
+        return isUserGen;
+    }
+
+    public void setIsUserGen(int isUserGen) {
+        this.isUserGen = isUserGen;
     }
 }
