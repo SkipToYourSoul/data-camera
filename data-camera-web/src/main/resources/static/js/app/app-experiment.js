@@ -23,13 +23,23 @@ var exp_newest_timestamp = {};
  */
 var recorder_timestamp = {};
 
+/**
+ * 初始化实验页面入口
+ * 1、初始化实验轨迹、传感器绑定信息
+ * 2、初始化实验状态（监控或录制）
+ */
 function initResourceOfExperimentPage() {
     // init experiment track and sensors
+    // -- 初始化实验轨迹、传感器绑定信息
     for (var exp_id in experiments){
+        if (!experiments.hasOwnProperty(exp_id)){
+            continue;
+        }
         var experiment = experiments[exp_id];
         exp_newest_timestamp[exp_id] = new Date().getTime();
 
-        for (var i in experiment['trackInfoList']){
+        // -- 遍历轨迹
+        for (var i = 0; i < experiment['trackInfoList'].length; i++){
             var track = experiment['trackInfoList'][i];
             var track_id = track['id'];
             var track_type = track['type'];
@@ -60,8 +70,9 @@ function initResourceOfExperimentPage() {
                 });
                 value = sensor.id;
             } else {
+                // not bound, add freeSensors to source
                 for (var index in freeSensors){
-                    if (track['type'] == freeSensors[index]['sensorConfig']['type']) {
+                    if (freeSensors.hasOwnProperty(index) && track['type'] == freeSensors[index]['sensorConfig']['type']) {
                         source.push({
                             value: freeSensors[index].id,
                             text: freeSensors[index].name
@@ -94,6 +105,7 @@ function initResourceOfExperimentPage() {
     }
 
     // init experiment which is in monitoring state
+    // -- 更改实验状态（如果在监控或录制状态）
     for (var id in isExperimentMonitor){
         if (!isExperimentMonitor.hasOwnProperty(id) || !isExperimentRecorder.hasOwnProperty(id)){
             continue;
@@ -122,6 +134,10 @@ function initResourceOfExperimentPage() {
     }
 }
 
+/**
+ * 实验监控按钮点击触发
+ * @param button
+ */
 function expMonitor(button){
     var exp_id = button.getAttribute('data');
     var exp_state_dom = $('#experiment-es-' + exp_id);
@@ -162,6 +178,10 @@ function expMonitor(button){
     });
 }
 
+/**
+ * 实验录制按钮点击触发
+ * @param button
+ */
 function expRecorder(button) {
     var exp_id = button.getAttribute('data');
     var exp_state_dom = $('#experiment-rs-' + exp_id);
@@ -262,6 +282,10 @@ function expRecorder(button) {
     }
 }
 
+/**
+ * 结束监控时页面的更改
+ * @param exp_id
+ */
 function pageStopMonitor(exp_id){
     if (isExperimentRecorder[exp_id] == 1){
         pageStopRecorder(exp_id);
@@ -277,6 +301,10 @@ function pageStopMonitor(exp_id){
     $('.app-exp-track-statistics .content-value').html('-');
 }
 
+/**
+ * 结束录制时页面的更改
+ * @param exp_id
+ */
 function pageStopRecorder(exp_id){
     $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-default').text('非录制');
     $('#experiment-recorder-' + exp_id).html('<i class="fa fa-camera-retro"></i>&nbsp;开始录制');
@@ -286,6 +314,10 @@ function pageStopRecorder(exp_id){
     }
 }
 
+/**
+ * 监控时定期更新图表数据
+ * @param exp_id
+ */
 function doInterval(exp_id){
     exp_monitor_interval[exp_id] = setInterval(function(){
         askForData(exp_id);

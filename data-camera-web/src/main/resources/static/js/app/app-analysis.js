@@ -3,17 +3,39 @@
  *  Author: liye on 2017/11/25
  *  Description:
  */
+
+/**
+ * key: chart_dom
+ * value: {key:legend, value:true or false}
+ * @type {{}}
+ */
 var analysis_chart_legend_selected = {};
+
+/**
+ * key: chart_dom
+ * value: {'start': xx, 'end': xx}
+ * @type {{}}
+ */
 var analysis_chart_data_zoom = {};
 
+/**
+ * 初始化分析页面入口
+ * 显示第一个实验tab的数据
+ */
 function initResourceOfAnalysisPage(){
     // init the first exp content charts
     for (var exp_id in experiments) {
-        initExpContentChart(exp_id);
-        break;
+        if (experiments.hasOwnProperty(exp_id)){
+            initExpContentChart(exp_id);
+            break;
+        }
     }
 }
 
+/**
+ * 加载实验tab内容
+ * @param exp_id
+ */
 function initExpContentChart(exp_id){
     if ( $(".exp-recorder-panel-" + exp_id).length == 0 ){
         // message_info("暂无实验内容", 'info');
@@ -29,6 +51,7 @@ function initExpContentChart(exp_id){
         }
     }
 
+    // --- 异步请求实验片段数据
     $.ajax({
         type: 'get',
         url: data_addrss + "/exp-content",
@@ -153,7 +176,7 @@ function initExpContentChart(exp_id){
                         }
                     }
                 }
-            } else {
+            } else if (response.code == "1111") {
                 message_info("加载数据失败，失败原因为：" + response.data, 'error');
             }
         },
@@ -163,9 +186,9 @@ function initExpContentChart(exp_id){
     });
 }
 
-
 /**
- * operation of exp content
+ * 生成新的用户自定义内容
+ * @param button
  */
 function generateNewContent(button) {
     var button_content = button.getAttribute('data');
@@ -235,6 +258,10 @@ function generateNewContent(button) {
     });
 }
 
+/**
+ * 删除实验片段内容
+ * @param button
+ */
 function deleteContent(button) {
     var content_id = button.getAttribute('data');
     bootbox.confirm({
@@ -264,4 +291,12 @@ function deleteContent(button) {
             }
         }
     });
+}
+
+/**
+ * 开始回放片段数据
+ * @param button
+ */
+function recorderPlay(button) {
+    var exp_id = button.getAttribute('data');
 }

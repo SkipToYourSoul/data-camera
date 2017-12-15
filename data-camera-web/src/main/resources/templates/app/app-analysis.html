@@ -3,10 +3,10 @@
     <div th:fragment="app-analysis">
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                <!-- 实验中没有片段记录数据 -->
+                <!-- 应用中没有实验数据 -->
                 <div th:if="${#maps.isEmpty(experiments)}"
                      class="alert alert-info" role="alert">TIPS: 应用中暂无实验记录，请先在实验模式下新建实验并记录数据吧:)</div>
-                <!-- 遍历实验片段记录数据 -->
+                <!-- 遍历实验数据 -->
                 <div th:if="${not #maps.isEmpty(experiments)}">
                     <ul class="nav nav-pills" role="tablist" id="app-analysis-tab">
                         <th:block th:each="entry,index:${experiments}">
@@ -20,15 +20,19 @@
                         <th:block th:each="entry,index:${experiments}">
                             <div th:id="|tab-experiment-${entry.key}|" role="tabpanel"
                                  th:class="${index.count eq 1}?'tab-pane active fade in':'tab-pane fade'">
-                                <!-- contents -->
+                                <!-- 实验中没有片段记录数据 -->
                                 <div th:if="${not #maps.containsKey(recorders, entry.key)}"
                                      class="alert alert-info" role="alert">TIPS: 还没有已生成的实验内容，请先在实验模式下记录数据吧:)</div>
-
+                                <!-- 遍历实验片段记录数据 -->
                                 <th:block th:each="recorder,index:${recorders[entry.key]}">
                                     <div th:class="|panel panel-default exp-recorder-panel-${entry.key}|">
                                         <div class="panel-heading">
                                             <div class="panel-title">
-                                                <a role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}" aria-expanded="true" aria-controls="collapseOne" th:text="|原生实验片段${index.count},
+                                                <a th:if="${recorder.isUserGen eq 0}" role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}"
+                                                   aria-expanded="true" aria-controls="collapseOne" th:text="|原生实验片段${index.count},
+                                                数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></a>
+                                                <a th:if="${recorder.isUserGen eq 1}" role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}"
+                                                   aria-expanded="true" aria-controls="collapseOne" th:text="|用户新生成的实验片段${index.count},
                                                 数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></a>
                                             </div>
                                         </div>
@@ -47,6 +51,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-xs-4 col-sm-4 col-md-4">
+                                                        <!-- 实验片段操作详情 -->
                                                         <div class="app-analysis-content-info">
                                                             <div class="info">
                                                                 <div class="title">实验片段： <a href="#" th:id="|analysis-content-name-${recorder.id}|" data-type="text" th:text="${recorder.name}"></a></div>
@@ -54,12 +59,12 @@
                                                             <div class="my-container">
                                                                 <div class="title">片段回放（回放功能应放置在内容页）</div>
                                                                 <div class="btn-group">
-                                                                    <button id="play-btn" class="btn btn-success" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
+                                                                    <button id="play-btn" class="btn btn-success" th:data="${entry.key}" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
                                                                     <button id="pause-btn" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>
                                                                     <button id="reset-btn" class="btn btn-danger" onclick="recorderReset()"><i class="fa fa-reply"></i>&nbsp;重置</button>
                                                                 </div>
                                                             </div>
-                                                            <div class="my-container">
+                                                            <div class="my-container" th:if="${recorder.isUserGen eq 0}">
                                                                 <div class="title">实验片段修改</div>
                                                                 <button class="btn btn-default" th:data="|${entry.key}-${recorder.id}|" onclick="generateNewContent(this)">
                                                                     <i class="fa fa-area-chart"></i>&nbsp;生成新的实验片段</button>
