@@ -59,9 +59,9 @@
                                                             <div class="my-container">
                                                                 <div class="title">片段回放（回放功能应放置在内容页）</div>
                                                                 <div class="btn-group">
-                                                                    <button id="play-btn" class="btn btn-success" th:data="${entry.key}" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
-                                                                    <button id="pause-btn" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>
-                                                                    <button id="reset-btn" class="btn btn-danger" onclick="recorderReset()"><i class="fa fa-reply"></i>&nbsp;重置</button>
+                                                                    <button th:id="|play-btn-${entry.key}|" class="btn btn-success" th:data="${entry.key}" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
+                                                                    <button th:id="|pause-btn-${entry.key}|" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>
+                                                                    <button th:id="|reset-btn-${entry.key}|" class="btn btn-danger" onclick="recorderReset()"><i class="fa fa-reply"></i>&nbsp;重置</button>
                                                                 </div>
                                                             </div>
                                                             <div class="my-container" th:if="${recorder.isUserGen eq 0}">
