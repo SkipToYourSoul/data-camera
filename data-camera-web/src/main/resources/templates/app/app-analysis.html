@@ -1,6 +1,6 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:fragment="app-analysis">
+    <div th:fragment="app-analysis-old">
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <!-- 应用中没有实验数据 -->
@@ -105,6 +105,19 @@
         </div>
 
         <div th:include="module/common::sub-footer"></div>
+    </div>
+
+    <div th:fragment="app-analysis">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-xs-12">
+                <div class="app-analysis-tree-dom">
+
+                </div>
+                <div class="app-analysis-chart-dom">
+
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

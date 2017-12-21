@@ -1,9 +1,153 @@
 /** app css **/
 body{
-    background: rgba(245, 245, 245, 0.8);
+    background: #F1F3FA;
     padding-top:60px;
 }
 
+/* 场景页面主布局样式 */
+.sidebar-panel {
+    position: fixed;
+    top: 70px;
+    bottom: 5px;
+    z-index: 1000;
+    display: block;
+    padding: 0 5px 10px 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.main-panel {
+    position: fixed;
+    top: 70px;
+    bottom: 5px;
+    right: 3px;
+    z-index: 1000;
+    display: block;
+    padding: 0 5px 10px 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar-content {
+    background: #fff;
+    padding: 10px 10px 30px;
+}
+
+.main-content {
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+/* 场景页面左侧导航样式 */
+.sidebar-img {
+    float: none;
+    margin: 0 auto;
+    width: 50%;
+    height: 50%;
+    -webkit-border-radius: 50% !important;
+    -moz-border-radius: 50% !important;
+    border-radius: 50% !important;
+}
+
+.sidebar-info {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.sidebar-info .info-title {
+    color: #5b9bd1;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.sidebar-info .info-title a{
+    color: #9d9d9d;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sidebar-info .info-description {
+    text-transform: uppercase;
+    color: #5b9bd1;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.sidebar-buttons {
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #9d9d9d;
+}
+
+.sidebar-buttons .btn {
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.sidebar-buttons .btn:last-child {
+    margin-right: 0;
+}
+
+.sidebar-menu {
+    padding-top: 15px;
+    padding-bottom: 10px;
+}
+
+.sidebar-menu .main-menu{
+    margin-bottom: 5px;
+}
+
+.sidebar-menu ul li {
+    border-bottom: 1px solid #f0f4f7;
+}
+
+.sidebar-menu ul li:last-child {
+    border-bottom: none;
+}
+
+.sidebar-menu ul li a {
+    color: #93a3b5;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.sidebar-menu ul li a i {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.sidebar-menu ul li a:hover {
+    background-color: #fafcfd;
+    color: #5b9bd1;
+}
+
+.sidebar-menu ul li.active {
+    border-bottom: none;
+}
+
+.sidebar-menu ul li.active a {
+    color: #5b9bd1;
+    background-color: #f6f9fb;
+    border-left: 2px solid #5b9bd1;
+    margin-left: -2px;
+}
+
+.sidebar-menu .my-panel{
+    border: 0;
+}
+
+.sidebar-menu .my-panel-body{
+    padding: 5px 15px 5px 15px;
+}
+
+/* 场景页面右侧内容样式 */
 .app-tab-pane-content{
     padding-top: 10px;
 }
@@ -15,6 +159,20 @@ body{
     font-size: 14px;
     font-weight: 600;
     color: #5b9bd1;
+}
+
+/* 场景分析页面样式 */
+.app-analysis-tree-dom{
+    border-radius: 10px;
+    border: 1px solid #9d9d9d;
+    height: 300px;
+    margin-bottom: 10px;
+}
+
+.app-analysis-chart-dom{
+    border-radius: 5px;
+    border: 1px solid #9d9d9d;
+    height: 500px;
 }
 
 /** app-experiment.html **/

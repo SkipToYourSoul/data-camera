@@ -9,7 +9,8 @@ function inAppPage(){
     var $app_main_tab = $('#app-main-tab');
     var tab = getQueryString("tab");
     if (tab == null){
-        initResourceOfExperimentPage();
+        // initResourceOfExperimentPage();
+        // initResourceOfAnalysisPage();
     } else if (tab != null && tab == 2){
         $loader.fakeLoader({
             timeToHide: 1000,
@@ -25,8 +26,12 @@ function inAppPage(){
         var page = e.target.getAttribute('href');
         if (page == "#app-experiment"){
             initResourceOfExperimentPage();
+            $('#content-menu').attr("hidden", true);
+            $('#app-menu').attr("hidden", false);
         } else if (page == "#app-analysis") {
-            initResourceOfAnalysisPage();
+            // initResourceOfAnalysisPage();
+            $('#content-menu').attr("hidden", false);
+            $('#app-menu').attr("hidden", true);
         }
     });
 

@@ -1,4 +1,4 @@
-/** navbar **/
+/** 通用：导航栏样式 **/
 .navbar {
     margin-bottom:0;
 }
@@ -38,124 +38,22 @@
     border-left:solid 1px #d9d9de;
 }
 
-/** new sidebar **/
-.profile-userpic img {
-    float: none;
-    margin: 0 auto;
-    width: 50%;
-    height: 50%;
-    -webkit-border-radius: 50% !important;
-    -moz-border-radius: 50% !important;
-    border-radius: 50% !important;
+/* 通用：滚动条样式 */
+.scroll::-webkit-scrollbar {
+    width: 10px;
 }
 
-.profile-app-info {
-    text-align: center;
-    margin-top: 20px;
+.scroll::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 20px;
 }
 
-.profile-app-info .info-title {
-    color: #5b9bd1;
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 7px;
+.scroll::-webkit-scrollbar-track {
+    background: #ddd;
+    border-radius: 20px;
 }
 
-.profile-app-info .info-title a{
-    color: #9d9d9d;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.profile-app-info .info-description {
-    text-transform: uppercase;
-    color: #5b9bd1;
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-
-.profile-buttons {
-    text-align: center;
-    margin-top: 10px;
-}
-
-.profile-buttons .btn {
-    text-transform: uppercase;
-    font-size: 11px;
-    font-weight: 600;
-    /*padding: 6px 15px;*/
-    margin-right: 5px;
-}
-
-.profile-buttons .btn:last-child {
-    margin-right: 0;
-}
-
-.profile-usermenu {
-    margin-top: 30px;
-}
-
-.profile-usermenu .main-menu{
-    margin-bottom: 10px;
-}
-
-.profile-usermenu ul li {
-    border-bottom: 1px solid #f0f4f7;
-}
-
-.profile-usermenu ul li:last-child {
-    border-bottom: none;
-}
-
-.profile-usermenu ul li a {
-    color: #93a3b5;
-    font-size: 14px;
-    font-weight: 400;
-}
-
-.profile-usermenu ul li a i {
-    margin-right: 8px;
-    font-size: 14px;
-}
-
-.profile-usermenu ul li a:hover {
-    background-color: #fafcfd;
-    color: #5b9bd1;
-}
-
-.profile-usermenu ul li.active {
-    border-bottom: none;
-}
-
-.profile-usermenu ul li.active a {
-    color: #5b9bd1;
-    background-color: #f6f9fb;
-    border-left: 2px solid #5b9bd1;
-    margin-left: -2px;
-}
-
-/* Profile Content */
-.profile-content {
-    padding: 20px;
-    background-color: #FFFFFF;
-}
-
-.sidebar {
-    position: fixed;
-    top: 51px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #FFFFFF;
-    border-right: 1px solid #eeeeee;
-}
-
-/** footer **/
+/** 通用：脚注样式 **/
 .footer{
     background-color: #eee;
     border-top: 1px solid #ccc;
