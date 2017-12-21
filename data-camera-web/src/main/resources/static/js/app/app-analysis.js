@@ -19,6 +19,13 @@ var analysis_chart_legend_selected = {};
 var analysis_chart_data_zoom = {};
 
 /**
+ * key: exp_id
+ * value: content_data
+ * @type {{}}
+ */
+var analysis_exp_content_data = {};
+
+/**
  * 初始化分析页面入口
  * 显示第一个实验tab的数据
  */
@@ -61,6 +68,7 @@ function initExpContentChart(exp_id){
         success: function (response) {
             if (response.code == "0000") {
                 var content_data = response.data;
+                analysis_exp_content_data[exp_id] = content_data;
                 for (var content_id in content_data){
                     if (!content_data.hasOwnProperty(content_id)){
                         continue;
@@ -293,10 +301,38 @@ function deleteContent(button) {
     });
 }
 
+/** ================== 录制相关 ================== **/
+var analysis_recorder_interval = {};
+var analysis_recorder_time = {};
+
+/**
+ * 录制时间更新
+ * @param interval 时间增长单位
+ * @param exp_id 实验id
+ */
+function setClockTime(interval, exp_id) {
+    analysis_recorder_time[exp_id] = new Date(analysis_recorder_time[exp_id].getTime() + 1000*interval);
+    var format_time = analysis_recorder_time[exp_id].Format("yyyy-MM-dd HH:mm:ss");
+    $('#recorder-clock').html(format_time);
+
+    return format_time;
+}
+
 /**
  * 开始回放片段数据
  * @param button
  */
 function recorderPlay(button) {
     var exp_id = button.getAttribute('data');
+    var content_data = analysis_exp_content_data[exp_id];
+
+    analysis_recorder_time[exp_id] = new Date(Date.parse(recorder_start_time.replace(/-/g, "/")));
+
+    analysis_recorder_interval[exp_id] = setInterval(function () {
+        var time = setClockTime(1, exp_id);
+        setRecorderChart(time);
+        setRecorderVideo(time);
+    }, 1000);
+    $('#play-btn-' + exp_id).attr('disabled', 'disabled');
+    $('#pause-btn' + exp_id).removeAttr('disabled');
 }
