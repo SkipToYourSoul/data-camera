@@ -110,9 +110,17 @@
     <div th:fragment="app-analysis">
         <div class="row">
             <div class="col-sm-12 col-md-12 col-xs-12">
-                <div class="app-analysis-tree-dom" id="myDiagramDiv">
-
+                <div class="app-analysis-tree-group">
+                    <!-- 该场景没有片段记录数据 -->
+                    <div th:if="${not #maps.containsKey(recorders, app.id)}"
+                         class="alert alert-warning my-info" role="alert">暂无可展示的数据片段</div>
+                    <!-- 遍历片段记录数据 -->
+                    <th:block th:each="recorder,index:${recorders[app.id]}">
+                        <div th:if="${recorder.isUserGen eq 0}" class="app-analysis-tree-dom" th:id="|tree-chart-${recorder.id}|">
+                        </div>
+                    </th:block>
                 </div>
+
                 <div class="app-analysis-chart-dom">
 
                 </div>

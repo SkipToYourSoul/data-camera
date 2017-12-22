@@ -21,7 +21,7 @@ function inAppPage(){
         initResourceOfAnalysisPage();
     }
 
-    init();
+    initTreeDom();
 
     // -- tab change
     $app_main_tab.find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
