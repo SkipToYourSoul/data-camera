@@ -21,6 +21,8 @@ function inAppPage(){
         initResourceOfAnalysisPage();
     }
 
+    init();
+
     // -- tab change
     $app_main_tab.find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         var page = e.target.getAttribute('href');
@@ -32,6 +34,7 @@ function inAppPage(){
             // initResourceOfAnalysisPage();
             $('#content-menu').attr("hidden", false);
             $('#app-menu').attr("hidden", true);
+            init();
         }
     });
 

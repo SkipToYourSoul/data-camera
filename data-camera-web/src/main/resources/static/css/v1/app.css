@@ -152,6 +152,27 @@ body{
     font-weight: 600;
 }
 
+.sidebar-menu2{
+    padding: 15px 10px 10px 10px;
+}
+
+.sidebar-menu2 .my-alter{
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.sidebar-menu2 .menu-title{
+    text-align: center;
+    font-weight: 600;
+    padding-bottom: 5px;
+}
+
+.sidebar-menu2 .menu-content{
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-bottom: 5px;
+}
+
 /* 场景页面右侧内容样式 */
 .app-tab-pane-content{
     padding-top: 10px;
@@ -171,6 +192,7 @@ body{
     border-radius: 10px;
     border: 1px solid #9d9d9d;
     height: 300px;
+    width: 100%;
     margin-bottom: 10px;
 }
 
