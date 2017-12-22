@@ -116,12 +116,17 @@
                          class="alert alert-warning my-info" role="alert">暂无可展示的数据片段</div>
                     <!-- 遍历片段记录数据 -->
                     <th:block th:each="recorder,index:${recorders[app.id]}">
-                        <div th:if="${recorder.isUserGen eq 0}" class="app-analysis-tree-dom" th:id="|tree-chart-${recorder.id}|">
+                        <div th:if="${recorder.isUserGen eq 0}" class="app-analysis-tree-dom" th:data="${recorder.id}">
+                            <div class="tree-info">
+                                <span th:text="${recorder.name}"></span>
+                                <span th:text="|数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></span>
+                            </div>
+                            <div class="tree-chart" th:id="|tree-chart-${recorder.id}|"></div>
                         </div>
                     </th:block>
                 </div>
 
-                <div class="app-analysis-chart-dom">
+                <div class="app-analysis-chart-dom" hidden="hidden">
 
                 </div>
             </div>

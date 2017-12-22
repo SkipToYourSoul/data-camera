@@ -151,7 +151,7 @@ public class ViewController {
 
             // --- RECORDER:
             Map<Long, List<RecorderInfo>> recorders = new HashMap<Long, List<RecorderInfo>>(16);
-            recorders = baseInfoService.getAllRecorders();
+            recorders = baseInfoService.getAllRecorders(apps);
             /*if (!experiments.isEmpty()) {
                 recorders = baseInfoService.getAllRecordersOfCurrentApp(experiments);
             }*/

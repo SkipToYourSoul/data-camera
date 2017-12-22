@@ -31,7 +31,7 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
      * @param isDeleted
      * @return
      */
-    List<RecorderInfo> findByIsDeleted(int isDeleted);
+    List<RecorderInfo> findByIsDeletedOrderByIdDesc(int isDeleted);
 
     /**
      * find recorders of current app

@@ -3,7 +3,16 @@
  * Author: liye on 2017/12/22
  * Description: 生成数据片段关系的树形图
  */
+// -- node 数据
+var rDataMap = {};
+
+// -- 入口函数，初始化树形图
 function initTreeDom(){
+    if (!recorders.hasOwnProperty(app['id'])){
+        console.log("Empty data recorders in this app.");
+        return;
+    }
+
     var $go = go.GraphObject.make;  // for conciseness in defining templates
     // Define a simple node template consisting of text followed by an expand/collapse button
     var nodeTemplate = $go(go.Node, "Horizontal",
@@ -31,10 +40,17 @@ function initTreeDom(){
         var name = recorder['name'];
         var parentId = recorder['parentId'];
         if (recorder['isUserGen'] == 0){
-            rData[rid] = [];
+            if (!rData.hasOwnProperty(rid)){
+                rData[rid] = [];
+            }
             rData[rid].push({'key': rid, 'name': name});
+            rDataMap[rid] = -1;
         } else {
+            if (!rData.hasOwnProperty(parentId)){
+                rData[parentId] = [];
+            }
             rData[parentId].push({'key': rid, 'parent': parentId, 'name': name});
+            rDataMap[rid] = parentId;
         }
     }
 
@@ -63,8 +79,58 @@ function initTreeDom(){
 
 }
 
+// -- node选中事件
 function nodeSelectionChanged(node) {
     if (node.isSelected) {
-        console.log(node.data.key);
+        var target = findParent(node.data.key) + '';
+        console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
+        showRecorderContent(target);
+    }
+    
+    function findParent(id) {
+        if (rDataMap[id] == -1){
+            return id;
+        } else {
+            return findParent(rDataMap[id]);
+        }
+    }
+}
+
+// -- 边栏菜单点击事件
+$('.menu-content ul li').click(function (e) {
+    var target = $(e.target).parent().attr('data');
+    showRecorderContent(target);
+});
+
+/**
+ * 展示当前实验片段的内容
+ * @param target 选中的内容id
+ */
+function showRecorderContent(target){
+    // 只展示当前选中的树形图
+    var dom = $('.app-analysis-tree-group').find('.app-analysis-tree-dom');
+    for (var index=0; index<dom.length; index++){
+        var $dom = $(dom[index]);
+        if ($dom.attr('data') == target){
+            console.log("Show tree-dom:" + $dom.attr('data'));
+            $dom.attr("hidden", false);
+        } else {
+            console.log("Hide tree-dom:" + $dom.attr('data'));
+            $dom.attr("hidden", true);
+        }
+    }
+    // 展示数据图表
+    $('.app-analysis-chart-dom').attr("hidden", false);
+    // 激活菜单
+    var menu = $('.menu-content ul li');
+    for (var index=0; index<menu.length; index++){
+        var $menu = $(menu[index]);
+        if ($menu.attr('data') == target){
+            console.log("Active li:" + $menu.attr('data'));
+            $menu.addClass('active');
+        } else {
+            console.log("InActive li:" + $menu.attr('data'));
+            $menu.removeClass('active');
+        }
     }
 }

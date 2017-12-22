@@ -139,19 +139,6 @@ body{
     margin-left: -2px;
 }
 
-.sidebar-menu .my-panel{
-    border: 0;
-}
-
-.sidebar-menu .my-panel-body{
-    padding: 5px 15px 5px 15px;
-}
-
-.sidebar-menu .my-alter{
-    margin-bottom: 0;
-    font-weight: 600;
-}
-
 .sidebar-menu2{
     padding: 15px 10px 10px 10px;
 }
@@ -173,6 +160,17 @@ body{
     padding-bottom: 5px;
 }
 
+.sidebar-menu2 ul li.active {
+    border-bottom: none;
+}
+
+.sidebar-menu2 ul li.active a {
+    color: #9e9e9e;
+    background-color: #FFFFFF;
+    border-left: 2px solid #5e5e5e;
+    margin-left: -2px;
+}
+
 /* 场景页面右侧内容样式 */
 .app-tab-pane-content{
     padding-top: 10px;
@@ -189,15 +187,26 @@ body{
 
 /* 场景分析页面样式 */
 .app-analysis-tree-group{
-    padding: 10px;
+    padding-bottom: 10px;
 }
 
 .app-analysis-tree-dom{
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     border: 1px solid #9d9d9d;
+    margin-bottom: 10px;
+}
+
+.app-analysis-tree-dom .tree-info{
+    padding: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: rgba(154, 154, 154, 0.1);
+}
+
+.app-analysis-tree-dom .tree-chart{
     height: 200px;
     width: 100%;
-    margin-bottom: 10px;
 }
 
 .app-analysis-chart-dom{

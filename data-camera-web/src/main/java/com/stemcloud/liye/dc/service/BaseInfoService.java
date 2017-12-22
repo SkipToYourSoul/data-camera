@@ -136,23 +136,28 @@ public class BaseInfoService {
     }
 
     /**
-     * 获取当前应用下的所有实验记录
+     * 获取当前应用下的所有实验记录，按创建时间排序
      * @return Map<appId-Recorder>
      */
-    public Map<Long, List<RecorderInfo>> getAllRecorders(){
-        List<RecorderInfo> recorders = recorderRepository.findByIsDeleted(0);
-        Map<Long, List<RecorderInfo>> map = new HashMap<Long, List<RecorderInfo>>();
-        for (RecorderInfo r : recorders){
-            long appId = r.getAppId();
-            List<RecorderInfo> list =  null;
-            if (map.containsKey(appId)){
-                list = map.get(appId);
-            } else {
-                list = new ArrayList<RecorderInfo>();
+    public Map<Long, List<RecorderInfo>> getAllRecorders(Map<Long, AppInfo> apps){
+        List<RecorderInfo> recorders = recorderRepository.findByIsDeletedOrderByIdDesc(0);
+        Map<Long, List<RecorderInfo>> map = new LinkedHashMap<Long, List<RecorderInfo>>();
+        for (Map.Entry<Long, AppInfo> entry : apps.entrySet()){
+            long appId = entry.getKey();
+            for (RecorderInfo r : recorders){
+                if (appId == r.getAppId()){
+                    List<RecorderInfo> list;
+                    if (map.containsKey(appId)){
+                        list = map.get(appId);
+                    } else {
+                        list = new ArrayList<RecorderInfo>();
+                    }
+                    list.add(r);
+                    map.put(appId, list);
+                }
             }
-            list.add(r);
-            map.put(appId, list);
         }
+
         return map;
     }
 
