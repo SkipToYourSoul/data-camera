@@ -19,6 +19,9 @@ public class RecorderInfo {
     @Column(name = "exp_id", nullable = false)
     private long expId;
 
+    @Column(name = "app_id", nullable = false)
+    private long appId;
+
     @Column(name = "devices", nullable = false)
     private String devices;
 
@@ -47,6 +50,8 @@ public class RecorderInfo {
     @Column(name = "is_user_generate", columnDefinition = "INT DEFAULT 0")
     private int isUserGen = 0;
 
+    @Column(name = "parent_id", columnDefinition = "INT DEFAULT -1")
+    private int parentId = -1;
 
     public long getId() {
         return id;
@@ -62,6 +67,14 @@ public class RecorderInfo {
 
     public void setExpId(long expId) {
         this.expId = expId;
+    }
+
+    public long getAppId() {
+        return appId;
+    }
+
+    public void setAppId(long appId) {
+        this.appId = appId;
     }
 
     public String getDevices() {
@@ -126,5 +139,13 @@ public class RecorderInfo {
 
     public void setIsUserGen(int isUserGen) {
         this.isUserGen = isUserGen;
+    }
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
     }
 }

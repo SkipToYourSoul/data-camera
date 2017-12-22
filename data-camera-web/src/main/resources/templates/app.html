@@ -75,48 +75,39 @@
                         <ul class="nav">
                             <th:block th:each="entry,index:${apps}">
                                 <li th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
-                                    <a th:text="${entry.value.name}" th:href="@{/app(id=${entry.key})}" th:class="|app-${index.count}|"></a></li>
+                                    <a th:text="${entry.value.name}" th:href="@{/app(id=${entry.key})}" th:class="|app-${index.count}|"></a>
+                                </li>
                             </th:block>
                         </ul>
                     </div>
 
                     <!-- 片段列表 -->
-                    <div class="sidebar-menu" id="content-menu">
+                    <div class="sidebar-menu" id="content-menu" th:if="${param.id}">
                         <div class="panel-group" id="sidebar-accordion" role="tablist" aria-multiselectable="true">
-                            <div class="panel panel-info my-panel">
-                                <div class="panel-heading" role="tab" id="headingOne">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                            <i class="fa fa-arrow-right"></i>&nbsp; 植物生长实验
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                                    <div class="my-panel-body">
-                                        <ul class="nav">
-                                            <li class="active"><a href="#">片段1</a></li>
-                                            <li><a href="#">片段2</a></li>
-                                        </ul>
+                            <th:block th:each="entry,index:${apps}">
+                                <div class="panel panel-info my-panel">
+                                    <div class="panel-heading" role="tab" th:id="|exp-heading-${entry.key}|">
+                                        <h4 class="panel-title">
+                                            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" th:href="@{|#exp-collapse-${entry.key}|}" aria-expanded="true">
+                                                <i class="fa fa-arrow-right"></i>&nbsp; <span th:text="${entry.value.name}"></span>
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div th:id="@{|exp-collapse-${entry.key}|}" th:class="${index.count eq 1}?'panel-collapse collapse in':'panel-collapse collapse'" role="tabpanel">
+                                        <div class="my-panel-body">
+                                            <!-- 实验中没有片段记录数据 -->
+                                            <div th:if="${not #maps.containsKey(recorders, entry.key)}"
+                                                 class="alert alert-warning my-alter" role="alert">没有可选的数据片段</div>
+                                            <!-- 遍历实验片段记录数据 -->
+                                            <ul class="nav" th:if="${#maps.containsKey(recorders, entry.key)}">
+                                                <th:block th:each="recorder,index:${recorders[entry.key]}">
+                                                    <li th:if="${recorder.isUserGen eq 0}"><a href="#" th:text="${recorder.name}"></a></li>
+                                                </th:block>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="panel panel-info my-panel">
-                                <div class="panel-heading" role="tab" id="headingTwo">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                            <i class="fa fa-arrow-right"></i>&nbsp; 细菌培养实验
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                                    <div class="my-panel-body">
-                                        <ul class="nav">
-                                            <li class="active"><a href="#">p1</a></li>
-                                            <li><a href="#">p2</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
+                            </th:block>
                         </div>
                     </div>
                 </div>
@@ -158,6 +149,9 @@
         tracks:
             key = track_id
             value = trackInfo
+        recorder:
+            key = app_id
+            value = recorderInfo
         isExperimentMonitor:
             key = exp_id
             if in monitor status, value = 1, else value = 0
@@ -174,6 +168,7 @@
 
         var experiments = [[${experiments}]];
         var tracks = [[${tracks}]];
+        var recorders = [[${recorders}]];
 
         var freeSensors = [[${freeSensors}]];
         var boundSensors = [[${boundSensors}]];
@@ -181,8 +176,6 @@
         var isExperimentMonitor = [[${isExperimentMonitor}]];
         var isExperimentRecorder = [[${isExperimentRecorder}]];
         var expRecorderTime = [[${expRecorderTime}]];
-
-        var recorders = [[${recorders}]];
     </script>
 
     <script th:src="@{source/loading/fakeLoader.js}"></script>

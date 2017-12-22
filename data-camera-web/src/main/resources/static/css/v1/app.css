@@ -147,6 +147,11 @@ body{
     padding: 5px 15px 5px 15px;
 }
 
+.sidebar-menu .my-alter{
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
 /* 场景页面右侧内容样式 */
 .app-tab-pane-content{
     padding-top: 10px;

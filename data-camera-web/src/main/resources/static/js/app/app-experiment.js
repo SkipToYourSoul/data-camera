@@ -152,7 +152,8 @@ function expMonitor(button){
         type: 'get',
         url: crud_address + "/monitor",
         data: {
-            "exp-id": exp_id
+            "exp-id": exp_id,
+            "app-id": app['id']
         },
         success: function (response) {
             if (response.code == "1111"){
@@ -240,6 +241,7 @@ function expRecorder(button) {
             url: crud_address + "/record",
             data: {
                 "exp-id": exp_id,
+                "app-id": app['id'],
                 "is-save": is_save_recorder
             },
             success: function (response) {

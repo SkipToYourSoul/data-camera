@@ -27,6 +27,13 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
     RecorderInfo findByExpIdAndIsRecorderAndIsDeleted(long expId, int inRecorder, int isDeleted);
 
     /**
+     * find online recorder
+     * @param isDeleted
+     * @return
+     */
+    List<RecorderInfo> findByIsDeleted(int isDeleted);
+
+    /**
      * find recorders of current app
      * @param ids
      * @return

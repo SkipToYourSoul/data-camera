@@ -269,11 +269,16 @@ public class CrudController {
         return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("sensor-id")));
     }
 
+    /**
+     * 点击“监控”按钮触发的动作
+     * @param queryParams
+     * @return
+     */
     @GetMapping("/monitor")
     public Map monitorSensor(@RequestParam Map<String, String> queryParams){
-        Long expId = Long.valueOf(queryParams.get("exp-id"));
         Map<String, Object> map;
         try {
+            Long expId = Long.valueOf(queryParams.get("exp-id"));
             int response = crudService.changeSensorsMonitorStatusOfCurrentExperiment(expId);
             map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
@@ -297,13 +302,19 @@ public class CrudController {
         return map;
     }
 
+    /**
+     * 点击“录制”按钮触发的动作
+     * @param queryParams
+     * @return
+     */
     @GetMapping("/record")
     public Map recordSensor(@RequestParam Map<String, String> queryParams){
-        Long expId = Long.valueOf(queryParams.get("exp-id"));
-        int isSave = Integer.parseInt(queryParams.get("is-save"));
         Map<String, Object> map;
         try {
-            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(expId, isSave);
+            Long expId = Long.valueOf(queryParams.get("exp-id"));
+            int isSave = Integer.parseInt(queryParams.get("is-save"));
+            Long appId = Long.valueOf(queryParams.get("app-id"));
+            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(appId, expId, isSave);
             map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());

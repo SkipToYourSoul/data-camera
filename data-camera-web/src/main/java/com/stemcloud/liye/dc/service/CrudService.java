@@ -241,7 +241,7 @@ public class CrudService {
      * @throws Exception 若抛出异常，则回滚
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized Integer changeSensorsRecorderStatusOfCurrentExperiment(long expId, int isSave) throws Exception {
+    public synchronized Integer changeSensorsRecorderStatusOfCurrentExperiment(long appId, long expId, int isSave) throws Exception {
         // --- check the recorder status of current exp
         ExperimentInfo exp = expRepository.findById(expId);
         int status = exp.getIsRecorder();
@@ -270,6 +270,7 @@ public class CrudService {
 
             RecorderInfo recorderInfo = new RecorderInfo();
             recorderInfo.setExpId(expId);
+            recorderInfo.setAppId(appId);
             recorderInfo.setIsRecorder(1);
             recorderInfo.setStartTime(new Date());
             recorderInfo.setDevices(new Gson().toJson(devices));

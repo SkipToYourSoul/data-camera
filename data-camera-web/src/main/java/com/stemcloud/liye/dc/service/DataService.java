@@ -162,6 +162,7 @@ public class DataService {
         newRecorder.setStartTime(minTime);
         newRecorder.setEndTime(maxTime);
         newRecorder.setExpId(expId);
+        newRecorder.setAppId(recorder.getAppId());
         newRecorder.setIsRecorder(0);
         newRecorder.setIsUserGen(1);
         for (RecorderDevices device: devices){

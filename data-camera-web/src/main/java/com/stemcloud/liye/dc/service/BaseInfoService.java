@@ -137,8 +137,29 @@ public class BaseInfoService {
 
     /**
      * 获取当前应用下的所有实验记录
+     * @return Map<appId-Recorder>
+     */
+    public Map<Long, List<RecorderInfo>> getAllRecorders(){
+        List<RecorderInfo> recorders = recorderRepository.findByIsDeleted(0);
+        Map<Long, List<RecorderInfo>> map = new HashMap<Long, List<RecorderInfo>>();
+        for (RecorderInfo r : recorders){
+            long appId = r.getAppId();
+            List<RecorderInfo> list =  null;
+            if (map.containsKey(appId)){
+                list = map.get(appId);
+            } else {
+                list = new ArrayList<RecorderInfo>();
+            }
+            list.add(r);
+            map.put(appId, list);
+        }
+        return map;
+    }
+
+    /**
+     * 获取当前应用下的所有实验记录
      * @param experiments 应用中的实验
-     * @return Map
+     * @return Map<expId-Recorder>
      */
     public Map<Long, List<RecorderInfo>> getAllRecordersOfCurrentApp(Map<Long, ExperimentInfo> experiments){
         Set<Long> expId = experiments.keySet();

@@ -151,9 +151,10 @@ public class ViewController {
 
             // --- RECORDER:
             Map<Long, List<RecorderInfo>> recorders = new HashMap<Long, List<RecorderInfo>>(16);
-            if (!experiments.isEmpty()) {
+            recorders = baseInfoService.getAllRecorders();
+            /*if (!experiments.isEmpty()) {
                 recorders = baseInfoService.getAllRecordersOfCurrentApp(experiments);
-            }
+            }*/
             model.addAttribute("recorders", recorders);
         }
 
