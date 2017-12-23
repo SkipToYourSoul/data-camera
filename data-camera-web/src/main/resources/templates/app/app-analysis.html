@@ -110,6 +110,7 @@
     <div th:fragment="app-analysis">
         <div class="row">
             <div class="col-sm-12 col-md-12 col-xs-12">
+                <!-- 片段关系树形图 -->
                 <div class="app-analysis-tree-group">
                     <!-- 该场景没有片段记录数据 -->
                     <div th:if="${not #maps.containsKey(recorders, app.id)}"
@@ -126,8 +127,33 @@
                     </th:block>
                 </div>
 
-                <div class="app-analysis-chart-dom" hidden="hidden">
-
+                <!-- 数据展示图 -->
+                <div class="app-analysis-chart-dom">
+                    <!-- 操作栏 -->
+                    <div class="action-bar">
+                        <div class="btn-group">
+                            <button class="btn btn-default"><i class="fa fa-play"></i></button>
+                            <button class="btn btn-default"><i class="fa fa-save"></i></button>
+                            <button class="btn btn-default"><i class="fa fa-trash"></i></button>
+                        </div>
+                        <button class="btn btn-default pull-right"><i class="fa fa-share"></i></button>
+                    </div>
+                    <!-- 图表显示栏 -->
+                    <div class="chart-dom" id="app-analysis-chart-dom">
+                        <div class="panel panel-default my-panel">
+                            <div class="my-panel-heading">
+                                <div class="panel-title">
+                                    <a role="button" data-toggle="collapse" th:href="@{|#collapse-1|}"
+                                       aria-expanded="true"><i class="fa fa-arrows-v"></i>&nbsp; title</a>
+                                </div>
+                            </div>
+                            <div th:id="|collapse-1|" class="panel-collapse collapse in" role="tabpanel">
+                                <div class="panel-body">
+                                    body
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

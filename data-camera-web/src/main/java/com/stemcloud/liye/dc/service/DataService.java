@@ -82,37 +82,54 @@ public class DataService {
         for (RecorderInfo r : ris){
             long beginMillis = System.currentTimeMillis();
             long id = r.getId();
-            List<RecorderDevices> devices = new Gson().fromJson(r.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
-            Date startTime = r.getStartTime();
-            Date endTime = r.getEndTime();
-
-            // -- video data
-            List<VideoData> videos = videoDataRepository.findByRecorderInfo(r);
-            Map<Long, Video> videoMap = transferVideoData(videos);
-
-            // -- value data for chart
-            List<ValueData> chartValues = new ArrayList<ValueData>();
-            for (RecorderDevices device: devices){
-                long sensorId = device.getSensor();
-                List<String> legends = device.getLegends();
-                chartValues.addAll(valueDataRepository.findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
-                        sensorId, legends, startTime, endTime
-                ));
-            }
-            Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
-                    = transferChartData(chartValues);
-
-            Map<String, Map> map = new HashMap<String, Map>(2);
-            map.put(SensorType.CHART.toString(), chartMap);
-            map.put(SensorType.VIDEO.toString(), videoMap);
-
-            result.put(id, map);
+            result.put(id, getRecorderData(id));
             long endMillis = System.currentTimeMillis();
             logger.info("Get content data, id={}, cost time={} ms.", id, (endMillis - beginMillis));
         }
 
         return result;
     }
+
+    /**
+     *
+     * @param recorderId
+     * @return MAP
+     *  key: SensorType
+     *  value: sensor-id, data
+     */
+    public Map getRecorderData(long recorderId){
+        RecorderInfo recorder = recorderRepository.findOne(recorderId);
+        List<RecorderDevices> devices = new Gson().fromJson(recorder.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+        Date startTime = recorder.getStartTime();
+        Date endTime = recorder.getEndTime();
+
+        // -- video data
+        List<VideoData> videos = videoDataRepository.findByRecorderInfo(recorder);
+        Map<Long, Video> videoMap = transferVideoData(videos);
+
+        // -- value data for chart
+        List<ValueData> chartValues = new ArrayList<ValueData>();
+        for (RecorderDevices device: devices){
+            long sensorId = device.getSensor();
+            List<String> legends = device.getLegends();
+            chartValues.addAll(valueDataRepository.findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                    sensorId, legends, startTime, endTime
+            ));
+        }
+        Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
+                = transferChartData(chartValues);
+
+        Map<String, Map> map = new HashMap<String, Map>(2);
+        map.put(SensorType.CHART.toString(), chartMap);
+        map.put(SensorType.VIDEO.toString(), videoMap);
+
+        return map;
+    }
+
+
+
+
+
 
     /**
      * 新生成一条用户自定义的实验片段

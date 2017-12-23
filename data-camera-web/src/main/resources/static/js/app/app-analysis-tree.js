@@ -1,7 +1,9 @@
 /**
  * Belongs to
  * Author: liye on 2017/12/22
- * Description: 生成数据片段关系的树形图
+ * Description:
+ *  生成数据片段关系的树形图
+ *  使用的后台数据(app, recorders)
  */
 // -- node 数据
 var rDataMap = {};
@@ -133,4 +135,6 @@ function showRecorderContent(target){
             $menu.removeClass('active');
         }
     }
+
+    initChartDom(target);
 }

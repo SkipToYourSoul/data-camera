@@ -105,6 +105,29 @@ public class DataController {
     }
 
     /**
+     * 获取实验片段数据
+     *  CHART: Map<Long, Map<String, List<ChartTimeSeries>>>
+     *  VIDEO: Map<Long, Video>
+     * @param queryParams recorderId
+     * @return Map
+     */
+    @GetMapping("/get-recorder-data")
+    Map getRecorderData(@RequestParam Map<String, String> queryParams){
+        Map<String, Object> map;
+        try{
+            Long beginTime = System.currentTimeMillis();
+            long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+            map = ServerReturnTool.serverSuccess(dataService.getRecorderData(recorderId));
+            Long endTime = System.currentTimeMillis();
+            logger.info("[/data/get-recorder-data] request recorder data, cost={} ms.", (endTime - beginTime));
+        } catch (Exception e){
+            map = ServerReturnTool.serverFailure(e.getMessage());
+            logger.error("[/data/get-recorder-data]", e);
+        }
+        return map;
+    }
+
+    /**
      * 生成用户自定义的实验片段
      *
      * @param queryParams
