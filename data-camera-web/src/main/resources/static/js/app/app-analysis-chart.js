@@ -26,7 +26,7 @@ function initChartDom(recorderId){
                 message_info("请求数据成功", 'success');
                 var chartData = response.data['CHART'];
                 var videoData = response.data['VIDEO'];
-                initDom(chartData, videoData);
+                initDom(chartData, videoData, recorder);
             } else if (response.code == "1111") {
                 message_info("加载数据失败，失败原因为：" + response.data, 'error');
             }
@@ -36,27 +36,38 @@ function initChartDom(recorderId){
         }
     });
 
-    function initDom(chartData, videoData){
+    function initDom(chartData, videoData, recorder){
         var $dom = $('#app-analysis-chart-dom');
+        $dom.empty();
         // chart
         for (var sensorId in chartData){
             if (!chartData.hasOwnProperty(sensorId)){
                 continue;
             }
             for (var legend in chartData[sensorId]){
-                var $id = sensorId + "-" + legend;
-                $dom.append(generate($id));
+                if (!chartData[sensorId].hasOwnProperty(legend)){
+                    continue;
+                }
+                var chartId = "chart-" + recorderId + '-' + legend;
+                var title = "[设备" + legend + "]";
+                $dom.append(generate(legend, title, chartId));
+                if (echarts.getInstanceByDom(document.getElementById(chartId)) == null){
+                    var chart = echarts.init(document.getElementById(chartId), "", opts = {
+                        height: 100
+                    });
+                    chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
+                }
             }
         }
 
-        function generate(id) {
+        function generate(panelId, title, contentId) {
             return '<div class="panel panel-default my-panel">' +
                 '<div class="my-panel-heading">' +
                 '<div class="panel-title">' +
-                '<a role="button" data-toggle="collapse" href="#' + id + '" aria-expanded="true"><i class="fa fa-arrows-v"></i>&nbsp; title2</a>' +
+                '<a role="button" data-toggle="collapse" href="#' + panelId + '" aria-expanded="true"><i class="fa fa-arrows-v"></i>&nbsp; ' + title + '</a>' +
                 '</div></div>' +
-                '<div id="' + id + '" class="panel-collapse collapse in" role="tabpanel">' +
-                '<div class="panel-body">body2</div>' +
+                '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
+                '<div class="panel-body my-panel-body"><div id="' + contentId + '"></div></div>' +
                 '</div></div>';
         }
     }
@@ -74,5 +85,50 @@ function initChartDom(recorderId){
                 return recorders[app['id']][index];
             }
         }
+    }
+}
+
+function buildAnalysisChartOption(data, legend) {
+    return {
+        tooltip: app_chart_tooltip,
+        grid: [{
+            top: 10,
+            bottom: 30,
+            left: 30,
+            right: 20
+        }],
+        calculable: true,
+        xAxis: [
+            {
+                type: 'time',
+                boundaryGap : ['20%', '20%'],
+                axisPointer: {
+                    show: true,
+                    type: 'line',
+                    snap: true,
+                    z: 100
+                }
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                scale: true,
+                splitArea: {
+                    show: true
+                },
+                boundaryGap: true
+            }
+        ],
+        series: [
+            {
+                name: legend,
+                type: 'line',
+                symbolSize: 5,
+                symbol:'circle',
+                hoverAnimation: false,
+                data: data
+            }
+        ]
     }
 }

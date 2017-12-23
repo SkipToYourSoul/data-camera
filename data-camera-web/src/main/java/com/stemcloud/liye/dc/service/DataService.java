@@ -111,9 +111,8 @@ public class DataService {
         List<ValueData> chartValues = new ArrayList<ValueData>();
         for (RecorderDevices device: devices){
             long sensorId = device.getSensor();
-            List<String> legends = device.getLegends();
-            chartValues.addAll(valueDataRepository.findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
-                    sensorId, legends, startTime, endTime
+            chartValues.addAll(valueDataRepository.findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                    sensorId, startTime, endTime
             ));
         }
         Map<Long, Map<String, List<ChartTimeSeries>>> chartMap

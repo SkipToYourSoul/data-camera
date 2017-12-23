@@ -87,6 +87,7 @@ function nodeSelectionChanged(node) {
         var target = findParent(node.data.key) + '';
         console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
         showRecorderContent(target);
+        initChartDom(node.data.key);
     }
     
     function findParent(id) {
@@ -102,6 +103,7 @@ function nodeSelectionChanged(node) {
 $('.menu-content ul li').click(function (e) {
     var target = $(e.target).parent().attr('data');
     showRecorderContent(target);
+    initChartDom(target);
 });
 
 /**
@@ -135,6 +137,4 @@ function showRecorderContent(target){
             $menu.removeClass('active');
         }
     }
-
-    initChartDom(target);
 }
