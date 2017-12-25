@@ -23,6 +23,13 @@ public class ChartTimeSeries {
         this.name = date;
     }
 
+    public ChartTimeSeries(Date date){
+        List<Object> list = new ArrayList<Object>();
+        list.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date));
+        this.value = list;
+        this.name = date;
+    }
+
     public Date getName() {
         return name;
     }

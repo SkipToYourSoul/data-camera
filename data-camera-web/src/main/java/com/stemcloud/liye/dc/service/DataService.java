@@ -109,18 +109,48 @@ public class DataService {
 
         // -- value data for chart
         List<ValueData> chartValues = new ArrayList<ValueData>();
+        long minDataTime = System.currentTimeMillis();
+        long maxDataTime = 0L;
         for (RecorderDevices device: devices){
             long sensorId = device.getSensor();
-            chartValues.addAll(valueDataRepository.findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+            List<ValueData> dataList = valueDataRepository.findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
                     sensorId, startTime, endTime
-            ));
+            );
+            if (dataList.size() == 0){
+                continue;
+            }
+            chartValues.addAll(dataList);
+            if (dataList.get(0).getCreateTime().getTime() < minDataTime){
+                minDataTime = dataList.get(0).getCreateTime().getTime();
+            }
+            if (dataList.get(dataList.size() - 1).getCreateTime().getTime() > maxDataTime){
+                maxDataTime = dataList.get(dataList.size() - 1).getCreateTime().getTime();
+            }
         }
         Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
                 = transferChartData(chartValues);
 
-        Map<String, Map> map = new HashMap<String, Map>(2);
+        // -- 将不同数据段的数据对齐
+        for (Map.Entry<Long, Map<String, List<ChartTimeSeries>>> entry : chartMap.entrySet()){
+            Map<String, List<ChartTimeSeries>> map = entry.getValue();
+            for (Map.Entry<String, List<ChartTimeSeries>> subEntry : map.entrySet()){
+                List<ChartTimeSeries> list = subEntry.getValue();
+                if (list.get(0).getName().getTime() > minDataTime){
+                    list.add(0, new ChartTimeSeries(new Date(minDataTime)));
+                }
+                if (list.get(list.size() - 1).getName().getTime() < maxDataTime) {
+                    list.add(new ChartTimeSeries(new Date(maxDataTime)));
+                }
+                map.put(subEntry.getKey(), list);
+            }
+            chartMap.put(entry.getKey(), map);
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>(2);
         map.put(SensorType.CHART.toString(), chartMap);
         map.put(SensorType.VIDEO.toString(), videoMap);
+        map.put("MIN", minDataTime);
+        map.put("MAX", maxDataTime);
 
         return map;
     }

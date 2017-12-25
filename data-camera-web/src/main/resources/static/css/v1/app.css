@@ -219,6 +219,31 @@ body{
     padding: 0 10px 5px 10px;
 }
 
+.app-analysis-chart-dom .timeline-dom{
+    padding: 10px 30px 20px;
+}
+
+/* timeline 自定义样式 */
+#timeline-slider .ui-slider-tip {
+    /*visibility: visible;*/
+    opacity: 1;
+    top: -40px;
+    width: 80px;
+    height: 35px;
+    line-height: 15px;
+    margin-left: -40px;
+}
+
+#timeline-slider .ui-slider-pip-first .ui-slider-label {
+    margin-left: -30px;
+    width: 120px;
+}
+
+#timeline-slider .ui-slider-pip-last .ui-slider-label {
+    margin-left: -85px;
+    width: 120px;
+}
+
 .app-analysis-chart-dom .chart-dom{
     padding-bottom: 10px;
 }

@@ -26,7 +26,7 @@ function initChartDom(recorderId){
                 message_info("请求数据成功", 'success');
                 var chartData = response.data['CHART'];
                 var videoData = response.data['VIDEO'];
-                initDom(chartData, videoData, recorder);
+                initDom(chartData, videoData, response.data['MIN'], response.data['MAX']);
             } else if (response.code == "1111") {
                 message_info("加载数据失败，失败原因为：" + response.data, 'error');
             }
@@ -36,7 +36,23 @@ function initChartDom(recorderId){
         }
     });
 
-    function initDom(chartData, videoData, recorder){
+    function initDom(chartData, videoData, minTime, maxTime){
+        // timeline
+        var timeline = generateTimeList(minTime, maxTime);
+        $(".slider").slider({
+            range: true,
+            min: 0,
+            max: timeline.length - 1,
+            values: [0, timeline.length - 1]
+        }).slider("pips", {
+            rest: "pip",
+            labels: timeline
+        }).slider("float", {
+            labels: timeline
+        }).on("slidechange", function(e,ui) {
+            console.log(ui.value);
+        });
+
         var $dom = $('#app-analysis-chart-dom');
         $dom.empty();
         // chart
@@ -70,6 +86,14 @@ function initChartDom(recorderId){
                 '<div class="panel-body my-panel-body"><div id="' + contentId + '"></div></div>' +
                 '</div></div>';
         }
+
+        function generateTimeList(minTime, maxTime) {
+            var list = [];
+            for(var index = minTime; index <= maxTime; index += 1000){
+                list.push(new Date(index).Format("yyyy-MM-dd HH:mm:ss"));
+            }
+            return list;
+        }
     }
 
     /**
@@ -90,7 +114,16 @@ function initChartDom(recorderId){
 
 function buildAnalysisChartOption(data, legend) {
     return {
-        tooltip: app_chart_tooltip,
+        tooltip: {
+            trigger: 'axis',
+            backgroundColor: 'rgba(245, 245, 245, 0.8)',
+            borderWidth: 1,
+            borderColor: '#ccc',
+            padding: 10,
+            textStyle: {
+                color: '#000'
+            }
+        },
         grid: [{
             top: 10,
             bottom: 30,
@@ -101,22 +134,13 @@ function buildAnalysisChartOption(data, legend) {
         xAxis: [
             {
                 type: 'time',
-                boundaryGap : ['20%', '20%'],
-                axisPointer: {
-                    show: true,
-                    type: 'line',
-                    snap: true,
-                    z: 100
-                }
+                boundaryGap : ['20%', '20%']
             }
         ],
         yAxis: [
             {
                 type: 'value',
                 scale: true,
-                splitArea: {
-                    show: true
-                },
                 boundaryGap: true
             }
         ],
