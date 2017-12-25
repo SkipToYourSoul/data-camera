@@ -4,7 +4,7 @@ import com.stemcloud.liye.dc.common.DbTools;
 import com.stemcloud.liye.dc.common.GlobalVariables;
 import com.stemcloud.liye.dc.common.QuartzManager;
 import com.stemcloud.liye.dc.listener.SensorMonitorJob;
-import com.stemcloud.liye.dc.socket.RandomGenerator;
+import com.stemcloud.liye.dc.common.RandomGenerator;
 
 import java.sql.SQLException;
 
