@@ -1,6 +1,7 @@
 package com.stemcloud.liye.dc.service;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
@@ -13,6 +14,8 @@ import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
 import com.stemcloud.liye.dc.domain.common.SensorType;
 import com.stemcloud.liye.dc.domain.view.Video;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,8 @@ import java.util.*;
  */
 @Service
 public class DataService {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final SensorRepository sensorRepository;
     private final ValueDataRepository valueDataRepository;
     private final RecorderRepository recorderRepository;
@@ -39,18 +44,31 @@ public class DataService {
         this.videoDataRepository = videoDataRepository;
     }
 
+    /**
+     * 获取实验最新的传感器数据
+     *
+     * @param expId 给定的实验id
+     * @param timestamp 时间戳下限
+     * @return sensor_id, (data_key, List<data_value>)
+     */
     public Map<Long, Map<String, List<ChartTimeSeries>>> getRecentDataOfBoundSensors(long expId, long timestamp){
         List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         Set<Long> boundSensorIds = new HashSet<Long>();
         for (SensorInfo bs: boundSensors){
             boundSensorIds.add(bs.getId());
         }
-        return transferChartData(valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(new Date(timestamp), boundSensorIds));
+
+        Date time = new Date(timestamp);
+        List<ValueData> data = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(time, boundSensorIds);
+
+        logger.info("Request data size={}, time={}", data.size(), time.toString());
+        return transferChartData(data);
     }
 
     /**
-     * get content data of experiment
-     * @param expId
+     * 获取实验片段数据
+     *
+     * @param expId 给定的实验id
      * @return Map<Long, Map>
      *     key: content_id
      *     value: SensorType, Map<SensorId, data>
@@ -62,39 +80,161 @@ public class DataService {
         }});
         // traverse content
         for (RecorderInfo r : ris){
+            long beginMillis = System.currentTimeMillis();
             long id = r.getId();
-            RecorderDevices devices = new Gson().fromJson(r.getDevices(), RecorderDevices.class);
-            Date startTime = r.getStartTime();
-            Date endTime = r.getEndTime();
-            Set<Long> sids = new HashSet<Long>(devices.getSensors());
-
-            // -- video data
-            List<VideoData> videos = videoDataRepository.findByRecorderInfo(r);
-            Map<Long, Video> videoMap = transferVideoData(videos);
-
-            // -- value data for chart
-            Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
-                    = transferChartData(valueDataRepository.findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sids, startTime, endTime));
-
-            Map<String, Map> map = new HashMap<String, Map>(2);
-            map.put(SensorType.CHART.toString(), chartMap);
-            map.put(SensorType.VIDEO.toString(), videoMap);
-
-            result.put(id, map);
+            result.put(id, getRecorderData(id));
+            long endMillis = System.currentTimeMillis();
+            logger.info("Get content data, id={}, cost time={} ms.", id, (endMillis - beginMillis));
         }
 
         return result;
     }
 
     /**
-     * sensor_id, (data_key, List<data_value>)
+     *
+     * @param recorderId
+     * @return MAP
+     *  key: SensorType
+     *  value: sensor-id, data
+     */
+    public Map getRecorderData(long recorderId){
+        RecorderInfo recorder = recorderRepository.findOne(recorderId);
+        List<RecorderDevices> devices = new Gson().fromJson(recorder.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+        Date startTime = recorder.getStartTime();
+        Date endTime = recorder.getEndTime();
+
+        // -- video data
+        List<VideoData> videos = videoDataRepository.findByRecorderInfo(recorder);
+        Map<Long, Video> videoMap = transferVideoData(videos);
+
+        // -- value data for chart
+        List<ValueData> chartValues = new ArrayList<ValueData>();
+        long minDataTime = System.currentTimeMillis();
+        long maxDataTime = 0L;
+        for (RecorderDevices device: devices){
+            long sensorId = device.getSensor();
+            List<ValueData> dataList = valueDataRepository.findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                    sensorId, startTime, endTime
+            );
+            if (dataList.size() == 0){
+                continue;
+            }
+            chartValues.addAll(dataList);
+            if (dataList.get(0).getCreateTime().getTime() < minDataTime){
+                minDataTime = dataList.get(0).getCreateTime().getTime();
+            }
+            if (dataList.get(dataList.size() - 1).getCreateTime().getTime() > maxDataTime){
+                maxDataTime = dataList.get(dataList.size() - 1).getCreateTime().getTime();
+            }
+        }
+        Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
+                = transferChartData(chartValues);
+
+        // -- 将不同数据段的数据对齐
+        for (Map.Entry<Long, Map<String, List<ChartTimeSeries>>> entry : chartMap.entrySet()){
+            Map<String, List<ChartTimeSeries>> map = entry.getValue();
+            for (Map.Entry<String, List<ChartTimeSeries>> subEntry : map.entrySet()){
+                List<ChartTimeSeries> list = subEntry.getValue();
+                if (list.get(0).getName().getTime() > minDataTime){
+                    list.add(0, new ChartTimeSeries(new Date(minDataTime)));
+                }
+                if (list.get(list.size() - 1).getName().getTime() < maxDataTime) {
+                    list.add(new ChartTimeSeries(new Date(maxDataTime)));
+                }
+                map.put(subEntry.getKey(), list);
+            }
+            chartMap.put(entry.getKey(), map);
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put(SensorType.CHART.toString(), chartMap);
+        map.put(SensorType.VIDEO.toString(), videoMap);
+        map.put("MIN", minDataTime);
+        map.put("MAX", maxDataTime);
+
+        return map;
+    }
+
+
+
+
+
+
+    /**
+     * 新生成一条用户自定义的实验片段
+     *
+     * @param expId 实验id
+     * @param contentId 片段id
+     * @param start 数据截取起点
+     * @param end 数据截取终点
+     * @param legend 留下的数据维度
+     */
+    public void generateUserContent(long expId, long contentId, int start, int end, List<String> legend){
+        RecorderInfo recorder = recorderRepository.findOne(contentId);
+        Date startTime = recorder.getStartTime();
+        Date endTime = recorder.getEndTime();
+        List<RecorderDevices> devices = new Gson().fromJson(recorder.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+
+        // 遍历选中的几个数据段，找出最低和最高时间
+        Date minTime = endTime, maxTime = startTime;
+        Map<Long, List<String>> sensorLegend = new HashMap<Long, List<String>>();
+        for (String index : legend) {
+            long sensorId = Long.parseLong(index.split("-")[0]);
+            String key = index.split("-")[1];
+            List<ValueData> values = valueDataRepository.findBySensorIdAndKeyAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                    sensorId, key, startTime, endTime);
+            int lowerIndex = (int) Math.ceil((double) start/100 * values.size()) - 1;
+            int higherIndex = (int) Math.floor((double) end/100 * values.size()) - 1;
+            Date lowerTime = values.get(lowerIndex).getCreateTime();
+            Date higherTime = values.get(higherIndex).getCreateTime();
+            if (lowerTime.compareTo(minTime) < 0){
+                minTime = lowerTime;
+            }
+            if (higherTime.compareTo(maxTime) > 0){
+                maxTime = higherTime;
+            }
+            List<String> ls = new ArrayList<String>();
+            if (sensorLegend.containsKey(sensorId)){
+                ls = sensorLegend.get(sensorId);
+            }
+            ls.add(key);
+            sensorLegend.put(sensorId, ls);
+        }
+
+        // 保存新的实验记录
+        RecorderInfo newRecorder = new RecorderInfo();
+        newRecorder.setName("用户生成的新记录");
+        newRecorder.setDescription("用户新纪录描述");
+        newRecorder.setStartTime(minTime);
+        newRecorder.setEndTime(maxTime);
+        newRecorder.setExpId(expId);
+        newRecorder.setAppId(recorder.getAppId());
+        newRecorder.setIsRecorder(0);
+        newRecorder.setIsUserGen(1);
+        for (RecorderDevices device: devices){
+            if (sensorLegend.containsKey(device.getSensor())){
+                device.setLegends(sensorLegend.get(device.getSensor()));
+            } else {
+                devices.remove(device);
+            }
+        }
+        newRecorder.setDevices(new Gson().toJson(devices));
+        recorderRepository.save(newRecorder);
+        logger.info("Generate new recorder, exp-id={}", expId);
+    }
+
+    /**
+     * 将valueData转换成为echart需要的时间数据格式
+     *
+     * @param vd
+     * @return sensor_id, (data_key, List<data_value>)
      */
     private Map<Long, Map<String, List<ChartTimeSeries>>> transferChartData(List<ValueData> vd){
-        Map<Long, Map<String, List<ChartTimeSeries>>> result = new HashMap<Long, Map<String, List<ChartTimeSeries>>>();
+        Map<Long, Map<String, List<ChartTimeSeries>>> result = new HashMap<Long, Map<String, List<ChartTimeSeries>>>(16);
 
         for (ValueData d : vd){
             long sensorId = d.getSensorId();
-            String key = d.getKey();
+            String key = sensorId + "-" + d.getKey();
             Double value = d.getValue();
             Date time = d.getCreateTime();
 
@@ -117,12 +257,14 @@ public class DataService {
                 result.put(sensorId, map);
             }
         }
-
         return result;
     }
 
     /**
-     * sensor_id, video_path
+     * 将videoData转换成为video.js需要的数据格式
+     *
+     * @param videos
+     * @return sensor_id, Video
      */
     private Map<Long, Video> transferVideoData(List<VideoData> videos){
         Map<Long, Video> map = new HashMap<Long, Video>();

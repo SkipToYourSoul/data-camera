@@ -269,11 +269,16 @@ public class CrudController {
         return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("sensor-id")));
     }
 
+    /**
+     * 点击“监控”按钮触发的动作
+     * @param queryParams
+     * @return
+     */
     @GetMapping("/monitor")
     public Map monitorSensor(@RequestParam Map<String, String> queryParams){
-        Long expId = Long.valueOf(queryParams.get("exp-id"));
         Map<String, Object> map;
         try {
+            Long expId = Long.valueOf(queryParams.get("exp-id"));
             int response = crudService.changeSensorsMonitorStatusOfCurrentExperiment(expId);
             map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
@@ -283,8 +288,8 @@ public class CrudController {
         return map;
     }
 
-    @GetMapping("/isRecorder")
-    public Map isRecorder(@RequestParam Map<String, String> queryParams){
+    @GetMapping("/isRecord")
+    public Map isRecord(@RequestParam Map<String, String> queryParams){
         Long expId = Long.valueOf(queryParams.get("exp-id"));
         Map<String, Object> map;
         try {
@@ -292,38 +297,82 @@ public class CrudController {
             map = ServerReturnTool.serverSuccess(exp.getIsRecorder());
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/isRecorder", e);
+            logger.error("/crud/isRecord", e);
         }
         return map;
     }
 
-    @GetMapping("/recorder")
-    public Map recorderSensor(@RequestParam Map<String, String> queryParams){
-        Long expId = Long.valueOf(queryParams.get("exp-id"));
-        int isSave = Integer.parseInt(queryParams.get("is-save"));
+    /**
+     * 点击“录制”按钮触发的动作
+     * @param queryParams
+     * @return
+     */
+    @GetMapping("/record")
+    public Map recordSensor(@RequestParam Map<String, String> queryParams){
         Map<String, Object> map;
         try {
-            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(expId, isSave);
+            Long expId = Long.valueOf(queryParams.get("exp-id"));
+            int isSave = Integer.parseInt(queryParams.get("is-save"));
+            Long appId = Long.valueOf(queryParams.get("app-id"));
+            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(appId, expId, isSave);
             map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/recorder", e);
+            logger.error("/crud/record", e);
         }
         return map;
     }
 
-    @PostMapping("/content/name")
-    public Map modifyContentName(@RequestParam Map<String, String> queryParams){
+    @PostMapping("/recorder/name")
+    public Map modifySegmentName(@RequestParam Map<String, String> queryParams){
         String result = "";
         try {
             long contentId = Long.parseLong(queryParams.get("pk"));
             String name = queryParams.get("value");
-            crudService.updateContentName(contentId, name);
-            result = "内容名称变更为：" + name;
+            crudService.updateRecorderName(contentId, name);
+            result = "实验记录名称变更为：" + name;
         } catch (Exception e){
             return ServerReturnTool.serverFailure("后台数据错误");
         }
 
         return ServerReturnTool.serverSuccess(result);
+    }
+
+    @PostMapping("/recorder/desc")
+    public Map modifySegmentDesc(@RequestParam Map<String, String> queryParams){
+        String result = "";
+        try {
+            long contentId = Long.parseLong(queryParams.get("pk"));
+            String desc = queryParams.get("value");
+            crudService.updateRecorderDescription(contentId, desc);
+            result = "实验记录描述变更为：" + desc;
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+
+        return ServerReturnTool.serverSuccess(result);
+    }
+
+    /**
+     * 删除实验片段
+     *
+     * @param queryParams 参数
+     * @param request http请求
+     * @return
+     */
+    @GetMapping("/recorder/delete")
+    public Map deleteRecorder(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        if (!queryParams.containsKey("content-id") || Long.parseLong(queryParams.get("content-id")) < 0){
+            return ServerReturnTool.serverFailure("参数错误");
+        }
+        try {
+            String user = commonService.getCurrentLoginUser(request);
+            Long contentId = Long.parseLong(queryParams.get("content-id"));
+            logger.info("USER " + user + " DELETE RECORDER " + contentId);
+            crudService.deleteRecorder(contentId);
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure("后台数据错误");
+        }
+        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("content-id")));
     }
 }

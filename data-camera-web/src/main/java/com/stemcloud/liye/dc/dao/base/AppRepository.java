@@ -21,14 +21,7 @@ public interface AppRepository extends CrudRepository<AppInfo, Long> {
      * @param isDeleted: 0 or 1
      * @return apps
      */
-    List<AppInfo> findByCreatorAndIsDeletedOrderByCreateTime(String creator, int isDeleted);
-
-    /**
-     * find app by id
-     * @param id id
-     * @return app
-     */
-    AppInfo findById(long id);
+    List<AppInfo> findByCreatorAndIsDeletedOrderByCreateTimeDesc(String creator, int isDeleted);
 
     /**
      * delete app

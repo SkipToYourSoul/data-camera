@@ -27,6 +27,13 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
     RecorderInfo findByExpIdAndIsRecorderAndIsDeleted(long expId, int inRecorder, int isDeleted);
 
     /**
+     * find online recorder
+     * @param isDeleted
+     * @return
+     */
+    List<RecorderInfo> findByIsDeletedOrderByIdDesc(int isDeleted);
+
+    /**
      * find recorders of current app
      * @param ids
      * @return
@@ -56,6 +63,17 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     Integer updateName(long id, String name);
+
+    /**
+     * update desc
+     * @param id
+     * @param desc
+     * @return
+     */
+    @Query(value = "UPDATE RecorderInfo r SET r.description = ?2 WHERE id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer updateDescription(long id, String desc);
 
     /**
      * delete content

@@ -9,22 +9,31 @@ import java.util.List;
  * @author liye on 2017/11/29
  */
 public class RecorderDevices {
-    private List<Long> sensors;
-    private List<Long> tracks;
+    private Long sensor;
+    private Long track;
+    private List<String> legends;
 
-    public List<Long> getSensors() {
-        return sensors;
+    public Long getSensor() {
+        return sensor;
     }
 
-    public void setSensors(List<Long> sensors) {
-        this.sensors = sensors;
+    public void setSensor(Long sensor) {
+        this.sensor = sensor;
     }
 
-    public List<Long> getTracks() {
-        return tracks;
+    public Long getTrack() {
+        return track;
     }
 
-    public void setTracks(List<Long> tracks) {
-        this.tracks = tracks;
+    public void setTrack(Long track) {
+        this.track = track;
+    }
+
+    public List<String> getLegends() {
+        return legends;
+    }
+
+    public void setLegends(List<String> legends) {
+        this.legends = legends;
     }
 }

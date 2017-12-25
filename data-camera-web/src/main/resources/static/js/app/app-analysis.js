@@ -4,42 +4,83 @@
  *  Description:
  */
 
+/**
+ * key: chart_dom
+ * value: {key:legend, value:true or false}
+ * @type {{}}
+ */
+var analysis_chart_legend_selected = {};
+
+/**
+ * key: chart_dom
+ * value: {'start': xx, 'end': xx}
+ * @type {{}}
+ */
+var analysis_chart_data_zoom = {};
+
+/**
+ * key: exp_id
+ * value: content_data
+ * @type {{}}
+ */
+var analysis_exp_content_data = {};
+
+/**
+ * 初始化分析页面入口
+ * 显示第一个实验tab的数据
+ */
 function initResourceOfAnalysisPage(){
     // init the first exp content charts
     for (var exp_id in experiments) {
-        initExpContentChart(exp_id);
-        break;
+        if (experiments.hasOwnProperty(exp_id)){
+            initExpContentChart(exp_id);
+            break;
+        }
     }
 }
 
+/**
+ * 加载实验tab内容
+ * @param exp_id
+ */
 function initExpContentChart(exp_id){
-    var $loader = $("#app-analysis-loading");
-    $loader.fakeLoader({
-        timeToHide: 10000,
-        spinner:"spinner4",
-        bgColor:"rgba(154, 154, 154, 0.7)"
-    });
+    if ( $(".exp-recorder-panel-" + exp_id).length == 0 ){
+        // message_info("暂无实验内容", 'info');
+        return;
+    }
 
+    for (var i = 0; i < recorders[exp_id].length; i++){
+        var chart_dom = '#analysis-chart-' + exp_id + '-' + recorders[exp_id][i]['id'];
+        var video_dom = '#analysis-video-' + exp_id + '-' + recorders[exp_id][i]['id'];
+        if ( ($(chart_dom).length > 0 && $(chart_dom).html().length > 0) || ($(video_dom).length > 0 && $(video_dom).html().length > 0) ){
+            // message_info("数据已加载", 'info');
+            return;
+        }
+    }
+
+    // --- 异步请求实验片段数据
     $.ajax({
         type: 'get',
-        url: data_addrss + "/content",
-        async: false,
+        url: data_addrss + "/exp-content",
         data: {
             "exp-id": exp_id
         },
         success: function (response) {
             if (response.code == "0000") {
                 var content_data = response.data;
+                analysis_exp_content_data[exp_id] = content_data;
                 for (var content_id in content_data){
                     if (!content_data.hasOwnProperty(content_id)){
                         continue;
                     }
+
                     // --- edit able
                     var $content_name_dom = $('#analysis-content-name-' + content_id);
+                    var $content_desc_dom = $('#analysis-content-desc-' + content_id);
                     $content_name_dom.editable({
                         type: 'text',
                         pk: content_id,
-                        url: crud_address + '/content/name',
+                        url: crud_address + '/recorder/name',
                         title: '输入标题',
                         success: function(response) {
                             if (response.code == "1111"){
@@ -52,7 +93,23 @@ function initExpContentChart(exp_id){
                             message_info('修改失败', 'error');
                         }
                     });
-
+                    $content_desc_dom.editable({
+                        title: '输入描述',
+                        rows: 10,
+                        placeholder: '在这里输入描述',
+                        pk: content_id,
+                        url: crud_address + '/recorder/desc',
+                        success: function(response) {
+                            if (response.code == "1111"){
+                                message_info('操作无效: ' + response.data, "error");
+                            } else if (response.code == "0000"){
+                                message_info(response.data, 'success');
+                            }
+                        },
+                        error: function (response) {
+                            message_info('修改失败', 'error');
+                        }
+                    });
 
                     var chart_data = content_data[content_id]['CHART'];
                     var video_data = content_data[content_id]['VIDEO'];
@@ -72,8 +129,32 @@ function initExpContentChart(exp_id){
                                 height: chart_height
                             });
                             chart.setOption(analysisChartOption(chart_data));
+                            // -- bound event
+                            chart.on('legendselectchanged', function (params) {
+                                console.log(params);
+                                var current_legend = "";
+                                for (var key in params.selected){
+                                    if (params.selected[key] == true){
+                                        current_legend += key + ';';
+                                    }
+                                }
+                                if (current_legend.length > 0){
+                                    current_legend = current_legend.slice(0, current_legend.length - 1);
+                                }
+                                analysis_chart_legend_selected[this.dom] = current_legend;
+                            }, {'dom': chart_dom});
+                            chart.on('datazoom', function (params) {
+                                console.log(params);
+                                analysis_chart_data_zoom[this.dom] = {
+                                    'start': Math.round(params.start),
+                                    'end': Math.round(params.end)
+                                }
+                            }, {'dom': chart_dom});
+                            chart.resize({height: chart_height});
+                            console.log("first time to init chart");
                         } else {
                             echarts.getInstanceByDom(document.getElementById(chart_dom)).setOption(analysisChartOption(chart_data));
+                            console.log("not first time to init chart");
                         }
                     }
 
@@ -103,13 +184,155 @@ function initExpContentChart(exp_id){
                         }
                     }
                 }
+            } else if (response.code == "1111") {
+                message_info("加载数据失败，失败原因为：" + response.data, 'error');
             }
         },
         error: function (response) {
             message_info("操作失败，失败原因为：" + response, 'error');
         }
     });
+}
 
-    // complete loading
-    $loader.fadeOut();
+/**
+ * 生成新的用户自定义内容
+ * @param button
+ */
+function generateNewContent(button) {
+    var button_content = button.getAttribute('data');
+    var exp_id = button_content.split("-")[0];
+    var content_id = button_content.split("-")[1];
+    
+    var chart_dom = 'analysis-chart-' + exp_id + '-' + content_id;
+    var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
+    if (chart != null){
+        var option = chart.getOption();
+        if (!analysis_chart_data_zoom.hasOwnProperty(chart_dom)){
+            analysis_chart_data_zoom[chart_dom] = {
+                'start': Math.round(option['dataZoom'][0]['start']),
+                'end': Math.round(option['dataZoom'][0]['end'])
+            }
+        }
+        if (!analysis_chart_legend_selected.hasOwnProperty(chart_dom)){
+            analysis_chart_legend_selected[chart_dom] = option['legend'][0]['data'].join(';');
+        }
+    } else {
+        message_info("图表中暂无数据，不能生成新的内容", 'error');
+        return;
+    }
+
+    var dialog_message = '<p>数据起始时间：' + analysis_chart_data_zoom[chart_dom]['start'] + '</p>';
+    dialog_message += '<p>数据结束时间：' + analysis_chart_data_zoom[chart_dom]['end'] + '</p>';
+    dialog_message += '<p>数据维度：' + analysis_chart_legend_selected[chart_dom] + '</p>';
+
+    var dialog = bootbox.dialog({
+        title: '即将生成新的实验数据段，记录如下',
+        message: dialog_message,
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i>取消',
+                className: 'btn-danger'
+            },
+            ok: {
+                label: '<i class="fa fa-check"></i>确认生成',
+                className: 'btn-info',
+                callback: function(){
+                    message_info('内容生成中', 'info');
+                    $.ajax({
+                        type: 'get',
+                        url: data_addrss + "/new-content",
+                        async: false,
+                        data: {
+                            "exp-id": exp_id,
+                            "content-id": content_id,
+                            "start": analysis_chart_data_zoom[chart_dom]['start'],
+                            "end": analysis_chart_data_zoom[chart_dom]['end'],
+                            "legend": analysis_chart_legend_selected[chart_dom]
+                        },
+                        success: function (response) {
+                            if (response.code == "1111"){
+                                message_info('操作无效: ' + response.data, "error");
+                            } else if (response.code == "0000"){
+                                window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
+                            }
+                        },
+                        error: function (response) {
+                            message_info('操作无效', "error");
+                        }
+                    });
+                }
+            }
+        }
+    });
+}
+
+/**
+ * 删除实验片段内容
+ * @param button
+ */
+function deleteContent(button) {
+    var content_id = button.getAttribute('data');
+    bootbox.confirm({
+        title: "删除实验片段?",
+        message: "确认删除实验片段吗? ",
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i> 取消'
+            },
+            confirm: {
+                label: '<i class="fa fa-check"></i> 确认删除'
+            }
+        },
+        callback: function (result) {
+            if (result){
+                $.ajax({
+                    type: 'get',
+                    url: crud_address + '/recorder/delete?content-id=' + content_id,
+                    success: function (id) {
+                        window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
+                        $('#app-main-tab').find('li:eq(1) a').tab('show');
+                    },
+                    error: function (id) {
+                        message_info("删除实验片段失败", 'error');
+                    }
+                });
+            }
+        }
+    });
+}
+
+/** ================== 录制相关 ================== **/
+var analysis_recorder_interval = {};
+var analysis_recorder_time = {};
+
+/**
+ * 录制时间更新
+ * @param interval 时间增长单位
+ * @param exp_id 实验id
+ */
+function setClockTime(interval, exp_id) {
+    analysis_recorder_time[exp_id] = new Date(analysis_recorder_time[exp_id].getTime() + 1000*interval);
+    var format_time = analysis_recorder_time[exp_id].Format("yyyy-MM-dd HH:mm:ss");
+    $('#recorder-clock').html(format_time);
+
+    return format_time;
+}
+
+/**
+ * 开始回放片段数据
+ * @param button
+ */
+function recorderPlay(button) {
+    var exp_id = button.getAttribute('data');
+    var content_data = analysis_exp_content_data[exp_id];
+
+    analysis_recorder_time[exp_id] = new Date(Date.parse(recorder_start_time.replace(/-/g, "/")));
+
+    analysis_recorder_interval[exp_id] = setInterval(function () {
+        var time = setClockTime(1, exp_id);
+        setRecorderChart(time);
+        setRecorderVideo(time);
+    }, 1000);
+    $('#play-btn-' + exp_id).attr('disabled', 'disabled');
+    $('#pause-btn' + exp_id).removeAttr('disabled');
 }

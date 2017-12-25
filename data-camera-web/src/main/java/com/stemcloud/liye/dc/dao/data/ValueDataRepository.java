@@ -1,6 +1,7 @@
 package com.stemcloud.liye.dc.dao.data;
 
 import com.stemcloud.liye.dc.domain.data.ValueData;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Date;
@@ -15,19 +16,43 @@ import java.util.Set;
  */
 public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
     /**
-     * find data by sensor ids in time range
-     * @param sensorId
-     * @param startTime
-     * @param endTime
+     * 找到当前设备下维度(1或者多个)下，在给定时间戳范围内的数据
+     *
+     * @param sensorId 设备编号
+     * @param key 数据维度
+     * @param startTime 时间戳下限
+     * @param endTime 时间戳上线
      * @return
      */
-    List<ValueData> findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Set<Long> sensorId, Date startTime, Date endTime);
+    List<ValueData> findBySensorIdAndKeyInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, List<String> key, Date startTime, Date endTime);
 
     /**
-     * find data in sensor ids
-     * @param timestamp
-     * @param ids
+     * 找到当前设备下，比给定时间戳更新的数据
+     *
+     * @param timestamp 时间戳下限
+     * @param ids 设备编号
      * @return
      */
     List<ValueData> findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(Date timestamp, Set<Long> ids);
+
+    /**
+     * 找到当前设备下，在给定时间戳范围内的数据
+     *
+     * @param sensorId 设备编号
+     * @param startTime 时间戳下限
+     * @param endTime 时间戳上线
+     * @return
+     */
+    List<ValueData> findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, Date startTime, Date endTime);
+
+    /**
+     * 找到当前设备和维度下，在给定时间戳范围内的数据
+     *
+     * @param sensorId 设备编号
+     * @param key 数据维度
+     * @param startTime 时间戳下限
+     * @param endTime 时间戳上线
+     * @return
+     */
+    List<ValueData> findBySensorIdAndKeyAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, String key, Date startTime, Date endTime);
 }

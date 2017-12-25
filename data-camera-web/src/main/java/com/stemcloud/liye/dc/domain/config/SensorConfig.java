@@ -24,6 +24,9 @@ public class SensorConfig {
     @Column(name = "dimension", nullable = false)
     private String dimension;
 
+    @Column(name = "unit", nullable = false)
+    private String unit;
+
     public long getId() {
         return id;
     }
@@ -50,5 +53,13 @@ public class SensorConfig {
 
     public void setDimension(String dimension) {
         this.dimension = dimension;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

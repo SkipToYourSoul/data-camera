@@ -1,21 +1,14 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:fragment="app-analysis">
+    <div th:fragment="app-analysis-old">
         <div class="row">
-            <!-- 页面说明 -->
-            <div class="app-page-introduction">
-                <p>
-                    <i class="fa fa-info-circle"></i>&nbsp;在数据分析模式中，你能够分析之前所录制的实验数据
-                </p>
-                <p>
-                    <i class="fa fa-info-circle"></i>&nbsp;你可以任意编辑你所记录的数据，并以回放的方式来重现数据
-                </p>
-            </div>
-
             <div class="col-md-12 col-sm-12">
-                <div id="app-experiment-loading"></div>
+                <!-- 应用中没有实验数据 -->
+                <div th:if="${#maps.isEmpty(experiments)}"
+                     class="alert alert-info" role="alert">TIPS: 应用中暂无实验记录，请先在实验模式下新建实验并记录数据吧:)</div>
+                <!-- 遍历实验数据 -->
                 <div th:if="${not #maps.isEmpty(experiments)}">
-                    <ul class="nav nav-tabs" role="tablist" id="app-analysis-tab">
+                    <ul class="nav nav-pills" role="tablist" id="app-analysis-tab">
                         <th:block th:each="entry,index:${experiments}">
                             <li role="presentation" th:class="${index.count eq 1}?'active':''">
                                 <a th:href="|#tab-experiment-${entry.key}|"
@@ -27,15 +20,19 @@
                         <th:block th:each="entry,index:${experiments}">
                             <div th:id="|tab-experiment-${entry.key}|" role="tabpanel"
                                  th:class="${index.count eq 1}?'tab-pane active fade in':'tab-pane fade'">
-                                <!-- contents -->
-                                <th:block th:if="${#lists.isEmpty(recorders[entry.key])}">
-                                    <h3 style="margin-bottom: 50px">该实验下暂无内容，可在实验模式下录制数据内容</h3>
-                                </th:block>
+                                <!-- 实验中没有片段记录数据 -->
+                                <div th:if="${not #maps.containsKey(recorders, entry.key)}"
+                                     class="alert alert-info" role="alert">TIPS: 还没有已生成的实验内容，请先在实验模式下记录数据吧:)</div>
+                                <!-- 遍历实验片段记录数据 -->
                                 <th:block th:each="recorder,index:${recorders[entry.key]}">
-                                    <div class="panel panel-default">
+                                    <div th:class="|panel panel-default exp-recorder-panel-${entry.key}|">
                                         <div class="panel-heading">
                                             <div class="panel-title">
-                                                <a role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}" aria-expanded="true" aria-controls="collapseOne" th:text="|原生实验片段${index.count},
+                                                <a th:if="${recorder.isUserGen eq 0}" role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}"
+                                                   aria-expanded="true" aria-controls="collapseOne" th:text="|原生实验片段${index.count},
+                                                数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></a>
+                                                <a th:if="${recorder.isUserGen eq 1}" role="button" data-toggle="collapse" th:href="@{|#collapse-${recorder.id}|}"
+                                                   aria-expanded="true" aria-controls="collapseOne" th:text="|用户新生成的实验片段${index.count},
                                                 数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></a>
                                             </div>
                                         </div>
@@ -46,31 +43,52 @@
                                                         <div th:id="|analysis-info-${entry.key}-${recorder.id}|"></div>
                                                         <div th:id="|analysis-chart-${entry.key}-${recorder.id}|"></div>
                                                         <div th:id="|analysis-video-${entry.key}-${recorder.id}|"></div>
+                                                        <div class="app-analysis-content-desc">
+                                                            <div class="title">实验片段描述</div>
+                                                            <div class="content">
+                                                                <a href="#" th:id="|analysis-content-desc-${recorder.id}|" data-type="textarea" th:text="${recorder.description}"></a>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="col-xs-4 col-sm-4 col-md-4">
+                                                        <!-- 实验片段操作详情 -->
                                                         <div class="app-analysis-content-info">
                                                             <div class="info">
-                                                                <div class="title" th:text="|基本信息|"></div>
-                                                                <div class="content">名称（点击可修改）： <a href="#" th:id="|analysis-content-name-${recorder.id}|" data-type="text" th:text="${recorder.name}"></a></div>
-                                                                <div class="content" th:text="|描述： ${recorder.description}|"></div>
+                                                                <div class="title">实验片段： <a href="#" th:id="|analysis-content-name-${recorder.id}|" data-type="text" th:text="${recorder.name}"></a></div>
                                                             </div>
                                                             <div class="my-container">
-                                                                <div class="title">内容回放（回放功能应放置在内容页）</div>
+                                                                <div class="title">片段回放（回放功能应放置在内容页）</div>
                                                                 <div class="btn-group">
-                                                                    <button id="play-btn" class="btn btn-success" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
-                                                                    <button id="pause-btn" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>
-                                                                    <button id="reset-btn" class="btn btn-danger" onclick="recorderReset()"><i class="fa fa-reply"></i>&nbsp;重置</button>
+                                                                    <button th:id="|play-btn-${entry.key}|" class="btn btn-success" th:data="${entry.key}" onclick="recorderPlay()"><i class="fa fa-play"></i>&nbsp;回放</button>
+                                                                    <button th:id="|pause-btn-${entry.key}|" class="btn btn-warning" onclick="recorderPause()" disabled="disabled"><i class="fa fa-pause"></i>&nbsp;暂停</button>
+                                                                    <button th:id="|reset-btn-${entry.key}|" class="btn btn-danger" onclick="recorderReset()"><i class="fa fa-reply"></i>&nbsp;重置</button>
                                                                 </div>
                                                             </div>
-                                                            <div class="my-container">
-                                                                <div class="title">内容修改</div>
-                                                                <button class="btn btn-default">
-                                                                    <i class="fa fa-area-chart"></i>&nbsp;截图生成新内容</button>
-                                                                <button class="btn btn-default">
-                                                                    <i class="fa fa-trash"></i>&nbsp;删除当前内容</button>
+                                                            <div class="my-container" th:if="${recorder.isUserGen eq 0}">
+                                                                <div class="title">实验片段修改</div>
+                                                                <button class="btn btn-default" th:data="|${entry.key}-${recorder.id}|" onclick="generateNewContent(this)">
+                                                                    <i class="fa fa-area-chart"></i>&nbsp;生成新的实验片段</button>
+                                                                <button class="btn btn-default" th:data="|${recorder.id}|" onclick="deleteContent(this)">
+                                                                    <i class="fa fa-trash"></i>&nbsp;删除当前实验片段</button>
                                                             </div>
                                                             <div class="my-container">
-                                                                <div class="title">内容标注</div>
+                                                                <div class="title">实验片段标注</div>
+                                                                <select class="selectpicker"
+                                                                        multiple="multiple"
+                                                                        id="recorder-mark-select"
+                                                                        title="选取标注片段"
+                                                                        data-selected-text-format="count > 3"
+                                                                        data-actions-box="true">
+                                                                    <option>标注片段1</option>
+                                                                    <option>标注片段2</option>
+                                                                </select>
+                                                                <button class="btn btn-default">
+                                                                    <i class="fa fa-pencil"></i>&nbsp;标注片段</button>
+                                                            </div>
+                                                            <div class="my-container">
+                                                                <div class="title">内容生成</div>
+                                                                <button class="btn btn-success">
+                                                                    <i class="fa fa-save"></i>&nbsp;保存为用户内容</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -87,6 +105,49 @@
         </div>
 
         <div th:include="module/common::sub-footer"></div>
+    </div>
+
+    <div th:fragment="app-analysis">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-xs-12">
+                <!-- 片段关系树形图 -->
+                <div class="app-analysis-tree-group">
+                    <!-- 该场景没有片段记录数据 -->
+                    <div th:if="${not #maps.containsKey(recorders, app.id)}"
+                         class="alert alert-warning my-info" role="alert">暂无可展示的数据片段</div>
+                    <!-- 遍历片段记录数据 -->
+                    <th:block th:each="recorder,index:${recorders[app.id]}">
+                        <div th:if="${recorder.isUserGen eq 0}" class="app-analysis-tree-dom" th:data="${recorder.id}">
+                            <div class="tree-info">
+                                <span th:text="${recorder.name}"></span>
+                                <span th:text="|数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></span>
+                            </div>
+                            <div class="tree-chart" th:id="|tree-chart-${recorder.id}|"></div>
+                        </div>
+                    </th:block>
+                </div>
+
+                <!-- 数据展示图 -->
+                <div class="app-analysis-chart-dom" hidden="hidden">
+                    <!-- 操作栏 -->
+                    <div class="action-bar">
+                        <div class="btn-group">
+                            <button class="btn btn-default"><i class="fa fa-play"></i></button>
+                            <button class="btn btn-default"><i class="fa fa-save"></i></button>
+                            <button class="btn btn-default"><i class="fa fa-trash"></i></button>
+                        </div>
+                        <button class="btn btn-default pull-right"><i class="fa fa-share"></i></button>
+                    </div>
+                    <!-- 时间轴栏 -->
+                    <div class="timeline-dom" id="timeline-slider">
+                        <div class="slider"></div>
+                    </div>
+                    <!-- 图表显示栏 -->
+                    <div class="chart-dom" id="app-analysis-chart-dom">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
