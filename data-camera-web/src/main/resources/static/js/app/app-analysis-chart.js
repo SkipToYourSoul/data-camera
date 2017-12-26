@@ -6,6 +6,9 @@
  *    使用的后台数据(app, recorders)
  */
 
+// -- 当前显示的所有echarts对象
+var analysisCharts = [];
+
 // -- 入口函数，初始化数据图表
 function initChartDom(recorderId){
     console.info("Request recorder: " + recorderId);
@@ -50,7 +53,20 @@ function initChartDom(recorderId){
         }).slider("float", {
             labels: timeline
         }).on("slidechange", function(e,ui) {
-            console.log(ui.value);
+            var start = timeline[ui.values[0]];
+            var end = timeline[ui.values[1]];
+            var mark = [[{
+                xAxis: start
+            }, {
+                xAxis: end
+            }]];
+            for (var i=0; i<analysisCharts.length; i++){
+                var series = analysisCharts[i].getOption()['series'];
+                series[0]['markArea']['data'] = mark;
+                analysisCharts[i].setOption({
+                    series: series
+                });
+            }
         });
 
         var $dom = $('#app-analysis-chart-dom');
@@ -71,7 +87,8 @@ function initChartDom(recorderId){
                     var chart = echarts.init(document.getElementById(chartId), "", opts = {
                         height: 100
                     });
-                    chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
+                    chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend, timeline));
+                    analysisCharts.push(chart);
                 }
             }
         }
@@ -112,7 +129,7 @@ function initChartDom(recorderId){
     }
 }
 
-function buildAnalysisChartOption(data, legend) {
+function buildAnalysisChartOption(data, legend, timeline) {
     return {
         tooltip: {
             trigger: 'axis',
@@ -125,32 +142,69 @@ function buildAnalysisChartOption(data, legend) {
             }
         },
         grid: [{
-            top: 10,
-            bottom: 30,
-            left: 30,
-            right: 20
+            top: 5,
+            bottom: 5,
+            left: 40,
+            right: 10
         }],
         calculable: true,
         xAxis: [
             {
                 type: 'time',
-                boundaryGap : ['20%', '20%']
+                splitLine: {
+                    show: false
+                },
+                axisLabel: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                }
             }
         ],
         yAxis: [
             {
                 type: 'value',
                 scale: true,
-                boundaryGap: true
+                boundaryGap: false,
+                splitLine: {
+                    show: false
+                },
+                minInterval: 1
             }
         ],
         series: [
             {
                 name: legend,
                 type: 'line',
-                symbolSize: 5,
-                symbol:'circle',
+                showSymbol: false,
                 hoverAnimation: false,
+                itemStyle: {
+                    normal: {
+                        color: '#9e9e9e'
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: '#9d9d9d'
+                        }, {
+                            offset: 1,
+                            color: '#9e9e9e'
+                        }])
+                    }
+                },
+                smooth: true,
+                sampling: true,
+                markArea: {
+                    silent: true,
+                    data: [[{
+                        xAxis: timeline[0]
+                    },{
+                        xAxis: timeline[timeline.length - 1]
+                    }]]
+                },
                 data: data
             }
         ]
