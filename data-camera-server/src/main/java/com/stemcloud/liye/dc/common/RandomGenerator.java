@@ -1,7 +1,5 @@
-package com.stemcloud.liye.dc.socket;
+package com.stemcloud.liye.dc.common;
 
-import com.stemcloud.liye.dc.common.DbTools;
-import com.stemcloud.liye.dc.common.GlobalVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
