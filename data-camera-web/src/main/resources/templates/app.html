@@ -68,7 +68,7 @@
                     </div>
 
                     <!-- 场景列表 -->
-                    <div class="sidebar-menu" id="app-menu" hidden="hidden">
+                    <div class="sidebar-menu" id="app-menu">
                         <ul class="nav main-menu">
                             <li th:class="${param.id}?'':'active'">
                                 <a th:href="@{/app}"><i class="glyphicon glyphicon-home"></i>&nbsp; 场景管理页面</a>
@@ -85,7 +85,7 @@
                     </div>
 
                     <!-- 片段列表 -->
-                    <div class="sidebar-menu2" id="content-menu" th:if="${param.id}">
+                    <div class="sidebar-menu2" id="content-menu" th:if="${param.id}" hidden="hidden">
                         <div class="menu-title">
                             我的场景
                         </div>
@@ -116,12 +116,12 @@
                     </div>
                     <div th:if="${param.id}">
                         <ul class="nav nav-pills" role="tablist" id="app-main-tab">
-                            <li role="presentation" class=""><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
-                            <li role="presentation" class="active"><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">分析模式</a></li>
+                            <li role="presentation" class="active"><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
+                            <li role="presentation" class=""><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">分析模式</a></li>
                         </ul>
                         <div class="tab-content">
-                            <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
-                            <div th:include="app/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane active in fade app-tab-pane-content"></div>
+                            <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane active in fade app-tab-pane-content"></div>
+                            <div th:include="app/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
                         </div>
                     </div>
                 </div>

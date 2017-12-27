@@ -9,19 +9,14 @@ function inAppPage(){
     var $app_main_tab = $('#app-main-tab');
     var tab = getQueryString("tab");
     if (tab == null){
-        // initResourceOfExperimentPage();
-        // initResourceOfAnalysisPage();
+        // 进入页面时默认为实验模式
+        initResourceOfExperimentPage();
     } else if (tab != null && tab == 2){
-        $loader.fakeLoader({
-            timeToHide: 1000,
-            spinner:"spinner3",
-            bgColor:"rgba(154, 154, 154, 1)"
-        });
         $app_main_tab.find('li:eq(1) a').tab('show');
-        initResourceOfAnalysisPage();
+        $('#content-menu').attr("hidden", false);
+        $('#app-menu').attr("hidden", true);
+        initTreeDom();
     }
-
-    initTreeDom();
 
     // -- tab change
     $app_main_tab.find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -34,13 +29,7 @@ function inAppPage(){
             // initResourceOfAnalysisPage();
             $('#content-menu').attr("hidden", false);
             $('#app-menu').attr("hidden", true);
-            init();
+            initTreeDom();
         }
-    });
-
-    $('#app-analysis-tab').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        var page = e.target.getAttribute('href');
-        var exp_id = page.split('-')[2];
-        initExpContentChart(exp_id);
     });
 }

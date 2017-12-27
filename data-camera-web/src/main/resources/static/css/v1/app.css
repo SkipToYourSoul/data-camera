@@ -265,10 +265,17 @@ body{
     padding: 0;
 }
 
-/** app-experiment.html **/
-.app-exp-button-group{
-    margin-top: 10px;
+/** 场景实验页面样式 app-experiment.html **/
+.app-exp-action-bar{
     margin-bottom: 10px;
+    padding: 10px 15px;
+    background-color: #D3D3D3;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.app-exp-container{
+
 }
 
 .app-exp-status-container{

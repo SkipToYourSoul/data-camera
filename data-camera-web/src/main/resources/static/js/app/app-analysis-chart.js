@@ -152,7 +152,7 @@ function buildAnalysisChartOption(data, legend, timeline) {
             {
                 type: 'time',
                 splitLine: {
-                    show: false
+                    show: true
                 },
                 axisLabel: {
                     show: false
@@ -181,17 +181,17 @@ function buildAnalysisChartOption(data, legend, timeline) {
                 hoverAnimation: false,
                 itemStyle: {
                     normal: {
-                        color: '#9e9e9e'
+                        color: '#8ec6ad'
                     }
                 },
                 areaStyle: {
                     normal: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                             offset: 0,
-                            color: '#9d9d9d'
+                            color: '#8ec6ad'
                         }, {
                             offset: 1,
-                            color: '#9e9e9e'
+                            color: '#ffe'
                         }])
                     }
                 },
@@ -199,6 +199,11 @@ function buildAnalysisChartOption(data, legend, timeline) {
                 sampling: true,
                 markArea: {
                     silent: true,
+                    itemStyle: {
+                        normal: {
+                            color: 'rgba(245,222,179,0.8)'
+                        }
+                    },
                     data: [[{
                         xAxis: timeline[0]
                     },{

@@ -31,7 +31,12 @@ $('#table').bootstrapTable({
         align: 'center',
         title: '设备类型',
         formatter: 'deviceTypeFormatter'
-    }, {
+    },{
+        field: '-',
+        sortable: 'true',
+        align: 'center',
+        title: '电量显示'
+    }, /*{
         field: 'description',
         sortable: 'true',
         align: 'center',
@@ -42,18 +47,18 @@ $('#table').bootstrapTable({
         align: 'center',
         title: '创建时间',
         formatter: 'timeFormatter'
-    }, {
+    },*/ {
         field: 'appId',
         sortable: 'true',
         align: 'center',
-        title: '所属应用',
+        title: '所属场景',
         formatter: 'deviceBelongFormatter',
         cellStyle: 'deviceBelongStyle'
     }, {
         field: 'expId',
         sortable: 'true',
         align: 'center',
-        title: '所属实验ID',
+        title: '所属传感器组',
         formatter: 'deviceBelongFormatter',
         cellStyle: 'deviceBelongStyle'
     }]
