@@ -269,7 +269,7 @@ body{
 .app-exp-action-bar{
     margin-bottom: 10px;
     padding: 10px 15px;
-    background-color: #D3D3D3;
+    background-color: #f5f5f5;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
@@ -278,36 +278,45 @@ body{
 
 }
 
+.app-exp-container .my-alert{
+    margin: 10px;
+    font-weight: 600;
+    font-size: 16px
+}
+
 .app-exp-container .my-panel-body{
     padding: 0;
 }
 
 .app-exp-container .status{
-    padding-left: 5px;
-    padding-right: 0;
+    padding: 5px;
     font-size: 14px;
     font-weight: 600;
-    border-left: 3px solid #9d9d9d;
+    height: 40px;
 }
 
-.app-exp-container .status span{
-    margin-right: 10px;
+.app-exp-container .content{
+    padding: 0;
 }
 
-.app-exp-track-container{
-    padding: 10px 10px 10px 0;
-    margin: 10px 5px;
+.app-exp-container .chart{
+    padding-right: 0;
+}
+
+.app-exp-container .track{
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
     border: 2px solid #eeeeee;
 }
 
-.app-exp-track-chart{
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
+.app-exp-container .track .track-chart{
+    padding: 0;
     min-height: 100px;
 }
 
-.app-exp-track-statistics{
+.app-exp-container .track-statistics{
     border-radius: 5%;
     background-color: rgba(154, 154, 154, 0.1);
     min-height: 100px;
@@ -315,54 +324,40 @@ body{
     overflow-y: auto;
 }
 
-.app-exp-track-statistics .title{
-    padding: 15px 10px 5px 10px;
+.app-exp-container .track-statistics .title{
+    padding: 10px 10px 5px 10px;
     margin-bottom: 5px;
     font-size: 14px;
     font-weight: 600;
     border-bottom: 1px solid #9d9d9d;
 }
 
-.app-exp-track-statistics .content{
+.app-exp-container .track-statistics .content{
     padding: 5px 10px 5px 10px;
 }
 
-.app-exp-track-statistics .content-text{
+.app-exp-container .track-statistics .content-text{
 
 }
 
-.app-exp-track-statistics .content-sub-text{
+.app-exp-container .track-statistics .content-sub-text{
     font-size: 12px;
     color: #5c5b5b;
 }
 
-.app-exp-track-statistics .content-now-text{
-    padding-left: 50px;
+.app-exp-container .track-statistics .content-now-text{
+    padding-left: 20px;
     font-size: 28px;
     color: #d43f3a;
     font-weight: 600;
 }
 
-.app-exp-track-statistics .content-bound-sensor{
-    margin: 10px auto 10px;
+.app-exp-container .track-statistics .content-bound-sensor{
+    margin: 5px auto 5px;
     font-size: 14px;
     font-weight: 600;
     color: #9d9d9d;
     text-align: left;
-}
-
-.app-exp-button{
-    padding-right: 0;
-}
-
-.app-exp-button .btn{
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: 600;
-    margin-right: 5px;
-    /*-webkit-border-radius: 50% !important;
-    -moz-border-radius: 50% !important;
-    border-radius: 50% !important;*/
 }
 
 /** app-analysis.html **/

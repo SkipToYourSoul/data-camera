@@ -270,7 +270,7 @@ function expRecorder(button) {
                 } else if (action == "0"){
                     if (is_save_recorder == 1){
                         // save recorder, refresh page
-                        window.location.href = current_address + "?id=" + app['id'];
+                        window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
                     } else {
                         message_info("实验" + exp_id + ": 停止记录");
                         pageStopRecorder(exp_id);
@@ -438,3 +438,72 @@ function doInterval(exp_id){
 function allMonitor() {
     console.log(getQueryString('id'));
 }
+
+/**
+ * 实验页面的图表
+ * @param legend
+ * @returns {{tooltip, legend: {top: string, left: string, data: *}, grid: [*], calculable: boolean, toolbox: {show: boolean, feature: {dataView: {readOnly: boolean}, magicType: {show: boolean, type: [string,string]}}, right: number}, dataZoom, xAxis: [*], yAxis: [*], series: Array}}
+ */
+var experimentChartOption = function (legend) {
+    var series = [];
+    for (var index in legend){
+        var name = legend[index];
+        series.push({
+            name: name,
+            type: 'line',
+            symbolSize: 6,
+            symbol:'circle',
+            hoverAnimation: false,
+            smooth: true,
+            markArea: {
+                silent: true,
+                data: []
+            },
+            data: []
+        })
+    }
+
+    return {
+        backgroundColor: '#ffffff',
+        tooltip: app_chart_tooltip,
+        legend: {
+            top: '0%',
+            left: 'center',
+            data: legend
+        },
+        grid: [{
+            borderWidth: 0,
+            top: 10,
+            bottom: 30,
+            left: 40,
+            right: 25,
+            textStyle: {
+                color: "#fff"
+            }
+        }],
+        calculable: true,
+        xAxis: [
+            {
+                type: 'time',
+                boundaryGap : ['20%', '20%'],
+                axisPointer: {
+                    show: true,
+                    type: 'line',
+                    snap: true,
+                    z: 100
+                }
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                scale: true,
+                splitLine: {
+                    show: false
+                },
+                boundaryGap: true
+            }
+        ],
+        series: series
+    };
+};

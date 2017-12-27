@@ -9,6 +9,10 @@
 // -- 当前显示的所有echarts对象
 var analysisCharts = [];
 
+// -- 当前片段的时间轴数据
+var timeline = [];
+var timelineStart, timelineEnd;
+
 // -- 入口函数，初始化数据图表
 function initChartDom(recorderId){
     console.info("Request recorder: " + recorderId);
@@ -27,6 +31,7 @@ function initChartDom(recorderId){
         success: function (response) {
             if (response.code == "0000") {
                 message_info("请求数据成功", 'success');
+                currentRecorderData = response.data;
                 var chartData = response.data['CHART'];
                 var videoData = response.data['VIDEO'];
                 initDom(chartData, videoData, response.data['MIN'], response.data['MAX']);
@@ -41,7 +46,8 @@ function initChartDom(recorderId){
 
     function initDom(chartData, videoData, minTime, maxTime){
         // timeline
-        var timeline = generateTimeList(minTime, maxTime);
+        timeline = generateTimeList(minTime, maxTime);
+        timelineStart = 0; timelineEnd = timeline.length - 1;
         $(".slider").slider({
             range: true,
             min: 0,
@@ -53,19 +59,26 @@ function initChartDom(recorderId){
         }).slider("float", {
             labels: timeline
         }).on("slidechange", function(e,ui) {
-            var start = timeline[ui.values[0]];
-            var end = timeline[ui.values[1]];
-            var mark = [[{
-                xAxis: start
-            }, {
-                xAxis: end
-            }]];
-            for (var i=0; i<analysisCharts.length; i++){
-                var series = analysisCharts[i].getOption()['series'];
-                series[0]['markArea']['data'] = mark;
-                analysisCharts[i].setOption({
-                    series: series
-                });
+            if (recorderInterval != null){
+                // 正在回放数据，不进行高亮片段更新
+
+            } else {
+                timelineStart = ui.values[0];
+                timelineEnd = ui.values[1];
+                var start = timeline[timelineStart];
+                var end = timeline[timelineEnd];
+                var mark = [[{
+                    xAxis: start
+                }, {
+                    xAxis: end
+                }]];
+                for (var i=0; i<analysisCharts.length; i++){
+                    var series = analysisCharts[i].getOption()['series'];
+                    series[0]['markArea']['data'] = mark;
+                    analysisCharts[i].setOption({
+                        series: series
+                    });
+                }
             }
         });
 
@@ -87,7 +100,7 @@ function initChartDom(recorderId){
                     var chart = echarts.init(document.getElementById(chartId), "", opts = {
                         height: 100
                     });
-                    chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend, timeline));
+                    chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
                     analysisCharts.push(chart);
                 }
             }
@@ -129,7 +142,7 @@ function initChartDom(recorderId){
     }
 }
 
-function buildAnalysisChartOption(data, legend, timeline) {
+function buildAnalysisChartOption(data, legend) {
     return {
         tooltip: {
             trigger: 'axis',

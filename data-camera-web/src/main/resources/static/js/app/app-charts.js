@@ -6,7 +6,7 @@
 
 var app_chart_data_zoom = [{
     show: true,
-    height: 30,
+    height: 20,
     xAxisIndex: [0],
     bottom: 0,
     start: 0,
@@ -32,9 +32,9 @@ var app_chart_data_zoom = [{
 
 var app_chart_tooltip = {
     trigger: 'axis',
-    axisPointer: {
+    /*axisPointer: {
         type: 'cross'
-    },
+    },*/
     backgroundColor: 'rgba(245, 245, 245, 0.8)',
     borderWidth: 1,
     borderColor: '#ccc',
@@ -48,85 +48,6 @@ var app_chart_tooltip = {
         return obj;
     },
     extraCssText: 'width: 170px'
-};
-
-var experimentChartOption = function (legend) {
-    var series = [];
-    for (var index in legend){
-        var name = legend[index];
-        series.push({
-            name: name,
-            type: 'line',
-            symbolSize: 6,
-            symbol:'circle',
-            hoverAnimation: false,
-            markArea: {
-                silent: true,
-                data: []
-            },
-            markLine: {
-                data: [
-                    {type: 'average', name: '平均值'}
-                ]
-            },
-            data: []
-        })
-    }
-
-    return {
-        tooltip: app_chart_tooltip,
-        legend: {
-            top: '0%',
-            left: 'center',
-            data: legend
-        },
-        grid: [{
-            borderWidth: 0,
-            top: 30,
-            bottom: '20%',
-            left: 50,
-            right: 50,
-            textStyle: {
-                color: "#fff"
-            }
-        }],
-        calculable: true,
-        toolbox: {
-            show: true,
-            feature: {
-                dataView: {readOnly: true},
-                magicType : {show: true, type: ['line', 'bar']}
-            },
-            right: 20
-        },
-        dataZoom: app_chart_data_zoom,
-        xAxis: [
-            {
-                type: 'time',
-                name: 'TIME',
-                nameRotate: 45,
-                boundaryGap : ['20%', '20%'],
-                axisPointer: {
-                    show: true,
-                    type: 'line',
-                    snap: true,
-                    z: 100
-                }
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                name: 'VALUE',
-                scale: true,
-                splitArea: {
-                    show: true
-                },
-                boundaryGap: true
-            }
-        ],
-        series: series
-    };
 };
 
 var analysisChartOption = function (data){

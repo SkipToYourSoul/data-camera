@@ -86,7 +86,7 @@ function nodeSelectionChanged(node) {
     if (node.isSelected) {
         var target = findParent(node.data.key) + '';
         console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
-        showRecorderContent(target);
+        currentRecorder = showRecorderContent(target);
         initChartDom(node.data.key);
     }
     
@@ -102,7 +102,7 @@ function nodeSelectionChanged(node) {
 // -- 边栏菜单点击事件
 $('.menu-content ul li').click(function (e) {
     var target = $(e.target).parent().attr('data');
-    showRecorderContent(target);
+    currentRecorder = showRecorderContent(target);
     initChartDom(target);
 });
 
@@ -137,4 +137,6 @@ function showRecorderContent(target){
             $menu.removeClass('active');
         }
     }
+
+    return target;
 }

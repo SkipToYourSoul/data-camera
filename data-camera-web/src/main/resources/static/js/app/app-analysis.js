@@ -266,41 +266,6 @@ function generateNewContent(button) {
     });
 }
 
-/**
- * 删除实验片段内容
- * @param button
- */
-function deleteContent(button) {
-    var content_id = button.getAttribute('data');
-    bootbox.confirm({
-        title: "删除实验片段?",
-        message: "确认删除实验片段吗? ",
-        buttons: {
-            cancel: {
-                label: '<i class="fa fa-times"></i> 取消'
-            },
-            confirm: {
-                label: '<i class="fa fa-check"></i> 确认删除'
-            }
-        },
-        callback: function (result) {
-            if (result){
-                $.ajax({
-                    type: 'get',
-                    url: crud_address + '/recorder/delete?content-id=' + content_id,
-                    success: function (id) {
-                        window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
-                        $('#app-main-tab').find('li:eq(1) a').tab('show');
-                    },
-                    error: function (id) {
-                        message_info("删除实验片段失败", 'error');
-                    }
-                });
-            }
-        }
-    });
-}
-
 /** ================== 录制相关 ================== **/
 var analysis_recorder_interval = {};
 var analysis_recorder_time = {};

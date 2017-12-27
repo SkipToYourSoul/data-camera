@@ -10,21 +10,21 @@ $('#table').bootstrapTable({
     columns: [{
         field: 'radio',
         radio: 'true'
-    }, {
+    }, /*{
         field: 'id',
         sortable: 'true',
         align: 'center',
         title: '设备ID'
+    },*/{
+        field: 'code',
+        sortable: 'true',
+        align: 'center',
+        title: '设备编号(唯一)'
     }, {
         field: 'name',
         sortable: 'true',
         align: 'center',
         title: '设备名'
-    }, {
-        field: 'code',
-        sortable: 'true',
-        align: 'center',
-        title: '设备编号(唯一)'
     }, {
         field: 'sensorConfig',
         sortable: 'true',

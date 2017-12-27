@@ -19,7 +19,7 @@
         <div class="app-exp-container">
             <!-- 场景下没有实验 -->
             <div th:if="${#maps.isEmpty(experiments)}"
-                 class="alert alert-info" role="alert">TIPS: 应用下还没有实验，点击上方“添加新实验”按钮可新建实验:)</div>
+                 class="alert alert-info my-alert" role="alert">TIPS: 场景中还没有传感器组，请点击上方“添加传感器组”按钮可进行相关操作:)</div>
 
             <!-- 遍历构造实验tab -->
             <th:block th:each="experiment,index:${experiments}">
@@ -27,7 +27,7 @@
                     <div class="panel-heading">
                         <div class="panel-title">
                             <a role="button" data-toggle="collapse" th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
-                                <i class="fa fa-arrows-v"></i>&nbsp;<span th:text="|实验：${experiment.value.name}|"></span>
+                                <i class="fa fa-arrows-v"></i>&nbsp;<span th:text="|传感器组：${experiment.value.name}|"></span>
                             </a>
                             <span class="pull-right">
                                 <span class="label label-default" th:id="|experiment-es-${experiment.key}|">非监控</span>
@@ -39,87 +39,90 @@
                         <div class="panel-body my-panel-body">
                             <!-- 实验状态和操作栏 -->
                             <div class="status">
-                                <span>实验操作</span>
-                                <span>
+                                <div class="pull-right">
                                     <button class="btn btn-default btn-sm" th:data="${experiment.key}"
-                                            data-toggle="modal" data-target="#exp-modal" todo="edit"
-                                            style="margin-right: 10px"><i class="fa fa-info-circle"></i>&nbsp;编辑实验</button>
-                                    <button class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="deleteExp(this)"><i class="fa fa-minus-circle"></i>&nbsp;删除实验</button>
-                                </span>
-                                <span th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="app-exp-button pull-right">
-                                    <button class="btn btn-warning" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">
+                                            data-toggle="modal" data-target="#exp-modal" todo="edit"><i class="fa fa-plus"></i></button>
+                                    <button class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="deleteExp(this)"><i class="fa fa-trash"></i></button>
+                                    <span th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}">
+                                        <button class="btn btn-warning btn-sm" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">
                                         <i class="fa fa-eye"></i>&nbsp;开始监控</button>
-                                    <button class="btn btn-danger" th:data="${experiment.key}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.key}|">
+                                        <button class="btn btn-danger btn-sm" th:data="${experiment.key}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.key}|">
                                         <i class="fa fa-camera-retro"></i>&nbsp;开始录制</button>
-                                </span>
+                                    </span>
+                                </div>
                             </div>
 
-                            <!-- 实验内容 -->
-                            <div th:if="${#lists.isEmpty(experiment.value.trackInfoList)}"
-                                 class="alert alert-info" role="alert" style="margin-top: 10px;margin-bottom: 20px">
-                                TIPS: 实验下暂无相关设备，点击上方“编辑实验”按钮可添加设备:)</div>
-                            <th:block th:each="track,index:${experiment.value.trackInfoList}">
-                                <div class="app-exp-track-container">
-                                    <div class="row">
-                                        <div class="col-xs-9 col-sm-9 col-md-9" th:switch="${track.type}">
-                                            <div th:id="|experiment-track-${experiment.key}-${track.id}|" class="app-exp-track-chart">
-                                                <div th:case="1">
-                                                    <strong>轨迹加载中</strong>
-                                                </div>
-                                                <div th:case="2">
-                                                    <div class="alert alert-info" role="alert" style="font-weight: 600; font-size: 16px">
-                                                        TIPS: 视频轨迹在实验状态下无法看到实时数据状态，录制结束后可在“分析模式”中看到</div>
-                                                    <div class="text-center">
-                                                        <h1 style="color: #ac2925" class="shake-slow shake-constant">REC</h1>
+                            <!-- 实验图表和数据 -->
+                            <div class="content">
+                                <div th:if="${#lists.isEmpty(experiment.value.trackInfoList)}"
+                                     class="alert alert-info my-alert" role="alert">
+                                    TIPS: 传感器组中暂无任何传感器，点击上方“+”按钮可添加传感器:)</div>
+
+                                <th:block th:each="track,index:${experiment.value.trackInfoList}">
+                                    <div class="track">
+                                        <div class="row">
+                                            <!-- chart -->
+                                            <div class="col-xs-9 col-sm-9 col-md-9 chart" th:switch="${track.type}">
+                                                <div th:id="|experiment-track-${experiment.key}-${track.id}|" class="track-chart">
+                                                    <div th:case="1">
+                                                        <strong>轨迹加载中</strong>
                                                     </div>
-                                                </div>
-                                                <div th:case="0">
-                                                    <div class="alert alert-warning" role="alert" style="font-weight: 600; font-size: 16px">
-                                                        TIPS: 当前轨迹暂未绑定任何传感器，将不会产生数据</div>
+                                                    <div th:case="2">
+                                                        <div class="alert alert-info my-alter" role="alert">
+                                                            TIPS: 视频轨迹在实验状态下无法看到实时数据状态，录制结束后可在“分析模式”中看到</div>
+                                                        <div class="text-center">
+                                                            <h1 style="color: #ac2925" class="shake-slow shake-constant">REC</h1>
+                                                        </div>
+                                                    </div>
+                                                    <div th:case="0">
+                                                        <div class="alert alert-warning my-alter" role="alert">
+                                                            TIPS: 当前轨迹暂未绑定任何传感器，将不会产生数据</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-xs-3 col-sm-3 col-md-3">
-                                            <div class="app-exp-track-statistics" th:switch="${track.type}">
-                                                <div class="title">
-                                                    <span th:case="0" th:text="|未绑定设备的轨迹|"></span>
-                                                    <span th:case="1" th:text="|数值型轨迹${track.id}-统计信息|"></span>
-                                                    <span th:case="2" th:text="|视频轨迹${track.id}-统计信息|"></span>
-                                                    <button class="btn btn-default btn-xs pull-right" th:data="${track.id}" onclick="deleteTrack(this)"><i class="fa fa-close"></i></button>
-                                                </div>
-                                                <div class="content">
-                                                    <div th:if="${track.sensor != null}" class="content-text">
-                                                        <th:block th:each="myunit,index:${#strings.listSplit(track.sensor.sensorConfig.unit,';')}">
-                                                            <div class="content-sub-text" th:switch="${track.type}">
-                                                                <div th:case="1">
-                                                                    <div class="text-left">
-                                                                        最大值：<span class="content-value" style="margin-right: 10px" th:id="|experiment-info-${experiment.key}-${track.id}-${index.count}-1|">-</span>
-                                                                        最小值：<span class="content-value" th:id="|experiment-info-${experiment.key}-${track.id}-${index.count}-2|">-</span>
+
+                                            <div class="col-xs-3 col-sm-3 col-md-3">
+                                                <div class="track-statistics" th:switch="${track.type}">
+                                                    <div class="title">
+                                                        <span th:case="0" th:text="|未绑定设备的轨迹|"></span>
+                                                        <span th:case="1" th:text="|数值型轨迹${track.id}-统计信息|"></span>
+                                                        <span th:case="2" th:text="|视频轨迹${track.id}-统计信息|"></span>
+                                                        <button class="btn btn-default btn-xs pull-right" th:data="${track.id}" onclick="deleteTrack(this)"><i class="fa fa-close"></i></button>
+                                                    </div>
+                                                    <div class="content">
+                                                        <div th:if="${track.sensor != null}" class="content-text">
+                                                            <th:block th:each="myunit,index:${#strings.listSplit(track.sensor.sensorConfig.unit,';')}">
+                                                                <div class="content-sub-text" th:switch="${track.type}">
+                                                                    <div th:case="1">
+                                                                        <div class="text-left">
+                                                                            最大值：<span class="content-value" style="margin-right: 10px" th:id="|experiment-info-${experiment.key}-${track.id}-${index.count}-1|">-</span>
+                                                                            最小值：<span class="content-value" th:id="|experiment-info-${experiment.key}-${track.id}-${index.count}-2|">-</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div th:case="2">
+                                                                        开始录制时间: <span class="content-value" th:id="|experiment-info-${experiment.key}-${track.id}-${index.count}|">-</span>
                                                                     </div>
                                                                 </div>
-                                                                <div th:case="2">
-                                                                    开始录制时间: <span class="content-value" th:id="|experiment-info-${experiment.key}-${track.id}-${index.count}|">-</span>
+                                                                <div class="content-now-text" th:switch="${track.type}">
+                                                                    <div class="text-left">
+                                                                        <span class="content-value" th:id="|experiment-now-${experiment.key}-${track.id}-${index.count}|">-</span>
+                                                                        <span th:text="${myunit}"></span>
+                                                                        <span th:case="1" class="content-sub-text">当前值</span>
+                                                                        <span th:case="2" class="content-sub-text">持续时间</span>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="content-now-text" th:switch="${track.type}">
-                                                                <div class="text-left">
-                                                                    <span class="content-value" th:id="|experiment-now-${experiment.key}-${track.id}-${index.count}|">-</span>
-                                                                    <span th:text="${myunit}"></span>
-                                                                    <span th:case="1" class="content-sub-text">当前值</span>
-                                                                    <span th:case="2" class="content-sub-text">持续时间</span>
-                                                                </div>
-                                                            </div>
-                                                        </th:block>
-                                                    </div>
-                                                    <div class="content-bound-sensor">绑定的设备：
-                                                        <a href="#" th:id="|track-bound-${track.id}|" data-type="select" data-title="绑定设备"></a>
+                                                            </th:block>
+                                                        </div>
+                                                        <div class="content-bound-sensor">绑定的设备：
+                                                            <a href="#" th:id="|track-bound-${track.id}|" data-type="select" data-title="绑定设备"></a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </th:block>
+                                </th:block>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -22,8 +22,8 @@ $edit_app_form.formValidation({
         invalid: 'glyphicon glyphicon-remove'
     },
     fields: {
-        'app-name': {validators: {notEmpty: {message: '应用名不能为空'}}},
-        'app-desc': {validators: {notEmpty: {message: '应用描述不能为空'}}}
+        'app-name': {validators: {notEmpty: {message: '场景名不能为空'}}},
+        'app-desc': {validators: {notEmpty: {message: '场景描述不能为空'}}}
     }
 }).on('success.form.fv', function (evt){
     evt.preventDefault();
@@ -46,7 +46,7 @@ $edit_app_form.formValidation({
         }
     });
 }).on('err.form.fv', function (evt) {
-    message_info("应用表单提交失败", 'error');
+    message_info("场景表单提交失败", 'error');
 });
 
 $app_modal.on('show.bs.modal', function (event) {
@@ -67,8 +67,8 @@ $app_modal.on('show.bs.modal', function (event) {
 
 function deleteApp(){
     bootbox.confirm({
-        title: "删除应用?",
-        message: "确认删除应用吗? 应用相关的数据也会被删除.",
+        title: "删除场景?",
+        message: "确认删除场景吗? 场景相关的数据也会被删除.",
         buttons: {
             cancel: {
                 label: '<i class="fa fa-times"></i> 取消'
@@ -90,7 +90,7 @@ function deleteApp(){
                         }
                     },
                     error: function (id) {
-                        message_info("删除应用失败", 'error');
+                        message_info("删除场景失败", 'error');
                     }
                 });
             }
@@ -126,8 +126,8 @@ $edit_exp_form.formValidation({
         invalid: 'glyphicon glyphicon-remove'
     },
     fields: {
-        'exp-name': {validators: {notEmpty: {message: '实验名不能为空'}}},
-        'exp-desc': {validators: {notEmpty: {message: '实验描述不能为空'}}}
+        'exp-name': {validators: {notEmpty: {message: '传感器组名不能为空'}}},
+        'exp-desc': {validators: {notEmpty: {message: '传感器组描述不能为空'}}}
     }
 }).on('success.form.fv', function (evt){
     evt.preventDefault();
@@ -147,11 +147,11 @@ $edit_exp_form.formValidation({
             }
         },
         error: function (response) {
-            message_info("编辑实验失败", 'error');
+            message_info("编辑传感器组失败", 'error');
         }
     });
 }).on('err.form.fv', function (evt) {
-    message_info("实验表单提交失败", 'error');
+    message_info("传感器组表单提交失败", 'error');
 });
 
 $exp_modal.on('show.bs.modal', function (event) {
@@ -181,8 +181,8 @@ $exp_modal.on('show.bs.modal', function (event) {
 function deleteExp(evt) {
     var exp_id = evt.getAttribute('data');
     bootbox.confirm({
-        title: "删除实验?",
-        message: "确认删除实验吗? 实验相关的数据也会被删除.",
+        title: "删除传感器组?",
+        message: "确认删除传感器组吗? 传感器组相关的数据也会被删除.",
         buttons: {
             cancel: {
                 label: '<i class="fa fa-times"></i> 取消'
@@ -204,7 +204,7 @@ function deleteExp(evt) {
                         }
                     },
                     error: function (id) {
-                        message_info("删除实验失败", 'error');
+                        message_info("删除传感器组失败", 'error');
                     }
                 });
             }

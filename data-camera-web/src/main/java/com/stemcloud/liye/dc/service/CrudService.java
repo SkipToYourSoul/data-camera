@@ -274,8 +274,8 @@ public class CrudService {
             recorderInfo.setIsRecorder(1);
             recorderInfo.setStartTime(new Date());
             recorderInfo.setDevices(new Gson().toJson(devices));
-            recorderInfo.setName("实验" + expId + "的记录");
-            recorderInfo.setDescription("实验" + expId + "的记录描述");
+            recorderInfo.setName(exp.getName() + "-新片段");
+            recorderInfo.setDescription(exp.getName() + "的记录描述");
             recorderRepository.save(recorderInfo);
 
             logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
