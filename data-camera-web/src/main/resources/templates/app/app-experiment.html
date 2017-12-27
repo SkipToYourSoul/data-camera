@@ -24,50 +24,34 @@
             <!-- 遍历构造实验tab -->
             <th:block th:each="experiment,index:${experiments}">
                 <div class="panel panel-default">
-
-                </div>
-            </th:block>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-12">
-
-                <!-- 遍历构造实验tab -->
-                <th:block th:each="experiment,index:${experiments}">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <div class="panel-title">
-                                <strong th:text="|实验：${experiment.value.name}|">
-                                </strong>
-                            </div>
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <a role="button" data-toggle="collapse" th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
+                                <i class="fa fa-arrows-v"></i>&nbsp;<span th:text="|实验：${experiment.value.name}|"></span>
+                            </a>
+                            <span class="pull-right">
+                                <span class="label label-default" th:id="|experiment-es-${experiment.key}|">非监控</span>
+                                <span class="label label-default" th:id="|experiment-rs-${experiment.key}|">非录制</span>
+                            </span>
                         </div>
-                        <div class="panel-body">
+                    </div>
+                    <div th:id="|exp-${experiment.key}|" class="panel-collapse collapse in" role="tabpanel">
+                        <div class="panel-body my-panel-body">
                             <!-- 实验状态和操作栏 -->
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="app-exp-status-container">
-                                        <span>实验状态</span>
-                                        <span class="label label-default" th:id="|experiment-es-${experiment.key}|">非监控</span>
-                                        <span class="label label-default" th:id="|experiment-rs-${experiment.key}|">非录制</span>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="app-exp-status-container">
-                                        <span>实验操作</span>
-                                        <span>
-                                            <button class="btn btn-default btn-sm" th:data="${experiment.key}"
-                                                    data-toggle="modal" data-target="#exp-modal" todo="edit"
-                                                    style="margin-right: 10px"><i class="fa fa-info-circle"></i>&nbsp;编辑实验</button>
-                                            <button class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="deleteExp(this)"><i class="fa fa-minus-circle"></i>&nbsp;删除实验</button>
-                                        </span>
-                                        <span th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="app-exp-button pull-right">
-                                            <button class="btn btn-warning" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">
-                                                <i class="fa fa-eye"></i>&nbsp;开始监控</button>
-                                            <button class="btn btn-danger" th:data="${experiment.key}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.key}|">
-                                                <i class="fa fa-camera-retro"></i>&nbsp;开始录制</button>
-                                        </span>
-                                    </div>
-                                </div>
+                            <div class="status">
+                                <span>实验操作</span>
+                                <span>
+                                    <button class="btn btn-default btn-sm" th:data="${experiment.key}"
+                                            data-toggle="modal" data-target="#exp-modal" todo="edit"
+                                            style="margin-right: 10px"><i class="fa fa-info-circle"></i>&nbsp;编辑实验</button>
+                                    <button class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="deleteExp(this)"><i class="fa fa-minus-circle"></i>&nbsp;删除实验</button>
+                                </span>
+                                <span th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="app-exp-button pull-right">
+                                    <button class="btn btn-warning" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">
+                                        <i class="fa fa-eye"></i>&nbsp;开始监控</button>
+                                    <button class="btn btn-danger" th:data="${experiment.key}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.key}|">
+                                        <i class="fa fa-camera-retro"></i>&nbsp;开始录制</button>
+                                </span>
                             </div>
 
                             <!-- 实验内容 -->
@@ -138,8 +122,8 @@
                             </th:block>
                         </div>
                     </div>
-                </th:block>
-            </div>
+                </div>
+            </th:block>
         </div>
 
         <div th:include="module/common::sub-footer"></div>
