@@ -5,8 +5,6 @@
  *  生成数据片段关系的树形图
  *  使用的后台数据(app, recorders)
  */
-// -- node 数据
-var rDataMap = {};
 
 // -- 入口函数，初始化树形图
 function initTreeDom(){
@@ -38,21 +36,24 @@ function initTreeDom(){
     var appRecorders = recorders[app['id']];
     for (var index = 0; index < appRecorders.length; index ++){
         var recorder = appRecorders[index];
+        analysisObject.rDataMap[recorder['id']] = recorder['parentId'];
+    }
+    for (var index = 0; index < appRecorders.length; index ++){
+        var recorder = appRecorders[index];
         var rid = recorder['id'];
         var name = recorder['name'];
         var parentId = recorder['parentId'];
+        var ancestor = findParent(rid);
         if (recorder['isUserGen'] == 0){
             if (!rData.hasOwnProperty(rid)){
                 rData[rid] = [];
             }
             rData[rid].push({'key': rid, 'name': name});
-            rDataMap[rid] = -1;
         } else {
-            if (!rData.hasOwnProperty(parentId)){
-                rData[parentId] = [];
+            if (!rData.hasOwnProperty(ancestor)){
+                rData[ancestor] = [];
             }
-            rData[parentId].push({'key': rid, 'parent': parentId, 'name': name});
-            rDataMap[rid] = parentId;
+            rData[ancestor].push({'key': rid, 'parent': parentId, 'name': name});
         }
     }
 
@@ -86,24 +87,26 @@ function nodeSelectionChanged(node) {
     if (node.isSelected) {
         var target = findParent(node.data.key) + '';
         console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
-        currentRecorder = showRecorderContent(target);
+        showRecorderContent(target);
         initChartDom(node.data.key);
+        analysisObject.currentRecorderId = node.data.key;
     }
-    
-    function findParent(id) {
-        if (rDataMap[id] == -1){
-            return id;
-        } else {
-            return findParent(rDataMap[id]);
-        }
+}
+
+function findParent(id) {
+    if (analysisObject.rDataMap[id] == -1){
+        return id;
+    } else {
+        return findParent(analysisObject.rDataMap[id]);
     }
 }
 
 // -- 边栏菜单点击事件
 $('.menu-content ul li').click(function (e) {
     var target = $(e.target).parent().attr('data');
-    currentRecorder = showRecorderContent(target);
+    showRecorderContent(target);
     initChartDom(target);
+    analysisObject.currentRecorderId = target;
 });
 
 /**
@@ -137,6 +140,4 @@ function showRecorderContent(target){
             $menu.removeClass('active');
         }
     }
-
-    return target;
 }

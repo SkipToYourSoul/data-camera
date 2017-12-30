@@ -327,9 +327,9 @@ public class CrudController {
     public Map modifySegmentName(@RequestParam Map<String, String> queryParams){
         String result = "";
         try {
-            long contentId = Long.parseLong(queryParams.get("pk"));
+            long recorderId = Long.parseLong(queryParams.get("pk"));
             String name = queryParams.get("value");
-            crudService.updateRecorderName(contentId, name);
+            crudService.updateRecorderName(recorderId, name);
             result = "实验记录名称变更为：" + name;
         } catch (Exception e){
             return ServerReturnTool.serverFailure("后台数据错误");
@@ -342,9 +342,9 @@ public class CrudController {
     public Map modifySegmentDesc(@RequestParam Map<String, String> queryParams){
         String result = "";
         try {
-            long contentId = Long.parseLong(queryParams.get("pk"));
+            long recorderId = Long.parseLong(queryParams.get("pk"));
             String desc = queryParams.get("value");
-            crudService.updateRecorderDescription(contentId, desc);
+            crudService.updateRecorderDescription(recorderId, desc);
             result = "实验记录描述变更为：" + desc;
         } catch (Exception e){
             return ServerReturnTool.serverFailure("后台数据错误");
@@ -362,17 +362,18 @@ public class CrudController {
      */
     @GetMapping("/recorder/delete")
     public Map deleteRecorder(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        if (!queryParams.containsKey("content-id") || Long.parseLong(queryParams.get("content-id")) < 0){
+        if (!queryParams.containsKey("recorder-id") || Long.parseLong(queryParams.get("recorder-id")) < 0){
             return ServerReturnTool.serverFailure("参数错误");
         }
         try {
             String user = commonService.getCurrentLoginUser(request);
-            Long contentId = Long.parseLong(queryParams.get("content-id"));
-            logger.info("USER " + user + " DELETE RECORDER " + contentId);
-            crudService.deleteRecorder(contentId);
+            Long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+            logger.info("USER {} DELETE RECORDER {}", user, recorderId);
+            crudService.deleteAllRecorder(recorderId);
         } catch (Exception e){
+            logger.error("[/recorder/delete]", e);
             return ServerReturnTool.serverFailure("后台数据错误");
         }
-        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("content-id")));
+        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("recorder-id")));
     }
 }

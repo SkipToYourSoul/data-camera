@@ -6,13 +6,6 @@
  *    使用的后台数据(app, recorders)
  */
 
-// -- 当前显示的所有echarts对象
-var analysisCharts = [];
-
-// -- 当前片段的时间轴数据
-var timeline = [];
-var timelineStart, timelineEnd;
-
 // -- 入口函数，初始化数据图表
 function initChartDom(recorderId){
     console.info("Request recorder: " + recorderId);
@@ -31,7 +24,6 @@ function initChartDom(recorderId){
         success: function (response) {
             if (response.code == "0000") {
                 message_info("请求数据成功", 'success');
-                currentRecorderData = response.data;
                 var chartData = response.data['CHART'];
                 var videoData = response.data['VIDEO'];
                 initDom(chartData, videoData, response.data['MIN'], response.data['MAX']);
@@ -46,36 +38,36 @@ function initChartDom(recorderId){
 
     function initDom(chartData, videoData, minTime, maxTime){
         // timeline
-        timeline = generateTimeList(minTime, maxTime);
-        timelineStart = 0; timelineEnd = timeline.length - 1;
+        analysisObject.timeline = generateTimeList(minTime, maxTime);
+        analysisObject.timelineStart = 0; analysisObject.timelineEnd = analysisObject.timeline.length - 1;
         $(".slider").slider({
             range: true,
             min: 0,
-            max: timeline.length - 1,
-            values: [0, timeline.length - 1]
+            max: analysisObject.timeline.length - 1,
+            values: [0, analysisObject.timeline.length - 1]
         }).slider("pips", {
             rest: "pip",
-            labels: timeline
+            labels: analysisObject.timeline
         }).slider("float", {
-            labels: timeline
+            labels: analysisObject.timeline
         }).on("slidechange", function(e,ui) {
             if (recorderInterval != null){
                 // 正在回放数据，不进行高亮片段更新
 
             } else {
-                timelineStart = ui.values[0];
-                timelineEnd = ui.values[1];
-                var start = timeline[timelineStart];
-                var end = timeline[timelineEnd];
+                analysisObject.timelineStart = ui.values[0];
+                analysisObject.timelineEnd = ui.values[1];
+                var start = analysisObject.timeline[analysisObject.timelineStart];
+                var end = analysisObject.timeline[analysisObject.timelineEnd];
                 var mark = [[{
                     xAxis: start
                 }, {
                     xAxis: end
                 }]];
-                for (var i=0; i<analysisCharts.length; i++){
-                    var series = analysisCharts[i].getOption()['series'];
+                for (var i in analysisObject.chart){
+                    var series = analysisObject.chart[i].getOption()['series'];
                     series[0]['markArea']['data'] = mark;
-                    analysisCharts[i].setOption({
+                    analysisObject.chart[i].setOption({
                         series: series
                     });
                 }
@@ -101,7 +93,9 @@ function initChartDom(recorderId){
                         height: 100
                     });
                     chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
-                    analysisCharts.push(chart);
+
+                    analysisObject.setChart(chartId, chart);
+                    analysisObject.setChartData(chartId, chartData[sensorId][legend]);
                 }
             }
         }
@@ -190,7 +184,8 @@ function buildAnalysisChartOption(data, legend) {
             {
                 name: legend,
                 type: 'line',
-                showSymbol: false,
+                symbolSize: 5,
+                symbol:'circle',
                 hoverAnimation: false,
                 itemStyle: {
                     normal: {
@@ -218,9 +213,9 @@ function buildAnalysisChartOption(data, legend) {
                         }
                     },
                     data: [[{
-                        xAxis: timeline[0]
+                        xAxis: analysisObject.timeline[0]
                     },{
-                        xAxis: timeline[timeline.length - 1]
+                        xAxis: analysisObject.timeline[analysisObject.timeline.length - 1]
                     }]]
                 },
                 data: data

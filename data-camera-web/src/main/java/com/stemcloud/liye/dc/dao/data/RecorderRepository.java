@@ -42,6 +42,14 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
     List<RecorderInfo> findByExperiments(Set<Long> ids);
 
     /**
+     * find recorders by parent id
+     * @param id
+     * @param isDeleted
+     * @return
+     */
+    List<RecorderInfo> findByParentIdAndIsDeleted(long id, int isDeleted);
+
+    /**
      * end recorder, update end time
      * @param id
      * @param endTime

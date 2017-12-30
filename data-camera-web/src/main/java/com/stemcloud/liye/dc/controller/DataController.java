@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -81,30 +82,6 @@ public class DataController {
     }
 
     /**
-     * 获取实验片段数据，并返回
-     *
-     * Map<Long, Map<Long, Map<String, List<ChartTimeSeries>>>>
-     *      content_id, (sensor_id, (data_key, List<data_value>))
-     * @param queryParams
-     * @return
-     */
-    @GetMapping("/exp-content")
-    Map content(@RequestParam Map<String, String> queryParams){
-        Map<String, Object> map;
-        try{
-            Long beginTime = System.currentTimeMillis();
-            long expId = Long.parseLong(queryParams.get("exp-id"));
-            map = ServerReturnTool.serverSuccess(dataService.getContentDataOfExperiment(expId));
-            Long endTime = System.currentTimeMillis();
-            logger.info("[/data/exp-content] request content data in {} ms.", (endTime - beginTime));
-        } catch (Exception e){
-            map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("[/data/exp-content]", e);
-        }
-        return map;
-    }
-
-    /**
      * 获取实验片段数据
      *  CHART: Map<Long, Map<String, List<ChartTimeSeries>>>
      *  VIDEO: Map<Long, Video>
@@ -133,16 +110,18 @@ public class DataController {
      * @param queryParams
      * @return
      */
-    @GetMapping("/new-content")
+    @GetMapping("/user-new-recorder")
     Map newContent(@RequestParam Map<String, String> queryParams){
-        Map<String, Object> map = ServerReturnTool.serverSuccess("success");
-        long expId = Long.parseLong(queryParams.get("exp-id"));
-        long contentId = Long.parseLong(queryParams.get("content-id"));
-        int start = Integer.parseInt(queryParams.get("start"));
-        int end = Integer.parseInt(queryParams.get("end"));
-        List<String> legend = Arrays.asList(queryParams.get("legend").split(";"));
-        dataService.generateUserContent(expId, contentId, start, end, legend);
+        long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+        String start = queryParams.get("start");
+        String end = queryParams.get("end");
+        logger.info("[/data/user-new-recorder], id={}, start={}, end={}", recorderId, start, end);
+        // List<String> legend = Arrays.asList(queryParams.get("legend").split(";"));
 
-        return map;
+        try {
+            return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end/*, legend*/));
+        } catch (ParseException e) {
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
     }
 }

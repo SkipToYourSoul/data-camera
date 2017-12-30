@@ -33,3 +33,56 @@ function inAppPage(){
         }
     });
 }
+
+var analysisObject = (function () {
+    // -- 当前显示的所有echarts对象, key: domId, value: chartInstance
+    var chart = {};
+
+    // -- 当前选中的数据片段data, key: domId, value: data
+    var chartData = {};
+
+    var setChart = function (key, value) {
+        chart[key] = value;
+    };
+
+    // deep copy
+    var getChart = function () {
+        return $.extend(true, {}, chart);
+    };
+
+    var setChartData = function (key, value) {
+        chartData[key] = value;
+    };
+
+    var getChartData = function () {
+        return $.extend(true, {}, chartData);
+    };
+
+    // -- 当前片段的时间轴数据
+    var timeline = [];
+    var timelineStart, timelineEnd;
+
+    // -- node 数据
+    var rDataMap = {};
+
+    // -- 实验片段信息
+    var currentRecorderId = null;
+
+    // -- 标记是否正在回放
+    var recorderInterval = null;
+
+    return {
+        chart: chart,
+        setChart: setChart,
+        getChart: getChart,
+        chartData: chartData,
+        setChartData: setChartData,
+        getChartData: getChartData,
+        timeline: timeline,
+        timelineStart: timelineStart,
+        timelineEnd: timelineEnd,
+        rDataMap: rDataMap,
+        currentRecorderId: currentRecorderId,
+        recorderInterval: recorderInterval
+    }
+})();

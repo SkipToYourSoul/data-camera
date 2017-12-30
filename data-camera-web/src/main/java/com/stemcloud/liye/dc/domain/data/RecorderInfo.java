@@ -51,7 +51,7 @@ public class RecorderInfo {
     private int isUserGen = 0;
 
     @Column(name = "parent_id", columnDefinition = "INT DEFAULT -1")
-    private int parentId = -1;
+    private long parentId = -1;
 
     public long getId() {
         return id;
@@ -141,11 +141,11 @@ public class RecorderInfo {
         this.isUserGen = isUserGen;
     }
 
-    public int getParentId() {
+    public long getParentId() {
         return parentId;
     }
 
-    public void setParentId(int parentId) {
+    public void setParentId(long parentId) {
         this.parentId = parentId;
     }
 }

@@ -187,7 +187,19 @@ public class CrudService {
         recorderRepository.updateDescription(id, description);
     }
 
-    public void deleteRecorder(long id){
+    public void deleteAllRecorder(long id){
+        deleteRecorder(id);
+        List<RecorderInfo> rs = recorderRepository.findByParentIdAndIsDeleted(id, 0);
+        logger.info("delete {}, has child {}", id, rs.size());
+        if (rs.size() == 0){
+            return;
+        }
+        for (RecorderInfo r: rs){
+            deleteAllRecorder(r.getId());
+        }
+    }
+
+    private void deleteRecorder(long id){
         recorderRepository.deleteRecorder(id);
     }
 

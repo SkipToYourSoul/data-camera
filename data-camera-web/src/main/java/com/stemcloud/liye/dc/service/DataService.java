@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -63,31 +65,6 @@ public class DataService {
 
         logger.info("Request data size={}, time={}", data.size(), time.toString());
         return transferChartData(data);
-    }
-
-    /**
-     * 获取实验片段数据
-     *
-     * @param expId 给定的实验id
-     * @return Map<Long, Map>
-     *     key: content_id
-     *     value: SensorType, Map<SensorId, data>
-     */
-    public Map<Long, Map> getContentDataOfExperiment(final long expId){
-        Map<Long, Map> result = new HashMap<Long, Map>(16);
-        List<RecorderInfo> ris = recorderRepository.findByExperiments(new HashSet<Long>(){{
-            add(expId);
-        }});
-        // traverse content
-        for (RecorderInfo r : ris){
-            long beginMillis = System.currentTimeMillis();
-            long id = r.getId();
-            result.put(id, getRecorderData(id));
-            long endMillis = System.currentTimeMillis();
-            logger.info("Get content data, id={}, cost time={} ms.", id, (endMillis - beginMillis));
-        }
-
-        return result;
     }
 
     /**
@@ -163,64 +140,29 @@ public class DataService {
     /**
      * 新生成一条用户自定义的实验片段
      *
-     * @param expId 实验id
-     * @param contentId 片段id
+     * @param recorderId 片段id
      * @param start 数据截取起点
      * @param end 数据截取终点
-     * @param legend 留下的数据维度
      */
-    public void generateUserContent(long expId, long contentId, int start, int end, List<String> legend){
-        RecorderInfo recorder = recorderRepository.findOne(contentId);
-        Date startTime = recorder.getStartTime();
-        Date endTime = recorder.getEndTime();
-        List<RecorderDevices> devices = new Gson().fromJson(recorder.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+    public Long generateUserContent(long recorderId, String start, String end) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        // 遍历选中的几个数据段，找出最低和最高时间
-        Date minTime = endTime, maxTime = startTime;
-        Map<Long, List<String>> sensorLegend = new HashMap<Long, List<String>>();
-        for (String index : legend) {
-            long sensorId = Long.parseLong(index.split("-")[0]);
-            String key = index.split("-")[1];
-            List<ValueData> values = valueDataRepository.findBySensorIdAndKeyAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
-                    sensorId, key, startTime, endTime);
-            int lowerIndex = (int) Math.ceil((double) start/100 * values.size()) - 1;
-            int higherIndex = (int) Math.floor((double) end/100 * values.size()) - 1;
-            Date lowerTime = values.get(lowerIndex).getCreateTime();
-            Date higherTime = values.get(higherIndex).getCreateTime();
-            if (lowerTime.compareTo(minTime) < 0){
-                minTime = lowerTime;
-            }
-            if (higherTime.compareTo(maxTime) > 0){
-                maxTime = higherTime;
-            }
-            List<String> ls = new ArrayList<String>();
-            if (sensorLegend.containsKey(sensorId)){
-                ls = sensorLegend.get(sensorId);
-            }
-            ls.add(key);
-            sensorLegend.put(sensorId, ls);
-        }
+        RecorderInfo recorder = recorderRepository.findOne(recorderId);
+        List<RecorderDevices> devices = new Gson().fromJson(recorder.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
 
         // 保存新的实验记录
         RecorderInfo newRecorder = new RecorderInfo();
-        newRecorder.setName("用户生成的新记录");
-        newRecorder.setDescription("用户新纪录描述");
-        newRecorder.setStartTime(minTime);
-        newRecorder.setEndTime(maxTime);
-        newRecorder.setExpId(expId);
+        newRecorder.setName("来自片段{" + recorder.getName() + "}");
+        newRecorder.setDescription("子片段描述");
+        newRecorder.setStartTime(sdf.parse(start));
+        newRecorder.setEndTime(sdf.parse(end));
+        newRecorder.setExpId(recorder.getExpId());
         newRecorder.setAppId(recorder.getAppId());
         newRecorder.setIsRecorder(0);
         newRecorder.setIsUserGen(1);
-        for (RecorderDevices device: devices){
-            if (sensorLegend.containsKey(device.getSensor())){
-                device.setLegends(sensorLegend.get(device.getSensor()));
-            } else {
-                devices.remove(device);
-            }
-        }
+        newRecorder.setParentId(recorderId);
         newRecorder.setDevices(new Gson().toJson(devices));
-        recorderRepository.save(newRecorder);
-        logger.info("Generate new recorder, exp-id={}", expId);
+        return recorderRepository.save(newRecorder).getId();
     }
 
     /**

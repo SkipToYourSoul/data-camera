@@ -24,6 +24,9 @@
     <link rel="stylesheet" th:href="@{source/jqueryui/theme.css}"/>
     <link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui-slider-pips.css}"/>
 
+    <link rel="stylesheet" th:href="@{source/messenger/messenger.css}"/>
+    <link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}"/>
+
     <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
     <link rel="stylesheet" th:href="@{css/v1/app.css}"/>
 </head>
@@ -90,7 +93,7 @@
                             我的场景
                         </div>
                         <th:block th:each="entry,index:${apps}">
-                            <a type="button" class="btn btn-info btn-block" th:href="@{/app(id=${entry.key})}">
+                            <a type="button" class="btn btn-info btn-block" th:href="@{/app(id=${entry.key},tab=2)}">
                                 <i th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-arrow-down':'fa fa-arrow-right'">&nbsp; <span th:text="${entry.value.name}"></span></i>
                             </a>
                             <div th:if="${#httpServletRequest.getParameter('id') eq ''+entry.key}" class="menu-content">
@@ -179,6 +182,7 @@
     <script th:src="@{source/jqueryui/jquery-ui-slider-pips.js}"></script>
 
     <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/messenger/messenger-theme-future.js}"></script>
     <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
     <script th:src="@{source/bootbox/bootbox.min.js}"></script>
 

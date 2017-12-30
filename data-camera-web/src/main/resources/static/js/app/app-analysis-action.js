@@ -4,23 +4,20 @@
  * Description:
  */
 
-// -- 当前选中的数据片段id
-var currentRecorder = null;
-
-// -- 当前选中的数据片段data
-var currentRecorderData = null;
-
-// -- 标记是否正在回放
+/**
+ * 录制相关操作，play, pause, reset
+ * @type {null}
+ */
 var recorderInterval = null;
-
 function recorderPlay() {
     recorderInterval = setInterval(function () {
-        console.log(timelineStart + "-" + timelineEnd);
-        if (timelineStart >= timelineEnd){
-            console.log("clear recorder interval");
+        setTimeLine(++analysisObject.timelineStart, analysisObject.timelineEnd);
+        if (analysisObject.timelineStart >= analysisObject.timelineEnd){
             recorderPause();
+            recorderInterval = null;
+            // 隐藏时间标记
+            $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
         }
-        setTimeLine(++timelineStart, timelineEnd);
     }, 1000);
     $('#play-btn').attr('disabled', 'disabled');
     $('#pause-btn').removeAttr('disabled');
@@ -30,27 +27,57 @@ function recorderPlay() {
             .slider({values: [start, end]})
             .slider("pips", "refresh")
             .slider("float", "refresh");
+
         // 显示时间标记
         $("#timeline-slider").find(".ui-slider-tip").css("visibility", "visible");
+
+        // 重置chart数据
+        for (var i in analysisObject.chart){
+            var series = analysisObject.chart[i].getOption()['series'];
+            var chartData = analysisObject.getChartData()[i];
+            series[0]['data'] = getNewChartData(chartData);
+            series[0]['markArea']['data'] = [];
+            analysisObject.chart[i].setOption({
+                series: series
+            });
+        }
+
+        function getNewChartData(d){
+            var n = [];
+            for (var j=0; j<d.length; j++){
+                n.push(d[j]);
+                if (d[j]['value'][0] > analysisObject.timeline[start] && d[j]['value'].length == 2){
+                    n[j]['value'].pop();
+                }
+            }
+            return n;
+        }
     }
 }
 
 function recorderPause() {
     clearInterval(recorderInterval);
-    recorderInterval = null;
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
 }
 
 function recorderReset() {
     clearInterval(recorderInterval);
-    recorderInterval = null;
+    analysisObject.recorderInterval = null;
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
     $(".slider")
-        .slider({values: [0, timeline.length - 1]})
+        .slider({values: [0, analysisObject.timeline.length - 1]})
         .slider("pips", "refresh")
         .slider("float", "refresh");
+    // 重置chart数据
+    for (var i in analysisObject.chart){
+        var series = analysisObject.chart[i].getOption()['series'];
+        series[0]['data'] = analysisObject.getChartData()[i];
+        analysisObject.chart[i].setOption({
+            series: series
+        });
+    }
 }
 
 /**
@@ -59,7 +86,7 @@ function recorderReset() {
 function deleteContent() {
     bootbox.confirm({
         title: "删除数据片段?",
-        message: "确认删除数据片段吗? 当前数据片段id为：" + currentRecorder,
+        message: "确认删除数据片段吗? 当前数据片段id为：" + analysisObject.currentRecorderId,
         buttons: {
             cancel: {
                 label: '<i class="fa fa-times"></i> 取消'
@@ -72,7 +99,7 @@ function deleteContent() {
             if (result){
                 $.ajax({
                     type: 'get',
-                    url: crud_address + '/recorder/delete?content-id=' + currentRecorder,
+                    url: crud_address + '/recorder/delete?recorder-id=' + analysisObject.currentRecorderId,
                     success: function (response) {
                         if (response.code == "0000") {
                             window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
@@ -84,6 +111,51 @@ function deleteContent() {
                         message_info("数据请求被拒绝", 'error');
                     }
                 });
+            }
+        }
+    });
+}
+
+/**
+ * 生成用户自定义的数据片段
+ */
+function generateNewContent() {
+    var dialog_message = '<p>数据起始时间：' + analysisObject.timeline[analysisObject.timelineStart] + '</p>';
+    dialog_message += '<p>数据结束时间：' + analysisObject.timeline[analysisObject.timelineEnd] + '</p>';
+
+    var dialog = bootbox.dialog({
+        title: '即将生成新的数据片段，记录如下',
+        message: dialog_message,
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i>取消',
+                className: 'btn-danger'
+            },
+            ok: {
+                label: '<i class="fa fa-check"></i>确认生成',
+                className: 'btn-info',
+                callback: function(){
+                    message_info('内容生成中', 'info');
+                    $.ajax({
+                        type: 'get',
+                        url: data_addrss + "/user-new-recorder",
+                        data: {
+                            "recorder-id": analysisObject.currentRecorderId,
+                            "start": analysisObject.timeline[analysisObject.timelineStart],
+                            "end": analysisObject.timeline[analysisObject.timelineEnd]
+                        },
+                        success: function (response) {
+                            if (response.code == "1111"){
+                                message_info('操作无效: ' + response.data, "error");
+                            } else if (response.code == "0000"){
+                                window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
+                            }
+                        },
+                        error: function (response) {
+                            message_info('数据请求被拒绝', "error");
+                        }
+                    });
+                }
             }
         }
     });
