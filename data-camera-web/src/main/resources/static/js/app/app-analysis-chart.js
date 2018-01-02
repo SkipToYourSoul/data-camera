@@ -12,8 +12,32 @@ function initChartDom(recorderId){
     var recorder = findRecorderInfo(recorderId);
     if (recorder == null){
         console.log("Null data recorder");
+        window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
         return;
     }
+
+    // 获取数据片段描述
+    var $appAnalysisDesc = $('#app-analysis-desc');
+    $appAnalysisDesc.editable('destroy');
+    $appAnalysisDesc.html(recorder['description']);
+    $appAnalysisDesc.editable({
+        title: '输入描述',
+        rows: 5,
+        placeholder: '在这里输入描述',
+        pk: recorderId,
+        url: crud_address + '/recorder/desc',
+        success: function(response) {
+            if (response.code == "1111"){
+                message_info('操作无效: ' + response.data, "error");
+            } else if (response.code == "0000"){
+                message_info("实验记录描述变更为：" + response.data, 'success');
+                recorder['description'] = response.data;
+            }
+        },
+        error: function (response) {
+            message_info('数据请求被拒绝', 'error');
+        }
+    });
     // 异步请求实验片段数据
     $.ajax({
         type: 'get',

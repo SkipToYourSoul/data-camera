@@ -345,7 +345,7 @@ public class CrudController {
             long recorderId = Long.parseLong(queryParams.get("pk"));
             String desc = queryParams.get("value");
             crudService.updateRecorderDescription(recorderId, desc);
-            result = "实验记录描述变更为：" + desc;
+            result = desc;
         } catch (Exception e){
             return ServerReturnTool.serverFailure("后台数据错误");
         }

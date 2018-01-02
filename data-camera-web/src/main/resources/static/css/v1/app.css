@@ -9,7 +9,7 @@ body{
     position: fixed;
     top: 70px;
     bottom: 5px;
-    z-index: 1000;
+    z-index: 1;
     display: block;
     padding: 0 5px 10px 10px;
     overflow-x: hidden;
@@ -21,7 +21,7 @@ body{
     top: 70px;
     bottom: 5px;
     right: 3px;
-    z-index: 1000;
+    z-index: 1;
     display: block;
     padding: 0 5px 10px 10px;
     overflow-x: hidden;
@@ -265,6 +265,22 @@ body{
     padding: 0;
 }
 
+.app-analysis-chart-dom .description-dom{
+    padding: 10px 5px;
+    font-weight: 600;
+}
+
+.app-analysis-chart-dom .description-dom .desc-title{
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.app-analysis-chart-dom .description-dom .desc-content{
+    padding: 5px 10px 5px 30px;
+    border: 1px solid #9d9d9d;
+    font-size: 14px;
+}
+
 /** 场景实验页面样式 app-experiment.html **/
 .app-exp-action-bar{
     margin-bottom: 10px;
@@ -358,54 +374,4 @@ body{
     font-weight: 600;
     color: #9d9d9d;
     text-align: left;
-}
-
-/** app-analysis.html **/
-.app-analysis-content-desc{
-    padding: 10px 20px 10px 20px;
-    font-weight: 600;
-}
-
-.app-analysis-content-desc .title{
-    font-size: 18px;
-    margin-bottom: 5px;
-}
-
-.app-analysis-content-desc .content{
-    padding: 5px 10px 5px 10px;
-    border: 1px solid #9d9d9d;
-    font-size: 14px;
-}
-
-.app-analysis-video{
-    padding: 10px 30px 0 20px;
-}
-.app-analysis-content-info{
-    border-radius: 5%;
-    background-color: rgba(154, 154, 154, 0.1);
-    min-height: 100px;
-    padding: 10px 0 10px 0;
-}
-
-.app-analysis-content-info .title{
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 3px;
-}
-
-.app-analysis-content-info .info{
-    padding: 15px 10px 5px 10px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #9d9d9d;
-}
-
-.app-analysis-content-info .info .title{
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.app-analysis-content-info .my-container{
-    padding: 5px 10px 5px 10px;
-    margin-bottom: 5px;
 }
