@@ -6,8 +6,8 @@
  *    使用的后台数据(app, recorders)
  */
 
-// -- 入口函数，初始化数据图表
-function initChartDom(recorderId){
+// -- 入口函数，初始化数据图表以及视频
+function initRecorderContentDom(recorderId){
     console.info("Request recorder: " + recorderId);
     var recorder = findRecorderInfo(recorderId);
     if (recorder == null){
@@ -75,18 +75,17 @@ function initChartDom(recorderId){
         }).slider("float", {
             labels: analysisObject.timeline
         }).on("slidechange", function(e,ui) {
+            console.log("In event");
             if (recorderInterval != null){
                 // 正在回放数据，不进行高亮片段更新
 
             } else {
                 analysisObject.timelineStart = ui.values[0];
                 analysisObject.timelineEnd = ui.values[1];
-                var start = analysisObject.timeline[analysisObject.timelineStart];
-                var end = analysisObject.timeline[analysisObject.timelineEnd];
                 var mark = [[{
-                    xAxis: start
+                    xAxis: analysisObject.timeline[analysisObject.timelineStart]
                 }, {
-                    xAxis: end
+                    xAxis: analysisObject.timeline[analysisObject.timelineEnd]
                 }]];
                 for (var i in analysisObject.chart){
                     var series = analysisObject.chart[i].getOption()['series'];
@@ -97,10 +96,10 @@ function initChartDom(recorderId){
                 }
             }
         });
-
-        var $dom = $('#app-analysis-chart-dom');
-        $dom.empty();
+        
         // chart
+        var $dom = $('#app-analysis-chart');
+        $dom.empty();
         for (var sensorId in chartData){
             if (!chartData.hasOwnProperty(sensorId)){
                 continue;
@@ -121,6 +120,33 @@ function initChartDom(recorderId){
                     analysisObject.setChart(chartId, chart);
                     analysisObject.setChartData(chartId, chartData[sensorId][legend]);
                 }
+            }
+        }
+        
+        // video
+        var $dom2 = $('#app-analysis-video');
+        $dom2.empty();
+        var vCount = 0;
+        for (var vSensorId in videoData){
+            if (!videoData.hasOwnProperty(vSensorId)){
+                continue;
+            }
+            var videoOption = videoData[vSensorId]['option'];
+            var videoId = 'video-' + vSensorId;
+            var videoDomId = 'video-dom-' + vSensorId;
+            $dom2.append(generate(videoDomId + '-' + (vCount++), "video from sensor " + vSensorId, videoDomId));
+
+            if (videoOption['sources'] != null){
+                $('#' + videoDomId).append('<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video>');
+                var video = videojs(videoId, videoOption, function () {
+                    videojs.log('The video player ' + videoId + ' is ready');
+                });
+                analysisObject.setVideo(videoId, video);
+            } else {
+                var progressBar = '<div class="progress">' +
+                    '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">' +
+                    '<span class="sr-only">45% Complete</span></div></div>';
+                $('#' + videoDomId).append('<div id=' + videoId + '> <p class="text-center">视频来自设备(编号：' + vSensorId + ')，上传中</p>' + progressBar + '</div>');
             }
         }
 

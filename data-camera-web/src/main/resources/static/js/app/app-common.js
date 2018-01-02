@@ -58,6 +58,13 @@ var analysisObject = (function () {
         return $.extend(true, {}, chartData);
     };
 
+    // -- 视频dom
+    var video = {};
+
+    var setVideo = function (key, value) {
+        video[key] = value
+    };
+
     // -- 当前片段的时间轴数据
     var timeline = [];
     var timelineStart, timelineEnd;
@@ -78,6 +85,8 @@ var analysisObject = (function () {
         chartData: chartData,
         setChartData: setChartData,
         getChartData: getChartData,
+        video: video,
+        setVideo: setVideo,
         timeline: timeline,
         timelineStart: timelineStart,
         timelineEnd: timelineEnd,

@@ -79,18 +79,6 @@ function initTreeDom(){
             });
         }
     }
-
-}
-
-// -- node选中事件
-function nodeSelectionChanged(node) {
-    if (node.isSelected) {
-        var target = findParent(node.data.key) + '';
-        console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
-        showRecorderContent(target);
-        initChartDom(node.data.key);
-        analysisObject.currentRecorderId = node.data.key;
-    }
 }
 
 function findParent(id) {
@@ -101,19 +89,31 @@ function findParent(id) {
     }
 }
 
+// -- node选中事件
+function nodeSelectionChanged(node) {
+    if (node.isSelected) {
+        var target = findParent(node.data.key) + '';
+        console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
+        showRecorderContent(target, node.data.key);
+    }
+}
+
 // -- 边栏菜单点击事件
 $('.menu-content ul li').click(function (e) {
     var target = $(e.target).parent().attr('data');
-    showRecorderContent(target);
-    initChartDom(target);
-    analysisObject.currentRecorderId = target;
+    console.log("Click the menu: " + target);
+    showRecorderContent(target, target);
 });
 
 /**
  * 展示当前实验片段的内容
- * @param target 选中的内容id
+ * @param target 选中的内容parent id
+ * @param node 选中的内容id
  */
-function showRecorderContent(target){
+function showRecorderContent(target, node){
+    // 更新当前recorder id
+    analysisObject.currentRecorderId = node;
+
     // 只展示当前选中的树形图
     var dom = $('.app-analysis-tree-group').find('.app-analysis-tree-dom');
     for (var index=0; index<dom.length; index++){
@@ -128,6 +128,8 @@ function showRecorderContent(target){
     }
     // 展示数据图表
     $('.app-analysis-chart-dom').attr("hidden", false);
+    initRecorderContentDom(node);
+
     // 激活菜单
     var menu = $('.menu-content ul li');
     for (var index=0; index<menu.length; index++){

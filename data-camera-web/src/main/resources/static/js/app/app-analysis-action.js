@@ -63,7 +63,7 @@ function recorderPause() {
 
 function recorderReset() {
     clearInterval(recorderInterval);
-    analysisObject.recorderInterval = null;
+    recorderInterval = null;
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
     $(".slider")
@@ -74,6 +74,11 @@ function recorderReset() {
     for (var i in analysisObject.chart){
         var series = analysisObject.chart[i].getOption()['series'];
         series[0]['data'] = analysisObject.getChartData()[i];
+        series[0]['markArea']['data'] = [[{
+            xAxis: analysisObject.timeline[0]
+        }, {
+            xAxis: analysisObject.timeline[analysisObject.timeline.length - 1]
+        }]];
         analysisObject.chart[i].setOption({
             series: series
         });
