@@ -71,6 +71,14 @@ function getObjectLength(obj){
     return count;
 }
 
+// --- 判断dom是否存在, 如: $('#id').exist()
+$.fn.exist = function(){
+    if($(this).length>=1){
+        return true;
+    }
+    return false;
+};
+
 /**
  * 获取url参数
  *

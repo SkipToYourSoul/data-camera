@@ -62,7 +62,7 @@ var analysisObject = (function () {
     var video = {};
 
     var setVideo = function (key, value) {
-        video[key] = value
+        video[key] = value;
     };
 
     // -- 当前片段的时间轴数据

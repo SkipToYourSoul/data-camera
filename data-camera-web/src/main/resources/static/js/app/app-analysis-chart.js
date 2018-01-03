@@ -75,7 +75,6 @@ function initRecorderContentDom(recorderId){
         }).slider("float", {
             labels: analysisObject.timeline
         }).on("slidechange", function(e,ui) {
-            console.log("In event");
             if (recorderInterval != null){
                 // 正在回放数据，不进行高亮片段更新
 
@@ -125,8 +124,15 @@ function initRecorderContentDom(recorderId){
         
         // video
         var $dom2 = $('#app-analysis-video');
+        // -- clear dom content
+        for (var domId in analysisObject.video){
+            videojs(domId).dispose();
+            console.log("Dispose video " + domId);
+            delete analysisObject.video[domId];
+        }
         $dom2.empty();
         var vCount = 0;
+        // -- generate new content
         for (var vSensorId in videoData){
             if (!videoData.hasOwnProperty(vSensorId)){
                 continue;
@@ -138,10 +144,11 @@ function initRecorderContentDom(recorderId){
 
             if (videoOption['sources'] != null){
                 $('#' + videoDomId).append('<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video>');
-                var video = videojs(videoId, videoOption, function () {
+                videojs(videoId, videoOption, function () {
                     videojs.log('The video player ' + videoId + ' is ready');
+                    analysisObject.setVideo(videoId, this);
                 });
-                analysisObject.setVideo(videoId, video);
+
             } else {
                 var progressBar = '<div class="progress">' +
                     '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">' +
