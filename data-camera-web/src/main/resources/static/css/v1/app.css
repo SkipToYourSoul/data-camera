@@ -160,6 +160,13 @@ body{
     padding-bottom: 5px;
 }
 
+.sidebar-menu2 .menu-btn {
+    color: #fff;
+    background-color: #4b91f4;
+    border-color: #4b91f4;
+    border-radius: 20px;
+}
+
 .sidebar-menu2 ul li.active {
     border-bottom: none;
 }
@@ -193,7 +200,7 @@ body{
 .app-analysis-tree-dom{
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    border: 1px solid #9d9d9d;
+    border: 1px solid rgb(245, 245, 245);
     margin-bottom: 5px;
 }
 

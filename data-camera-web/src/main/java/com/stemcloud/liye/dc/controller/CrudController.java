@@ -314,7 +314,7 @@ public class CrudController {
             Long expId = Long.valueOf(queryParams.get("exp-id"));
             int isSave = Integer.parseInt(queryParams.get("is-save"));
             Long appId = Long.valueOf(queryParams.get("app-id"));
-            int response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(appId, expId, isSave);
+            long response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(appId, expId, isSave);
             map = ServerReturnTool.serverSuccess(response);
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());

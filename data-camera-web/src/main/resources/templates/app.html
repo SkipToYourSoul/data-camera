@@ -93,19 +93,29 @@
                             我的场景
                         </div>
                         <th:block th:each="entry,index:${apps}">
-                            <a type="button" class="btn btn-info btn-block" th:href="@{/app(id=${entry.key},tab=2)}">
-                                <i th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-arrow-down':'fa fa-arrow-right'">&nbsp; <span th:text="${entry.value.name}"></span></i>
-                            </a>
-                            <div th:if="${#httpServletRequest.getParameter('id') eq ''+entry.key}" class="menu-content">
+                            <div class="row" style="padding: 5px 0 0 0">
+                                <div class="col-sm-2" style="padding-top: 5px">
+                                    <a role="button" data-toggle="collapse" th:href="|#recorder-${index.count}|" aria-expanded="true">
+                                        <i th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-arrow-down':'fa fa-arrow-right'"></i>
+                                    </a>
+                                </div>
+                                <div class="col-sm-10" style="padding: 0 10px 0 0">
+                                    <a type="button" class="btn menu-btn btn-block" th:href="@{/app(id=${entry.key},tab=2)}" th:text="${entry.value.name}"></a>
+                                </div>
+                            </div>
+
+                            <div th:if="${#httpServletRequest.getParameter('id') eq ''+entry.key}" class="menu-content collapse in" th:id="|recorder-${index.count}|">
                                 <!-- 该场景没有片段记录数据 -->
                                 <div th:if="${not #maps.containsKey(recorders, entry.key)}"
                                      class="alert alert-warning my-alter" role="alert">没有可选的数据片段</div>
                                 <!-- 遍历片段记录数据 -->
-                                <ul class="nav" th:if="${#maps.containsKey(recorders, entry.key)}">
-                                    <th:block th:each="recorder,index:${recorders[entry.key]}">
-                                        <li th:if="${recorder.isUserGen eq 0}" th:data="${recorder.id}"><a th:href="|#${recorder.id}|" th:text="${recorder.name}"></a></li>
-                                    </th:block>
-                                </ul>
+                                <div class="com-sm-10 col-sm-offset-2">
+                                    <ul class="nav" th:if="${#maps.containsKey(recorders, entry.key)}">
+                                        <th:block th:each="recorder,index:${recorders[entry.key]}">
+                                            <li th:if="${recorder.isUserGen eq 0}" th:data="${recorder.id}"><a th:href="|#${recorder.id}|" th:text="${recorder.name}"></a></li>
+                                        </th:block>
+                                    </ul>
+                                </div>
                             </div>
                         </th:block>
                     </div>

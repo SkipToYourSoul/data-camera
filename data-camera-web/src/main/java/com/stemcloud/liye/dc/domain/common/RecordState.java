@@ -10,14 +10,14 @@ public enum RecordState {
     /**
      * record state
      */
-    ING(1), END(0), ERR(-1);
-    int value;
+    ING(-1), END(0), ERR(-10);
+    long value;
 
-    RecordState(int value) {
+    RecordState(long value) {
         this.value = value;
     }
 
-    public int getValue() {
+    public long getValue() {
         return value;
     }
 }

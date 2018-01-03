@@ -230,7 +230,7 @@ function expRecorder(button) {
             }
         },
         error: function (response) {
-            message_info("操作失败，失败原因为：" + response, 'error');
+            message_info("请求数据失败", 'error');
         }
     });
 
@@ -255,7 +255,9 @@ function expRecorder(button) {
                 }
 
                 var action = response.data;
-                if (action == "1"){
+                if (action == "-10"){
+                    message_info("实验" + exp_id + "未绑定传感器，不能记录");
+                } else if (action == "-1"){
                     // start recorder
                     message_info("实验" + exp_id + ": 开始记录");
                     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
@@ -268,17 +270,14 @@ function expRecorder(button) {
                         recorder_timestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
                     }
                 } else if (action == "0"){
-                    if (is_save_recorder == 1){
-                        // save recorder, refresh page
-                        window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
-                    } else {
-                        message_info("实验" + exp_id + ": 停止记录");
-                        pageStopRecorder(exp_id);
-                    }
+                    message_info("实验" + exp_id + ": 停止记录");
+                    pageStopRecorder(exp_id);
+                } else {
+                    window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + action;
                 }
             },
             error: function (response) {
-                message_info("操作失败，失败原因为：" + response, 'error');
+                message_info("请求数据失败", 'error');
             }
         });
     }

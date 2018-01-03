@@ -246,14 +246,15 @@ public class CrudService {
      * @param expId 实验id
      * @param isSave 是否保存实验片段
      * @return {
-     *     -1：实验没有绑定传感器
-     *     1：开始录制
-     *     0：结束录制
+     *     -10：实验没有绑定传感器
+     *     -1：开始录制
+     *     0: 结束录制未保存结果
+     *     ?>0：结束录制并保存结果，返回recorder id
      * }
      * @throws Exception 若抛出异常，则回滚
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized Integer changeSensorsRecorderStatusOfCurrentExperiment(long appId, long expId, int isSave) throws Exception {
+    public synchronized Long changeSensorsRecorderStatusOfCurrentExperiment(long appId, long expId, int isSave) throws Exception {
         // --- check the recorder status of current exp
         ExperimentInfo exp = expRepository.findById(expId);
         int status = exp.getIsRecorder();
@@ -263,9 +264,9 @@ public class CrudService {
             return RecordState.ERR.getValue();
         }
 
-        if (status == RecordState.END.getValue()){
-            // --- not in recorder state
-            expRepository.recorderExp(expId, RecordState.ING.getValue());
+        if (status == 0){
+            // --- 处于非录制状态，切换为录制状态
+            expRepository.recorderExp(expId, 1);
 
             // --- new a recorder info
             List<RecorderDevices> devices = new ArrayList<RecorderDevices>();
@@ -292,7 +293,7 @@ public class CrudService {
 
             logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
             return RecordState.ING.getValue();
-        } else if (status == RecordState.ING.getValue()){
+        } else if (status == 1){
             // --- end recorder
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo == null){
@@ -305,15 +306,16 @@ public class CrudService {
                 recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 0);
                 // save video if have
                 saveVideo(recorderInfo);
+                logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
+                return recorderInfo.getId();
             } else {
                 // not save data, delete recorder
                 recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1);
+                logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
+                return RecordState.END.getValue();
             }
-
-            logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
-            return RecordState.END.getValue();
         }
-        return -1;
+        return RecordState.ERR.getValue();
     }
 
     /**-------**/

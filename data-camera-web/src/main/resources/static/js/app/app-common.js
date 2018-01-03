@@ -7,7 +7,10 @@
 function inAppPage(){
     var $loader = $("#app-loading");
     var $app_main_tab = $('#app-main-tab');
+
+    // -- 进入页面的动作
     var tab = getQueryString("tab");
+    var recorder = getQueryString("recorder");
     if (tab == null){
         // 进入页面时默认为实验模式
         initResourceOfExperimentPage();
@@ -16,6 +19,9 @@ function inAppPage(){
         $('#content-menu').attr("hidden", false);
         $('#app-menu').attr("hidden", true);
         initTreeDom();
+    }
+    if (recorder != null){
+        showRecorderContent(findParent(recorder) + '', recorder);
     }
 
     // -- tab change

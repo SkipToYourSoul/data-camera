@@ -66,7 +66,10 @@ function initTreeDom(){
                 $go(go.Diagram, "tree-chart-" + id,
                     {
                         initialAutoScale: go.Diagram.UniformToFill,
-                        initialContentAlignment: go.Spot.Center,
+                        initialContentAlignment: go.Spot.LeftCenter,
+                        isReadOnly: true,  // do not allow users to modify or select in this view
+                        allowSelect: true,
+                        allowMove: false,
                         // define the layout for the diagram
                         layout: $go(go.TreeLayout, { nodeSpacing: 5, layerSpacing: 30 })
                     });
@@ -91,7 +94,7 @@ function findParent(id) {
 
 // -- node选中事件
 function nodeSelectionChanged(node) {
-    if (node.isSelected) {
+    if (node.isSelected && node.data.key != analysisObject.currentRecorderId) {
         var target = findParent(node.data.key) + '';
         console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
         showRecorderContent(target, node.data.key);
