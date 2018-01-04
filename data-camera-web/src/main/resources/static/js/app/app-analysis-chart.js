@@ -61,6 +61,16 @@ function initRecorderContentDom(recorderId){
     });
 
     function initDom(chartData, videoData, minTime, maxTime){
+        // 片段没有任何数据
+        if (isEmptyObject(chartData) && isEmptyObject(videoData)){
+            $('.app-analysis-chart-dom').attr("hidden", true);
+            $('.app-analysis-info-dom').attr("hidden", false);
+            return;
+        } else {
+            $('.app-analysis-chart-dom').attr("hidden", false);
+            $('.app-analysis-info-dom').attr("hidden", true);
+        }
+
         // timeline
         analysisObject.timeline = generateTimeList(minTime, maxTime);
         analysisObject.timelineStart = 0; analysisObject.timelineEnd = analysisObject.timeline.length - 1;
@@ -246,10 +256,10 @@ function buildAnalysisChartOption(data, legend) {
                 hoverAnimation: false,
                 itemStyle: {
                     normal: {
-                        color: '#8ec6ad'
+                        color: 'black'
                     }
                 },
-                areaStyle: {
+                /*areaStyle: {
                     normal: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                             offset: 0,
@@ -259,14 +269,14 @@ function buildAnalysisChartOption(data, legend) {
                             color: '#ffe'
                         }])
                     }
-                },
+                },*/
                 smooth: true,
                 sampling: true,
                 markArea: {
                     silent: true,
                     itemStyle: {
                         normal: {
-                            color: 'rgba(245,222,179,0.8)'
+                            color: 'rgb(245, 245, 245)'
                         }
                     },
                     data: [[{

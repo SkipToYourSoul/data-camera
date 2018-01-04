@@ -84,7 +84,7 @@
 
     <build>
         <finalName>
-            tag-checker-test
+            tag-checker-front
         </finalName>
 
         <resources>

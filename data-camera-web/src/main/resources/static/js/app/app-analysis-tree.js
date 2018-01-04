@@ -61,7 +61,7 @@ function initTreeDom(){
     for (var index = 0; index < appRecorders.length; index ++){
         var recorder = appRecorders[index];
         var id = recorder['id'];
-        if (recorder['isUserGen'] == 0){
+        if (recorder['isUserGen'] == 0 && recorder['isRecorder'] == 0){
             var myDiagram =
                 $go(go.Diagram, "tree-chart-" + id,
                     {

@@ -1,3 +1,9 @@
+body {
+    font-family: "Hiragino Sans GB","华文细黑","STHeiti","微软雅黑","Microsoft YaHei",SimHei,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    /*font-size: 16px;
+    line-height: 1.6;*/
+}
+
 /** 通用：导航栏样式 **/
 .navbar {
     margin-bottom:0;

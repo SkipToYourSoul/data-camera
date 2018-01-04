@@ -206,27 +206,37 @@ function expRecorder(button) {
                 return;
             }
             var recorder_status = response.data;
+            var time = new Date().getTime();
             if (recorder_status == "1"){
                 // -- end recorder, confirm to save the data
-                bootbox.confirm({
-                    title: "保存录制数据?",
-                    message: "需要保存录制的数据吗?",
+                bootbox.dialog({
+                    title: "保存录制数据片段?",
+                    message: '<div class="row"> <div class="form-group" style="margin-bottom: 5px"><label class="col-sm-2 control-label">片段名</label>' +
+                    '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-name" placeholder="请输入片段标题"/></div></div>' +
+                    '<div class="form-group"><label class="col-sm-2 control-label">片段描述</label>' +
+                    '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-desc" placeholder="请输入片段描述"></div></div>' +
+                    '</div>',
                     async: false,
                     buttons: {
                         cancel: {
-                            label: '<i class="fa fa-times"></i> 取消'
+                            label: '<i class="fa fa-times"></i> 取消',
+                            className: 'btn-danger',
+                            callback: function(){
+                                submitToServer(0, time);
+                            }
                         },
                         confirm: {
-                            label: '<i class="fa fa-check"></i> 保存'
+                            label: '<i class="fa fa-check"></i> 保存',
+                            className: 'btn-success',
+                            callback: function(){
+                                submitToServer(1, time);
+                            }
                         }
-                    },
-                    callback: function (result) {
-                        submitToServer(result?1:0);
                     }
                 });
             } else if (recorder_status == "0"){
                 // -- begin recorder
-                submitToServer(0);
+                submitToServer(0, time);
             }
         },
         error: function (response) {
@@ -234,7 +244,7 @@ function expRecorder(button) {
         }
     });
 
-    function submitToServer(is_save_recorder){
+    function submitToServer(is_save_recorder, time){
         // --- change recorder status on server
         $.ajax({
             type: 'get',
@@ -242,7 +252,10 @@ function expRecorder(button) {
             data: {
                 "exp-id": exp_id,
                 "app-id": app['id'],
-                "is-save": is_save_recorder
+                "is-save": is_save_recorder,
+                "data-name": $('#dialog-data-name').val(),
+                "data-desc": $('#dialog-data-desc').val(),
+                "data-time": time
             },
             success: function (response) {
                 if (response.code == "1111"){

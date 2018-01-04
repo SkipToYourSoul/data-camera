@@ -112,7 +112,8 @@
                                 <div class="com-sm-10 col-sm-offset-2">
                                     <ul class="nav" th:if="${#maps.containsKey(recorders, entry.key)}">
                                         <th:block th:each="recorder,index:${recorders[entry.key]}">
-                                            <li th:if="${recorder.isUserGen eq 0}" th:data="${recorder.id}"><a th:href="|#${recorder.id}|" th:text="${recorder.name}"></a></li>
+                                            <li th:if="${recorder.isUserGen eq 0 and recorder.isRecorder eq 0}" th:data="${recorder.id}">
+                                                <a th:href="|#${recorder.id}|" th:text="|${recorder.name} ${#dates.format(recorder.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.endTime, 'HH:mm:ss')}|"></a></li>
                                         </th:block>
                                     </ul>
                                 </div>

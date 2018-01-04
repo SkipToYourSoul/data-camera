@@ -301,6 +301,10 @@ body{
     border-bottom: 1px solid transparent;
 }
 
+.app-analysis-info-dom{
+    padding: 5px 20px;
+}
+
 /** 场景实验页面样式 app-experiment.html **/
 .app-exp-action-bar{
     margin-bottom: 10px;

@@ -232,7 +232,7 @@ public class CrudService {
                 if (recorderInfo == null) {
                     throw new Exception("end record, but no record info in table");
                 }
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1);
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
                 expRepository.recorderExp(expId, 0);
             }
             response = 0;
@@ -245,6 +245,9 @@ public class CrudService {
      *  录制操作，开始录制时，新建片段信息；结束操作时，为当前片段信息加上结束时间
      * @param expId 实验id
      * @param isSave 是否保存实验片段
+     * @param name 数据片段名
+     * @param desc 数据片段描述
+     * @param timestamp 数据片段时间
      * @return {
      *     -10：实验没有绑定传感器
      *     -1：开始录制
@@ -254,7 +257,7 @@ public class CrudService {
      * @throws Exception 若抛出异常，则回滚
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized Long changeSensorsRecorderStatusOfCurrentExperiment(long appId, long expId, int isSave) throws Exception {
+    public synchronized Long changeSensorsRecorderStatusOfCurrentExperiment(long appId, long expId, int isSave, String name, String desc, Long timestamp) throws Exception {
         // --- check the recorder status of current exp
         ExperimentInfo exp = expRepository.findById(expId);
         int status = exp.getIsRecorder();
@@ -300,17 +303,23 @@ public class CrudService {
                 throw new Exception("end record, but no record info in table");
             }
             expRepository.recorderExp(expId, 0);
+            if (name.trim().isEmpty()){
+                name = recorderInfo.getName();
+            }
+            if (desc.trim().isEmpty()){
+                desc = recorderInfo.getDescription();
+            }
 
             if (isSave == 1){
                 // save data
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 0);
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(timestamp), 0, name, desc);
                 // save video if have
                 saveVideo(recorderInfo);
                 logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
                 return recorderInfo.getId();
             } else {
                 // not save data, delete recorder
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1);
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, name, desc);
                 logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
                 return RecordState.END.getValue();
             }
