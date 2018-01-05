@@ -74,7 +74,7 @@ public class DataService {
      *  key: SensorType
      *  value: sensor-id, data
      */
-    public Map getRecorderData(long recorderId){
+    public Map getRecorderData(long recorderId) throws ParseException {
         RecorderInfo recorder = recorderRepository.findOne(recorderId);
         List<RecorderDevices> devices = new Gson().fromJson(recorder.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
         Date startTime = recorder.getStartTime();
@@ -108,14 +108,17 @@ public class DataService {
                 = transferChartData(chartValues);
 
         // -- 将不同数据段的数据对齐
+        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         for (Map.Entry<Long, Map<String, List<ChartTimeSeries>>> entry : chartMap.entrySet()){
             Map<String, List<ChartTimeSeries>> map = entry.getValue();
             for (Map.Entry<String, List<ChartTimeSeries>> subEntry : map.entrySet()){
                 List<ChartTimeSeries> list = subEntry.getValue();
-                if (list.get(0).getName().getTime() > minDataTime){
+                Date sDate = s.parse(String.valueOf(list.get(0).getValue().get(0)));
+                Date eDate = s.parse(String.valueOf(list.get(list.size() - 1).getValue().get(0)));
+                if (sDate.getTime() > minDataTime){
                     list.add(0, new ChartTimeSeries(new Date(minDataTime)));
                 }
-                if (list.get(list.size() - 1).getName().getTime() < maxDataTime) {
+                if (eDate.getTime() < maxDataTime) {
                     list.add(new ChartTimeSeries(new Date(maxDataTime)));
                 }
                 map.put(subEntry.getKey(), list);
@@ -183,7 +186,7 @@ public class DataService {
             if (!result.containsKey(sensorId)){
                 Map<String, List<ChartTimeSeries>> map = new HashMap<String, List<ChartTimeSeries>>();
                 List<ChartTimeSeries> list = new ArrayList<ChartTimeSeries>();
-                list.add(new ChartTimeSeries(time, value));
+                list.add(new ChartTimeSeries(d));
                 map.put(key, list);
                 result.put(sensorId, map);
             } else {
@@ -191,9 +194,9 @@ public class DataService {
                 List<ChartTimeSeries> list = new ArrayList<ChartTimeSeries>();
                 if (map.containsKey(key)){
                     list = map.get(key);
-                    list.add(new ChartTimeSeries(time, value));
+                    list.add(new ChartTimeSeries(d));
                 } else {
-                    list.add(new ChartTimeSeries(time, value));
+                    list.add(new ChartTimeSeries(d));
                 }
                 map.put(key, list);
                 result.put(sensorId, map);

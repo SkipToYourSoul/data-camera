@@ -180,8 +180,8 @@ function initRecorderContentDom(recorderId){
 
         function generateTimeList(minTime, maxTime) {
             var list = [];
-            for(var index = minTime; index <= maxTime; index += 1000){
-                list.push(new Date(index).Format("yyyy-MM-dd HH:mm:ss"));
+            for(var index = Math.floor(minTime/1000); index <= Math.ceil(maxTime/1000); index += 1){
+                list.push(new Date(index*1000).Format("yyyy-MM-dd HH:mm:ss"));
             }
             return list;
         }
@@ -211,6 +211,17 @@ function buildAnalysisChartOption(data, legend) {
             borderWidth: 1,
             borderColor: '#ccc',
             padding: 10,
+            formatter: function (params) {
+                params = params[0];
+                var html = "<b>TIME: </b>" + params.value[0] + "<br/>";
+                if (params.value.length > 1){
+                    html += "<b>VALUE: </b>" + params.value[1] + "<br/>";
+                }
+                if (params.name !== null){
+                    html += "<b>MARK: </b>"+ params.name;
+                }
+                return html;
+            },
             textStyle: {
                 color: '#000'
             }
@@ -259,17 +270,6 @@ function buildAnalysisChartOption(data, legend) {
                         color: 'black'
                     }
                 },
-                /*areaStyle: {
-                    normal: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                            offset: 0,
-                            color: '#8ec6ad'
-                        }, {
-                            offset: 1,
-                            color: '#ffe'
-                        }])
-                    }
-                },*/
                 smooth: true,
                 sampling: true,
                 markArea: {

@@ -32,8 +32,11 @@ public class ValueData {
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
-    @Column(name = "create_time", updatable = false)
+    @Column(name = "create_time", updatable = false, scale = 3)
     private Date createTime;
+
+    @Column(name = "data_mark")
+    private String mark;
 
     public long getId() {
         return id;
@@ -77,6 +80,14 @@ public class ValueData {
 
     public Date getCreateTime() {
         return createTime;
+    }
+
+    public String getMark() {
+        return mark;
+    }
+
+    public void setMark(String mark) {
+        this.mark = mark;
     }
 
     @Override
