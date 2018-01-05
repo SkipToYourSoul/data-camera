@@ -21,7 +21,11 @@ function inAppPage(){
         initTreeDom();
     }
     if (recorder != null){
-        showRecorderContent(findParent(recorder) + '', recorder);
+        for (var index=0; index<recorders[app['id']].length; index++){
+            if (recorders[app['id']][index]['id'] == recorder){
+                showRecorderContent(findParent(recorder) + '', recorder);
+            }
+        }
     }
 
     // -- tab change
@@ -99,5 +103,9 @@ var analysisObject = (function () {
         rDataMap: rDataMap,
         currentRecorderId: currentRecorderId,
         recorderInterval: recorderInterval
-    }
+    };
+})();
+
+var experimentObject = (function (){
+    return {};
 })();

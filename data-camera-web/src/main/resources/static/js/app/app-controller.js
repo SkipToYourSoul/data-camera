@@ -168,7 +168,7 @@ $exp_modal.on('show.bs.modal', function (event) {
     } else if (todo == "edit"){
         $('#exp-confirm-btn').removeClass('btn-success').addClass('btn-warning').text(edit_device_text);
         for (var exp_id in experiments){
-            if ( current_exp_id == '' + exp_id){
+            if ( experiments.hasOwnProperty(exp_id) && current_exp_id == '' + exp_id){
                 $('#exp-name').val(experiments[exp_id]['name']);
                 $('#exp-desc').val(experiments[exp_id]['description']);
                 break;
