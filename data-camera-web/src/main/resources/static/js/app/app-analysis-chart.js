@@ -18,26 +18,8 @@ function initRecorderContentDom(recorderId){
 
     // 获取数据片段描述
     var $appAnalysisDesc = $('#app-analysis-desc');
-    $appAnalysisDesc.editable('destroy');
     $appAnalysisDesc.html(recorder['description']);
-    $appAnalysisDesc.editable({
-        title: '输入描述',
-        rows: 5,
-        placeholder: '在这里输入描述',
-        pk: recorderId,
-        url: crud_address + '/recorder/desc',
-        success: function(response) {
-            if (response.code == "1111"){
-                message_info('操作无效: ' + response.data, "error");
-            } else if (response.code == "0000"){
-                message_info("实验记录描述变更为：" + response.data, 'success');
-                recorder['description'] = response.data;
-            }
-        },
-        error: function (response) {
-            message_info('数据请求被拒绝', 'error');
-        }
-    });
+
     // 异步请求实验片段数据
     $.ajax({
         type: 'get',
@@ -117,12 +99,12 @@ function initRecorderContentDom(recorderId){
                 if (!chartData[sensorId].hasOwnProperty(legend)){
                     continue;
                 }
-                var chartId = "chart-" + recorderId + '-' + legend;
-                var title = "[设备" + legend + "]";
-                $dom.append(generate(legend, title, chartId));
+                var chartId = "chart-" + recorderId + '-' + sensorId + '-' + legend;
+                $dom.append(generate(sensorId +'-'+new Date().getTime(), legend, chartId));
                 if (echarts.getInstanceByDom(document.getElementById(chartId)) == null){
                     var chart = echarts.init(document.getElementById(chartId), "", opts = {
-                        height: 100
+                        height: 100,
+                        width: $('#' + chartId).width()
                     });
                     chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
 
@@ -255,7 +237,8 @@ function buildAnalysisChartOption(data, legend) {
                 splitLine: {
                     show: false
                 },
-                minInterval: 1
+                minInterval: 1,
+                splitNumber: 3
             }
         ],
         series: [

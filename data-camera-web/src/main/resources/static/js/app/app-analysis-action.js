@@ -10,6 +10,7 @@
  */
 var recorderInterval = null;
 function recorderPlay() {
+    var interval = 1000/parseInt($('#recorder-speed').find('.active input').val());
     recorderInterval = setInterval(function () {
         setTimeLine(++analysisObject.timelineStart, analysisObject.timelineEnd);
         if (analysisObject.timelineStart >= analysisObject.timelineEnd){
@@ -18,7 +19,7 @@ function recorderPlay() {
             // 隐藏时间标记
             $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
         }
-    }, 1000);
+    }, interval);
     $('#play-btn').attr('disabled', 'disabled');
     $('#pause-btn').removeAttr('disabled');
 
@@ -46,7 +47,7 @@ function recorderPlay() {
             var n = [];
             for (var j=0; j<d.length; j++){
                 n.push(d[j]);
-                if (d[j]['value'][0] > analysisObject.timeline[start] && d[j]['value'].length == 2){
+                if (d[j]['value'][0] > analysisObject.timeline[start] + '.000' && d[j]['value'].length == 2){
                     n[j]['value'].pop();
                 }
             }
@@ -162,6 +163,32 @@ function generateNewContent() {
                     });
                 }
             }
+        }
+    });
+}
+
+/**
+ * 保存更新数据片段描述
+ */
+function saveDataDesc(){
+    var $appAnalysisDesc = $('#app-analysis-desc');
+
+    $.ajax({
+        type: 'get',
+        url: crud_address + '/recorder/desc',
+        data: {
+            "desc": $appAnalysisDesc.val(),
+            "id": analysisObject.currentRecorderId
+        },
+        success: function (response) {
+            if (response.code == "0000"){
+                message_info("保存成功", "success");
+            } else if (response.code == "1111") {
+                message_info('操作无效: ' + response.data, "error");
+            }
+        },
+        error: function (response) {
+            message_info("数据请求被拒绝", 'error');
         }
     });
 }

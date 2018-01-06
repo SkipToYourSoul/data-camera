@@ -35,18 +35,22 @@ public class ChartTimeSeries {
         this.value = list;
 
         // mark and style
-        if (vd.getMark() != null){
+        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+        Map<String, Object> subMap = new HashMap<String, Object>();
+        if (vd.getMark() != null && !vd.getMark().trim().isEmpty()){
             this.name = vd.getMark();
-            Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-            Map<String, Object> subMap = new HashMap<String, Object>();
-            subMap.put("color", "red");
-            subMap.put("borderColor", "red");
-            subMap.put("borderWidth", 10);
+            subMap.put("color", "black");
+            subMap.put("borderColor", "black");
+            subMap.put("borderWidth", 5);
             subMap.put("borderType", "dotted");
             subMap.put("opacity", 0.7);
             map.put("normal", subMap);
-            this.itemStyle = map;
+        }else {
+            this.name = "无";
+            subMap.put("opacity", 1);
+            map.put("normal", subMap);
         }
+        this.itemStyle = map;
     }
 
     public String getName() {

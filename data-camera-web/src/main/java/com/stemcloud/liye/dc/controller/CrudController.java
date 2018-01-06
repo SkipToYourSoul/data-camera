@@ -341,12 +341,12 @@ public class CrudController {
         return ServerReturnTool.serverSuccess(result);
     }
 
-    @PostMapping("/recorder/desc")
+    @GetMapping("/recorder/desc")
     public Map modifySegmentDesc(@RequestParam Map<String, String> queryParams){
         String result = "";
         try {
-            long recorderId = Long.parseLong(queryParams.get("pk"));
-            String desc = queryParams.get("value");
+            long recorderId = Long.parseLong(queryParams.get("id"));
+            String desc = queryParams.get("desc");
             crudService.updateRecorderDescription(recorderId, desc);
             result = desc;
         } catch (Exception e){
