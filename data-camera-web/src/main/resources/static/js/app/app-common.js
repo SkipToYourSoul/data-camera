@@ -13,12 +13,14 @@ function inAppPage(){
     var recorder = getQueryString("recorder");
     if (tab == null){
         // 进入页面时默认为实验模式
-        initResourceOfExperimentPage();
+        initExperiment();
+        appObject.iFe = false;
     } else if (tab != null && tab == 2){
         $app_main_tab.find('li:eq(1) a').tab('show');
         $('#content-menu').attr("hidden", false);
         $('#app-menu').attr("hidden", true);
-        initTreeDom();
+        initTreeDom(true);
+        appObject.iFa = false;
     }
     if (recorder != null){
         for (var index=0; index<recorders[app['id']].length; index++){
@@ -32,7 +34,7 @@ function inAppPage(){
     $app_main_tab.find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         var page = e.target.getAttribute('href');
         if (page == "#app-experiment"){
-            initResourceOfExperimentPage();
+            initExperiment();
             $('#content-menu').attr("hidden", true);
             $('#app-menu').attr("hidden", false);
         } else if (page == "#app-analysis") {
@@ -43,6 +45,16 @@ function inAppPage(){
         }
     });
 }
+
+var appObject = (function () {
+    var isFirstTimeInExp = true;
+    var isFirstTimeInAnalysis = true;
+
+    return {
+        iFe: isFirstTimeInExp,
+        iFa: isFirstTimeInAnalysis
+    }
+})();
 
 var analysisObject = (function () {
     // -- 当前显示的所有echarts对象, key: domId, value: chartInstance
@@ -106,6 +118,33 @@ var analysisObject = (function () {
     };
 })();
 
-var experimentObject = (function (){
-    return {};
+var expObject = (function (){
+    /**
+     * key: exp_id
+     * value: timestamp
+     * @type {{}}
+     */
+    var newestTimestamp = {};
+
+    /**
+     * key: exp_id
+     * value: 2017-08-17T18:16:31.000+08:00
+     * @type {{}}
+     */
+    var recorderTimestamp = {};
+
+    var setNewTime = function (key, value) {
+        newestTimestamp[key] = value;
+    };
+
+    var setRecorderTime = function (key, value) {
+        recorderTimestamp[key] = value;
+    };
+    
+    return {
+        newestTimestamp: newestTimestamp,
+        setNewTime: setNewTime,
+        recorderTimestamp: recorderTimestamp,
+        setRecorderTime: setRecorderTime
+    };
 })();

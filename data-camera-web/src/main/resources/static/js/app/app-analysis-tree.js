@@ -8,6 +8,14 @@
 
 // -- 入口函数，初始化树形图
 function initTreeDom(){
+    // 判断加载状态
+    if (appObject.iFa == false){
+        console.log("Not the first time in analysis");
+        return;
+    } else {
+        appObject.iFa = false;
+    }
+    
     if (!recorders.hasOwnProperty(app['id'])){
         console.log("Empty data recorders in this app.");
         return;

@@ -63,7 +63,7 @@ public class DataService {
         Date time = new Date(timestamp);
         List<ValueData> data = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(time, boundSensorIds);
 
-        logger.info("Request data size={}, time={}", data.size(), time.toString());
+        // logger.info("Request data size={}, time={}", data.size(), time.toString());
         return transferChartData(data);
     }
 
@@ -179,9 +179,7 @@ public class DataService {
 
         for (ValueData d : vd){
             long sensorId = d.getSensorId();
-            String key = sensorId + "-" + d.getKey();
-            Double value = d.getValue();
-            Date time = d.getCreateTime();
+            String key = d.getKey();
 
             if (!result.containsKey(sensorId)){
                 Map<String, List<ChartTimeSeries>> map = new HashMap<String, List<ChartTimeSeries>>();

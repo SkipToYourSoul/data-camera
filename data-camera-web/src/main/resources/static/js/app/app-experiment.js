@@ -6,12 +6,6 @@
 
 /**
  * key: exp_id
- * value: exp_interval
- * @type {{}}
- */
-var exp_monitor_interval = {};
-/**
- * key: exp_id
  * value: timestamp
  * @type {{}}
  */

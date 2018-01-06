@@ -207,6 +207,13 @@ public class CrudService {
     /************/
     /* MONIT AND RECORD   */
     /************/
+
+    /**
+     * 监控操作，开始监控时，进入监控状态；结束监控时，若有未保存的录制信息，则作相应删除
+     * @param expId
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
     public synchronized Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId) throws Exception {
         // --- check the monitor status of current exp

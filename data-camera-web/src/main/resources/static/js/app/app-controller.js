@@ -101,16 +101,31 @@ function deleteApp(){
 // ----------------------------
 // --- new, edit, delete exp
 // ----------------------------
-function initExpSelect(free_sensors){
+function initExpSelect(){
     var valueHtml = '<optgroup label="数值型传感器" data-max-options="2">';
     var videoHtml = '<optgroup label="摄像头" data-max-options="2">';
-    for (var i in free_sensors){
-        var sensor = free_sensors[i];
+    for (var i in freeSensors){
+        var sensor = freeSensors[i];
         var text = sensor['name'] + '(' + sensor['code'] + ')';
         if (sensor['sensorConfig']['type'] == 1){
             valueHtml += '<option value="' + sensor.id + '">' + text + '</option>';
         } else if (sensor['sensorConfig']['type'] == 2){
             videoHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+        }
+    }
+    for (var boundApp in boundSensors){
+        if (boundSensors.hasOwnProperty(boundApp)) {
+            for (var index in boundSensors[boundApp]){
+                if (boundSensors[boundApp].hasOwnProperty(index)){
+                    var sensor = boundSensors[boundApp][index];
+                    var text = boundSensors[boundApp][index].name + "(绑定于：" + apps[boundApp]['name'] + ")";
+                    if (sensor['sensorConfig']['type'] == 1){
+                        valueHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
+                    } else if (sensor['sensorConfig']['type'] == 2){
+                        videoHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
+                    }
+                }
+            }
         }
     }
     valueHtml += '</optgroup>';
@@ -164,7 +179,7 @@ $exp_modal.on('show.bs.modal', function (event) {
         $('#exp-confirm-btn').text(new_device_text);
         $('#exp-name').val("");
         $('#exp-desc').val("");
-        initExpSelect(freeSensors);
+        initExpSelect();
     } else if (todo == "edit"){
         $('#exp-confirm-btn').removeClass('btn-success').addClass('btn-warning').text(edit_device_text);
         for (var exp_id in experiments){
@@ -174,7 +189,7 @@ $exp_modal.on('show.bs.modal', function (event) {
                 break;
             }
         }
-        initExpSelect(freeSensors);
+        initExpSelect();
     }
 });
 

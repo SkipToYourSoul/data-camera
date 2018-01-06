@@ -71,14 +71,20 @@ public class DataController {
      * @param request
      * @return
      */
-    @GetMapping("/monitor")
+    @GetMapping("/monitoring")
     Map monitor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        Long beginTime = System.currentTimeMillis();
-        Map result = dataService.getRecentDataOfBoundSensors(Long.parseLong(queryParams.get("exp-id")), Long.parseLong(queryParams.get("timestamp")));
-        Long endTime = System.currentTimeMillis();
+        Map<String, Object> map;
+        try {
+            Long beginTime = System.currentTimeMillis();
+            map = ServerReturnTool.serverSuccess(dataService.getRecentDataOfBoundSensors(Long.parseLong(queryParams.get("exp-id")), Long.parseLong(queryParams.get("timestamp"))));
+            Long endTime = System.currentTimeMillis();
+            logger.info("[/data/monitoring] request data in {} ms.", (endTime - beginTime));
+        } catch (Exception e){
+            map = ServerReturnTool.serverFailure(e.getMessage());
+            logger.error("[/data/monitoring]", e);
+        }
 
-        logger.info("request monitor data in {} ms.", (endTime - beginTime));
-        return result;
+        return map;
     }
 
     /**

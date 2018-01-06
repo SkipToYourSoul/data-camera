@@ -47,7 +47,7 @@ function initRecorderContentDom(recorderId){
         },
         success: function (response) {
             if (response.code == "0000") {
-                message_info("请求数据成功", 'success');
+                console.log("请求数据成功", 'success');
                 var chartData = response.data['CHART'];
                 var videoData = response.data['VIDEO'];
                 initDom(chartData, videoData, response.data['MIN'], response.data['MAX']);
@@ -230,7 +230,7 @@ function buildAnalysisChartOption(data, legend) {
             top: 5,
             bottom: 5,
             left: 40,
-            right: 10
+            right: 20
         }],
         calculable: true,
         xAxis: [
@@ -267,11 +267,22 @@ function buildAnalysisChartOption(data, legend) {
                 hoverAnimation: false,
                 itemStyle: {
                     normal: {
-                        color: 'black'
+                        color: 'rgb(255, 70, 131)'
                     }
                 },
                 smooth: true,
                 sampling: true,
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: 'rgb(255, 158, 68)'
+                        }, {
+                            offset: 1,
+                            color: 'rgb(255, 70, 131)'
+                        }])
+                    }
+                },
                 markArea: {
                     silent: true,
                     itemStyle: {

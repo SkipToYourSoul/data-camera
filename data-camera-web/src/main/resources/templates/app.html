@@ -66,8 +66,8 @@
                     <!-- 操作按钮 -->
                     <div class="sidebar-buttons">
                         <button th:if="!${param.id}" type="button" class="btn btn-success btn-large" data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
-                        <button th:if="${param.id}" type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑场景</button>
-                        <button th:if="${param.id}" type="button" class="btn btn-danger btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除场景</button>
+                        <button th:if="${param.id}" type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑场景</button>
+                        <button th:if="${param.id}" type="button" class="btn btn-primary btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除场景</button>
                     </div>
 
                     <!-- 场景列表 -->
@@ -95,8 +95,8 @@
                         <th:block th:each="entry,index:${apps}">
                             <div class="row" style="padding: 5px 0 0 0">
                                 <div class="col-sm-2" style="padding-top: 5px">
-                                    <a role="button" data-toggle="collapse" th:href="|#recorder-${index.count}|" aria-expanded="true">
-                                        <i th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-arrow-down':'fa fa-arrow-right'"></i>
+                                    <a role="button" data-toggle="collapse" th:href="|#recorder-${index.count}|" aria-expanded="true" style="color: #000000;">
+                                        <i th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-caret-square-o-down':'fa fa-caret-square-o-right'"></i>
                                     </a>
                                 </div>
                                 <div class="col-sm-10" style="padding: 0 10px 0 0">
@@ -213,7 +213,8 @@
     <script th:src="@{js/app/app-common.js}"></script>
     <script th:src="@{js/app/app-controller.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-charts.js}"></script>
-    <script th:if="${param.id}" th:src="@{js/app/app-experiment.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/app/app-experiment-chart.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/app/app-experiment-action.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-action.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-chart.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-tree.js}"></script>
