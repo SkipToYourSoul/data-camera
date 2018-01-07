@@ -174,8 +174,6 @@ function doInterval(exp_id){
  */
 function expMonitor(button){
     var exp_id = button.getAttribute('data');
-    var exp_state_dom = $('#experiment-es-' + exp_id);
-    var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
 
     if (!boundSensors.hasOwnProperty(exp_id)){
         message_info('实验未绑定任何设备，不能进行监控', 'error');
@@ -197,14 +195,44 @@ function expMonitor(button){
             var action = response.data;
             if (action == "1"){
                 // start monitor
-                isExperimentMonitor[exp_id] = 1;
-                exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-                exp_monitor_btn.removeClass('btn-default').addClass('btn-success');
-
-                doInterval(exp_id);
+                pageStartMonitor(exp_id);
             } else if (action == "0"){
                 // stop monitor
                 pageStopMonitor(exp_id);
+            }
+        },
+        error: function (response) {
+            message_info("数据请求失败", 'error');
+        }
+    });
+}
+
+/**
+ * 全局监控
+ *  若有不在监控状态下的实验，则调整为监控
+ *  若所有实验都在监控状态，则停止监控
+ */
+function allMonitor() {
+    $.ajax({
+        type: 'get',
+        url: crud_address + "/allMonitor",
+        data: {
+            "app-id": app['id']
+        },
+        success: function (response) {
+            if (response.code == "1111"){
+                message_info('服务器异常: ' + response.data, "error");
+                return;
+            }
+            var status = response.data;
+            if (status['action'] == "close"){
+                for (var expId in experiments){
+                    pageStopMonitor(expId);
+                }
+            } else if (status['action'] == "open"){
+                for (var exp in status['ids']){
+                    pageStartMonitor(status['ids'][exp])
+                }
             }
         },
         error: function (response) {
@@ -329,6 +357,30 @@ function expRecorder(button) {
             }
         });
     }
+}
+
+/**
+ * 全局录制
+ *  若有在监控状态下但不在录制状态下的实验，则调整为录制
+ *  若所有实验都在录制状态，则停止录制
+ */
+function allRecord(){
+
+}
+
+/**
+ * 开始监控时页面的更改
+ * @param exp_id
+ */
+function pageStartMonitor(exp_id){
+    var exp_state_dom = $('#experiment-es-' + exp_id);
+    var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
+
+    isExperimentMonitor[exp_id] = 1;
+    exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
+    exp_monitor_btn.removeClass('btn-default').addClass('btn-success');
+
+    doInterval(exp_id);
 }
 
 /**

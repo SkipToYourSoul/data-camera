@@ -80,6 +80,7 @@ function recorderReset() {
         }, {
             xAxis: analysisObject.timeline[analysisObject.timeline.length - 1]
         }]];
+        series[0]['markLine']['data'] = [];
         analysisObject.chart[i].setOption({
             series: series
         });
@@ -183,6 +184,11 @@ function saveDataDesc(){
         success: function (response) {
             if (response.code == "0000"){
                 message_info("保存成功", "success");
+                for (var index=0; index<recorders[app['id']].length; index++){
+                    if (recorders[app['id']][index]['id'] == analysisObject.currentRecorderId){
+                        recorders[app['id']][index]['description'] = $appAnalysisDesc.val();
+                    }
+                }
             } else if (response.code == "1111") {
                 message_info('操作无效: ' + response.data, "error");
             }

@@ -58,25 +58,20 @@ function initExperiment(){
                 value = sensor.id;
             } else {
                 // not bound, add freeSensors to source
-                for (var free in freeSensors){
-                    if (freeSensors.hasOwnProperty(free) && track['type'] == freeSensors[free]['sensorConfig']['type']) {
+                for (var sensorIndex in sensors){
+                    var sensor = sensors[sensorIndex];
+                    var id = sensor['id'];
+                    if (freeSensors.hasOwnProperty(id) && track['type'] == freeSensors[id]['sensorConfig']['type']){
                         source.push({
-                            value: freeSensors[free].id,
-                            text: freeSensors[free].name
+                            value: freeSensors[id].id,
+                            text: freeSensors[id].name
                         });
-                    }
-                }
-                for (var boundApp in boundSensors){
-                    if (boundSensors.hasOwnProperty(boundApp)) {
-                        for (var index in boundSensors[boundApp]){
-                            if (boundSensors[boundApp].hasOwnProperty(index) && track['type'] == boundSensors[boundApp][index]['sensorConfig']['type']){
-                                source.push({
-                                    value: boundSensors[boundApp][index].id,
-                                    text: boundSensors[boundApp][index].name + "(绑定于：" + apps[boundApp]['name'] + ")",
-                                    disabled: true
-                                });
-                            }
-                        }
+                    } else if (sensor['sensorConfig']['type'] == track['type']){
+                        source.push({
+                            value: id,
+                            text: sensor['name'] + "(绑定于：" + apps[sensor['appId']]['name'] + ")",
+                            disabled: true
+                        });
                     }
                 }
             }

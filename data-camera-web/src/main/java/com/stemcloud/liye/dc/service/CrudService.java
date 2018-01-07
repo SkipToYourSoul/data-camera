@@ -248,6 +248,35 @@ public class CrudService {
         return response;
     }
 
+    public synchronized Map allMonitor(long appId){
+        Map<String, Object> map = new HashMap<String, Object>(2);
+
+        List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
+        List<Long> notInMonitorIds = new ArrayList<Long>();
+        for (ExperimentInfo exp: experiments){
+            if (exp.getIsMonitor() == 0){
+                notInMonitorIds.add(exp.getId());
+            }
+        }
+
+        if (notInMonitorIds.isEmpty()){
+            // 全部处于监控状态，关闭
+            map.put("action", "close");
+            for (ExperimentInfo exp: experiments) {
+                expRepository.monitorExp(exp.getId(), 0);
+            }
+        } else {
+            // 部分还没进入监控状态
+            map.put("action", "open");
+            for (Long expId : notInMonitorIds){
+                expRepository.monitorExp(expId, 1);
+            }
+            map.put("ids", notInMonitorIds);
+        }
+
+        return map;
+    }
+
     /**
      *  录制操作，开始录制时，新建片段信息；结束操作时，为当前片段信息加上结束时间
      * @param expId 实验id

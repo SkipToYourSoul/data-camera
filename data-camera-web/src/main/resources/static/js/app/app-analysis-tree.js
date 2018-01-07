@@ -133,7 +133,7 @@ function showRecorderContent(target, node){
             console.log("Show tree-dom:" + $dom.attr('data'));
             $dom.attr("hidden", false);
         } else {
-            console.log("Hide tree-dom:" + $dom.attr('data'));
+            // console.log("Hide tree-dom:" + $dom.attr('data'));
             $dom.attr("hidden", true);
         }
     }
@@ -149,7 +149,7 @@ function showRecorderContent(target, node){
             console.log("Active li:" + $menu.attr('data'));
             $menu.addClass('active');
         } else {
-            console.log("InActive li:" + $menu.attr('data'));
+            // console.log("InActive li:" + $menu.attr('data'));
             $menu.removeClass('active');
         }
     }

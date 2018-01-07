@@ -91,6 +91,9 @@ var analysisObject = (function () {
     var timeline = [];
     var timelineStart, timelineEnd;
 
+    // -- 当前片段的时间秒数数据
+    var secondLine = [];
+
     // -- node 数据
     var rDataMap = {};
 
@@ -112,6 +115,7 @@ var analysisObject = (function () {
         timeline: timeline,
         timelineStart: timelineStart,
         timelineEnd: timelineEnd,
+        secondLine: secondLine,
         rDataMap: rDataMap,
         currentRecorderId: currentRecorderId,
         recorderInterval: recorderInterval

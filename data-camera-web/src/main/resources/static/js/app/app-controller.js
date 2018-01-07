@@ -104,27 +104,24 @@ function deleteApp(){
 function initExpSelect(){
     var valueHtml = '<optgroup label="数值型传感器" data-max-options="2">';
     var videoHtml = '<optgroup label="摄像头" data-max-options="2">';
-    for (var i in freeSensors){
-        var sensor = freeSensors[i];
-        var text = sensor['name'] + '(' + sensor['code'] + ')';
-        if (sensor['sensorConfig']['type'] == 1){
-            valueHtml += '<option value="' + sensor.id + '">' + text + '</option>';
-        } else if (sensor['sensorConfig']['type'] == 2){
-            videoHtml += '<option value="' + sensor.id + '">' + text + '</option>';
-        }
-    }
-    for (var boundApp in boundSensors){
-        if (boundSensors.hasOwnProperty(boundApp)) {
-            for (var index in boundSensors[boundApp]){
-                if (boundSensors[boundApp].hasOwnProperty(index)){
-                    var sensor = boundSensors[boundApp][index];
-                    var text = boundSensors[boundApp][index].name + "(绑定于：" + apps[boundApp]['name'] + ")";
-                    if (sensor['sensorConfig']['type'] == 1){
-                        valueHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
-                    } else if (sensor['sensorConfig']['type'] == 2){
-                        videoHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
-                    }
-                }
+    for (var sensorIndex in sensors){
+        var sensor = sensors[sensorIndex];
+        var id = sensor['id'];
+        var type = sensor['sensorConfig']['type'];
+        var text = sensor['name'];
+        if (type == 1){
+            if (freeSensors.hasOwnProperty(id)){
+                valueHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+            } else {
+                text += "(绑定于：" + apps[sensor['appId']]['name'] + ")";
+                valueHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
+            }
+        } else if (type == 2){
+            if (freeSensors.hasOwnProperty(id)){
+                videoHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+            } else {
+                text += "(绑定于：" + apps[sensor['appId']]['name'] + ")";
+                videoHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
             }
         }
     }

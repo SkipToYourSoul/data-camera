@@ -145,9 +145,10 @@ public class ViewController {
             model.addAttribute("tracks", tracks);
 
             // --- SENSOR: get user's sensor of this app and available sensors
-            List<SensorInfo> availableSensor = baseInfoService.getAvailableSensorOfCurrentUser(user);
+            Map<Long, SensorInfo> availableSensor = baseInfoService.getAvailableSensorOfCurrentUser(user);
             model.addAttribute("freeSensors", availableSensor);
             model.addAttribute("boundSensors", boundSensors);
+            model.addAttribute("sensors", baseInfoService.getOnlineSensor(user));
 
             // --- RECORDER:
             Map<Long, List<RecorderInfo>> recorders = new HashMap<Long, List<RecorderInfo>>(16);

@@ -288,6 +288,19 @@ public class CrudController {
         return map;
     }
 
+    @GetMapping("/allMonitor")
+    public Map allMonitorSensor(@RequestParam Map<String, String> queryParams){
+        Map<String, Object> map;
+        try {
+            Long appId = Long.valueOf(queryParams.get("app-id"));
+            map = ServerReturnTool.serverSuccess(crudService.allMonitor(appId));
+        } catch (Exception e){
+            map = ServerReturnTool.serverFailure(e.getMessage());
+            logger.error("/crud/content", e);
+        }
+        return map;
+    }
+
     @GetMapping("/isRecord")
     public Map isRecord(@RequestParam Map<String, String> queryParams){
         Long expId = Long.valueOf(queryParams.get("exp-id"));
@@ -341,6 +354,11 @@ public class CrudController {
         return ServerReturnTool.serverSuccess(result);
     }
 
+    /**
+     * 修改实验片段描述
+     * @param queryParams
+     * @return
+     */
     @GetMapping("/recorder/desc")
     public Map modifySegmentDesc(@RequestParam Map<String, String> queryParams){
         String result = "";

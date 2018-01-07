@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.management.Sensor;
 
 import java.util.*;
 
@@ -112,8 +113,13 @@ public class BaseInfoService {
      * @param user 用户
      * @return
      */
-    public List<SensorInfo> getAvailableSensorOfCurrentUser(String user){
-        return sensorRepository.findByCreatorAndAppIdAndExpIdAndTrackId(user, 0, 0, 0);
+    public Map<Long, SensorInfo> getAvailableSensorOfCurrentUser(String user){
+        List<SensorInfo> list = sensorRepository.findByCreatorAndAppIdAndExpIdAndTrackId(user, 0, 0, 0);
+        Map<Long, SensorInfo> map = new HashMap<Long, SensorInfo>();
+        for (SensorInfo sensor: list){
+            map.put(sensor.getId(), sensor);
+        }
+        return map;
     }
 
     // --- TRACK

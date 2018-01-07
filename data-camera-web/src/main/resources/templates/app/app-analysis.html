@@ -40,11 +40,14 @@
                                 <input type="radio" name="options" id="option3" autocomplete="off" value="4"/> X4
                             </label>
                         </div>
-                        <div class="btn-group">
+                        <span class="record-time">
+                            <span id="recorder-current-time">00:00</span>/<span id="recorder-total-time">-</span>
+                        </span>
+                        <div class="btn-group pull-right">
                             <button class="btn btn-default" onclick="generateNewContent()"><i class="fa fa-save"></i></button>
                             <button class="btn btn-default" onclick="deleteContent()"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-default"><i class="fa fa-share"></i></button>
                         </div>
-                        <button class="btn btn-default pull-right"><i class="fa fa-share"></i></button>
                     </div>
                     <!-- 时间轴栏 -->
                     <div class="timeline-dom" id="timeline-slider">
