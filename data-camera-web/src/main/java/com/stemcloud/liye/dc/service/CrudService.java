@@ -248,13 +248,26 @@ public class CrudService {
         return response;
     }
 
+    /**
+     * 全局监控操作
+     * @param appId 当前appId
+     * @return
+     */
     public synchronized Map allMonitor(long appId){
         Map<String, Object> map = new HashMap<String, Object>(2);
 
         List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         List<Long> notInMonitorIds = new ArrayList<Long>();
+        // 选出当前绑定了设备，但是又没有处于监控状态的实验
         for (ExperimentInfo exp: experiments){
-            if (exp.getIsMonitor() == 0){
+            Boolean hasSensor = false;
+            for (TrackInfo track : exp.getTrackInfoList()){
+                if (track.getSensor() != null){
+                    hasSensor = true;
+                    break;
+                }
+            }
+            if (hasSensor && exp.getIsMonitor() == 0){
                 notInMonitorIds.add(exp.getId());
             }
         }

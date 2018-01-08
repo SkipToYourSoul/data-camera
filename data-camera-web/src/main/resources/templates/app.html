@@ -66,8 +66,10 @@
                     <!-- 操作按钮 -->
                     <div class="sidebar-buttons">
                         <button th:if="!${param.id}" type="button" class="btn btn-success btn-large" data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
-                        <button th:if="${param.id}" type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑场景</button>
-                        <button th:if="${param.id}" type="button" class="btn btn-primary btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除场景</button>
+                        <div class="btn-group">
+                            <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑场景</button>
+                            <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除场景</button>
+                        </div>
                     </div>
 
                     <!-- 场景列表 -->

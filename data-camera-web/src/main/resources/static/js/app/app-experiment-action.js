@@ -229,10 +229,12 @@ function allMonitor() {
                 for (var expId in experiments){
                     pageStopMonitor(expId);
                 }
+                $('#all-monitor-btn').removeClass('btn-success').addClass('btn-default');
             } else if (status['action'] == "open"){
                 for (var exp in status['ids']){
-                    pageStartMonitor(status['ids'][exp])
+                    pageStartMonitor(status['ids'][exp]);
                 }
+                $('#all-monitor-btn').removeClass('btn-default').addClass('btn-success');
             }
         },
         error: function (response) {
@@ -365,7 +367,7 @@ function expRecorder(button) {
  *  若所有实验都在录制状态，则停止录制
  */
 function allRecord(){
-
+    message_info("developing", "info");
 }
 
 /**
