@@ -253,7 +253,8 @@ public class CrudService {
      * @param appId 当前appId
      * @return
      */
-    public synchronized Map allMonitor(long appId){
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized Map allMonitor(long appId) throws Exception {
         Map<String, Object> map = new HashMap<String, Object>(2);
 
         List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
@@ -277,6 +278,14 @@ public class CrudService {
             map.put("action", "close");
             for (ExperimentInfo exp: experiments) {
                 expRepository.monitorExp(exp.getId(), 0);
+                if (exp.getIsRecorder() == 1) {
+                    // --- end recorder
+                    RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(exp.getId(), 1, 0);
+                    if (recorderInfo != null) {
+                        recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
+                        expRepository.recorderExp(exp.getId(), 0);
+                    }
+                }
             }
         } else {
             // 部分还没进入监控状态
