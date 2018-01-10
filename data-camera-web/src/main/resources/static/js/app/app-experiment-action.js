@@ -7,7 +7,7 @@
 
 function initActionStatus(){
     // -- 更改实验状态（如果在监控或录制状态）
-    isExperimentMonitor.keys().forEach(function (id) {
+    Object.keys(isExperimentMonitor).forEach(function (id) {
         var exp_monitor_btn = $('#experiment-monitor-' + id);
         var exp_monitor_dom = $('#experiment-es-' + id);
         var exp_recorder_btn = $('#experiment-recorder-' + id);

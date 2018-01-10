@@ -42,12 +42,12 @@ function initTreeDom(){
     // Construct node data
     var rData = {};
     var appRecorders = recorders[app['id']];
-    for (var index = 0; index < appRecorders.length; index ++){
-        var recorder = appRecorders[index];
+    // 构造节点关系
+    appRecorders.forEach(function (recorder, index) {
         analysisObject.rDataMap[recorder['id']] = recorder['parentId'];
-    }
-    for (var index = 0; index < appRecorders.length; index ++){
-        var recorder = appRecorders[index];
+    });
+    // 数据构造
+    appRecorders.forEach(function (recorder, index) {
         var rid = recorder['id'];
         var name = recorder['name'];
         var parentId = recorder['parentId'];
@@ -63,11 +63,10 @@ function initTreeDom(){
             }
             rData[ancestor].push({'key': rid, 'parent': parentId, 'name': name});
         }
-    }
+    });
 
     // 画图
-    for (var index = 0; index < appRecorders.length; index ++){
-        var recorder = appRecorders[index];
+    appRecorders.forEach(function (recorder, index) {
         var id = recorder['id'];
         if (recorder['isUserGen'] == 0 && recorder['isRecorder'] == 0){
             var myDiagram =
@@ -75,9 +74,12 @@ function initTreeDom(){
                     {
                         initialAutoScale: go.Diagram.UniformToFill,
                         initialContentAlignment: go.Spot.LeftCenter,
-                        isReadOnly: true,  // do not allow users to modify or select in this view
+                        isReadOnly: false,  // do not allow users to modify or select in this view
                         allowSelect: true,
                         allowMove: false,
+                        allowVerticalScroll: rData[id].length >= 5,
+                        allowHorizontalScroll: rData[id].length >= 5,
+                        allowZoom: true,
                         // define the layout for the diagram
                         layout: $go(go.TreeLayout, { nodeSpacing: 5, layerSpacing: 30 })
                     });
@@ -89,7 +91,7 @@ function initTreeDom(){
                 nodeDataArray: rData[id]
             });
         }
-    }
+    });
 }
 
 function findParent(id) {

@@ -11,17 +11,19 @@
 var recorderInterval = null;
 function recorderPlay() {
     var interval = 1000/parseInt($('#recorder-speed').find('.active input').val());
-    recorderInterval = setInterval(function () {
-        setTimeLine(++analysisObject.timelineStart, analysisObject.timelineEnd);
-        if (analysisObject.timelineStart >= analysisObject.timelineEnd){
-            recorderPause();
-            recorderInterval = null;
-            // 隐藏时间标记
-            $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
-        }
-    }, interval);
+    recorderInterval = setInterval(recorderAction, interval);
     $('#play-btn').attr('disabled', 'disabled');
     $('#pause-btn').removeAttr('disabled');
+}
+
+function recorderAction(){
+    setTimeLine(++analysisObject.timelineStart, analysisObject.timelineEnd);
+    if (analysisObject.timelineStart >= analysisObject.timelineEnd){
+        recorderPause();
+        recorderInterval = null;
+        // 隐藏时间标记
+        $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
+    }
 
     function setTimeLine(start, end){
         $(".slider")
@@ -86,6 +88,12 @@ function recorderReset() {
         });
     }
 }
+
+$('#recorder-speed').find('input:radio').change(function(radio){
+    var speed = radio.target.getAttribute('value');
+    var interval = 1000/parseInt(speed);
+});
+
 
 /**
  * 删除实验片段内容

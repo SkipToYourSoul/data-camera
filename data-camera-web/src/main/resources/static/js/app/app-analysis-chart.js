@@ -57,6 +57,19 @@ function initRecorderContentDom(recorderId){
         analysisObject.timeline = generateTimeList(minTime, maxTime);
         analysisObject.timelineStart = 0; analysisObject.timelineEnd = analysisObject.timeline.length - 1;
         analysisObject.secondLine = generateSecondList(minTime, maxTime);
+        var step = 5;
+        var timeLength = analysisObject.secondLine.length;
+        if ( timeLength > 60 && timeLength <= 120){
+            step = 10;
+        } else if ( timeLength > 120 && timeLength <= 300 ){
+            step = 30;
+        } else if ( timeLength > 300 && timeLength <= 600 ){
+            step = 60;
+        } else if ( timeLength > 300 && timeLength <= 1800 ){
+            step = 150;
+        } else if ( timeLength > 1800 ) {
+            step = 600;
+        }
         $('#recorder-total-time').html(analysisObject.secondLine[analysisObject.secondLine.length - 1]);
         $(".slider").slider({
             range: true,
@@ -65,7 +78,7 @@ function initRecorderContentDom(recorderId){
             values: [0, analysisObject.timeline.length - 1]
         }).slider("pips", {
             rest: 'label',
-            step: 5,
+            step: step,
             labels: analysisObject.secondLine
         }).slider("float", {
             labels: analysisObject.secondLine
@@ -105,28 +118,28 @@ function initRecorderContentDom(recorderId){
         // chart
         var $dom = $('#app-analysis-chart');
         $dom.empty();
-        for (var sensorId in chartData){
-            if (!chartData.hasOwnProperty(sensorId)){
-                continue;
-            }
-            for (var legend in chartData[sensorId]){
-                if (!chartData[sensorId].hasOwnProperty(legend)){
-                    continue;
-                }
+        Object.keys(chartData).forEach(function (sensorId) {
+            var data = chartData[sensorId];
+            var chartWidth = 0;
+            Object.keys(data).forEach(function (legend) {
                 var chartId = "chart-" + recorderId + '-' + sensorId + '-' + legend;
                 $dom.append(generate(sensorId +'-'+new Date().getTime(), legend, chartId));
+                chartWidth = $('#' + chartId).width();
+            });
+            Object.keys(data).forEach(function (legend) {
+                var chartId = "chart-" + recorderId + '-' + sensorId + '-' + legend;
                 if (echarts.getInstanceByDom(document.getElementById(chartId)) == null){
                     var chart = echarts.init(document.getElementById(chartId), "", opts = {
                         height: 100,
-                        width: $('#' + chartId).width()
+                        width: chartWidth
                     });
                     chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
 
                     analysisObject.setChart(chartId, chart);
                     analysisObject.setChartData(chartId, chartData[sensorId][legend]);
                 }
-            }
-        }
+            });
+        });
         
         // video
         var $dom2 = $('#app-analysis-video');
@@ -163,6 +176,13 @@ function initRecorderContentDom(recorderId){
             }
         }
 
+        /**
+         * 生成图表panel
+         * @param panelId
+         * @param title
+         * @param contentId
+         * @returns {string}
+         */
         function generate(panelId, title, contentId) {
             return '<div class="panel panel-default my-panel">' +
                 '<div class="my-panel-heading">' +
@@ -174,6 +194,12 @@ function initRecorderContentDom(recorderId){
                 '</div></div>';
         }
 
+        /**
+         * 绝对时间数组（时间）
+         * @param minTime
+         * @param maxTime
+         * @returns {Array}
+         */
         function generateTimeList(minTime, maxTime) {
             var list = [];
             for(var index = Math.floor(minTime/1000); index <= Math.ceil(maxTime/1000); index += 1){
@@ -182,6 +208,12 @@ function initRecorderContentDom(recorderId){
             return list;
         }
 
+        /**
+         * 相对时间数组（秒数）
+         * @param minTime
+         * @param maxTime
+         * @returns {Array}
+         */
         function generateSecondList(minTime, maxTime){
             var list = [];
             var second = 0;
@@ -311,7 +343,7 @@ function buildAnalysisChartOption(data, legend) {
                     silent: true,
                     itemStyle: {
                         normal: {
-                            color: 'rgb(245, 245, 245)'
+                            color: '#DCDCDC'
                         }
                     },
                     data: [[{

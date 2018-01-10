@@ -86,8 +86,6 @@ public class DataService {
 
         // -- value data for chart
         List<ValueData> chartValues = new ArrayList<ValueData>();
-        long minDataTime = System.currentTimeMillis();
-        long maxDataTime = 0L;
         for (RecorderDevices device: devices){
             long sensorId = device.getSensor();
             List<ValueData> dataList = valueDataRepository.findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
@@ -97,17 +95,13 @@ public class DataService {
                 continue;
             }
             chartValues.addAll(dataList);
-            if (dataList.get(0).getCreateTime().getTime() < minDataTime){
-                minDataTime = dataList.get(0).getCreateTime().getTime();
-            }
-            if (dataList.get(dataList.size() - 1).getCreateTime().getTime() > maxDataTime){
-                maxDataTime = dataList.get(dataList.size() - 1).getCreateTime().getTime();
-            }
         }
         Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
                 = transferChartData(chartValues);
 
         // -- 将不同数据段的数据对齐
+        long maxDataTime = endTime.getTime();
+        long minDataTime = startTime.getTime();
         SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         for (Map.Entry<Long, Map<String, List<ChartTimeSeries>>> entry : chartMap.entrySet()){
             Map<String, List<ChartTimeSeries>> map = entry.getValue();

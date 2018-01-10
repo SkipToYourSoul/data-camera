@@ -15,29 +15,25 @@ function initExperiment(){
     }
 
     // -- 初始化实验轨迹、传感器绑定信息
-    for (var exp_id in experiments){
-        if (!experiments.hasOwnProperty(exp_id)){
-            continue;
-        }
+    Object.keys(experiments).forEach(function (exp_id) {
         var experiment = experiments[exp_id];
         // - 设置该实验的最新数据时间
         expObject.setNewTime(exp_id, new Date().getTime());
 
         // -- 遍历轨迹
-        for (var i = 0; i < experiment['trackInfoList'].length; i++){
-            var track = experiment['trackInfoList'][i];
+        experiment['trackInfoList'].forEach(function (track, index) {
             var track_id = track['id'];
             var track_type = track['type'];
 
             // init track chart
-            var legend = (null == track['sensor']) ? [] : track['sensor']['sensorConfig']['dimension'].split(';');
+            var legends = (null == track['sensor']) ? [] : track['sensor']['sensorConfig']['dimension'].split(';');
             if (track_type == 1) {
                 // --- value sensor
-                for (var j=0; j < legend.length; j++){
-                    var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend[j];
+                legends.forEach(function (legend) {
+                    var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
                     var chart = echarts.init(document.getElementById(chart_dom), "", opts = {height: 150});
-                    chart.setOption(experimentChartOption(legend[j]));
-                }
+                    chart.setOption(experimentChartOption(legend));
+                });
             } else if (track_type == 2){
 
             } else if (track_type == 0){
@@ -58,8 +54,7 @@ function initExperiment(){
                 value = sensor.id;
             } else {
                 // not bound, add freeSensors to source
-                for (var sensorIndex in sensors){
-                    var sensor = sensors[sensorIndex];
+                sensors.forEach(function (sensor, index) {
                     var id = sensor['id'];
                     if (freeSensors.hasOwnProperty(id) && track['type'] == freeSensors[id]['sensorConfig']['type']){
                         source.push({
@@ -73,7 +68,7 @@ function initExperiment(){
                             disabled: true
                         });
                     }
-                }
+                });
             }
             $track_bound_dom.editable({
                 prepend: '不绑定设备',
@@ -96,8 +91,8 @@ function initExperiment(){
                     message_info('绑定操作失败: ' + error, 'error');
                 }
             });
-        }
-    }
+        });
+    });
 
     // -- 初始化实验监控和录制状态
     initActionStatus();

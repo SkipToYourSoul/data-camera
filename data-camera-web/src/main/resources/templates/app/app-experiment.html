@@ -82,12 +82,12 @@
                                                 <div class="panel panel-default my-panel">
                                                     <div class="panel-heading my-panel-heading">
                                                         <div class="panel-title">
-                                                            <a role="button" data-toggle="collapse" th:href="@{|#exp-${experiment.key}-${track.id}|}" aria-expanded="true">
+                                                            <a role="button" data-toggle="collapse" th:href="@{|#exp-${experiment.key}-${track.id}-${dim}|}" aria-expanded="true">
                                                                 <i class="fa fa-arrows-v"></i>&nbsp; <span th:text="|${dim}(${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)})|"></span>
                                                             </a>
                                                         </div>
                                                     </div>
-                                                    <div th:id="|exp-${experiment.key}-${track.id}|" class="panel-collapse collapse in" role="tabpanel">
+                                                    <div th:id="|exp-${experiment.key}-${track.id}-${dim}|" class="panel-collapse collapse in" role="tabpanel">
                                                         <div class="panel-body my-panel-body">
                                                             <div class="row">
                                                                 <!-- 轨迹绑定的传感器内容，包括：未绑定，数值型，摄像头 -->

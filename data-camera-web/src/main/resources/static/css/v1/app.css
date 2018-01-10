@@ -163,7 +163,7 @@ body{
 .sidebar-menu2 .menu-btn {
     color: #000000;
     background-color: #FFFFFF;
-    border: 2px solid #000000;
+    border: 1px solid #ccc;
 }
 
 .sidebar-menu2 ul li.active {
