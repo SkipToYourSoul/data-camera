@@ -7,11 +7,7 @@
 
 function initActionStatus(){
     // -- 更改实验状态（如果在监控或录制状态）
-    for (var id in isExperimentMonitor){
-        if (!isExperimentMonitor.hasOwnProperty(id) || !isExperimentRecorder.hasOwnProperty(id)){
-            continue;
-        }
-
+    isExperimentMonitor.keys().forEach(function (id) {
         var exp_monitor_btn = $('#experiment-monitor-' + id);
         var exp_monitor_dom = $('#experiment-es-' + id);
         var exp_recorder_btn = $('#experiment-recorder-' + id);
@@ -27,12 +23,12 @@ function initActionStatus(){
 
                 expObject.setRecorderTime(id, []);
                 expObject.recorderTimestamp[id].push(expRecorderTime[id]);
-                
+
                 expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
             }
             doInterval(id);
         }
-    }
+    });
 }
 
 /**
@@ -67,10 +63,9 @@ function doInterval(exp_id){
             }
 
             // --- traverse the sensors of this experiment
-            for (var index=0; index<exp_bound_sensors.length; index++){
-                var sensor = exp_bound_sensors[index];
-                var sensor_type = exp_bound_sensors[index]['sensorConfig']['type'];
-                var sensor_dimension = exp_bound_sensors[index]['sensorConfig']['dimension'];
+            exp_bound_sensors.forEach(function (sensor, index) {
+                var sensor_type = sensor['sensorConfig']['type'];
+                var sensor_dimension = sensor['sensorConfig']['dimension'];
                 var sensor_id = sensor['id'];
                 var track_id = sensor['trackId'];
 
@@ -141,7 +136,7 @@ function doInterval(exp_id){
                         $('#experiment-now-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(Math.round((Date.now() - Date.parse(start_time))/1000));
                     }
                 }
-            }
+            });
         });
     }
 

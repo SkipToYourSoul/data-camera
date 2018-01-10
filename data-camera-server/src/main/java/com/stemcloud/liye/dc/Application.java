@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc;
 
-import com.stemcloud.liye.dc.common.DbTools;
+import com.stemcloud.liye.dc.dao.DbTools;
 import com.stemcloud.liye.dc.common.GlobalVariables;
 import com.stemcloud.liye.dc.common.QuartzManager;
 import com.stemcloud.liye.dc.listener.SensorMonitorJob;

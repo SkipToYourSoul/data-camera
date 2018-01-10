@@ -19,7 +19,9 @@ import java.util.Set;
 /**
  * Belongs to data-camera-server
  * Description:
- *  listen sensor monitor status
+ *  listen sensor monitor status, 轮询监听实验状态
+ *  更新 GlobalVariables.sensorMonitorStatus, 当前sensor的监控状态
+ *  更新 GlobalVariables.sensorInfo, 当前sensor的绑定信息
  * @author liye on 2017/11/18
  */
 public class SensorMonitorJob implements Job {

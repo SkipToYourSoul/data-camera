@@ -1,6 +1,7 @@
-package com.stemcloud.liye.dc.common;
+package com.stemcloud.liye.dc.dao;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
+import com.stemcloud.liye.dc.common.DbConnectionPool;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +50,15 @@ public class DbTools {
         return result;
     }
 
+    /**
+     * 获取传感器配置信息，静态信息，不会更改
+     * @return Map:
+     *  key: sensorId
+     *  value: sensorConfig(id, dimension, type)
+     */
     public static Map<Long, SensorConfig> loadSensorConfigMap(){
         Map<Long, SensorConfig> sensorConfigMap = new HashMap<Long, SensorConfig>(16);
-        String sql = "SELECT id, dimension, type FROM dc_base_sensor_config";
+        String sql = "SELECT id, dimension, `type` FROM dc_base_sensor_config";
         DruidPooledConnection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
