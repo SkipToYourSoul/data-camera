@@ -162,7 +162,7 @@ function generateNewContent() {
                     message_info('内容生成中', 'info');
                     $.ajax({
                         type: 'get',
-                        url: data_addrss + "/user-new-recorder",
+                        url: data_address + "/user-new-recorder",
                         data: {
                             "recorder-id": analysisObject.currentRecorderId,
                             "start": analysisObject.timeline[analysisObject.timelineStart],

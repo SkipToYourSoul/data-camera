@@ -24,13 +24,6 @@ public interface ExperimentRepository extends CrudRepository<ExperimentInfo, Lon
     List<ExperimentInfo> findByIsDeletedOrderByCreateTime(int isDeleted);
 
     /**
-     * find exp by id
-     * @param id id
-     * @return exp
-     */
-    ExperimentInfo findById(long id);
-
-    /**
      * find exps by app
      * @param appInfo app
      * @param isDeleted

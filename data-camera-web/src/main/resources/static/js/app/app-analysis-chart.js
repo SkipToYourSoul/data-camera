@@ -23,7 +23,7 @@ function initRecorderContentDom(recorderId){
     // 异步请求实验片段数据
     $.ajax({
         type: 'get',
-        url: data_addrss + "/get-recorder-data",
+        url: data_address + "/get-recorder-data",
         data: {
             "recorder-id": recorderId
         },

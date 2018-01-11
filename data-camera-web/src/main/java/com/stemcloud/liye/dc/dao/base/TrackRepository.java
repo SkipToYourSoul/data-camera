@@ -23,13 +23,6 @@ public interface TrackRepository extends CrudRepository<TrackInfo, Long> {
     List<TrackInfo> findByIsDeletedOrderByCreateTime(int isDeleted);
 
     /**
-     * find track by id
-     * @param id id
-     * @return track
-     */
-    TrackInfo findById(long id);
-
-    /**
      * bound sensor on track
      * @param sensorId
      * @param trackId
@@ -55,7 +48,7 @@ public interface TrackRepository extends CrudRepository<TrackInfo, Long> {
      * @param id
      * @return recorder count
      */
-    @Query(value = "UPDATE TrackInfo t SET t.isDeleted = 1 WHERE t.id = ?1")
+    @Query(value = "UPDATE TrackInfo t SET t.isDeleted = 1, t.experiment = null, t.sensor = null WHERE t.id = ?1")
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     Integer deleteTrack(long id);

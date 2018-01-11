@@ -39,7 +39,7 @@ function initActionStatus(){
 var exp_monitor_interval = {};
 
 /**
- * 监控时定期更新图表数据
+ * 监控时定期更新图表数据，后期需改成web socket
  * @param exp_id
  */
 function doInterval(exp_id){
@@ -53,7 +53,7 @@ function doInterval(exp_id){
      */
     function askForData(exp_id) {
         var exp_bound_sensors = boundSensors[exp_id];
-        $.get(data_addrss + "/monitoring", {
+        $.get(data_address + "/monitoring", {
             "exp-id": exp_id,
             "timestamp": expObject.newestTimestamp[exp_id]
         }, function (response) {
@@ -163,17 +163,69 @@ function doInterval(exp_id){
     }
 }
 
+function getExpStatusFromServer(expId){
+    var status = null;
+    $.ajax({
+        type: 'get',
+        url: action_address + "/status",
+        async: false,
+        data: {
+            "exp-id": expId
+        },
+        success: function (response) {
+            if (response.code == "1111"){
+                commonObject.printExceptionMsg(response.data);
+            } else if (response.code == "0000"){
+                var status = response.data;
+            }
+        },
+        error: function (response) {
+            commonObject.printRejectMsg();
+        }
+    });
+    return status;
+}
+
 /**
  * 实验监控按钮点击触发
  * @param button
  */
 function expMonitor(button){
-    var exp_id = button.getAttribute('data');
+    var expId = button.getAttribute('data');
+    $.ajax({
+        type: 'get',
+        url: action_address + "/status",
+        async: false,
+        data: {
+            "exp-id": expId
+        },
+        success: function (response) {
+            if (response.code == "1111"){
+                commonObject.printExceptionMsg(response.data);
+            } else if (response.code == "0000"){
+                var status = response.data;
+                if (status == "not_bound_sensor" || status == "unknown"){
+                    message_info("实验未绑定任何设备，不能进行监控", "info");
+                } else if (status == "stop"){
+                    // 当前状态是非监控，开始监控
+                    message_info("开始监控实验" + expId, "success");
+                    doMonitor(1);
+                } else if (status == "doing"){
+                    // 当前状态是监控，停止监控，若正在录制，提示是否保存
+                }
+            }
+        },
+        error: function (response) {
+            commonObject.printRejectMsg();
+        }
+    });
 
-    if (!boundSensors.hasOwnProperty(exp_id)){
-        message_info('实验未绑定任何设备，不能进行监控', 'error');
-        return;
+    function doMonitor(action) {
+
     }
+    
+    
+
 
     $.ajax({
         type: 'get',

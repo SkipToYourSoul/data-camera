@@ -6,12 +6,31 @@
 var context_path = "/camera";
 var base_address = window.location.origin + context_path;
 var crud_address = base_address + "/crud";
-var data_addrss = base_address + "/data";
+var action_address = base_address + "/action";
+var data_address = base_address + "/data";
 
 var current_address = window.location.href;
 if (current_address.indexOf('?') >= 0){
     current_address = current_address.substring(0, window.location.href.indexOf('?'));
 }
+
+var commonObject = (function () {
+    // ajax msg
+    var ajaxRejectMsg = function () {
+        message_info("请求服务器数据被拒绝", 'error');
+        console.warn("请求服务器数据被拒绝");
+    };
+
+    var ajaxExceptionMsg = function (e) {
+        message_info("后台服务异常，原因为: " + e, 'error');
+        console.warn("后台服务异常，原因为: " + e);
+    };
+
+    return {
+        printRejectMsg: ajaxRejectMsg,
+        printExceptionMsg: ajaxExceptionMsg
+    }
+})();
 
 $._messengerDefaults = {
     extraClasses: 'messenger-fixed messenger-on-top',

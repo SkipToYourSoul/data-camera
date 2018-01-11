@@ -87,7 +87,7 @@ public class CrudService {
     public void deleteExp(Long id){
         int e = expRepository.deleteExp(id);
         logger.info("DELETE EXPERIMENT " + id);
-        ExperimentInfo exp = expRepository.findById(id);
+        ExperimentInfo exp = expRepository.findOne(id);
         Set<TrackInfo> tracks = exp.getTrackInfoList();
         for (TrackInfo track: tracks){
             if (track.getIsDeleted() == 0) {
@@ -97,7 +97,7 @@ public class CrudService {
     }
 
     public ExperimentInfo findExp(Long id){
-        return expRepository.findById(id);
+        return expRepository.findOne(id);
     }
 
     /************/
@@ -120,7 +120,7 @@ public class CrudService {
     public void deleteTrack(Long id){
         int t = trackRepository.deleteTrack(id);
         logger.info("DELETE TRACK {}", id);
-        TrackInfo track = trackRepository.findById(id);
+        TrackInfo track = trackRepository.findOne(id);
         // unbound sensor
         if (null != track.getSensor()){
             long sensorId = track.getSensor().getId();
@@ -132,7 +132,7 @@ public class CrudService {
     }
 
     public TrackInfo findTrack(Long id){
-        return trackRepository.findById(id);
+        return trackRepository.findOne(id);
     }
 
     /************/
@@ -158,7 +158,7 @@ public class CrudService {
     }
 
     public void boundSensor(long sensorId, long trackId){
-        TrackInfo trackInfo = trackRepository.findById(trackId);
+        TrackInfo trackInfo = trackRepository.findOne(trackId);
         SensorInfo sensorInfo = sensorRepository.findById(sensorId);
         trackInfo.setSensor(sensorInfo);
         trackRepository.save(trackInfo);
@@ -217,7 +217,7 @@ public class CrudService {
     @Transactional(rollbackFor = Exception.class)
     public synchronized Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId) throws Exception {
         // --- check the monitor status of current exp
-        ExperimentInfo exp = expRepository.findById(expId);
+        ExperimentInfo exp = expRepository.findOne(expId);
         List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         int status = exp.getIsMonitor();
         int response = -1;
@@ -251,7 +251,7 @@ public class CrudService {
     /**
      * 全局监控操作
      * @param appId 当前appId
-     * @return
+     * @return 三种状态：1) 部分监控，提示用户不能进行操作; 2) 全部监控，停止全局监控; 3） 全部非监控，进入全局监控
      */
     @Transactional(rollbackFor = Exception.class)
     public synchronized Map allMonitor(long appId) throws Exception {
@@ -317,7 +317,7 @@ public class CrudService {
     @Transactional(rollbackFor = Exception.class)
     public synchronized Long changeSensorsRecorderStatusOfCurrentExperiment(long appId, long expId, int isSave, String name, String desc, Long timestamp) throws Exception {
         // --- check the recorder status of current exp
-        ExperimentInfo exp = expRepository.findById(expId);
+        ExperimentInfo exp = expRepository.findOne(expId);
         int status = exp.getIsRecorder();
         List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         if (sensors.size() == 0){
