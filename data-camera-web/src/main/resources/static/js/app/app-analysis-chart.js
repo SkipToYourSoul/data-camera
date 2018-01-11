@@ -90,14 +90,15 @@ function initRecorderContentDom(recorderId){
                 var line = [{
                     xAxis: analysisObject.timeline[ui.values[0]]
                 }];
-                for (var i in analysisObject.chart){
+                Object.keys(analysisObject.chart).forEach(function (i) {
                     var series = analysisObject.chart[i].getOption()['series'];
                     series[0]['markLine']['data'] = line;
                     analysisObject.chart[i].setOption({
                         series: series
                     });
-                }
+                });
             } else {
+                // 正常状态，进行标记区域更新
                 analysisObject.timelineStart = ui.values[0];
                 analysisObject.timelineEnd = ui.values[1];
                 var mark = [[{
@@ -105,13 +106,13 @@ function initRecorderContentDom(recorderId){
                 }, {
                     xAxis: analysisObject.timeline[analysisObject.timelineEnd]
                 }]];
-                for (var i in analysisObject.chart){
+                Object.keys(analysisObject.chart).forEach(function (i) {
                     var series = analysisObject.chart[i].getOption()['series'];
                     series[0]['markArea']['data'] = mark;
                     analysisObject.chart[i].setOption({
                         series: series
                     });
-                }
+                });
             }
         });
         

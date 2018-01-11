@@ -35,7 +35,7 @@ function recorderAction(){
         $("#timeline-slider").find(".ui-slider-tip").css("visibility", "visible");
 
         // 重置chart数据
-        for (var i in analysisObject.chart){
+        Object.keys(analysisObject.chart).forEach(function (i) {
             var series = analysisObject.chart[i].getOption()['series'];
             var chartData = analysisObject.getChartData()[i];
             series[0]['data'] = getNewChartData(chartData);
@@ -43,14 +43,21 @@ function recorderAction(){
             analysisObject.chart[i].setOption({
                 series: series
             });
-        }
+        });
 
         function getNewChartData(d){
             var n = [];
+            // find point
+            var point = 0;
             for (var j=0; j<d.length; j++){
-                n.push(d[j]);
-                if (d[j]['value'][0] > analysisObject.timeline[start] + '.000' && d[j]['value'].length == 2){
-                    n[j]['value'].pop();
+                if (d[j]['value'][0] > analysisObject.timeline[start] + '.000'){
+                    point = j;
+                    n = d.slice(0, point);
+                    n.push(d[d.length - 1]);
+                    if (n[n.length - 1]['value'].length == 2){
+                        n[n.length - 1]['value'].pop();
+                    }
+                    break;
                 }
             }
             return n;
@@ -92,6 +99,8 @@ function recorderReset() {
 $('#recorder-speed').find('input:radio').change(function(radio){
     var speed = radio.target.getAttribute('value');
     var interval = 1000/parseInt(speed);
+    clearInterval(recorderInterval);
+    recorderInterval = setInterval(recorderAction, interval);
 });
 
 
