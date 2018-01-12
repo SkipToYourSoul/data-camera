@@ -37,7 +37,6 @@ public class CrudService {
     private final SensorRepository sensorRepository;
     private final SensorRegisterRepository sensorRegisterRepository;
     private final RecorderRepository recorderRepository;
-    private final VideoDataRepository videoDataRepository;
 
     public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, SensorRegisterRepository sensorRegisterRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
         this.appRepository = appRepository;
@@ -46,14 +45,13 @@ public class CrudService {
         this.sensorRepository = sensorRepository;
         this.sensorRegisterRepository = sensorRegisterRepository;
         this.recorderRepository = recorderRepository;
-        this.videoDataRepository = videoDataRepository;
     }
 
     /*************/
     /* APP       */
     /*************/
-    public long saveApp(AppInfo app){
-        return appRepository.save(app).getId();
+    public AppInfo saveApp(AppInfo app){
+        return appRepository.save(app);
     }
 
     public void deleteApp(Long id){

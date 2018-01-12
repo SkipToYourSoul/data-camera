@@ -144,11 +144,19 @@ var expObject = (function (){
     var setRecorderTime = function (key, value) {
         recorderTimestamp[key] = value;
     };
+
+    var newObjectText = "确认创建";
+    var editObjectText = "确认修改";
+
+    var currentExpId = 0;
     
     return {
         newestTimestamp: newestTimestamp,
         setNewTime: setNewTime,
         recorderTimestamp: recorderTimestamp,
-        setRecorderTime: setRecorderTime
+        setRecorderTime: setRecorderTime,
+        newObjectText: newObjectText,
+        editObjectText: editObjectText,
+        currentExpId: currentExpId
     };
 })();

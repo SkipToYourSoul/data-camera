@@ -84,11 +84,15 @@ function initExperiment(){
                     }
                 },
                 url: crud_address + '/bound/toggle',
-                success: function(result) {
-                    window.location.href = current_address + "?id=" + app['id'];
+                success: function (response) {
+                    if (response.code == "0000"){
+                        window.location.href = current_address + "?id=" + app['id'];
+                    } else if (response.code == "1111") {
+                        commonObject.printExceptionMsg(response.data);
+                    }
                 },
-                error: function (error) {
-                    message_info('绑定操作失败: ' + error, 'error');
+                error: function () {
+                    commonObject.printRejectMsg();
                 }
             });
         });
