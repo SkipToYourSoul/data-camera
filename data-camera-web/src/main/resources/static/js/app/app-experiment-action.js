@@ -163,8 +163,13 @@ function doInterval(exp_id){
     }
 }
 
+/**
+ * 获取当前实验状态
+ * @param expId
+ * @returns NOT_BOUND_SENSOR, MONITORING_NOT_RECORDING, MONITORING_AND_RECORDING, NOT_MONITOR, UNKNOWN
+ */
 function getExpStatusFromServer(expId){
-    var status = null;
+    var status = "unknown";
     $.ajax({
         type: 'get',
         url: action_address + "/status",
@@ -192,33 +197,23 @@ function getExpStatusFromServer(expId){
  */
 function expMonitor(button){
     var expId = button.getAttribute('data');
-    $.ajax({
-        type: 'get',
-        url: action_address + "/status",
-        async: false,
-        data: {
-            "exp-id": expId
-        },
-        success: function (response) {
-            if (response.code == "1111"){
-                commonObject.printExceptionMsg(response.data);
-            } else if (response.code == "0000"){
-                var status = response.data;
-                if (status == "not_bound_sensor" || status == "unknown"){
-                    message_info("实验未绑定任何设备，不能进行监控", "info");
-                } else if (status == "stop"){
-                    // 当前状态是非监控，开始监控
-                    message_info("开始监控实验" + expId, "success");
-                    doMonitor(1);
-                } else if (status == "doing"){
-                    // 当前状态是监控，停止监控，若正在录制，提示是否保存
-                }
-            }
-        },
-        error: function (response) {
-            commonObject.printRejectMsg();
-        }
-    });
+    var status = getExpStatusFromServer(expId);
+    if (status == "unknown"){
+        return;
+    } else if (status == "not_bound_sensor"){
+        message_info("实验未绑定任何设备，不能进行监控", "info");
+    } else if (status == "not_monitor"){
+        // 当前状态是非监控，开始监控
+        message_info("开始监控实验" + expId, "success");
+        doMonitor(1, false);
+    } else if (status == "monitoring_not_recording") {
+        // 当前状态是监控非录制，停止监控
+        message_info("停止监控实验" + expId, "success");
+        doMonitor(1);
+    } else if (status == "monitoring_and_recording"){
+        var isSave = askForSaveRecorder();
+    }
+
 
     function doMonitor(action) {
 
@@ -252,6 +247,41 @@ function expMonitor(button){
             message_info("数据请求失败", 'error');
         }
     });
+}
+
+/**
+ * 询问是否需要保存录制的数据片段
+ * @returns {number}
+ */
+function askForSaveRecorder(){
+    var msgHtml = '<div class="row"> <div class="form-group" style="margin-bottom: 5px"><label class="col-sm-2 control-label">片段名</label>' +
+        '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-name" placeholder="请输入片段标题"/></div></div>' +
+        '<div class="form-group"><label class="col-sm-2 control-label">片段描述</label>' +
+        '<div class="col-sm-10"><textarea rows="3" class="form-control" id="dialog-data-desc" placeholder="请输入片段描述"></div></div>' +
+        '</div>';
+
+    bootbox.dialog({
+        title: "保存录制数据片段?",
+        message: msgHtml,
+        async: false,
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i> 取消',
+                className: 'btn-danger',
+                callback: function(){
+                    return 0;
+                }
+            },
+            confirm: {
+                label: '<i class="fa fa-check"></i> 保存',
+                className: 'btn-success',
+                callback: function(){
+                    return 1;
+                }
+            }
+        }
+    });
+    return 0;
 }
 
 /**
