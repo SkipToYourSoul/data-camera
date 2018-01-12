@@ -37,4 +37,20 @@ public class ActionController {
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
+
+    @GetMapping("/monitor")
+    public Map expMonitor(@RequestParam Map<String, String> queryParams){
+        try {
+            long expId = Long.parseLong(queryParams.get("exp-id"));
+            int action = Integer.parseInt(queryParams.get("action"));
+            int isSave = Integer.parseInt(queryParams.get("isSave"));
+            long dataTime = Long.parseLong(queryParams.get("data-time"));
+            String name = queryParams.get("data-name");
+            String desc = queryParams.get("data-desc");
+            return ServerReturnTool.serverSuccess(actionService.changeMonitorState(expId, action, isSave, dataTime, name, desc));
+        } catch (Exception e){
+            logger.error("[/monitor]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
 }

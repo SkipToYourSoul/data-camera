@@ -165,8 +165,9 @@ function doInterval(exp_id){
 
 /**
  * 获取当前实验状态
+ *  NOT_BOUND_SENSOR, MONITORING_NOT_RECORDING, MONITORING_AND_RECORDING, NOT_MONITOR, UNKNOWN
  * @param expId
- * @returns NOT_BOUND_SENSOR, MONITORING_NOT_RECORDING, MONITORING_AND_RECORDING, NOT_MONITOR, UNKNOWN
+ * @returns {string}
  */
 function getExpStatusFromServer(expId){
     var status = "unknown";
@@ -181,7 +182,7 @@ function getExpStatusFromServer(expId){
             if (response.code == "1111"){
                 commonObject.printExceptionMsg(response.data);
             } else if (response.code == "0000"){
-                var status = response.data;
+                status = response.data;
             }
         },
         error: function (response) {
@@ -199,54 +200,61 @@ function expMonitor(button){
     var expId = button.getAttribute('data');
     var status = getExpStatusFromServer(expId);
     if (status == "unknown"){
-        return;
+        message_info("状态unknown", "info");
     } else if (status == "not_bound_sensor"){
         message_info("实验未绑定任何设备，不能进行监控", "info");
     } else if (status == "not_monitor"){
         // 当前状态是非监控，开始监控
         message_info("开始监控实验" + expId, "success");
-        doMonitor(1, false);
+        doMonitor(1, 0, 0);
     } else if (status == "monitoring_not_recording") {
         // 当前状态是监控非录制，停止监控
         message_info("停止监控实验" + expId, "success");
-        doMonitor(1);
+        doMonitor(0, 0, 0);
     } else if (status == "monitoring_and_recording"){
         var isSave = askForSaveRecorder();
+        var endTime = new Date().getTime();
+        doMonitor(0, isSave, endTime);
     }
 
+    // action -> 0: stop, 1: start
+    // isSave -> 0: not save, 1: save
+    function doMonitor(action, isSave, endTime) {
+        var $name = $('#dialog-data-name');
+        var $desc = $('#dialog-data-desc');
+        $.ajax({
+            type: 'get',
+            url: action_address + "/monitor",
+            data: {
+                "exp-id": expId,
+                "action": action,
+                "isSave": isSave,
+                "data-time": endTime,
+                "data-name": $name.val(),
+                "data-desc": $desc.val()
+            },
+            success: function (response) {
+                if (response.code == "1111"){
+                    commonObject.printExceptionMsg(response.data);
+                } else if (response.code == "0000"){
+                    if (action == "1"){
+                        // start monitor
+                        pageStartMonitor(expId);
+                    } else if (action == "0"){
+                        // stop monitor
+                        pageStopMonitor(expId);
+                    }
+                }
+            },
+            error: function (response) {
+                commonObject.printRejectMsg();
+            }
+        });
 
-    function doMonitor(action) {
-
+        // 完成后清空片段数据框
+        $name.val("");
+        $desc.val("");
     }
-    
-    
-
-
-    $.ajax({
-        type: 'get',
-        url: crud_address + "/monitor",
-        data: {
-            "exp-id": exp_id,
-            "app-id": app['id']
-        },
-        success: function (response) {
-            if (response.code == "1111"){
-                message_info('监控操作失败: ' + response.data, "error");
-                return;
-            }
-            var action = response.data;
-            if (action == "1"){
-                // start monitor
-                pageStartMonitor(exp_id);
-            } else if (action == "0"){
-                // stop monitor
-                pageStopMonitor(exp_id);
-            }
-        },
-        error: function (response) {
-            message_info("数据请求失败", 'error');
-        }
-    });
 }
 
 /**
