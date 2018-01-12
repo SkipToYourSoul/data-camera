@@ -4,7 +4,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
-import com.stemcloud.liye.dc.domain.common.ServerReturnTool;
+import com.stemcloud.liye.dc.common.ServerReturnTool;
 import com.stemcloud.liye.dc.domain.config.SensorRegister;
 import com.stemcloud.liye.dc.service.CommonService;
 import com.stemcloud.liye.dc.service.CrudService;
@@ -269,25 +269,6 @@ public class CrudController {
         return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("sensor-id")));
     }
 
-    /**
-     * 点击“监控”按钮触发的动作
-     * @param queryParams
-     * @return
-     */
-    @GetMapping("/monitor")
-    public Map monitorSensor(@RequestParam Map<String, String> queryParams){
-        Map<String, Object> map;
-        try {
-            Long expId = Long.valueOf(queryParams.get("exp-id"));
-            int response = crudService.changeSensorsMonitorStatusOfCurrentExperiment(expId);
-            map = ServerReturnTool.serverSuccess(response);
-        } catch (Exception e){
-            map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/content", e);
-        }
-        return map;
-    }
-
     @GetMapping("/allMonitor")
     public Map allMonitorSensor(@RequestParam Map<String, String> queryParams){
         Map<String, Object> map;
@@ -297,44 +278,6 @@ public class CrudController {
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
             logger.error("/crud/content", e);
-        }
-        return map;
-    }
-
-    @GetMapping("/isRecord")
-    public Map isRecord(@RequestParam Map<String, String> queryParams){
-        Long expId = Long.valueOf(queryParams.get("exp-id"));
-        Map<String, Object> map;
-        try {
-            ExperimentInfo exp = crudService.findExp(expId);
-            map = ServerReturnTool.serverSuccess(exp.getIsRecorder());
-        } catch (Exception e){
-            map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/isRecord", e);
-        }
-        return map;
-    }
-
-    /**
-     * 点击“录制”按钮触发的动作
-     * @param queryParams
-     * @return
-     */
-    @GetMapping("/record")
-    public Map recordSensor(@RequestParam Map<String, String> queryParams){
-        Map<String, Object> map;
-        try {
-            Long expId = Long.valueOf(queryParams.get("exp-id"));
-            int isSave = Integer.parseInt(queryParams.get("is-save"));
-            Long appId = Long.valueOf(queryParams.get("app-id"));
-            String name = queryParams.get("data-name");
-            String desc = queryParams.get("data-desc");
-            Long time = Long.valueOf(queryParams.get("data-time"));
-            long response = crudService.changeSensorsRecorderStatusOfCurrentExperiment(appId, expId, isSave, name, desc, time);
-            map = ServerReturnTool.serverSuccess(response);
-        } catch (Exception e){
-            map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/record", e);
         }
         return map;
     }

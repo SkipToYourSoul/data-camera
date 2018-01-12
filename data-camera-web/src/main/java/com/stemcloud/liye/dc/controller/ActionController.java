@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc.controller;
 
-import com.stemcloud.liye.dc.domain.common.ServerReturnTool;
+import com.stemcloud.liye.dc.common.ServerReturnTool;
 import com.stemcloud.liye.dc.service.ActionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +50,33 @@ public class ActionController {
             return ServerReturnTool.serverSuccess(actionService.changeMonitorState(expId, action, isSave, dataTime, name, desc));
         } catch (Exception e){
             logger.error("[/monitor]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/record")
+    public Map expRecord(@RequestParam Map<String, String> queryParams){
+        try {
+            long expId = Long.parseLong(queryParams.get("exp-id"));
+            int action = Integer.parseInt(queryParams.get("action"));
+            int isSave = Integer.parseInt(queryParams.get("isSave"));
+            long dataTime = Long.parseLong(queryParams.get("data-time"));
+            String name = queryParams.get("data-name");
+            String desc = queryParams.get("data-desc");
+            return ServerReturnTool.serverSuccess(actionService.changeRecorderState(expId, action, isSave, dataTime, name, desc));
+        } catch (Exception e){
+            logger.error("[/record]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/monitor/all")
+    public Map expMonitorAll(@RequestParam Map<String, String> queryParams){
+        try {
+            Long appId = Long.valueOf(queryParams.get("app-id"));
+            return ServerReturnTool.serverSuccess("");
+        } catch (Exception e){
+            logger.error("[/monitor/all]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }

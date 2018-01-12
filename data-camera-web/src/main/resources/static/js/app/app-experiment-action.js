@@ -193,6 +193,40 @@ function getExpStatusFromServer(expId){
 }
 
 /**
+ * 询问是否需要保存录制的数据片段
+ * @returns {number}
+ */
+function askForSaveRecorder(doFunction, action, endTime){
+    var msgHtml = '<div class="row"> <div class="form-group" style="margin-bottom: 45px"><label class="col-sm-2 control-label">片段名</label>' +
+        '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-name" placeholder="请输入片段标题"/></div></div>' +
+        '<div class="form-group"><label class="col-sm-2 control-label">片段描述</label>' +
+        '<div class="col-sm-10"><textarea rows="3" class="form-control" id="dialog-data-desc" placeholder="请输入片段描述"></textarea></div></div>' +
+        '</div>';
+
+    bootbox.dialog({
+        title: "保存录制数据片段?",
+        message: msgHtml,
+        async: false,
+        buttons: {
+            cancel: {
+                label: '<i class="fa fa-times"></i> 取消',
+                className: 'btn-danger',
+                callback: function(){
+                    doFunction(action, 0, endTime);
+                }
+            },
+            confirm: {
+                label: '<i class="fa fa-check"></i> 保存',
+                className: 'btn-success',
+                callback: function(){
+                    doFunction(action, 1, endTime);
+                }
+            }
+        }
+    });
+}
+
+/**
  * 实验监控按钮点击触发
  * @param button
  */
@@ -212,9 +246,7 @@ function expMonitor(button){
         message_info("停止监控实验" + expId, "success");
         doMonitor(0, 0, 0);
     } else if (status == "monitoring_and_recording"){
-        var isSave = askForSaveRecorder();
-        var endTime = new Date().getTime();
-        doMonitor(0, isSave, endTime);
+        askForSaveRecorder(doMonitor, 0, new Date().getTime());
     }
 
     // action -> 0: stop, 1: start
@@ -243,6 +275,9 @@ function expMonitor(button){
                     } else if (action == "0"){
                         // stop monitor
                         pageStopMonitor(expId);
+                        if (isSave == 1 && response.data != -1){
+                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
+                        }
                     }
                 }
             },
@@ -258,39 +293,76 @@ function expMonitor(button){
 }
 
 /**
- * 询问是否需要保存录制的数据片段
- * @returns {number}
+ * 实验录制按钮点击触发
+ * @param button
  */
-function askForSaveRecorder(){
-    var msgHtml = '<div class="row"> <div class="form-group" style="margin-bottom: 5px"><label class="col-sm-2 control-label">片段名</label>' +
-        '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-name" placeholder="请输入片段标题"/></div></div>' +
-        '<div class="form-group"><label class="col-sm-2 control-label">片段描述</label>' +
-        '<div class="col-sm-10"><textarea rows="3" class="form-control" id="dialog-data-desc" placeholder="请输入片段描述"></div></div>' +
-        '</div>';
+function expRecorder(button) {
+    var expId = button.getAttribute('data');
+    var status = getExpStatusFromServer(expId);
+    if (status == "unknown"){
+        message_info("状态unknown", "info");
+    } else if (status == "not_bound_sensor"){
+        message_info("实验未绑定任何设备，不能进行录制", "info");
+    } else if (status == "not_monitor"){
+        // 当前状态是非监控，不能录制
+        message_info("实验未开始监控，不能进行录制", "info");
+    } else if (status == "monitoring_not_recording") {
+        // 当前状态是监控非录制，开始录制
+        message_info("开始录制实验" + expId, "success");
+        doRecorder(1, 0, 0);
+    } else if (status == "monitoring_and_recording"){
+        // 停止录制
+        askForSaveRecorder(doRecorder, 0, new Date().getTime());
+    }
 
-    bootbox.dialog({
-        title: "保存录制数据片段?",
-        message: msgHtml,
-        async: false,
-        buttons: {
-            cancel: {
-                label: '<i class="fa fa-times"></i> 取消',
-                className: 'btn-danger',
-                callback: function(){
-                    return 0;
+    function doRecorder(action, isSave, endTime){
+        var $name = $('#dialog-data-name');
+        var $desc = $('#dialog-data-desc');
+        $.ajax({
+            type: 'get',
+            url: action_address + "/record",
+            data: {
+                "exp-id": expId,
+                "action": action,
+                "isSave": isSave,
+                "data-name": $name.val(),
+                "data-desc": $desc.val(),
+                "data-time": endTime
+            },
+            success: function (response) {
+                if (response.code == "1111"){
+                    commonObject.printExceptionMsg(response.data);
+                } else if (response.code == "0000"){
+                    if (!expObject.recorderTimestamp.hasOwnProperty(expId)){
+                        expObject.setRecorderTime(expId, []);
+                    }
+                    if (action == 1){
+                        pageStartRecord(expId);
+                        if (expObject.recorderTimestamp[expId].length % 2 == 0){
+                            expObject.recorderTimestamp[expId].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+                        } else {
+                            expObject.recorderTimestamp[expId].pop();
+                            expObject.recorderTimestamp[expId].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+                        }
+                    } else if (action == 0){
+                        pageStopRecorder(expId);
+                        if (isSave == 1 && response.data != -1){
+                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
+                        }
+                    }
                 }
             },
-            confirm: {
-                label: '<i class="fa fa-check"></i> 保存',
-                className: 'btn-success',
-                callback: function(){
-                    return 1;
-                }
+            error: function (response) {
+                commonObject.printRejectMsg();
             }
-        }
-    });
-    return 0;
+        });
+
+        // 完成后清空片段数据框
+        $name.val("");
+        $desc.val("");
+    }
 }
+
 
 /**
  * 全局监控
@@ -329,124 +401,6 @@ function allMonitor() {
 }
 
 /**
- * 实验录制按钮点击触发
- * @param button
- */
-function expRecorder(button) {
-    var exp_id = button.getAttribute('data');
-    var exp_state_dom = $('#experiment-rs-' + exp_id);
-    var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
-
-    if (!isExperimentMonitor.hasOwnProperty(exp_id) || isExperimentMonitor[exp_id] == 0){
-        message_info("实验" + exp_id + "未开始监控，无法进行录制！");
-        return;
-    }
-
-    // -- get recorder status
-    $.ajax({
-        type: 'get',
-        url: crud_address + "/isRecord",
-        data: {
-            "exp-id": exp_id
-        },
-        success: function (response) {
-            if (response.code == "1111"){
-                message_info('录制操作无效: ' + response.data, "error");
-                return;
-            }
-            var recorder_status = response.data;
-            var time = new Date().getTime();
-            if (recorder_status == "1"){
-                // -- end recorder, confirm to save the data
-                bootbox.dialog({
-                    title: "保存录制数据片段?",
-                    message: '<div class="row"> <div class="form-group" style="margin-bottom: 5px"><label class="col-sm-2 control-label">片段名</label>' +
-                    '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-name" placeholder="请输入片段标题"/></div></div>' +
-                    '<div class="form-group"><label class="col-sm-2 control-label">片段描述</label>' +
-                    '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-desc" placeholder="请输入片段描述"></div></div>' +
-                    '</div>',
-                    async: false,
-                    buttons: {
-                        cancel: {
-                            label: '<i class="fa fa-times"></i> 取消',
-                            className: 'btn-danger',
-                            callback: function(){
-                                submitToServer(0, time);
-                            }
-                        },
-                        confirm: {
-                            label: '<i class="fa fa-check"></i> 保存',
-                            className: 'btn-success',
-                            callback: function(){
-                                submitToServer(1, time);
-                            }
-                        }
-                    }
-                });
-            } else if (recorder_status == "0"){
-                // -- begin recorder
-                submitToServer(0, time);
-            }
-        },
-        error: function (response) {
-            message_info("请求数据失败", 'error');
-        }
-    });
-
-    function submitToServer(is_save_recorder, time){
-        // --- change recorder status on server
-        $.ajax({
-            type: 'get',
-            url: crud_address + "/record",
-            data: {
-                "exp-id": exp_id,
-                "app-id": app['id'],
-                "is-save": is_save_recorder,
-                "data-name": $('#dialog-data-name').val(),
-                "data-desc": $('#dialog-data-desc').val(),
-                "data-time": time
-            },
-            success: function (response) {
-                if (response.code == "1111"){
-                    message_info('操作无效: ' + response.data, "error");
-                    return;
-                }
-
-                if (!expObject.recorderTimestamp.hasOwnProperty(exp_id)){
-                    expObject.setRecorderTime(exp_id, []);
-                }
-
-                var action = response.data;
-                if (action == "-10"){
-                    message_info("实验" + exp_id + "未绑定传感器，不能记录");
-                } else if (action == "-1"){
-                    // start recorder
-                    message_info("实验" + exp_id + ": 开始记录");
-                    exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-                    exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
-                    isExperimentRecorder[exp_id] = 1;
-                    if (expObject.recorderTimestamp[exp_id].length % 2 == 0){
-                        expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-                    } else {
-                        expObject.recorderTimestamp[exp_id].pop();
-                        expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-                    }
-                } else if (action == "0"){
-                    message_info("实验" + exp_id + ": 停止记录");
-                    pageStopRecorder(exp_id);
-                } else {
-                    pageStopRecorder(exp_id);
-                    window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + action;
-                }
-            },
-            error: function (response) {
-                message_info("请求数据失败", 'error');
-            }
-        });
-    }
-}
-
-/**
  * 全局录制
  *  若有在监控状态下但不在录制状态下的实验，则调整为录制
  *  若所有实验都在录制状态，则停止录制
@@ -475,9 +429,7 @@ function pageStartMonitor(exp_id){
  * @param exp_id
  */
 function pageStopMonitor(exp_id){
-    if (isExperimentRecorder[exp_id] == 1){
-        pageStopRecorder(exp_id);
-    }
+    pageStopRecorder(exp_id);
 
     isExperimentMonitor[exp_id] = 0;
     $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-default').text('非监控');
@@ -487,6 +439,20 @@ function pageStopMonitor(exp_id){
     delete exp_monitor_interval[exp_id];
 
     $('.content-value-' + exp_id).html('-');
+}
+
+/**
+ * 开始录制时页面的更改
+ * @param exp_id
+ */
+function pageStartRecord(exp_id) {
+    var exp_state_dom = $('#experiment-rs-' + exp_id);
+    var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
+
+    exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
+    exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
+
+    isExperimentRecorder[exp_id] = 1;
 }
 
 /**

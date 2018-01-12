@@ -12,7 +12,7 @@ import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.ValueData;
 import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
-import com.stemcloud.liye.dc.domain.common.SensorType;
+import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.domain.view.Video;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

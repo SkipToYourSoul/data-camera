@@ -18,7 +18,7 @@ import com.stemcloud.liye.dc.domain.config.SensorRegister;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
-import com.stemcloud.liye.dc.domain.common.SensorType;
+import com.stemcloud.liye.dc.common.SensorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -118,7 +118,6 @@ public class CrudService {
     }
 
     public void deleteTrack(Long id){
-        int t = trackRepository.deleteTrack(id);
         logger.info("DELETE TRACK {}", id);
         TrackInfo track = trackRepository.findOne(id);
         // unbound sensor
@@ -129,6 +128,7 @@ public class CrudService {
                 logger.info("UNBOUND SENSOR {}", sensorId);
             }
         }
+        trackRepository.deleteTrack(id);
     }
 
     public TrackInfo findTrack(Long id){
@@ -148,7 +148,7 @@ public class CrudService {
     }
 
     public SensorInfo findSensor(Long id){
-        return sensorRepository.findById(id);
+        return sensorRepository.findOne(id);
     }
 
     public void unboundSensor(long sensorId, long trackId){
@@ -159,7 +159,7 @@ public class CrudService {
 
     public void boundSensor(long sensorId, long trackId){
         TrackInfo trackInfo = trackRepository.findOne(trackId);
-        SensorInfo sensorInfo = sensorRepository.findById(sensorId);
+        SensorInfo sensorInfo = sensorRepository.findOne(sensorId);
         trackInfo.setSensor(sensorInfo);
         trackRepository.save(trackInfo);
         long expId = trackInfo.getExperiment().getId();
@@ -207,47 +207,6 @@ public class CrudService {
     /************/
     /* MONIT AND RECORD   */
     /************/
-
-    /**
-     * 监控操作，开始监控时，进入监控状态；结束监控时，若有未保存的录制信息，则作相应删除
-     * @param expId
-     * @return
-     * @throws Exception
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public synchronized Integer changeSensorsMonitorStatusOfCurrentExperiment(long expId) throws Exception {
-        // --- check the monitor status of current exp
-        ExperimentInfo exp = expRepository.findOne(expId);
-        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
-        int status = exp.getIsMonitor();
-        int response = -1;
-        if (sensors.size() == 0){
-            logger.warn("NO SENSORS BOUND FOR EXPERIMENT {}, RETURN -1", expId);
-            return response;
-        }
-
-        if (status == 0){
-            // --- not in monitor state
-            expRepository.monitorExp(expId, 1);
-            response = 1;
-        } else if (status == 1){
-            // --- in monitor state
-            expRepository.monitorExp(expId, 0);
-            if (exp.getIsRecorder() == 1) {
-                // --- end recorder
-                RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
-                if (recorderInfo == null) {
-                    throw new Exception("end record, but no record info in table");
-                }
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
-                expRepository.recorderExp(expId, 0);
-            }
-            response = 0;
-        }
-        logger.info("CHANGE MONITOR STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
-        return response;
-    }
-
     /**
      * 全局监控操作
      * @param appId 当前appId
@@ -297,117 +256,5 @@ public class CrudService {
         }
 
         return map;
-    }
-
-    /**
-     *  录制操作，开始录制时，新建片段信息；结束操作时，为当前片段信息加上结束时间
-     * @param expId 实验id
-     * @param isSave 是否保存实验片段
-     * @param name 数据片段名
-     * @param desc 数据片段描述
-     * @param timestamp 数据片段时间
-     * @return {
-     *     -10：实验没有绑定传感器
-     *     -1：开始录制
-     *     0: 结束录制未保存结果
-     *     ?>0：结束录制并保存结果，返回recorder id
-     * }
-     * @throws Exception 若抛出异常，则回滚
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public synchronized Long changeSensorsRecorderStatusOfCurrentExperiment(long appId, long expId, int isSave, String name, String desc, Long timestamp) throws Exception {
-        // --- check the recorder status of current exp
-        ExperimentInfo exp = expRepository.findOne(expId);
-        int status = exp.getIsRecorder();
-        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
-        if (sensors.size() == 0){
-            logger.warn("NO SENSORS BOUND FOR EXPERIMENT {}, RETURN -1", expId);
-            return RecordState.ERR.getValue();
-        }
-
-        if (status == 0){
-            // --- 处于非录制状态，切换为录制状态
-            expRepository.recorderExp(expId, 1);
-
-            // --- new a recorder info
-            List<RecorderDevices> devices = new ArrayList<RecorderDevices>();
-            for (SensorInfo sensor: sensors){
-                RecorderDevices device = new RecorderDevices();
-                long sensorId = sensor.getId();
-                long trackId = sensor.getTrackId();
-                List<String> legend = Arrays.asList(sensor.getSensorConfig().getDimension().split(";"));
-                device.setSensor(sensorId);
-                device.setTrack(trackId);
-                device.setLegends(legend);
-                devices.add(device);
-            }
-
-            RecorderInfo recorderInfo = new RecorderInfo();
-            recorderInfo.setExpId(expId);
-            recorderInfo.setAppId(appId);
-            recorderInfo.setIsRecorder(1);
-            recorderInfo.setStartTime(new Date());
-            recorderInfo.setDevices(new Gson().toJson(devices));
-            recorderInfo.setName(exp.getName() + "-新片段");
-            recorderInfo.setDescription(exp.getName() + "的记录描述");
-            recorderRepository.save(recorderInfo);
-
-            logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
-            return RecordState.ING.getValue();
-        } else if (status == 1){
-            // --- end recorder
-            RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
-            if (recorderInfo == null){
-                throw new Exception("end record, but no record info in table");
-            }
-            expRepository.recorderExp(expId, 0);
-            if (name.trim().isEmpty()){
-                name = recorderInfo.getName();
-            }
-            if (desc.trim().isEmpty()){
-                desc = recorderInfo.getDescription();
-            }
-
-            if (isSave == 1){
-                // save data
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(timestamp), 0, name, desc);
-                // save video if have
-                saveVideo(recorderInfo);
-                logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
-                return recorderInfo.getId();
-            } else {
-                // not save data, delete recorder
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, name, desc);
-                logger.info("CHANGE RECORDER STATUS OF EXPERIMENT {} from {} to {}", expId, status, Math.abs(status - 1));
-                return RecordState.END.getValue();
-            }
-        }
-        return RecordState.ERR.getValue();
-    }
-
-    /**-------**/
-    /* VIDEO   */
-    /**-------**/
-
-    /**
-     * 在录制结束时，保存视频记录
-     *
-     * @param recorderInfo 录制的片段信息
-     */
-    private void saveVideo(RecorderInfo recorderInfo){
-        String devicesStr = recorderInfo.getDevices();
-        List<RecorderDevices> devices = new Gson().fromJson(devicesStr, new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
-        for (RecorderDevices d : devices){
-            long trackId = d.getTrack();
-            long sensorId = d.getSensor();
-            if (findSensor(sensorId).getSensorConfig().getType() == SensorType.VIDEO.getValue()){
-                VideoData videoData = new VideoData();
-                videoData.setSensorId(sensorId);
-                videoData.setTrackId(trackId);
-                videoData.setRecorderInfo(recorderInfo);
-                videoDataRepository.save(videoData);
-                logger.info("SAVE VIDEO DATA, SENSOR ID IS {}, TRACK ID IS {}, RECORDER IS {}", sensorId, trackId, recorderInfo.getId());
-            }
-        }
     }
 }

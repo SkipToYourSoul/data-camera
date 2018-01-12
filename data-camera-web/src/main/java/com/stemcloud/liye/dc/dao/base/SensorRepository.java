@@ -25,13 +25,6 @@ public interface SensorRepository extends CrudRepository<SensorInfo, Long> {
     List<SensorInfo> findByCreatorAndIsDeletedOrderByCreateTime(String creator, int isDeleted);
 
     /**
-     * find sensor by id
-     * @param id id
-     * @return sensor
-     */
-    SensorInfo findById(long id);
-
-    /**
      * find sensor by app id
      * @param appId
      * @return sensors
