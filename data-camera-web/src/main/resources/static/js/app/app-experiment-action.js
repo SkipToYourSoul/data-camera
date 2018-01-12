@@ -193,6 +193,35 @@ function getExpStatusFromServer(expId){
 }
 
 /**
+ * 获取当前应用下实验的整体状态
+ *  ALL_MONITORING_AND_ALL_RECORDING, ALL_MONITORING_AND_PART_RECORDING, ALL_MONITORING_AND_NO_RECORDING,
+ *  ALL_NOT_MONITOR, PART_MONITORING
+ * @returns {string}
+ */
+function getAppStatusFromServer(){
+    var status = "unknown";
+    $.ajax({
+        type: 'get',
+        url: action_address + "/status/all",
+        async: false,
+        data: {
+            "app-id": app['id']
+        },
+        success: function (response) {
+            if (response.code == "1111"){
+                commonObject.printExceptionMsg(response.data);
+            } else if (response.code == "0000"){
+                status = response.data;
+            }
+        },
+        error: function (response) {
+            commonObject.printRejectMsg();
+        }
+    });
+    return status;
+}
+
+/**
  * 询问是否需要保存录制的数据片段
  * @returns {number}
  */
@@ -333,17 +362,8 @@ function expRecorder(button) {
                 if (response.code == "1111"){
                     commonObject.printExceptionMsg(response.data);
                 } else if (response.code == "0000"){
-                    if (!expObject.recorderTimestamp.hasOwnProperty(expId)){
-                        expObject.setRecorderTime(expId, []);
-                    }
                     if (action == 1){
                         pageStartRecord(expId);
-                        if (expObject.recorderTimestamp[expId].length % 2 == 0){
-                            expObject.recorderTimestamp[expId].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-                        } else {
-                            expObject.recorderTimestamp[expId].pop();
-                            expObject.recorderTimestamp[expId].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-                        }
                     } else if (action == 0){
                         pageStopRecorder(expId);
                         if (isSave == 1 && response.data != -1){
@@ -370,34 +390,93 @@ function expRecorder(button) {
  *  若所有实验都在监控状态，则停止监控
  */
 function allMonitor() {
-    $.ajax({
-        type: 'get',
-        url: crud_address + "/allMonitor",
-        data: {
-            "app-id": app['id']
-        },
-        success: function (response) {
-            if (response.code == "1111"){
-                message_info('服务器异常: ' + response.data, "error");
-                return;
-            }
-            var status = response.data;
-            if (status['action'] == "close"){
-                for (var expId in experiments){
-                    pageStopMonitor(expId);
+    var status = getAppStatusFromServer();
+    console.log("status: " + status);
+    if (status == "unknown"){
+        message_info("状态unknown", "info");
+    } else if (status == "part_monitoring" || status == "all_not_monitor"){
+        bootbox.confirm({
+            title: "开始全局监控",
+            message: "是否要开始全局监控",
+            buttons: {
+                cancel: { label: '<i class="fa fa-times"></i> 取消' },
+                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+            },
+            callback: function (result) {
+                if (result){
+                    doAllMonitor(1, 0, 0);
                 }
-                $('#all-monitor-btn').removeClass('btn-success').addClass('btn-default');
-            } else if (status['action'] == "open"){
-                for (var exp in status['ids']){
-                    pageStartMonitor(status['ids'][exp]);
-                }
-                $('#all-monitor-btn').removeClass('btn-default').addClass('btn-success');
             }
-        },
-        error: function (response) {
-            message_info("数据请求失败", 'error');
-        }
-    });
+        });
+    } else if (status == "all_monitoring_and_no_recording"){
+        bootbox.confirm({
+            title: "结束全局监控",
+            message: "是否要结束全局监控",
+            buttons: {
+                cancel: { label: '<i class="fa fa-times"></i> 取消' },
+                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+            },
+            callback: function (result) {
+                if (result){
+                    doAllMonitor(0, 0, 0);
+                }
+            }
+        });
+    } else if (status == "all_monitoring_and_all_recording" || status == "all_monitoring_and_part_recording"){
+        var endTime = new Date().getTime();
+        bootbox.confirm({
+            title: "结束全局监控",
+            message: "即将结束监控，是否保存当前录制的片段",
+            buttons: {
+                cancel: { label: '<i class="fa fa-times"></i> 取消' },
+                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+            },
+            callback: function (result) {
+                if (result){
+                    doAllMonitor(0, 1, endTime);
+                } else {
+                    doAllMonitor(0, 0, endTime);
+                }
+            }
+        });
+    }
+
+    function doAllMonitor(action, isSave, endTime){
+        $.ajax({
+            type: 'get',
+            url: action_address + "/monitor/all",
+            data: {
+                "app-id": app['id'],
+                "action": action,
+                "isSave": isSave,
+                "data-time": endTime
+            },
+            success: function (response) {
+                if (response.code == "1111"){
+                    commonObject.printExceptionMsg(response.data);
+                } else if (response.code == "0000"){
+                    var targetExp = response.data;
+                    if (action == 1){
+                        $('#all-monitor-btn').removeClass('btn-default').addClass('btn-success');
+                        targetExp.forEach(function (expId) {
+                            pageStartMonitor(expId);
+                        });
+                    } else if (action == 0){
+                        $('#all-monitor-btn').removeClass('btn-success').addClass('btn-default');
+                        targetExp.forEach(function (expId) {
+                            pageStopMonitor(expId);
+                        });
+                        if (isSave == 1){
+                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
+                        }
+                    }
+                }
+            },
+            error: function (response) {
+                commonObject.printRejectMsg();
+            }
+        });
+    }
 }
 
 /**
@@ -406,7 +485,81 @@ function allMonitor() {
  *  若所有实验都在录制状态，则停止录制
  */
 function allRecord(){
-    message_info("developing", "info");
+    var status = getAppStatusFromServer();
+    console.log("status: " + status);
+    if (status == "unknown"){
+        message_info("状态unknown", "info");
+    } else if (status == "part_monitoring" || status == "all_not_monitor"){
+        message_info("当前不是全局监控状态，不能进行全局录制", "info");
+    } else if (status == "all_monitoring_and_no_recording" || status == "all_monitoring_and_part_recording"){
+        bootbox.confirm({
+            title: "开始全局录制",
+            message: "是否要开始全局录制",
+            buttons: {
+                cancel: { label: '<i class="fa fa-times"></i> 取消' },
+                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+            },
+            callback: function (result) {
+                if (result){
+                    doAllRecord(1, 0, 0);
+                }
+            }
+        });
+    } else if (status == "all_monitoring_and_all_recording"){
+        var endTime = new Date().getTime();
+        bootbox.confirm({
+            title: "结束全局录制",
+            message: "即将结束录制，是否保存当前录制的片段",
+            buttons: {
+                cancel: { label: '<i class="fa fa-times"></i> 取消' },
+                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+            },
+            callback: function (result) {
+                if (result){
+                    doAllRecord(0, 1, endTime);
+                } else {
+                    doAllRecord(0, 0, endTime);
+                }
+            }
+        });
+    }
+
+    function doAllRecord(action, isSave, endTime){
+        $.ajax({
+            type: 'get',
+            url: action_address + "/record/all",
+            data: {
+                "app-id": app['id'],
+                "action": action,
+                "isSave": isSave,
+                "data-time": endTime
+            },
+            success: function (response) {
+                if (response.code == "1111"){
+                    commonObject.printExceptionMsg(response.data);
+                } else if (response.code == "0000"){
+                    var targetExp = response.data;
+                    if (action == 1){
+                        $('#all-record-btn').removeClass('btn-default').addClass('btn-success');
+                        targetExp.forEach(function (expId) {
+                            pageStartRecord(expId);
+                        });
+                    } else if (action == 0){
+                        $('#all-record-btn').removeClass('btn-success').addClass('btn-default');
+                        targetExp.forEach(function (expId) {
+                            pageStopRecorder(expId);
+                        });
+                        if (isSave == 1){
+                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
+                        }
+                    }
+                }
+            },
+            error: function (response) {
+                commonObject.printRejectMsg();
+            }
+        });
+    }
 }
 
 /**
@@ -452,6 +605,17 @@ function pageStartRecord(exp_id) {
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
     exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
 
+    if (!expObject.recorderTimestamp.hasOwnProperty(exp_id)){
+        expObject.setRecorderTime(exp_id, []);
+    }
+
+    if (expObject.recorderTimestamp[exp_id].length % 2 == 0){
+        expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+    } else {
+        expObject.recorderTimestamp[exp_id].pop();
+        expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+    }
+
     isExperimentRecorder[exp_id] = 1;
 }
 
@@ -463,7 +627,7 @@ function pageStopRecorder(exp_id){
     $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-default').text('非录制');
     $('#experiment-recorder-' + exp_id).removeClass('btn-success').addClass('btn-default');
     isExperimentRecorder[exp_id] = 0;
-    if (expObject.recorderTimestamp[exp_id].length % 2 == 1) {
+    if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length % 2 == 1) {
         expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
     }
 }

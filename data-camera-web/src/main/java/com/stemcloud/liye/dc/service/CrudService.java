@@ -1,7 +1,5 @@
 package com.stemcloud.liye.dc.service;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
@@ -13,12 +11,8 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
-import com.stemcloud.liye.dc.domain.common.RecordState;
 import com.stemcloud.liye.dc.domain.config.SensorRegister;
-import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
-import com.stemcloud.liye.dc.domain.data.VideoData;
-import com.stemcloud.liye.dc.common.SensorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -201,60 +195,5 @@ public class CrudService {
 
     private void deleteRecorder(long id){
         recorderRepository.deleteRecorder(id);
-    }
-
-
-    /************/
-    /* MONIT AND RECORD   */
-    /************/
-    /**
-     * 全局监控操作
-     * @param appId 当前appId
-     * @return 三种状态：1) 部分监控，提示用户不能进行操作; 2) 全部监控，停止全局监控; 3） 全部非监控，进入全局监控
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public synchronized Map allMonitor(long appId) throws Exception {
-        Map<String, Object> map = new HashMap<String, Object>(2);
-
-        List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
-        List<Long> notInMonitorIds = new ArrayList<Long>();
-        // 选出当前绑定了设备，但是又没有处于监控状态的实验
-        for (ExperimentInfo exp: experiments){
-            Boolean hasSensor = false;
-            for (TrackInfo track : exp.getTrackInfoList()){
-                if (track.getSensor() != null){
-                    hasSensor = true;
-                    break;
-                }
-            }
-            if (hasSensor && exp.getIsMonitor() == 0){
-                notInMonitorIds.add(exp.getId());
-            }
-        }
-
-        if (notInMonitorIds.isEmpty()){
-            // 全部处于监控状态，关闭
-            map.put("action", "close");
-            for (ExperimentInfo exp: experiments) {
-                expRepository.monitorExp(exp.getId(), 0);
-                if (exp.getIsRecorder() == 1) {
-                    // --- end recorder
-                    RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(exp.getId(), 1, 0);
-                    if (recorderInfo != null) {
-                        recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
-                        expRepository.recorderExp(exp.getId(), 0);
-                    }
-                }
-            }
-        } else {
-            // 部分还没进入监控状态
-            map.put("action", "open");
-            for (Long expId : notInMonitorIds){
-                expRepository.monitorExp(expId, 1);
-            }
-            map.put("ids", notInMonitorIds);
-        }
-
-        return map;
     }
 }

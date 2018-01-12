@@ -3,6 +3,7 @@ package com.stemcloud.liye.dc.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.common.ExpStatus;
+import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
@@ -35,12 +36,14 @@ public class ActionService {
     private final RecorderRepository recorderRepository;
     private final SensorRepository sensorRepository;
     private final VideoDataRepository videoDataRepository;
+    private final AppRepository appRepository;
 
-    public ActionService(ExperimentRepository experimentRepository, RecorderRepository recorderRepository, SensorRepository sensorRepository, VideoDataRepository videoDataRepository) {
+    public ActionService(ExperimentRepository experimentRepository, RecorderRepository recorderRepository, SensorRepository sensorRepository, VideoDataRepository videoDataRepository, AppRepository appRepository) {
         this.experimentRepository = experimentRepository;
         this.recorderRepository = recorderRepository;
         this.sensorRepository = sensorRepository;
         this.videoDataRepository = videoDataRepository;
+        this.appRepository = appRepository;
     }
 
     /**
@@ -194,8 +197,100 @@ public class ActionService {
         }
     }
 
+    /**
+     * 获取当前场景的全局实验状态
+     * @param appId
+     * @return 6种状态
+     */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized Map allMonitor(long appId){
-        Map<String, Object> map = new HashMap<String, Object>(2);
+    public synchronized ExpStatus expAllStatus(long appId){
+        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
+        List<Long> notInMonitorIds = new ArrayList<Long>();
+        List<Long> notInRecordIds = new ArrayList<Long>();
+        int sensorExp = 0;
+        // 选出当前绑定了设备，但是又没有处于监控状态的实验
+        for (ExperimentInfo exp: experiments){
+            Boolean hasSensor = false;
+            for (TrackInfo track : exp.getTrackInfoList()){
+                if (track.getSensor() != null){
+                    hasSensor = true;
+                    break;
+                }
+            }
+            if (hasSensor){
+                sensorExp ++;
+                if (exp.getIsMonitor() == 0){
+                    notInMonitorIds.add(exp.getId());
+                }
+                if (exp.getIsRecorder() == 0){
+                    notInRecordIds.add(exp.getId());
+                }
+            }
+        }
+        if (notInMonitorIds.isEmpty() && notInRecordIds.isEmpty()){
+            return ExpStatus.ALL_MONITORING_AND_ALL_RECORDING;
+        } else if (notInMonitorIds.isEmpty() && sensorExp > notInRecordIds.size()){
+            return ExpStatus.ALL_MONITORING_AND_PART_RECORDING;
+        } else if (notInMonitorIds.isEmpty() && sensorExp == notInRecordIds.size()){
+            return ExpStatus.ALL_MONITORING_AND_NO_RECORDING;
+        } else if (!notInMonitorIds.isEmpty() && notInRecordIds.isEmpty()) {
+            return ExpStatus.UNKNOWN;
+        } else if (!notInMonitorIds.isEmpty() && notInMonitorIds.size() == sensorExp){
+            return ExpStatus.ALL_NOT_MONITOR;
+        } else if (!notInMonitorIds.isEmpty()){
+            return ExpStatus.PART_MONITORING;
+        }
+
+        return ExpStatus.UNKNOWN;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized List<Long> allMonitor(long appId, int action, int isSave, long dataTime) throws Exception {
+        List<Long> expIds =  new ArrayList<Long>();
+        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
+        for (ExperimentInfo exp: experiments){
+            Boolean hasSensor = false;
+            for (TrackInfo track : exp.getTrackInfoList()){
+                if (track.getSensor() != null){
+                    hasSensor = true;
+                    break;
+                }
+            }
+            if (hasSensor){
+                boolean noChange = (action == 1 && exp.getIsMonitor() == 1) || (action == 0 && exp.getIsMonitor() == 0);
+                if (!noChange){
+                    changeMonitorState(exp.getId(), action, isSave, dataTime, "", "");
+                    expIds.add(exp.getId());
+                    logger.info("Change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                }
+            }
+        }
+
+        return expIds;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized List<Long> allRecorder(long appId, int action, int isSave, long dataTime) throws Exception {
+        List<Long> expIds =  new ArrayList<Long>();
+        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
+        for (ExperimentInfo exp: experiments){
+            Boolean hasSensor = false;
+            for (TrackInfo track : exp.getTrackInfoList()){
+                if (track.getSensor() != null){
+                    hasSensor = true;
+                    break;
+                }
+            }
+            if (hasSensor && exp.getIsMonitor() == 1){
+                boolean noChange = (action == 1 && exp.getIsRecorder() == 1) || (action == 0 && exp.getIsRecorder() == 0);
+                if (!noChange){
+                    changeRecorderState(exp.getId(), action, isSave, dataTime, "", "");
+                    expIds.add(exp.getId());
+                    logger.info("Change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                }
+            }
+        }
+
+        return expIds;
     }
 }

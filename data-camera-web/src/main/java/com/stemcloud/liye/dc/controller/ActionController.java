@@ -28,7 +28,7 @@ public class ActionController {
     }
 
     @GetMapping("/status")
-    public Map getMonitorStatus(@RequestParam Map<String, String> queryParams){
+    public Map getStatus(@RequestParam Map<String, String> queryParams){
         try {
             long expId = Long.parseLong(queryParams.get("exp-id"));
             return ServerReturnTool.serverSuccess(actionService.expCurrentStatus(expId).getValue());
@@ -70,13 +70,41 @@ public class ActionController {
         }
     }
 
+    @GetMapping("/status/all")
+    public Map getAllStatus(@RequestParam Map<String, String> queryParams){
+        try {
+            long appId = Long.parseLong(queryParams.get("app-id"));
+            return ServerReturnTool.serverSuccess(actionService.expAllStatus(appId).getValue());
+        } catch (Exception e){
+            logger.error("[/status/all]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
     @GetMapping("/monitor/all")
     public Map expMonitorAll(@RequestParam Map<String, String> queryParams){
         try {
             Long appId = Long.valueOf(queryParams.get("app-id"));
-            return ServerReturnTool.serverSuccess("");
+            int action = Integer.parseInt(queryParams.get("action"));
+            int isSave = Integer.parseInt(queryParams.get("isSave"));
+            long dataTime = Long.parseLong(queryParams.get("data-time"));
+            return ServerReturnTool.serverSuccess(actionService.allMonitor(appId, action, isSave, dataTime));
         } catch (Exception e){
             logger.error("[/monitor/all]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/record/all")
+    public Map expRecordAll(@RequestParam Map<String, String> queryParams){
+        try {
+            Long appId = Long.valueOf(queryParams.get("app-id"));
+            int action = Integer.parseInt(queryParams.get("action"));
+            int isSave = Integer.parseInt(queryParams.get("isSave"));
+            long dataTime = Long.parseLong(queryParams.get("data-time"));
+            return ServerReturnTool.serverSuccess(actionService.allRecorder(appId, action, isSave, dataTime));
+        } catch (Exception e){
+            logger.error("[/record/all]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }

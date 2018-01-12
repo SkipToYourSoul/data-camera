@@ -269,19 +269,6 @@ public class CrudController {
         return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("sensor-id")));
     }
 
-    @GetMapping("/allMonitor")
-    public Map allMonitorSensor(@RequestParam Map<String, String> queryParams){
-        Map<String, Object> map;
-        try {
-            Long appId = Long.valueOf(queryParams.get("app-id"));
-            map = ServerReturnTool.serverSuccess(crudService.allMonitor(appId));
-        } catch (Exception e){
-            map = ServerReturnTool.serverFailure(e.getMessage());
-            logger.error("/crud/content", e);
-        }
-        return map;
-    }
-
     @PostMapping("/recorder/name")
     public Map modifySegmentName(@RequestParam Map<String, String> queryParams){
         String result = "";
