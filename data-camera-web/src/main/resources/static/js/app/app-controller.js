@@ -32,7 +32,7 @@ $('#edit-app-form').formValidation({
         data: expObject.editObjectText == action?$(this).serialize() + "&app-id=" + app['id']:$(this).serialize(),
         success: function (response) {
             if (response.code == "0000"){
-                window.location.href = current_address + "?id=" + response.data;
+                window.location.href = current_address + "?id=" + response.data['id'];
             } else if (response.code == "1111") {
                 commonObject.printExceptionMsg(response.data);
             }

@@ -15,6 +15,7 @@ public enum ExpStatus {
     NOT_BOUND_SENSOR("not_bound_sensor"), NOT_MONITOR("not_monitor"),
 
     //
+    NO_AVAILABLE_SENSOR("no_available_sensor"),
     ALL_MONITORING_AND_ALL_RECORDING("all_monitoring_and_all_recording"),
     ALL_MONITORING_AND_PART_RECORDING("all_monitoring_and_part_recording"),
     ALL_MONITORING_AND_NO_RECORDING("all_monitoring_and_no_recording"),

@@ -227,6 +227,10 @@ public class ActionService {
                 }
             }
         }
+        if (sensorExp == 0){
+            return ExpStatus.NO_AVAILABLE_SENSOR;
+        }
+
         if (notInMonitorIds.isEmpty() && notInRecordIds.isEmpty()){
             return ExpStatus.ALL_MONITORING_AND_ALL_RECORDING;
         } else if (notInMonitorIds.isEmpty() && sensorExp > notInRecordIds.size()){

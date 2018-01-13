@@ -195,7 +195,7 @@ function getExpStatusFromServer(expId){
 /**
  * 获取当前应用下实验的整体状态
  *  ALL_MONITORING_AND_ALL_RECORDING, ALL_MONITORING_AND_PART_RECORDING, ALL_MONITORING_AND_NO_RECORDING,
- *  ALL_NOT_MONITOR, PART_MONITORING
+ *  ALL_NOT_MONITOR, PART_MONITORING, NO_AVAILABLE_SENSOR
  * @returns {string}
  */
 function getAppStatusFromServer(){
@@ -394,6 +394,8 @@ function allMonitor() {
     console.log("status: " + status);
     if (status == "unknown"){
         message_info("状态unknown", "info");
+    } else if (status == "no_available_sensor") {
+        message_info("没有可用的传感器组", "info");
     } else if (status == "part_monitoring" || status == "all_not_monitor"){
         bootbox.confirm({
             title: "开始全局监控",
@@ -489,6 +491,8 @@ function allRecord(){
     console.log("status: " + status);
     if (status == "unknown"){
         message_info("状态unknown", "info");
+    } else if (status == "no_available_sensor") {
+        message_info("没有可用的传感器组", "info");
     } else if (status == "part_monitoring" || status == "all_not_monitor"){
         message_info("当前不是全局监控状态，不能进行全局录制", "info");
     } else if (status == "all_monitoring_and_no_recording" || status == "all_monitoring_and_part_recording"){
