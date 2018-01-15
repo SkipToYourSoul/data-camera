@@ -126,11 +126,17 @@ public class ActionService {
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public synchronized long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc){
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long response = -1;
 
         if (action == 1){
+            RecorderInfo testRecorder = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
+            if (testRecorder != null){
+                logger.warn("Start record, but the record has already start");
+                return -1L;
+            }
+
             experimentRepository.recorderExp(expId, 1);
             List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
 
@@ -158,7 +164,8 @@ public class ActionService {
             // --- end recorder
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo == null){
-                throw new Exception("end record, but no record info in table");
+                logger.warn("End record, but no record info in table");
+                return -1L;
             }
             experimentRepository.recorderExp(expId, 0);
             if (isSave == 1){
