@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc.common;
 
-import com.stemcloud.liye.dc.dao.DbTools;
+import com.stemcloud.liye.dc.dao.MysqlRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class RandomGenerator {
                     int type = GlobalVariables.sensorConfigMap.get(configId).getType();
                     if (type == 1) {
                         for (String dimension : dimensions) {
-                            recorders += DbTools.saveValueData(sensorId, trackId, dimension, randomDouble(10, 15));
+                            recorders += MysqlRepository.saveValueData(sensorId, trackId, dimension, randomDouble(10, 15));
                         }
                         monitor ++;
                     }

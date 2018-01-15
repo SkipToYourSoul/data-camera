@@ -1,8 +1,10 @@
 package com.stemcloud.liye.dc.listener;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
-import com.stemcloud.liye.dc.common.DbConnectionPool;
+import com.stemcloud.liye.dc.dao.DbConnectionPool;
 import com.stemcloud.liye.dc.common.GlobalVariables;
+import com.stemcloud.liye.dc.dao.MysqlRepository;
+import com.stemcloud.liye.dc.domain.SensorStatus;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -13,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,18 +44,12 @@ public class SensorMonitorJob implements Job {
 
     private int doJob() throws SQLException {
         Set<String> onlineSensors = new HashSet<String>();
-        String sql = "SELECT a.sensor_code, b.is_monitor, a.id, a.track_id, a.sensor_config_id " +
-                "FROM dc_base_sensor_info a, dc_base_experiment_info b " +
-                "WHERE a.exp_id = b.id AND a.is_deleted = 0";
-
-        DruidPooledConnection conn = DbConnectionPool.getInstance().getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
+        List<SensorStatus> sensorStatuses = MysqlRepository.fetchSensorStatus();
         int count = 0;
-        while (rs.next()){
-            GlobalVariables.sensorMonitorStatus.put(rs.getString(1), rs.getInt(2));
-            GlobalVariables.sensorInfo.put(rs.getString(1), String.format("%d_%d_%d", rs.getLong(3), rs.getLong(4), rs.getLong(5)));
-            onlineSensors.add(rs.getString(1));
+        for (SensorStatus status : sensorStatuses){
+            GlobalVariables.sensorMonitorStatus.put(status.getCode(), status.getIsMonitor());
+            GlobalVariables.sensorInfo.put(status.getCode(), String.format("%d_%d_%d", status.getId(), status.getTrackId(), status.getSensorConfigId()));
+            onlineSensors.add(status.getCode());
             count ++;
         }
         for (Map.Entry<String, Integer> entry : GlobalVariables.sensorMonitorStatus.entrySet()){
@@ -61,10 +58,6 @@ public class SensorMonitorJob implements Job {
                 GlobalVariables.sensorInfo.remove(entry.getKey());
             }
         }
-
-        rs.close();
-        ps.close();
-        conn.close();
 
         return count;
     }

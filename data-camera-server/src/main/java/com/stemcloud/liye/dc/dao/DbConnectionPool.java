@@ -1,4 +1,4 @@
-package com.stemcloud.liye.dc.common;
+package com.stemcloud.liye.dc.dao;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
@@ -17,11 +17,9 @@ import java.util.Properties;
  */
 public class DbConnectionPool {
     private static Logger logger = LoggerFactory.getLogger(DbConnectionPool.class);
-
-    private static DbConnectionPool dbConnectionPool = null;
     private static DruidDataSource druidDataSource = null;
 
-    static {
+    private static DruidDataSource loadProperties(){
         Properties properties = new Properties();
         try {
             properties.load(DbConnectionPool.class.getResourceAsStream("/db.properties"));
@@ -29,16 +27,13 @@ public class DbConnectionPool {
         } catch (Exception e) {
             logger.error("加载数据库配置失败", e);
         }
+        return druidDataSource;
     }
 
-    public static synchronized DbConnectionPool getInstance(){
-        if (null == dbConnectionPool){
-            dbConnectionPool = new DbConnectionPool();
+    public static synchronized DruidDataSource getInstance(){
+        if (null == druidDataSource){
+            druidDataSource = loadProperties();
         }
-        return dbConnectionPool;
-    }
-
-    public DruidPooledConnection getConnection() throws SQLException {
-        return druidDataSource.getConnection();
+        return druidDataSource;
     }
 }

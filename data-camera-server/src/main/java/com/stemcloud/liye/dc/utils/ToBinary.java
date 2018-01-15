@@ -1,4 +1,4 @@
-package com.stemcloud.liye.dc.common;
+package com.stemcloud.liye.dc.utils;
 
 import java.util.Arrays;
 
