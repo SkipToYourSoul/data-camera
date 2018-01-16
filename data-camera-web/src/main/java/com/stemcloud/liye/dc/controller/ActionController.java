@@ -88,7 +88,9 @@ public class ActionController {
             int action = Integer.parseInt(queryParams.get("action"));
             int isSave = Integer.parseInt(queryParams.get("isSave"));
             long dataTime = Long.parseLong(queryParams.get("data-time"));
-            return ServerReturnTool.serverSuccess(actionService.allMonitor(appId, action, isSave, dataTime));
+            String name = queryParams.get("data-name");
+            String desc = queryParams.get("data-desc");
+            return ServerReturnTool.serverSuccess(actionService.allMonitor(appId, action, isSave, dataTime, name, desc));
         } catch (Exception e){
             logger.error("[/monitor/all]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
@@ -102,7 +104,9 @@ public class ActionController {
             int action = Integer.parseInt(queryParams.get("action"));
             int isSave = Integer.parseInt(queryParams.get("isSave"));
             long dataTime = Long.parseLong(queryParams.get("data-time"));
-            return ServerReturnTool.serverSuccess(actionService.allRecorder(appId, action, isSave, dataTime));
+            String name = queryParams.get("data-name");
+            String desc = queryParams.get("data-desc");
+            return ServerReturnTool.serverSuccess(actionService.allRecorder(appId, action, isSave, dataTime, name, desc));
         } catch (Exception e){
             logger.error("[/record/all]", e);
             return ServerReturnTool.serverFailure(e.getMessage());

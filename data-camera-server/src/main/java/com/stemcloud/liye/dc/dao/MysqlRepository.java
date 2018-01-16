@@ -45,7 +45,7 @@ public class MysqlRepository {
             ps.close();
             conn.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("[saveValueData]", e);
         }
 
         return result;

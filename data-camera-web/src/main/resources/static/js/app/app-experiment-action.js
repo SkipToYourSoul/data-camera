@@ -218,7 +218,7 @@ function getAppStatusFromServer(){
  * 询问是否需要保存录制的数据片段
  * @returns {number}
  */
-function askForSaveRecorder(doFunction, action, endTime){
+function askForSaveRecorder(doFunction, action, endTime, title){
     var msgHtml = '<div class="row"> <div class="form-group" style="margin-bottom: 45px"><label class="col-sm-2 control-label">片段名</label>' +
         '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-name" placeholder="请输入片段标题"/></div></div>' +
         '<div class="form-group"><label class="col-sm-2 control-label">片段描述</label>' +
@@ -226,12 +226,12 @@ function askForSaveRecorder(doFunction, action, endTime){
         '</div>';
 
     bootbox.dialog({
-        title: "保存录制数据片段?",
+        title: title,
         message: msgHtml,
         async: false,
         buttons: {
             cancel: {
-                label: '<i class="fa fa-times"></i> 取消',
+                label: '<i class="fa fa-times"></i> 不保存',
                 className: 'btn-danger',
                 callback: function(){
                     doFunction(action, 0, endTime);
@@ -246,6 +246,10 @@ function askForSaveRecorder(doFunction, action, endTime){
             }
         }
     });
+
+    // 完成后清空片段数据框
+    $('#dialog-data-name').val("");
+    $('#dialog-data-desc').val("");
 }
 
 /**
@@ -268,14 +272,12 @@ function expMonitor(button){
         message_info("停止监控实验" + expId, "success");
         doMonitor(0, 0, 0);
     } else if (status == "monitoring_and_recording"){
-        askForSaveRecorder(doMonitor, 0, new Date().getTime());
+        askForSaveRecorder(doMonitor, 0, new Date().getTime(), "即将结束监控，是否保存录制数据片段?");
     }
 
     // action -> 0: stop, 1: start
     // isSave -> 0: not save, 1: save
     function doMonitor(action, isSave, endTime) {
-        var $name = $('#dialog-data-name');
-        var $desc = $('#dialog-data-desc');
         $.ajax({
             type: 'get',
             url: action_address + "/monitor",
@@ -284,8 +286,8 @@ function expMonitor(button){
                 "action": action,
                 "isSave": isSave,
                 "data-time": endTime,
-                "data-name": $name.val(),
-                "data-desc": $desc.val()
+                "data-name": $('#dialog-data-name').val(),
+                "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
                 if (response.code == "1111"){
@@ -299,6 +301,8 @@ function expMonitor(button){
                         pageStopMonitor(expId);
                         if (isSave == 1 && response.data != -1){
                             window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
+                        } else if (response.data == -1) {
+                            commonObject.printExceptionMsg("监控状态结束异常");
                         }
                     }
                 }
@@ -307,10 +311,6 @@ function expMonitor(button){
                 commonObject.printRejectMsg();
             }
         });
-
-        // 完成后清空片段数据框
-        $name.val("");
-        $desc.val("");
     }
 }
 
@@ -334,12 +334,10 @@ function expRecorder(button) {
         doRecorder(1, 0, 0);
     } else if (status == "monitoring_and_recording"){
         // 停止录制
-        askForSaveRecorder(doRecorder, 0, new Date().getTime());
+        askForSaveRecorder(doRecorder, 0, new Date().getTime(), "即将结束录制，是否保存录制数据片段?");
     }
 
     function doRecorder(action, isSave, endTime){
-        var $name = $('#dialog-data-name');
-        var $desc = $('#dialog-data-desc');
         $.ajax({
             type: 'get',
             url: action_address + "/record",
@@ -347,9 +345,9 @@ function expRecorder(button) {
                 "exp-id": expId,
                 "action": action,
                 "isSave": isSave,
-                "data-name": $name.val(),
-                "data-desc": $desc.val(),
-                "data-time": endTime
+                "data-time": endTime,
+                "data-name": $('#dialog-data-name').val(),
+                "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
                 if (response.code == "1111"){
@@ -361,6 +359,8 @@ function expRecorder(button) {
                         pageStopRecorder(expId);
                         if (isSave == 1 && response.data != -1){
                             window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
+                        } else if (response.data == -1){
+                            commonObject.printExceptionMsg("录制状态结束异常");
                         }
                     }
                 }
@@ -369,10 +369,6 @@ function expRecorder(button) {
                 commonObject.printRejectMsg();
             }
         });
-
-        // 完成后清空片段数据框
-        $name.val("");
-        $desc.val("");
     }
 }
 
@@ -419,7 +415,7 @@ function allMonitor() {
         });
     } else if (status == "all_monitoring_and_all_recording" || status == "all_monitoring_and_part_recording"){
         var endTime = new Date().getTime();
-        bootbox.confirm({
+        /*bootbox.confirm({
             title: "结束全局监控",
             message: "即将结束监控，是否保存当前录制的片段",
             buttons: {
@@ -433,7 +429,9 @@ function allMonitor() {
                     doAllMonitor(0, 0, endTime);
                 }
             }
-        });
+        });*/
+
+        askForSaveRecorder(doAllMonitor, 0, endTime, "即将结束全局监控，是否保存录制数据片段?");
     }
 
     function doAllMonitor(action, isSave, endTime){
@@ -444,7 +442,9 @@ function allMonitor() {
                 "app-id": app['id'],
                 "action": action,
                 "isSave": isSave,
-                "data-time": endTime
+                "data-time": endTime,
+                "data-name": $('#dialog-data-name').val(),
+                "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
                 if (response.code == "1111"){
@@ -504,8 +504,7 @@ function allRecord(){
             }
         });
     } else if (status == "all_monitoring_and_part_recording") {
-        var endTime = new Date().getTime();
-        bootbox.confirm({
+        /*bootbox.confirm({
             title: "开始全局录制",
             message: "当前有部分传感器组处于录制状态，是否要保存当前录制片段并进入全局录制",
             buttons: {
@@ -519,10 +518,10 @@ function allRecord(){
                     doAllRecord(1, 1, endTime);
                 }
             }
-        });
+        });*/
+        askForSaveRecorder(doAllRecord, 1, new Date().getTime(), "即将开始全局录制，是否保存之前已录制的数据片段?");
     } else if (status == "all_monitoring_and_all_recording"){
-        var endTime = new Date().getTime();
-        bootbox.confirm({
+        /*bootbox.confirm({
             title: "结束全局录制",
             message: "即将结束录制，是否保存当前录制的片段",
             buttons: {
@@ -536,7 +535,8 @@ function allRecord(){
                     doAllRecord(0, 0, endTime);
                 }
             }
-        });
+        });*/
+        askForSaveRecorder(doAllRecord, 0, new Date().getTime(), "即将结束全局录制，是否保存录制的数据片段?");
     }
 
     function doAllRecord(action, isSave, endTime){
@@ -547,7 +547,9 @@ function allRecord(){
                 "app-id": app['id'],
                 "action": action,
                 "isSave": isSave,
-                "data-time": endTime
+                "data-time": endTime,
+                "data-name": $('#dialog-data-name').val(),
+                "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
                 if (response.code == "1111"){

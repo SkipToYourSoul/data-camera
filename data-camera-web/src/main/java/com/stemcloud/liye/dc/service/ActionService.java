@@ -272,7 +272,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public synchronized List<Long> allMonitor(long appId, int action, int isSave, long dataTime) throws Exception {
+    public synchronized List<Long> allMonitor(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){
@@ -286,7 +286,7 @@ public class ActionService {
             if (hasSensor){
                 boolean noChange = (action == 1 && exp.getIsMonitor() == 1) || (action == 0 && exp.getIsMonitor() == 0);
                 if (!noChange){
-                    changeMonitorState(exp.getId(), action, isSave, dataTime, "", "");
+                    changeMonitorState(exp.getId(), action, isSave, dataTime, name + "来自传感器组{" + exp.getName() + "}", desc);
                     expIds.add(exp.getId());
                     logger.info("Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
@@ -297,7 +297,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public synchronized List<Long> allRecorder(long appId, int action, int isSave, long dataTime) throws Exception {
+    public synchronized List<Long> allRecorder(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){
@@ -315,7 +315,7 @@ public class ActionService {
                         changeRecorderState(exp.getId(), 0, isSave, dataTime, "", "");
                         changeRecorderState(exp.getId(), action, 0, 0, "", "");
                     } else {
-                        changeRecorderState(exp.getId(), action, isSave, dataTime, "", "");
+                        changeRecorderState(exp.getId(), action, isSave, dataTime, name + "来自传感器组{" + exp.getName() + "}", desc);
                     }
                     expIds.add(exp.getId());
                     logger.info("Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
