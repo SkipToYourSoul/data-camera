@@ -15,8 +15,12 @@ import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
+import com.stemcloud.liye.dc.domain.message.SensorStatus;
+import com.stemcloud.liye.dc.util.RedisKeyUtils;
+import com.stemcloud.liye.dc.util.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +41,12 @@ public class ActionService {
     private final SensorRepository sensorRepository;
     private final VideoDataRepository videoDataRepository;
     private final AppRepository appRepository;
+
+    @Autowired
+    RedisUtils redisUtils;
+    private Gson gson = new Gson();
+    private String MONITOR = "monitor";
+    private String RECORD = "record";
 
     public ActionService(ExperimentRepository experimentRepository, RecorderRepository recorderRepository, SensorRepository sensorRepository, VideoDataRepository videoDataRepository, AppRepository appRepository) {
         this.experimentRepository = experimentRepository;
@@ -110,6 +120,9 @@ public class ActionService {
             }
         }
 
+        // -- send message
+        sendMessageToRedis(expId, MONITOR, action);
+
         logger.info("Change experiment monitor state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
     }
@@ -178,6 +191,9 @@ public class ActionService {
                 recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
             }
         }
+
+        // -- send message
+        sendMessageToRedis(expId, MONITOR, action);
 
         logger.info("Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
@@ -303,5 +319,21 @@ public class ActionService {
         }
 
         return expIds;
+    }
+
+    /**
+     * 将传感器组的监控/录制状态通知redis
+     * @param expId 传感器组ID
+     * @param actionType monitor or recorder
+     * @param action 0 or 1
+     */
+    private void sendMessageToRedis(long expId, String actionType, int action){
+        logger.info("Send message to redis, expId={}, actionType={}, action={}", expId, actionType, action);
+        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
+        for (SensorInfo sensor : sensors) {
+            String redisKey = MONITOR.equals(actionType)? RedisKeyUtils.mkSensorMonitorKey(sensor.getCode()):RedisKeyUtils.mkSensorRecordKey(sensor.getCode());
+            String redisValue = gson.toJson(new SensorStatus(sensor.getCode(), action, sensor.getId(), sensor.getTrackId(), sensor.getSensorConfig().getId()));
+            redisUtils.lPush(redisKey, redisValue);
+        }
     }
 }

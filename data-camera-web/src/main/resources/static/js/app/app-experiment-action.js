@@ -495,7 +495,7 @@ function allRecord(){
         message_info("没有可用的传感器组", "info");
     } else if (status == "part_monitoring" || status == "all_not_monitor"){
         message_info("当前不是全局监控状态，不能进行全局录制", "info");
-    } else if (status == "all_monitoring_and_no_recording" || status == "all_monitoring_and_part_recording"){
+    } else if (status == "all_monitoring_and_no_recording"){
         bootbox.confirm({
             title: "开始全局录制",
             message: "是否要开始全局录制",
@@ -509,14 +509,33 @@ function allRecord(){
                 }
             }
         });
+    } else if (status == "all_monitoring_and_part_recording") {
+        var endTime = new Date().getTime();
+        bootbox.confirm({
+            title: "开始全局录制",
+            message: "当前有部分传感器组处于录制状态，是否要保存当前录制片段并进入全局录制",
+            buttons: {
+                cancel: { label: '<i class="fa fa-times"></i> 不保存当前片段，进入全局监控' },
+                confirm: { label: '<i class="fa fa-check"></i> 保存当前片段，进入全局监控' }
+            },
+            callback: function (result) {
+                if (result){
+                    doAllRecord(0, 1, endTime);
+                    doAllRecord(1, 0, 0);
+                } else {
+                    doAllRecord(0, 0, endTime);
+                    doAllRecord(1, 0, 0);
+                }
+            }
+        });
     } else if (status == "all_monitoring_and_all_recording"){
         var endTime = new Date().getTime();
         bootbox.confirm({
             title: "结束全局录制",
             message: "即将结束录制，是否保存当前录制的片段",
             buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 取消' },
-                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+                cancel: { label: '<i class="fa fa-times"></i> 不保存录制片段' },
+                confirm: { label: '<i class="fa fa-check"></i> 保存录制片段' }
             },
             callback: function (result) {
                 if (result){
