@@ -76,7 +76,7 @@ public class DataController {
             Long beginTime = System.currentTimeMillis();
             map = ServerReturnTool.serverSuccess(dataService.getRecentDataOfBoundSensors(Long.parseLong(queryParams.get("exp-id")), Long.parseLong(queryParams.get("timestamp"))));
             Long endTime = System.currentTimeMillis();
-            logger.info("[/data/monitoring] request data in {} ms.", (endTime - beginTime));
+            logger.debug("[/data/monitoring] request data in {} ms.", (endTime - beginTime));
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
             logger.error("[/data/monitoring]", e);
@@ -120,10 +120,8 @@ public class DataController {
         String start = queryParams.get("start");
         String end = queryParams.get("end");
         logger.info("[/data/user-new-recorder], id={}, start={}, end={}", recorderId, start, end);
-        // List<String> legend = Arrays.asList(queryParams.get("legend").split(";"));
-
         try {
-            return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end/*, legend*/));
+            return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end));
         } catch (ParseException e) {
             return ServerReturnTool.serverFailure(e.getMessage());
         }

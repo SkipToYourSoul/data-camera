@@ -21,9 +21,7 @@ function initActionStatus(){
                 exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
                 exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
 
-                expObject.setRecorderTime(id, []);
-                expObject.recorderTimestamp[id].push(expRecorderTime[id]);
-
+                expObject.setRecorderTime(id, [expRecorderTime[id]]);
                 expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
             }
             doInterval(id);
@@ -108,19 +106,14 @@ function doInterval(exp_id){
                         }
 
                         // --- update series markArea (if recorder)
-                        if (expObject.recorderTimestamp.hasOwnProperty(exp_id)){
+                        if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
                             var mark_list = series[0]['markArea']['data'];
-                            var recorder_length = expObject.recorderTimestamp[exp_id].length;
-                            if (recorder_length % 2 == 1){
-                                // - recorder ing
-                                var mark_index = Math.floor(recorder_length/2);
-                                mark_list[mark_index] = [{
-                                    xAxis: parseTime(expObject.recorderTimestamp[exp_id][recorder_length - 1])
-                                }, {
-                                    xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
-                                }];
-                                series[0]['markArea']['data'] = mark_list;
-                            }
+                            mark_list[0] = [{
+                                xAxis: parseTime(expObject.recorderTimestamp[exp_id][0])
+                            }, {
+                                xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
+                            }];
+                            series[0]['markArea']['data'] = mark_list;
                         }
 
                         // -- set new option
@@ -129,9 +122,9 @@ function doInterval(exp_id){
                         });
                     }
                 } else if (sensor_type == 2){
-                    if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length % 2 == 1){
+                    if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
                         // --- if in recorder state, update info
-                        var start_time = expObject.recorderTimestamp[exp_id][expObject.recorderTimestamp[exp_id].length - 1];
+                        var start_time = expObject.recorderTimestamp[exp_id][0];
                         $('#experiment-info-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(parseTime(start_time));
                         $('#experiment-now-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(Math.round((Date.now() - Date.parse(start_time))/1000));
                     }
@@ -401,8 +394,8 @@ function allMonitor() {
             title: "开始全局监控",
             message: "是否要开始全局监控",
             buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 取消' },
-                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+                cancel: { label: '<i class="fa fa-times"></i> 不开始全局监控' },
+                confirm: { label: '<i class="fa fa-check"></i> 开始全局监控' }
             },
             callback: function (result) {
                 if (result){
@@ -415,8 +408,8 @@ function allMonitor() {
             title: "结束全局监控",
             message: "是否要结束全局监控",
             buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 取消' },
-                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+                cancel: { label: '<i class="fa fa-times"></i> 不结束全局监控' },
+                confirm: { label: '<i class="fa fa-check"></i> 结束全局监控' }
             },
             callback: function (result) {
                 if (result){
@@ -430,8 +423,8 @@ function allMonitor() {
             title: "结束全局监控",
             message: "即将结束监控，是否保存当前录制的片段",
             buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 取消' },
-                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+                cancel: { label: '<i class="fa fa-times"></i> 结束全局监控不保存片段' },
+                confirm: { label: '<i class="fa fa-check"></i> 结束全局监控并保存片段' }
             },
             callback: function (result) {
                 if (result){
@@ -465,6 +458,7 @@ function allMonitor() {
                         });
                     } else if (action == 0){
                         $('#all-monitor-btn').removeClass('btn-success').addClass('btn-default');
+                        $('#all-record-btn').removeClass('btn-success').addClass('btn-default');
                         targetExp.forEach(function (expId) {
                             pageStopMonitor(expId);
                         });
@@ -620,23 +614,14 @@ function pageStopMonitor(exp_id){
  * @param exp_id
  */
 function pageStartRecord(exp_id) {
+    console.info("Page start recorder: " + exp_id);
     var exp_state_dom = $('#experiment-rs-' + exp_id);
     var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
 
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
     exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
 
-    if (!expObject.recorderTimestamp.hasOwnProperty(exp_id)){
-        expObject.setRecorderTime(exp_id, []);
-    }
-
-    if (expObject.recorderTimestamp[exp_id].length % 2 == 0){
-        expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-    } else {
-        expObject.recorderTimestamp[exp_id].pop();
-        expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-    }
-
+    expObject.setRecorderTime(exp_id, [new Date().Format("yyyy-MM-dd HH:mm:ss")]);
     isExperimentRecorder[exp_id] = 1;
 }
 
@@ -645,10 +630,9 @@ function pageStartRecord(exp_id) {
  * @param exp_id
  */
 function pageStopRecorder(exp_id){
+    console.info("Page stop recorder: " + exp_id);
     $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-default').text('非录制');
     $('#experiment-recorder-' + exp_id).removeClass('btn-success').addClass('btn-default');
     isExperimentRecorder[exp_id] = 0;
-    if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length % 2 == 1) {
-        expObject.recorderTimestamp[exp_id].push(new Date().Format("yyyy-MM-dd HH:mm:ss"));
-    }
+    expObject.setRecorderTime(exp_id, []);
 }

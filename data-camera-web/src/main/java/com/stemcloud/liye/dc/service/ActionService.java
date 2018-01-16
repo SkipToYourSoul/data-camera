@@ -193,7 +193,7 @@ public class ActionService {
         }
 
         // -- send message
-        sendMessageToRedis(expId, MONITOR, action);
+        sendMessageToRedis(expId, RECORD, action);
 
         logger.info("Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
@@ -288,7 +288,7 @@ public class ActionService {
                 if (!noChange){
                     changeMonitorState(exp.getId(), action, isSave, dataTime, "", "");
                     expIds.add(exp.getId());
-                    logger.info("Change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                    logger.info("Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
             }
         }
@@ -309,8 +309,7 @@ public class ActionService {
                 }
             }
             if (hasSensor && exp.getIsMonitor() == 1){
-                boolean noChange = (action == 1 && exp.getIsRecorder() == 1) || (action == 0 && exp.getIsRecorder() == 0);
-                if (!noChange){
+                if (!(action == 0 && exp.getIsRecorder() == 0)){
                     // -- 开始录制时，还有之前的记录在，需判定是否保存之前的记录
                     if (action == 1 && exp.getIsRecorder() == 1){
                         changeRecorderState(exp.getId(), 0, isSave, dataTime, "", "");
@@ -319,7 +318,7 @@ public class ActionService {
                         changeRecorderState(exp.getId(), action, isSave, dataTime, "", "");
                     }
                     expIds.add(exp.getId());
-                    logger.info("Change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                    logger.info("Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
             }
         }
