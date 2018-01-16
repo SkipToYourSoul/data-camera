@@ -311,7 +311,13 @@ public class ActionService {
             if (hasSensor && exp.getIsMonitor() == 1){
                 boolean noChange = (action == 1 && exp.getIsRecorder() == 1) || (action == 0 && exp.getIsRecorder() == 0);
                 if (!noChange){
-                    changeRecorderState(exp.getId(), action, isSave, dataTime, "", "");
+                    // -- 开始录制时，还有之前的记录在，需判定是否保存之前的记录
+                    if (action == 1 && exp.getIsRecorder() == 1){
+                        changeRecorderState(exp.getId(), 0, isSave, dataTime, "", "");
+                        changeRecorderState(exp.getId(), action, 0, 0, "", "");
+                    } else {
+                        changeRecorderState(exp.getId(), action, isSave, dataTime, "", "");
+                    }
                     expIds.add(exp.getId());
                     logger.info("Change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }

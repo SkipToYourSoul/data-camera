@@ -500,8 +500,8 @@ function allRecord(){
             title: "开始全局录制",
             message: "是否要开始全局录制",
             buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 取消' },
-                confirm: { label: '<i class="fa fa-check"></i> 确认' }
+                cancel: { label: '<i class="fa fa-times"></i> 不开始全局录制' },
+                confirm: { label: '<i class="fa fa-check"></i> 开始全局录制' }
             },
             callback: function (result) {
                 if (result){
@@ -515,16 +515,14 @@ function allRecord(){
             title: "开始全局录制",
             message: "当前有部分传感器组处于录制状态，是否要保存当前录制片段并进入全局录制",
             buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 不保存当前片段，进入全局监控' },
-                confirm: { label: '<i class="fa fa-check"></i> 保存当前片段，进入全局监控' }
+                cancel: { label: '<i class="fa fa-times"></i> 不保存当前片段，进入全局录制' },
+                confirm: { label: '<i class="fa fa-check"></i> 保存当前片段，进入全局录制' }
             },
             callback: function (result) {
                 if (result){
-                    doAllRecord(0, 1, endTime);
                     doAllRecord(1, 0, 0);
                 } else {
-                    doAllRecord(0, 0, endTime);
-                    doAllRecord(1, 0, 0);
+                    doAllRecord(1, 1, endTime);
                 }
             }
         });
