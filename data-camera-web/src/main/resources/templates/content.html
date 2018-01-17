@@ -23,18 +23,19 @@
 
     <div class="container-fluid">
         <div class="row" style="margin-top: 70px;">
-            <!-- 页面说明 -->
-            <div class="device-page-introduction">
-                <p>
-                    <i class="fa fa-info-circle"></i>&nbsp;在设备管理页面，你可以新建设备或编辑原有设备
-                </p>
-                <p>
-                    <i class="fa fa-info-circle"></i>&nbsp;新建设备时请严格根据设备上提供的编号新建，设备新建后编号不能修改，你可以通过删除设备来将设备从你的账户中解除
-                </p>
-                <hr/>
-            </div>
-            <div class="col-sm-12">
-
+            <div class="col-sm-12 col-md-12 col-xs-12">
+                <ul class="nav nav-pills" role="tablist">
+                    <li role="presentation" class="active"><a href="#my-share" aria-controls="my-share" role="tab" data-toggle="tab">我的发布</a></li>
+                    <li role="presentation" class=""><a href="#hot-share" aria-controls="hot-share" role="tab" data-toggle="tab">热门发布</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="my-share" role="tabpanel" class="tab-pane active in fade">
+                        <div class="alert alert-success" role="alert">...</div>
+                    </div>
+                    <div id="hot-share" role="tabpanel" class="tab-pane fade">
+                        <div class="alert alert-info" role="alert">...</div>
+                    </div>
+                </div>
             </div>
         </div>
 
