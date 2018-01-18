@@ -215,3 +215,43 @@ function saveDataDesc(){
         }
     });
 }
+
+/**
+ * 发布内容
+ */
+$('#content-form').formValidation({
+    framework: 'bootstrap',
+    icon: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove'
+    },
+    fields: {
+        'content-name': {validators: {notEmpty: {message: '不能为空'}}},
+        'content-desc': {validators: {notEmpty: {message: '不能为空'}}}
+    }
+}).on('success.form.fv', function (evt){
+    evt.preventDefault();
+    $.ajax({
+        type: 'post',
+        url: crud_address + '/content/new',
+        data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId,
+        success: function (response) {
+            if (response.code == "0000"){
+                window.location.href = base_address + "/content?id=" + response.data['id'];
+            } else if (response.code == "1111") {
+                commonObject.printExceptionMsg(response.data);
+            }
+        },
+        error: function (response) {
+            commonObject.printRejectMsg();
+        }
+    });
+}).on('err.form.fv', function (evt) {
+    commonObject.printRejectMsg();
+});
+
+$('#content-modal').on('show.bs.modal', function (evt) {
+    $('#content-name').val("");
+    $('#content-desc').val("");
+    $('#content-tag').val("");
+});

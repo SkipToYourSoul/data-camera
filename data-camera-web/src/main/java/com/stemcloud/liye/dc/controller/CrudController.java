@@ -376,4 +376,21 @@ public class CrudController {
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
+
+    @PostMapping("/content/new")
+    public Map publishContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        try {
+            String user = commonService.getCurrentLoginUser(request);
+            Long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+            String name = queryParams.get("content-name");
+            String desc = queryParams.get("content-desc");
+            String category = queryParams.get("content-category-select");
+            String tag = queryParams.get("content-tag");
+            int isShared = Integer.parseInt(queryParams.get("content-private-select"));
+            return ServerReturnTool.serverSuccess(crudService.saveContent(user, name, desc, category, tag, isShared, recorderId));
+        } catch (Exception e){
+            logger.error("[/content/new]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
 }

@@ -129,11 +129,6 @@ public class DataService {
         return map;
     }
 
-
-
-
-
-
     /**
      * 新生成一条用户自定义的实验片段
      *
@@ -164,7 +159,6 @@ public class DataService {
 
     /**
      * 将valueData转换成为echart需要的时间数据格式
-     *
      * @param vd
      * @return sensor_id, (data_key, List<data_value>)
      */
@@ -199,7 +193,6 @@ public class DataService {
 
     /**
      * 将videoData转换成为video.js需要的数据格式
-     *
      * @param videos
      * @return sensor_id, Video
      */
@@ -213,5 +206,15 @@ public class DataService {
             map.put(sensorId, video);
         }
         return map;
+    }
+
+    /**
+     * 更新数据标注
+     * @param id
+     * @param mark
+     */
+    public int updateDataMarker(long id, String mark){
+        logger.info("Update mark {} of id {}", mark, id);
+        return valueDataRepository.updateMarker(id, mark);
     }
 }

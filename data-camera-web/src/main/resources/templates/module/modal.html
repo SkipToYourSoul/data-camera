@@ -8,25 +8,25 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="app-modal-title">应用编辑窗口</h4>
+                        <h4 class="modal-title" id="app-modal-title">场景编辑窗口</h4>
                     </div>
                     <div class="modal-body">
                         <form class="form-horizontal" role="form" id="edit-app-form">
                             <div class="form-group">
-                                <label for="app-name" class="col-sm-2 control-label">应用标题</label>
+                                <label for="app-name" class="col-sm-2 control-label">场景标题</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control"
-                                           name="app-name" id="app-name" placeholder="应用标题不能为空"/>
+                                           name="app-name" id="app-name" placeholder="场景标题不能为空"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="app-desc" class="col-sm-2 control-label">应用描述</label>
+                                <label for="app-desc" class="col-sm-2 control-label">场景描述</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control"
                                               name="app-desc"
                                               rows="5"
                                               required="required"
-                                              placeholder="简单描述你的应用，不能为空"
+                                              placeholder="简单描述你的场景，不能为空"
                                               id="app-desc"></textarea>
                                 </div>
                             </div>
@@ -151,6 +151,80 @@
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
                                     <button type="button" class="btn btn-success btn-block" onclick="$('#edit-sensor-form').submit()" id="sensor-confirm-btn">确认创建</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发布内容 -->
+    <div th:fragment="content-modal">
+        <div class="modal fade" id="content-modal" tabindex="-1" role="dialog" aria-labelledby="content-modal-title">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="content-modal-title">发布内容</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="content-form">
+                            <div class="form-group">
+                                <label for="content-name" class="col-sm-2 control-label">标题</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control"
+                                           name="content-name" id="content-name" placeholder="内容标题不能为空"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content-desc" class="col-sm-2 control-label">介绍</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control"
+                                              name="content-desc"
+                                              rows="3"
+                                              required="required"
+                                              placeholder="讲讲关于内容的故事，让更多人了解"
+                                              id="content-desc"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content-category-select" class="col-sm-2 control-label">STEM分类</label>
+                                <div class="col-sm-10">
+                                    <select class="selectpicker"
+                                            data-width="100%"
+                                            id="content-category-select"
+                                            name="content-category-select">
+                                        <option value="科学">科学</option>
+                                        <option value="技术">技术</option>
+                                        <option value="工程">工程</option>
+                                        <option value="数学">数学</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content-tag" class="col-sm-2 control-label">标签</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control"
+                                           name="content-tag" id="content-tag"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content-private-select" class="col-sm-2 control-label">隐私</label>
+                                <div class="col-sm-10">
+                                    <select class="selectpicker"
+                                            data-width="100%"
+                                            id="content-private-select"
+                                            name="content-private-select">
+                                        <option value="1">公开-所有人可看</option>
+                                        <option value="0">私密-仅自己可看</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#content-form').submit()" id="content-confirm-btn">发布</button>
                                 </div>
                             </div>
                         </form>

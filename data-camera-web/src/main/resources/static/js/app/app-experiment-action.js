@@ -415,22 +415,6 @@ function allMonitor() {
         });
     } else if (status == "all_monitoring_and_all_recording" || status == "all_monitoring_and_part_recording"){
         var endTime = new Date().getTime();
-        /*bootbox.confirm({
-            title: "结束全局监控",
-            message: "即将结束监控，是否保存当前录制的片段",
-            buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 结束全局监控不保存片段' },
-                confirm: { label: '<i class="fa fa-check"></i> 结束全局监控并保存片段' }
-            },
-            callback: function (result) {
-                if (result){
-                    doAllMonitor(0, 1, endTime);
-                } else {
-                    doAllMonitor(0, 0, endTime);
-                }
-            }
-        });*/
-
         askForSaveRecorder(doAllMonitor, 0, endTime, "即将结束全局监控，是否保存录制数据片段?");
     }
 
@@ -504,38 +488,8 @@ function allRecord(){
             }
         });
     } else if (status == "all_monitoring_and_part_recording") {
-        /*bootbox.confirm({
-            title: "开始全局录制",
-            message: "当前有部分传感器组处于录制状态，是否要保存当前录制片段并进入全局录制",
-            buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 不保存当前片段，进入全局录制' },
-                confirm: { label: '<i class="fa fa-check"></i> 保存当前片段，进入全局录制' }
-            },
-            callback: function (result) {
-                if (result){
-                    doAllRecord(1, 0, 0);
-                } else {
-                    doAllRecord(1, 1, endTime);
-                }
-            }
-        });*/
         askForSaveRecorder(doAllRecord, 1, new Date().getTime(), "即将开始全局录制，是否保存之前已录制的数据片段?");
     } else if (status == "all_monitoring_and_all_recording"){
-        /*bootbox.confirm({
-            title: "结束全局录制",
-            message: "即将结束录制，是否保存当前录制的片段",
-            buttons: {
-                cancel: { label: '<i class="fa fa-times"></i> 不保存录制片段' },
-                confirm: { label: '<i class="fa fa-check"></i> 保存录制片段' }
-            },
-            callback: function (result) {
-                if (result){
-                    doAllRecord(0, 1, endTime);
-                } else {
-                    doAllRecord(0, 0, endTime);
-                }
-            }
-        });*/
         askForSaveRecorder(doAllRecord, 0, new Date().getTime(), "即将结束全局录制，是否保存录制的数据片段?");
     }
 

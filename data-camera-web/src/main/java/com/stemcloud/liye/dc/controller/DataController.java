@@ -116,13 +116,24 @@ public class DataController {
      */
     @GetMapping("/user-new-recorder")
     Map newContent(@RequestParam Map<String, String> queryParams){
-        long recorderId = Long.parseLong(queryParams.get("recorder-id"));
-        String start = queryParams.get("start");
-        String end = queryParams.get("end");
-        logger.info("[/data/user-new-recorder], id={}, start={}, end={}", recorderId, start, end);
         try {
+            long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+            String start = queryParams.get("start");
+            String end = queryParams.get("end");
+            logger.info("[/data/user-new-recorder], id={}, start={}, end={}", recorderId, start, end);
             return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end));
         } catch (ParseException e) {
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/user-data-mark")
+    Map addDataMark(@RequestParam Map<String, String> queryParams){
+        try{
+            long id = Long.parseLong(queryParams.get("data-id"));
+            String mark = queryParams.get("data-mark");
+            return ServerReturnTool.serverSuccess(dataService.updateDataMarker(id, mark));
+        } catch (Exception e){
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }

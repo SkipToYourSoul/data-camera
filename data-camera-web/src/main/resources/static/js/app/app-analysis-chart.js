@@ -135,6 +135,45 @@ function initRecorderContentDom(recorderId){
                         width: chartWidth
                     });
                     chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
+                    chart.on('dblclick', function (params) {
+                        console.log(params);
+                        bootbox.dialog({
+                            title: "为数据点添加描述",
+                            message: '<div class="form-group">' +
+                            '<textarea rows="3" class="form-control" id="dialog-data-mark" >' + params.name + '</textarea></div>',
+                            async: false,
+                            buttons: {
+                                cancel: {
+                                    label: '<i class="fa fa-times"></i> 不保存',
+                                    className: 'btn-danger'
+                                },
+                                confirm: {
+                                    label: '<i class="fa fa-check"></i> 保存',
+                                    className: 'btn-success',
+                                    callback: function(){
+                                        $.ajax({
+                                            type: 'get',
+                                            url: data_address + "/user-data-mark",
+                                            data: {
+                                                "data-id": params.data.itemStyle.normal.id,
+                                                "data-mark": $('#dialog-data-mark').val()
+                                            },
+                                            success: function (response) {
+                                                if (response.code == "1111"){
+                                                    commonObject.printExceptionMsg(response.data);
+                                                } else if (response.code == "0000"){
+                                                    window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + analysisObject.currentRecorderId;
+                                                }
+                                            },
+                                            error: function () {
+                                                commonObject.printRejectMsg();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    });
 
                     analysisObject.setChart(chartId, chart);
                     analysisObject.setChartData(chartId, chartData[sensorId][legend]);

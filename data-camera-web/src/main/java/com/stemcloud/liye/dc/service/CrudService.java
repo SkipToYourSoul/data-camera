@@ -5,6 +5,7 @@ import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
 import com.stemcloud.liye.dc.dao.config.SensorRegisterRepository;
+import com.stemcloud.liye.dc.dao.data.ContentRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
@@ -12,11 +13,11 @@ import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.domain.config.SensorRegister;
+import com.stemcloud.liye.dc.domain.data.ContentInfo;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -37,19 +38,20 @@ public class CrudService {
     private final SensorRepository sensorRepository;
     private final SensorRegisterRepository sensorRegisterRepository;
     private final RecorderRepository recorderRepository;
+    private final ContentRepository contentRepository;
 
-    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, SensorRegisterRepository sensorRegisterRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
+    public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, SensorRegisterRepository sensorRegisterRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository, ContentRepository contentRepository) {
         this.appRepository = appRepository;
         this.expRepository = expRepository;
         this.trackRepository = trackRepository;
         this.sensorRepository = sensorRepository;
         this.sensorRegisterRepository = sensorRegisterRepository;
         this.recorderRepository = recorderRepository;
+        this.contentRepository = contentRepository;
     }
 
-    /*************/
-    /* APP       */
-    /*************/
+    // -------------------------------------------------
+    /** 场景应用 **/
     public AppInfo saveApp(AppInfo app){
         return appRepository.save(app);
     }
@@ -68,10 +70,10 @@ public class CrudService {
     public AppInfo findApp(Long id){
         return appRepository.findOne(id);
     }
+    // -------------------------------------------------
 
-    /**************/
-    /* EXPERIMENT */
-    /**************/
+    // -------------------------------------------------
+    /** 传感器组 **/
     public ExperimentInfo saveExp(ExperimentInfo exp){
         return expRepository.save(exp);
     }
@@ -91,10 +93,10 @@ public class CrudService {
     public ExperimentInfo findExp(Long id){
         return expRepository.findOne(id);
     }
+    // -------------------------------------------------
 
-    /************/
-    /* TRACK    */
-    /************/
+    // -------------------------------------------------
+    /** 轨迹 **/
     public void newTrackAndBoundSensor(ExperimentInfo exp, SensorInfo sensor){
         TrackInfo track = new TrackInfo();
         track.setExperiment(exp);
@@ -126,10 +128,10 @@ public class CrudService {
     public TrackInfo findTrack(Long id){
         return trackRepository.findOne(id);
     }
+    // -------------------------------------------------
 
-    /************/
-    /* SENSOR   */
-    /************/
+    // -------------------------------------------------
+    /** 传感器 **/
     public long saveSensor(SensorInfo sensor){
         return sensorRepository.save(sensor).getId();
     }
@@ -167,10 +169,10 @@ public class CrudService {
     public void registerSensor(int action, String code){
         sensorRegisterRepository.register(action, code);
     }
+    // -------------------------------------------------
 
-    /************/
-    /* RECORDER  */
-    /************/
+    // -------------------------------------------------
+    /** 数据片段 **/
     public void updateRecorderName(long id, String name){
         recorderRepository.updateName(id, name);
     }
@@ -194,4 +196,21 @@ public class CrudService {
     private void deleteRecorder(long id){
         recorderRepository.deleteRecorder(id);
     }
+    // -------------------------------------------------
+
+    // -------------------------------------------------
+    /** 内容 **/
+    public ContentInfo saveContent(String user, String name, String desc, String category, String tag, int isShared, long recorderId){
+        ContentInfo content = new ContentInfo();
+        content.setOwner(user);
+        content.setTitle(name);
+        content.setDescription(desc);
+        content.setCategory(category);
+        content.setTag(tag);
+        content.setIsShared(isShared);
+        content.setRecorderInfo(recorderRepository.findOne(recorderId));
+        return contentRepository.save(content);
+    }
+
+    // -------------------------------------------------
 }
