@@ -4,6 +4,7 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.data.ContentInfo;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.CommonService;
@@ -151,11 +152,7 @@ public class ViewController {
             model.addAttribute("sensors", baseInfoService.getOnlineSensor(user));
 
             // --- RECORDER:
-            Map<Long, List<RecorderInfo>> recorders = new HashMap<Long, List<RecorderInfo>>(16);
-            recorders = baseInfoService.getAllRecorders(apps);
-            /*if (!experiments.isEmpty()) {
-                recorders = baseInfoService.getAllRecordersOfCurrentApp(experiments);
-            }*/
+            Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
             model.addAttribute("recorders", recorders);
         }
 
@@ -181,16 +178,35 @@ public class ViewController {
     }
 
     @GetMapping("/content")
-    public String content(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String content(@RequestParam(value = "id", required = false) Long id,
+                          Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
         // --- get login user name
         String currentUser = commonService.getCurrentLoginUser(request);
         if (currentUser == null) {
-            logger.warn("No login user");
-            response.sendRedirect(request.getContextPath() + "/index");
-            return "index";
+            logger.warn("[/content], no login user, redirect to /login");
+            response.sendRedirect(request.getContextPath() + "/login");
+            return "login";
         }
 
         model.addAttribute("inContent", true);
+
+        if (id == null){
+            // 内容浏览页
+            List<ContentInfo> userContent = crudService.selectUserContent(currentUser);
+            List<ContentInfo> hotContent = crudService.selectHotContent();
+
+            model.addAttribute("userContent", userContent);
+            model.addAttribute("hotContent", hotContent);
+        } else {
+            // 内容详情页
+            if (!baseInfoService.isContentBelongUser(id, currentUser)){
+                logger.warn("[/content], the user {} has not the content {}, redirect to /index", currentUser, id);
+                response.sendRedirect(request.getContextPath() + "/index");
+                return "index";
+            }
+            ContentInfo currentContent = crudService.findContent(id);
+            model.addAttribute("currentContent", currentContent);
+        }
 
         return "content";
     }

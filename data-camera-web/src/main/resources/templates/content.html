@@ -16,6 +16,7 @@
     <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
 
     <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
+    <link rel="stylesheet" th:href="@{css/v1/content.css}"/>
 </head>
 <body>
     <div class="navbar-wrapper" th:include="module/common::nav">
@@ -23,19 +24,26 @@
 
     <div class="container-fluid">
         <div class="row" style="margin-top: 70px;">
-            <div class="col-sm-12 col-md-12 col-xs-12">
-                <ul class="nav nav-pills" role="tablist">
-                    <li role="presentation" class="active"><a href="#my-share" aria-controls="my-share" role="tab" data-toggle="tab">我的发布</a></li>
-                    <li role="presentation" class=""><a href="#hot-share" aria-controls="hot-share" role="tab" data-toggle="tab">热门发布</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div id="my-share" role="tabpanel" class="tab-pane active in fade">
-                        <div class="alert alert-success" role="alert">...</div>
-                    </div>
-                    <div id="hot-share" role="tabpanel" class="tab-pane fade">
-                        <div class="alert alert-info" role="alert">...</div>
+            <div th:if="!${param.id}" id="content-preview" class="content-preview">
+                <div class="col-sm-12 col-md-12 col-xs-12">
+                    <ul class="nav nav-pills" role="tablist">
+                        <li role="presentation" class="active"><a href="#my-share" aria-controls="my-share" role="tab" data-toggle="tab">我的发布</a></li>
+                        <li role="presentation" class=""><a href="#hot-share" aria-controls="hot-share" role="tab" data-toggle="tab">热门发布</a></li>
+                    </ul>
+                    <div class="share-view">
+                        <div id="my-share" role="tabpanel" class="tab-pane active in fade">
+                            <div class="my-share-view">
+                            </div>
+                        </div>
+                        <div id="hot-share" role="tabpanel" class="tab-pane fade">
+                            <div class="hot-share-view">
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div th:if="${param.id}" id="content-detail" class="content-detail">
+
             </div>
         </div>
 
@@ -56,5 +64,13 @@
     <script th:src="@{source/validation/bootstrap.min.js}"></script>
 
     <script th:src="@{js/common.js}"></script>
+    <script th:if="!${param.id}" th:src="@{js/content/content-view.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/content/content-detail.js}"></script>
+
+    <script th:inline="javascript">
+        var userContent = [[${userContent}]];
+        var hotContent = [[${hotContent}]];
+        var currentContent = [[${currentContent}]];
+    </script>
 </body>
 </html>

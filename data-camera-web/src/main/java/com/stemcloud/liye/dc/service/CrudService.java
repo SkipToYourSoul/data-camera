@@ -212,5 +212,17 @@ public class CrudService {
         return contentRepository.save(content);
     }
 
+    public ContentInfo findContent(long id){
+        return contentRepository.findOne(id);
+    }
+
+    public List<ContentInfo> selectUserContent(String user){
+        return contentRepository.findByOwnerAndIsDeleted(user, 0);
+    }
+
+    public List<ContentInfo> selectHotContent(){
+        return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeAndViewDesc(1, 0);
+    }
+
     // -------------------------------------------------
 }
