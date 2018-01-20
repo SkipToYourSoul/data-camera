@@ -199,8 +199,8 @@ public class ViewController {
             model.addAttribute("hotContent", hotContent);
         } else {
             // 内容详情页
-            if (!baseInfoService.isContentBelongUser(id, currentUser)){
-                logger.warn("[/content], the user {} has not the content {}, redirect to /index", currentUser, id);
+            if (!baseInfoService.isContentCanVisit(id, currentUser)){
+                logger.warn("[/content], the user {} can not visit content {}, redirect to /index", currentUser, id);
                 response.sendRedirect(request.getContextPath() + "/index");
                 return "index";
             }

@@ -196,9 +196,9 @@ public class BaseInfoService {
      * @param user 用户
      * @return true or false
      */
-    public Boolean isContentBelongUser(long id, String user) {
+    public Boolean isContentCanVisit(long id, String user) {
         ContentInfo content = contentRepository.findOne(id);
         logger.info("Check user {} has content {}", user, id);
-        return content != null && content.getIsDeleted() == 0 && user.equals(content.getOwner());
+        return content != null && content.getIsDeleted() == 0 && (user.equals(content.getOwner()) || content.getIsShared() == 1);
     }
 }

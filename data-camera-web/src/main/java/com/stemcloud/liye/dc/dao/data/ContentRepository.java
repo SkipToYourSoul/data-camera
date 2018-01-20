@@ -1,7 +1,10 @@
 package com.stemcloud.liye.dc.dao.data;
 
 import com.stemcloud.liye.dc.domain.data.ContentInfo;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,5 +29,15 @@ public interface ContentRepository extends CrudRepository<ContentInfo, Long> {
      * @param isDeleted
      * @return
      */
-    List<ContentInfo> findTop50ByIsSharedAndIsDeletedOrderByLikeAndViewDesc(int isShared, int isDeleted);
+    List<ContentInfo> findTop50ByIsSharedAndIsDeletedOrderByLikeDesc(int isShared, int isDeleted);
+
+    /**
+     * delete content
+     * @param id
+     * @return 1
+     */
+    @Query(value = "UPDATE ContentInfo c SET c.isDeleted = 1 WHERE c.id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer deleteContent(long id);
 }

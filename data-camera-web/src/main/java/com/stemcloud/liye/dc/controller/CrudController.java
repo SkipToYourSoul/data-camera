@@ -393,4 +393,24 @@ public class CrudController {
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
+
+    /**
+     * 删除内容
+     * @param queryParams
+     * @param request
+     * @return
+     */
+    @GetMapping("/content/delete")
+    public Map deleteContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        try {
+            Long id = Long.parseLong(queryParams.get("content-id"));
+            String user = commonService.getCurrentLoginUser(request);
+            logger.info("User {} delete content {}", user, id);
+            crudService.deleteContent(id);
+            return ServerReturnTool.serverSuccess(id);
+        } catch (Exception e){
+            logger.error("[/content/delete]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
 }

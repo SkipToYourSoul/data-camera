@@ -9,6 +9,7 @@
 // -- 入口函数，初始化数据图表以及视频
 function initRecorderContentDom(recorderId){
     console.info("Request recorder: " + recorderId);
+    
     var recorder = findRecorderInfo(recorderId);
     if (recorder == null){
         console.log("Null data recorder");
@@ -215,71 +216,6 @@ function initRecorderContentDom(recorderId){
                 $('#' + videoDomId).append('<div id=' + videoId + '> <p class="text-center">视频来自设备(编号：' + vSensorId + ')，上传中</p>' + progressBar + '</div>');
             }
         }
-
-        /**
-         * 生成图表panel
-         * @param panelId
-         * @param title
-         * @param contentId
-         * @returns {string}
-         */
-        function generate(panelId, title, contentId) {
-            return '<div class="panel panel-default my-panel">' +
-                '<div class="my-panel-heading">' +
-                '<div class="panel-title">' +
-                '<a role="button" data-toggle="collapse" href="#' + panelId + '" aria-expanded="true"><i class="fa fa-arrows-v"></i>&nbsp; ' + title + '</a>' +
-                '</div></div>' +
-                '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
-                '<div class="panel-body my-panel-body"><div id="' + contentId + '"></div></div>' +
-                '</div></div>';
-        }
-
-        /**
-         * 绝对时间数组（时间）
-         * @param minTime
-         * @param maxTime
-         * @returns {Array}
-         */
-        function generateTimeList(minTime, maxTime) {
-            var list = [];
-            for(var index = Math.floor(minTime/1000); index <= Math.ceil(maxTime/1000); index += 1){
-                list.push(new Date(index*1000).Format("yyyy-MM-dd HH:mm:ss"));
-            }
-            return list;
-        }
-
-        /**
-         * 相对时间数组（秒数）
-         * @param minTime
-         * @param maxTime
-         * @returns {Array}
-         */
-        function generateSecondList(minTime, maxTime){
-            var list = [];
-            var second = 0;
-            var minute = 0;
-            var hour = 0;
-            for(var index = Math.floor(minTime/1000); index <= Math.ceil(maxTime/1000); index += 1){
-                var label = "";
-                if (hour != 0){
-                    label += (hour>=10)?(hour + ":"):("0" + hour + ":");
-                }
-                label += (minute>=10)?(minute + ":"):("0" + minute + ":");
-                label += (second>=10)?(second):("0" + second);
-                list.push(label);
-
-                second += 1;
-                if (second == 60){
-                    second = 0;
-                    minute++;
-                }
-                if (minute == 60){
-                    minute = 0;
-                    hour ++;
-                }
-            }
-            return list;
-        }
     }
 
     /**
@@ -296,6 +232,71 @@ function initRecorderContentDom(recorderId){
             }
         }
     }
+}
+
+/**
+ * 生成图表panel
+ * @param panelId
+ * @param title
+ * @param contentId
+ * @returns {string}
+ */
+function generate(panelId, title, contentId) {
+    return '<div class="panel panel-default my-panel">' +
+        '<div class="my-panel-heading">' +
+        '<div class="panel-title">' +
+        '<a role="button" data-toggle="collapse" href="#' + panelId + '" aria-expanded="true"><i class="fa fa-arrows-v"></i>&nbsp; ' + title + '</a>' +
+        '</div></div>' +
+        '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
+        '<div class="panel-body my-panel-body"><div id="' + contentId + '"></div></div>' +
+        '</div></div>';
+}
+
+/**
+ * 绝对时间数组（时间）
+ * @param minTime
+ * @param maxTime
+ * @returns {Array}
+ */
+function generateTimeList(minTime, maxTime) {
+    var list = [];
+    for(var index = Math.floor(minTime/1000); index <= Math.ceil(maxTime/1000); index += 1){
+        list.push(new Date(index*1000).Format("yyyy-MM-dd HH:mm:ss"));
+    }
+    return list;
+}
+
+/**
+ * 相对时间数组（秒数）
+ * @param minTime
+ * @param maxTime
+ * @returns {Array}
+ */
+function generateSecondList(minTime, maxTime){
+    var list = [];
+    var second = 0;
+    var minute = 0;
+    var hour = 0;
+    for(var index = Math.floor(minTime/1000); index <= Math.ceil(maxTime/1000); index += 1){
+        var label = "";
+        if (hour != 0){
+            label += (hour>=10)?(hour + ":"):("0" + hour + ":");
+        }
+        label += (minute>=10)?(minute + ":"):("0" + minute + ":");
+        label += (second>=10)?(second):("0" + second);
+        list.push(label);
+
+        second += 1;
+        if (second == 60){
+            second = 0;
+            minute++;
+        }
+        if (minute == 60){
+            minute = 0;
+            hour ++;
+        }
+    }
+    return list;
 }
 
 function buildAnalysisChartOption(data, legend) {
@@ -363,7 +364,7 @@ function buildAnalysisChartOption(data, legend) {
                 hoverAnimation: false,
                 itemStyle: {
                     normal: {
-                        color: 'rgb(255, 70, 131)'
+                        color: 'rgb(30, 144, 255)'
                     }
                 },
                 smooth: true,
@@ -372,10 +373,10 @@ function buildAnalysisChartOption(data, legend) {
                     normal: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                             offset: 0,
-                            color: 'rgb(255, 158, 68)'
+                            color: 'rgb(30, 144, 255)'
                         }, {
                             offset: 1,
-                            color: 'rgb(255, 70, 131)'
+                            color: 'rgb(0, 191, 255)'
                         }])
                     }
                 },
