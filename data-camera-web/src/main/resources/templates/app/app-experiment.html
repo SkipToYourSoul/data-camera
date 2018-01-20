@@ -29,8 +29,9 @@
                         <div class="panel-title">
                             <!-- 标题 -->
                             <a role="button" data-toggle="collapse" th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
-                                <i class="fa fa-arrows-v"></i>&nbsp;<span th:text="|传感器组：${experiment.value.name}|"></span>
+                                <i class="fa fa-arrows-v"></i>&nbsp;
                             </a>
+                            <a th:text="|传感器组：${experiment.value.name}|" th:data="${experiment.key}" data-toggle="modal" data-target="#exp-modal" todo="edit" from="modify-desc"></a>
                             <!-- 状态栏 -->
                             <span class="pull-right">
                                 <span class="label label-default" th:id="|experiment-es-${experiment.key}|">非监控</span>
@@ -45,7 +46,7 @@
                                 <!-- 按钮组 -->
                                 <span class="btn-group">
                                     <button class="btn btn-default btn-sm" th:data="${experiment.key}"
-                                            data-toggle="modal" data-target="#exp-modal" todo="edit"><i class="fa fa-plus"></i></button>
+                                            data-toggle="modal" data-target="#exp-modal" todo="edit" from="modify-sensor"><i class="fa fa-plus"></i></button>
                                     <button class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="deleteExp(this)"><i class="fa fa-trash"></i></button>
                                     <button th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">
                                     <i class="fa fa-eye"></i></button>

@@ -133,6 +133,7 @@ $('#edit-exp-form').formValidation({
 $('#exp-modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var todo = button.attr('todo');
+    var from = button.attr('from');
     expObject.currentExpId = button.attr('data');
 
     initExpSelect();
@@ -142,6 +143,15 @@ $('#exp-modal').on('show.bs.modal', function (event) {
         $('#exp-desc').val("");
     } else if (todo == "edit"){
         $('#exp-confirm-btn').removeClass('btn-success').addClass('btn-warning').text(expObject.editObjectText);
+        if (from == "modify-desc"){
+            $('#exp-name-group').attr("hidden", false);
+            $('#exp-desc-group').attr("hidden", false);
+            $('#exp-select-group').attr("hidden", "hidden");
+        } else if (from == "modify-sensor"){
+            $('#exp-name-group').attr("hidden", "hidden");
+            $('#exp-desc-group').attr("hidden", "hidden");
+            $('#exp-select-group').attr("hidden", false);
+        }
         $('#exp-name').val(experiments[expObject.currentExpId]['name']);
         $('#exp-desc').val(experiments[expObject.currentExpId]['description']);
     }
