@@ -4,31 +4,6 @@
  *  Description:
  *      实验的监控和录制操作
  */
-
-function initActionStatus(){
-    // -- 更改实验状态（如果在监控或录制状态）
-    Object.keys(isExperimentMonitor).forEach(function (id) {
-        var exp_monitor_btn = $('#experiment-monitor-' + id);
-        var exp_monitor_dom = $('#experiment-es-' + id);
-        var exp_recorder_btn = $('#experiment-recorder-' + id);
-        var exp_recorder_dom = $('#experiment-rs-' + id);
-
-        if (isExperimentMonitor[id] == 1){
-            exp_monitor_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-            exp_monitor_btn.removeClass('btn-default').addClass('btn-success');
-
-            if (isExperimentRecorder[id] == 1){
-                exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-                exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
-
-                expObject.setRecorderTime(id, [expRecorderTime[id]]);
-                expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
-            }
-            doInterval(id);
-        }
-    });
-}
-
 /**
  * key: exp_id
  * value: exp_interval
@@ -301,7 +276,7 @@ function expMonitor(button){
                         pageStopMonitor(expId);
                         if (isSave == 1 && response.data != -1){
                             window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
-                        } else if (response.data == -1) {
+                        } else if (isSave == 1 && response.data == -1) {
                             commonObject.printExceptionMsg("监控状态结束异常");
                         }
                     }
