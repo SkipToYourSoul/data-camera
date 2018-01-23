@@ -385,7 +385,7 @@ public class CrudController {
             String name = queryParams.get("content-name");
             String desc = queryParams.get("content-desc");
             String category = queryParams.get("content-category-select");
-            String tag = queryParams.get("content-tag");
+            String tag = queryParams.get("tags");
             int isShared = Integer.parseInt(queryParams.get("content-private-select"));
             return ServerReturnTool.serverSuccess(crudService.saveContent(user, name, desc, category, tag, isShared, recorderId));
         } catch (Exception e){

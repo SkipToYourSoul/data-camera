@@ -194,8 +194,9 @@
     <script th:src="@{js/common.js}"></script>
     <script th:if="!${param.id}" th:src="@{js/content/content-view.js}"></script>
 
-    <script th:if="${param.id}" th:src="@{js/charts.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/chart.js}"></script>
     <!-- 暂时共用，后续考虑分开 -->
+    <script th:if="${param.id}" th:src="@{js/app/app-analysis-chart.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-action.js}"></script>
     <script th:if="${param.id}" th:src="@{js/content/content-detail.js}"></script>
 </body>

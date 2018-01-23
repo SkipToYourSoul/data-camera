@@ -160,26 +160,31 @@ function inAppPage(){
     $('.content-tag-dropdown').dropdown({
         limitCount: 5,
         multipleMode: 'label',
+        input: '<input type="text" maxLength="20" placeholder="输入标签">',
         data: [
             {
                 "id": 1, // value值
                 "disabled": false, // 是否禁选
-                "groupName": "分组名",
-                "groupId": 3,//分组ID
                 "selected": false, // 是否选中
-                "name": "Betty Deborah Jackson" // 名称
+                "name": "温湿度" // 名称
             },
             {
                 "id": 2,
                 "disabled": false,
-                "groupName": "分组名",
-                "groupId": 2,
                 "selected": false,
-                "name": "Jason Barbara Clark"
+                "name": "光照"
+            },
+            {
+                "id": 3,
+                "disabled": false,
+                "selected": false,
+                "name": "摄像头"
             }
         ],
-        choice: function () {
+        choice: function (event, data) {
             console.log(arguments,this);
+            console.log(event);
+            console.log(data);
         }
     });
 }
@@ -241,6 +246,14 @@ var analysisObject = (function () {
     // -- 标记是否正在回放
     var recorderInterval = null;
 
+    var shareSelectedTags = [];
+    var addTag = function (tag) {
+        shareSelectedTags.push(tag);
+    };
+    var clearTag = function () {
+        shareSelectedTags.empty();
+    };
+
     return {
         chart: chart,
         setChart: setChart,
@@ -256,7 +269,10 @@ var analysisObject = (function () {
         secondLine: secondLine,
         rDataMap: rDataMap,
         currentRecorderId: currentRecorderId,
-        recorderInterval: recorderInterval
+        recorderInterval: recorderInterval,
+        shareSelectedTags: shareSelectedTags,
+        addTag: addTag,
+        clearTag: clearTag
     };
 })();
 

@@ -226,14 +226,25 @@ $('#content-form').formValidation({
     },
     fields: {
         'content-name': {validators: {notEmpty: {message: '不能为空'}}},
-        'content-desc': {validators: {notEmpty: {message: '不能为空'}}}
+        'content-desc': {validators: {notEmpty: {message: '不能为空'}}},
+        'content-tag': {validators: {notEmpty: {message: '不能为空'}}}
     }
 }).on('success.form.fv', function (evt){
     evt.preventDefault();
+
+    var selectedTags = $('#content-tag').find('option:selected');
+    if (selectedTags.length == 0){
+        message_info("请为分享的内容选择tag", "info");
+    }
+    var tags = [];
+    for (var index = 0; index < selectedTags.length; index ++ ){
+        tags.push(selectedTags[index]['text']);
+    }
+
     $.ajax({
         type: 'post',
         url: crud_address + '/content/new',
-        data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId,
+        data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId + "&tags=" + tags,
         success: function (response) {
             if (response.code == "0000"){
                 window.location.href = base_address + "/content?id=" + response.data['id'];
