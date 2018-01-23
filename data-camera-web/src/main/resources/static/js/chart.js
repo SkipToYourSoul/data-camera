@@ -230,10 +230,15 @@ function buildAnalysisChartOption(data, legend) {
                     silent: true,
                     itemStyle: {
                         normal: {
-                            color: 'rgb(0, 0, 0)'
+                            color: 'rgb(0, 0, 0)',
+                            lineStyle: {
+                                type: 'solid',
+                                width: 1
+                            }
                         }
                     },
-                    symbol: ['diamond', 'diamond'],
+                    symbol: 'none',
+                    symbolSize: 0,
                     data: []
                 },
                 data: data

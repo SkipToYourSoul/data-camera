@@ -187,6 +187,18 @@ function inAppPage(){
             console.log(data);
         }
     });
+
+    // -- 图片上传
+    $("#file-upload-input").fileinput({
+        language: 'zh',
+        uploadUrl: current_address + "/data/file/upload", // server upload action
+        allowedFileExtensions: ['jpg', 'png'],
+        uploadAsync: true,
+        minFileCount: 1,
+        maxFileCount: 1
+    }).on('fileuploaded', function(event, data, previewId, index) {
+        console.info("complete");
+    });
 }
 
 var appObject = (function () {
