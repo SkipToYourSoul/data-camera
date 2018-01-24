@@ -5,16 +5,13 @@ import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.common.ServerReturnTool;
-import com.stemcloud.liye.dc.domain.data.ContentInfo;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.DataService;
+import com.stemcloud.liye.dc.service.OssService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -34,11 +31,13 @@ public class DataController {
 
     private final BaseInfoService baseService;
     private final DataService dataService;
+    private final OssService ossService;
 
     @Autowired
-    public DataController(BaseInfoService baseService, DataService dataService) {
+    public DataController(BaseInfoService baseService, DataService dataService, OssService ossService) {
         this.baseService = baseService;
         this.dataService = dataService;
+        this.ossService = ossService;
     }
 
     @GetMapping("/app")
@@ -111,7 +110,6 @@ public class DataController {
 
     /**
      * 生成用户自定义的实验片段
-     *
      * @param queryParams
      * @return
      */
@@ -128,6 +126,11 @@ public class DataController {
         }
     }
 
+    /**
+     * 更新数据标注
+     * @param queryParams
+     * @return
+     */
     @GetMapping("/user-data-mark")
     Map addDataMark(@RequestParam Map<String, String> queryParams){
         try{
@@ -137,5 +140,11 @@ public class DataController {
         } catch (Exception e){
             return ServerReturnTool.serverFailure(e.getMessage());
         }
+    }
+
+    @PostMapping("/file-upload")
+    @ResponseBody
+    Map uploadFile(HttpServletRequest request){
+        return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request));
     }
 }
