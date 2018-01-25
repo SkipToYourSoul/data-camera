@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+    <title>内容发布</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{source/jqueryui/jquery.dropdown.css}"/>
+    <link rel="stylesheet" th:href="@{source/upload/fileinput.css}"/>
+
+    <link rel="stylesheet" th:href="@{source/messenger/messenger.css}"/>
+    <link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}"/>
+
+    <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
+</head>
+<body>
+    <div id="app-loading"></div>
+    <div class="navbar-wrapper" th:include="module/common::nav">
+    </div>
+
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+
+    <script th:src="@{source/jquery.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+    <script th:inline="javascript">
+        var recorder = [[${recorder}]];
+    </script>
+
+    <script th:src="@{source/jqueryui/jquery.dropdown.js}"></script>
+    <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/messenger/messenger-theme-future.js}"></script>
+
+    <!-- upload -->
+    <script th:src="@{source/upload/fileinput.js}"></script>
+    <script th:src="@{source/upload/theme.js}"></script>
+    <script th:src="@{source/upload/zh.js}"></script>
+
+    <script th:src="@{source/validation/formValidation.min.js}"></script>
+    <script th:src="@{source/validation/bootstrap.min.js}"></script>
+
+    <script th:src="@{js/common.js}"></script>
+</body>
+</html>

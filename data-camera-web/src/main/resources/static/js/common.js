@@ -197,17 +197,21 @@ function inAppPage(){
         dropZoneEnabled: false,
         showUpload: false,
         autoReplace: true,
-        maxFileSize: 4096,
+        maxFileSize: 1024,
         maxFileCount: 1
     }).on('fileselect', function (event, files) {
         // 选择文件后自动上传
         $("#file-upload-input").fileinput('upload');
-        console.info("selected");
     }).on('filesuccessremove', function(event, id) {//点击删除后立即执行
         $('#fileId').fileinput('refresh');//文件框刷新操作
-        console.info("remove");
+        console.info("file remove");
     }).on('fileuploaded', function(event, data, previewId, index) {
-        console.info("complete");
+        console.info("file uploaded");
+        if (data.response.code == "0000"){
+            analysisObject.contentImg = data.response.data;
+        } else {
+            commonObject.printExceptionMsg(data.response.data);
+        }
     });
 }
 
@@ -276,6 +280,9 @@ var analysisObject = (function () {
         shareSelectedTags.empty();
     };
 
+    // 分享内容的图片
+    var contentImg = "";
+
     return {
         chart: chart,
         setChart: setChart,
@@ -294,7 +301,8 @@ var analysisObject = (function () {
         recorderInterval: recorderInterval,
         shareSelectedTags: shareSelectedTags,
         addTag: addTag,
-        clearTag: clearTag
+        clearTag: clearTag,
+        contentImg: contentImg
     };
 })();
 

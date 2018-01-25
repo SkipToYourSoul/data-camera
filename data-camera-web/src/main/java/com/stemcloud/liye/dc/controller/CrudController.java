@@ -377,6 +377,12 @@ public class CrudController {
         }
     }
 
+    /**
+     * 发布内容
+     * @param queryParams
+     * @param request
+     * @return
+     */
     @PostMapping("/content/new")
     public Map publishContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
@@ -386,8 +392,9 @@ public class CrudController {
             String desc = queryParams.get("content-desc");
             String category = queryParams.get("content-category-select");
             String tag = queryParams.get("tags");
+            String img = queryParams.get("share-img");
             int isShared = Integer.parseInt(queryParams.get("content-private-select"));
-            return ServerReturnTool.serverSuccess(crudService.saveContent(user, name, desc, category, tag, isShared, recorderId));
+            return ServerReturnTool.serverSuccess(crudService.saveContent(user, name, desc, category, tag, isShared, recorderId, img));
         } catch (Exception e){
             logger.error("[/content/new]", e);
             return ServerReturnTool.serverFailure(e.getMessage());

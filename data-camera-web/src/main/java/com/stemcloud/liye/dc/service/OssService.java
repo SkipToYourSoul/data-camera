@@ -32,9 +32,12 @@ public class OssService {
     @Value("${oss.cloud.path}")
     private String baseCloudUploadPath;
 
+    @Value("${stem.server.path}")
+    private String stemServerPath;
+
     private OSSClient client = OSSClientFactory.createOSSClient();
 
-    public String uploadFileToOss(HttpServletRequest request){
+    public String uploadFileToOss(HttpServletRequest request, String from){
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = null;
         Map map =multipartRequest.getFileMap();
@@ -45,7 +48,7 @@ public class OssService {
         // 将文件先存到本地
         String fileName = multipartFile.getOriginalFilename();
         String suffix = fileName.substring(fileName.lastIndexOf("."));
-        String newFileName = "/share-content-" + System.currentTimeMillis() + suffix;
+        String newFileName = "/share-" + from + "-" + System.currentTimeMillis() + suffix;
         String serverFilePath = baseServerUploadPath + newFileName;
         try {
             InputStream is = multipartFile.getInputStream();
@@ -74,6 +77,6 @@ public class OssService {
             logger.error("An exception occured when copying file, original file={}", serverFilePath, e);
         }
 
-        return key;
+        return stemServerPath + key;
     }
 }

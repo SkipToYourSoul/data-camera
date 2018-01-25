@@ -244,7 +244,7 @@ $('#content-form').formValidation({
     $.ajax({
         type: 'post',
         url: crud_address + '/content/new',
-        data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId + "&tags=" + tags,
+        data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId + "&tags=" + tags + "&share-img=" + analysisObject.contentImg,
         success: function (response) {
             if (response.code == "0000"){
                 window.location.href = base_address + "/content?id=" + response.data['id'];

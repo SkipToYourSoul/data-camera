@@ -211,6 +211,26 @@ public class ViewController {
         return "content";
     }
 
+    @GetMapping("/share")
+    public String shareContent(@RequestParam(value = "rid", required = false) Long rid,
+                               Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String currentUser = commonService.getCurrentLoginUser(request);
+        if (currentUser == null){
+            logger.warn("[/share], no login user, redirect to /login");
+            response.sendRedirect(request.getContextPath() + "/login");
+            return "login";
+        }
+        if (rid == null){
+            logger.warn("[/share], unsupport url");
+            response.sendRedirect(request.getContextPath() + "/index");
+            return "index";
+        }
+        RecorderInfo recorderInfo = crudService.findRecorder(rid);
+        model.addAttribute("recorder", recorderInfo);
+
+        return "share";
+    }
+
     @GetMapping("/denied")
     public String denied(HttpServletRequest request) {
         logger.warn("denied: {}", request.getRequestURL().toString());

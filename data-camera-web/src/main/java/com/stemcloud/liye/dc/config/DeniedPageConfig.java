@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
  *  config denied page, filter http status 403/404
  * @author liye on 2017/11/9
  */
-@Configuration
+// @Configuration
 public class DeniedPageConfig implements EmbeddedServletContainerCustomizer {
     @Override
     public void customize(ConfigurableEmbeddedServletContainer container) {

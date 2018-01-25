@@ -173,6 +173,10 @@ public class CrudService {
 
     // -------------------------------------------------
     /** 数据片段 **/
+    public RecorderInfo findRecorder(long id){
+        return recorderRepository.findOne(id);
+    }
+
     public void updateRecorderName(long id, String name){
         recorderRepository.updateName(id, name);
     }
@@ -200,7 +204,7 @@ public class CrudService {
 
     // -------------------------------------------------
     /** 内容 **/
-    public ContentInfo saveContent(String user, String name, String desc, String category, String tag, int isShared, long recorderId){
+    public ContentInfo saveContent(String user, String name, String desc, String category, String tag, int isShared, long recorderId, String img){
         ContentInfo content = new ContentInfo();
         content.setOwner(user);
         content.setTitle(name);
@@ -209,6 +213,9 @@ public class CrudService {
         content.setTag(tag);
         content.setIsShared(isShared);
         content.setRecorderInfo(recorderRepository.findOne(recorderId));
+        if (!img.trim().isEmpty()){
+            content.setImg(img);
+        }
         return contentRepository.save(content);
     }
 

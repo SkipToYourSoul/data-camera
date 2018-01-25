@@ -32,6 +32,8 @@ public class ContentInfo {
 
     private String tag;
 
+    private String img;
+
     @Column(name = "view_count", columnDefinition = "INT DEFAULT 0")
     private int view = 0;
 
@@ -101,6 +103,14 @@ public class ContentInfo {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
     }
 
     public int getView() {
