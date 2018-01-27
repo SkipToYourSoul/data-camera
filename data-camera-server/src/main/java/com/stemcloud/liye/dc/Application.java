@@ -5,6 +5,8 @@ import com.stemcloud.liye.dc.common.GlobalVariables;
 import com.stemcloud.liye.dc.listener.QuartzManager;
 import com.stemcloud.liye.dc.listener.SensorMonitorJob;
 import com.stemcloud.liye.dc.common.RandomGenerator;
+import com.stemcloud.liye.dc.socket.NettyServer;
+import com.stemcloud.liye.dc.socket.Server;
 
 import java.sql.SQLException;
 
@@ -16,13 +18,14 @@ import java.sql.SQLException;
  */
 public class Application {
     public static void main(String[] args) throws InterruptedException, SQLException {
-        System.out.println("Init resources");
-        GlobalVariables.sensorConfigMap = MysqlRepository.loadSensorConfigMap();
-
-        System.out.println("Init scheduler");
-        QuartzManager.addJob("test", SensorMonitorJob.class, 5);
-
-        System.out.println("Init random generator");
-        new RandomGenerator().allSensor();
+//        System.out.println("Init resources");
+//        GlobalVariables.sensorConfigMap = MysqlRepository.loadSensorConfigMap();
+//
+//        System.out.println("Init scheduler");
+//        QuartzManager.addJob("test", SensorMonitorJob.class, 5);
+//
+//        System.out.println("Init random generator");
+//        new RandomGenerator().allSensor();
+        Server._default().start();
     }
 }
