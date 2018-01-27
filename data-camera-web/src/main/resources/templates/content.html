@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>DATA CAMERA内容页</title>
+
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/table/bootstrap-table.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
+</head>
+<body>
+    <div class="navbar-wrapper" th:include="module/common::nav">
+    </div>
+
+    <div class="container-fluid">
+        <div class="row" style="margin-top: 70px;">
+            <!-- 页面说明 -->
+            <div class="device-page-introduction">
+                <p>
+                    <i class="fa fa-info-circle"></i>&nbsp;在设备管理页面，你可以新建设备或编辑原有设备
+                </p>
+                <p>
+                    <i class="fa fa-info-circle"></i>&nbsp;新建设备时请严格根据设备上提供的编号新建，设备新建后编号不能修改，你可以通过删除设备来将设备从你的账户中解除
+                </p>
+                <hr/>
+            </div>
+            <div class="col-sm-12">
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div th:include="module/common::sub-footer"></div>
+        </div>
+    </div>
+
+    <script th:src="@{source/jquery.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+
+    <script th:src="@{source/table/bootstrap-table.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
+    <script th:src="@{source/bootbox/bootbox.min.js}"></script>
+
+    <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/validation/formValidation.min.js}"></script>
+    <script th:src="@{source/validation/bootstrap.min.js}"></script>
+
+    <script th:src="@{js/common.js}"></script>
+</body>
+</html>

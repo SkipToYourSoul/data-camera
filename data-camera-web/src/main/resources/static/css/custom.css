@@ -1,0 +1,321 @@
+body{
+    background: #fff;
+    padding-top:46px;
+}
+
+hr {
+    height:1px;
+    border:none;
+    border-top:1px solid #9d9d9d;
+}
+
+/** navbar **/
+.navbar {
+    margin-bottom:0;
+}
+
+.navbar-default {
+    background-color: #ffffff;
+}
+
+.navbar .navbar-nav>li>a {
+    color: #828587;
+    height: 60px;
+    line-height: 60px;
+    font-size:16px;
+    padding-top:0;
+    padding-bottom:0;
+}
+
+.navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>.open>a:focus {
+    color: #FFFFFF;
+    background-color: rgba(74, 145, 244, 0.7);
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+    color: #FFFFFF;
+    background-color: #4b91f4;
+}
+
+.navbar a, .dropdown-menu>li>a, .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover, .navbar-toggle{
+    color: rgba(154, 154, 154, 1);
+}
+
+.navbar-logo-img {
+    height: 60px;
+}
+
+.navbar-login-ul {
+    border-left:solid 1px #d9d9de;
+    margin-right: 10px;
+}
+
+/** index_old.html */
+.index-row{
+    margin-top: 15px
+}
+
+.index-map-container{
+    width: 100%;
+    height: 600px;
+    overflow: hidden;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.index-app-search{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.index-search-input{
+    margin-bottom: 20px;
+}
+
+.index-small-chart{
+    height: 300px;
+}
+
+.index-big-chart{
+    height: 300px;
+}
+
+/*
+ * app_old.html
+ */
+.sidebar {
+    position: fixed;
+    top: 55px;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    z-index: 1000;
+    display: block;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #FFFFFF;
+    border: 5px solid #5c5b5b;
+}
+
+.sidebar .app-group{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+    margin-right: -21px; /* 20px padding + 1px border */
+    margin-bottom: 20px;
+    margin-left: -20px;
+}
+.nav-sidebar > li > a {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+    color: #FFFFFF;
+    background-color: #4b91f4;
+}
+.nav-sidebar > li > span {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.app-new-button{
+    margin-top: 10px;
+    height: 80px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+
+/* Main content */
+.app-nav-tabs{
+    margin-top: 10px
+}
+
+.app-main-content {
+    padding: 10px;
+    background-color: rgba(245, 245, 245, 0.8);
+}
+@media (min-width: 768px) {
+    .app-main-content {
+        padding-right: 40px;
+        padding-left: 40px;
+    }
+}
+
+/* overview */
+.overview-panel-footer {
+    background-color: #FFFFFF;
+}
+
+.overview-title {
+    height: 35px;
+    line-height: 35px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #9d9d9d;
+}
+
+.overview-content {
+    height: 35px;
+    line-height: 35px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #ff5a00;
+}
+
+@media (max-width: 768px) {
+    .overview-content {
+        height: 35px;
+        line-height: 35px;
+        font-size: 18px;
+        font-weight: 400;
+        color: #ff5a00;
+    }
+
+    .value-sensor-info{
+        max-height: 200px;
+        overflow-y: auto;
+        padding-top: 15px;
+        padding-bottom: 5px;
+        margin-top: 10px;
+        border-top: 1px solid #5c5b5b;
+    }
+}
+
+.data-recorder-form{
+    background-color: #dddddd;
+    border-radius: 5px;
+    padding: 10px 10px 5px 10px;
+}
+
+/** recorder **/
+.recorder-time-view{
+    color: orangered;
+    font-weight: 500;
+    font-size: 20px;
+    text-align: right;
+}
+
+.recorder-duration-info{
+    max-height: 90px;
+    overflow-y: auto;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+
+/** sensor content **/
+.value-sensor-content{
+    height: 400px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+.value-sensor-info{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.value-sensor-data{
+    max-height: 400px;
+    overflow-y: auto;
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+.value-sensor-data-title {
+    height: 35px;
+    line-height: 35px;
+    font-size: 32px;
+    font-weight: 800;
+    color: #9d9d9d;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.value-sensor-data-content {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ff5a00;
+}
+
+.tab-sensor-content{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.tab-sensor-info{
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px;
+}
+
+.camera-sensor-tool{
+    margin-top: 10px;
+}
+
+.camera-sensor-tab{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.photo-sensor-tab{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: 400px;
+}
+
+/** analysis content **/
+.analysis-sensor-content{
+    height: 300px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+/** footer **/
+.content-about-us {
+    height: auto;
+    text-align: center;
+    overflow: hidden;
+    margin-top: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #ffffff;
+    color: #666;
+    border-top: solid 1px #ccc;
+}
+
+.content-about-us .title{
+    font-size: 24px;
+    line-height: 40px;
+    color: #2e87c5;
+}
+
+.content-about-us .desc{
+    width: 88%;
+    max-width: 1005px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 30px;
+    margin: 30px auto auto;
+    color: #666;
+}
+
+.copyright {
+    width: 100%;
+    height: 53px;
+    border-top: solid 1px #ccc;
+    text-align: center;
+    font-size: 16px;
+    line-height: 53px;
+    clear: both;
+}
