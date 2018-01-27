@@ -42,7 +42,7 @@
                                         <div class="col-sm-3 col-md-3 col-xs-3">
                                             <div class="share-view-container">
                                                 <div class="share-view-photo">
-                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="img-responsive center-block img-rounded"/>
+                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="share-img center-block img-rounded"/>
                                                 </div>
                                                 <div class="share-view-title">
                                                     <div>标题：<a th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a></div>
@@ -72,7 +72,7 @@
                                         <div class="col-sm-3 col-md-3 col-xs-3">
                                             <div class="share-view-container">
                                                 <div class="share-view-photo">
-                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="img-responsive center-block img-rounded"/>
+                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="share-img center-block img-rounded"/>
                                                 </div>
                                                 <div class="share-view-title">
                                                     <div>标题：<a th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a></div>

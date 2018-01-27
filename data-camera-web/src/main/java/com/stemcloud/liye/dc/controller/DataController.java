@@ -144,9 +144,9 @@ public class DataController {
 
     @PostMapping("/file-upload")
     @ResponseBody
-    Map uploadFile(HttpServletRequest request){
+    Map uploadFile(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try{
-            return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, "content"));
+            return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, queryParams.get("from")));
         } catch (Exception e){
             return ServerReturnTool.serverFailure(e.getCause().getMessage());
         }
