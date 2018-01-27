@@ -32,7 +32,7 @@ function initExperiment(){
                 legends.forEach(function (legend) {
                     var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
                     var chart = echarts.init(document.getElementById(chart_dom), "", opts = {height: 150});
-                    chart.setOption(experimentChartOption(legend));
+                    chart.setOption(buildExperimentChartOption(legend));
                 });
             } else if (track_type == 2){
 
@@ -102,78 +102,26 @@ function initExperiment(){
     initActionStatus();
 }
 
-/**
- * 实验页面的图表
- * @param legend
- * @returns
- */
-var experimentChartOption = function (legend) {
-    return {
-        backgroundColor: '#ffffff',
-        tooltip: app_chart_tooltip,
-        legend: {
-            top: '0%',
-            left: 'center',
-            data: legend
-        },
-        grid: [{
-            borderWidth: 0,
-            top: 10,
-            bottom: 30,
-            left: 40,
-            right: 25,
-            textStyle: {
-                color: "#fff"
+function initActionStatus(){
+    // -- 更改实验状态（如果在监控或录制状态）
+    Object.keys(isExperimentMonitor).forEach(function (id) {
+        var exp_monitor_btn = $('#experiment-monitor-' + id);
+        var exp_monitor_dom = $('#experiment-es-' + id);
+        var exp_recorder_btn = $('#experiment-recorder-' + id);
+        var exp_recorder_dom = $('#experiment-rs-' + id);
+
+        if (isExperimentMonitor[id] == 1){
+            exp_monitor_dom.removeClass('label-default').addClass('label-success').text('正在监控');
+            exp_monitor_btn.removeClass('btn-default').addClass('btn-success');
+
+            if (isExperimentRecorder[id] == 1){
+                exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
+                exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
+
+                expObject.setRecorderTime(id, [expRecorderTime[id]]);
+                expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
             }
-        }],
-        calculable: true,
-        xAxis: [
-            {
-                type: 'time',
-                boundaryGap : ['20%', '20%'],
-                axisPointer: {
-                    show: true,
-                    type: 'line',
-                    snap: true,
-                    z: 100
-                }
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                scale: true,
-                splitLine: {
-                    show: false
-                },
-                boundaryGap: true,
-                minInterval: 1,
-                splitNumber: 3
-            }
-        ],
-        series: {
-            name: legend,
-            type: 'line',
-            symbolSize: 4,
-            symbol:'circle',
-            hoverAnimation: false,
-            smooth: true,
-            areaStyle: {
-                normal: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                        offset: 0,
-                        color: 'rgb(255, 158, 68)'
-                    }, {
-                        offset: 1,
-                        color: 'rgb(255, 70, 131)'
-                    }])
-                }
-            },
-            markArea: {
-                silent: true,
-                data: []
-            },
-            data: []
+            doInterval(id);
         }
-    };
-};
+    });
+}

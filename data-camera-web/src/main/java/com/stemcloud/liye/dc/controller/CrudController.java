@@ -376,4 +376,48 @@ public class CrudController {
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
+
+    /**
+     * 发布内容
+     * @param queryParams
+     * @param request
+     * @return
+     */
+    @PostMapping("/content/new")
+    public Map publishContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        try {
+            String user = commonService.getCurrentLoginUser(request);
+            Long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+            String name = queryParams.get("content-name");
+            String desc = queryParams.get("content-desc");
+            String category = queryParams.get("content-category-select");
+            String tag = queryParams.get("tags");
+            String img = queryParams.get("share-img");
+            int isShared = Integer.parseInt(queryParams.get("content-private-select"));
+            return ServerReturnTool.serverSuccess(crudService.saveContent(user, name, desc, category, tag, isShared, recorderId, img));
+        } catch (Exception e){
+            logger.error("[/content/new]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    /**
+     * 删除内容
+     * @param queryParams
+     * @param request
+     * @return
+     */
+    @GetMapping("/content/delete")
+    public Map deleteContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        try {
+            Long id = Long.parseLong(queryParams.get("content-id"));
+            String user = commonService.getCurrentLoginUser(request);
+            logger.info("User {} delete content {}", user, id);
+            crudService.deleteContent(id);
+            return ServerReturnTool.serverSuccess(id);
+        } catch (Exception e){
+            logger.error("[/content/delete]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
 }

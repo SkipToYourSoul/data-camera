@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <!-- –¬‘ˆ£Ø±‡º≠ ”¶”√ -->
+
+    <!-- Êñ∞Â¢ûÔºèÁºñËæë Â∫îÁî® -->
     <div th:fragment="app-modal">
         <div class="modal fade" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="app-modal-title">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="app-modal-title">”¶”√±‡º≠¥∞ø⁄</h4>
+                        <h4 class="modal-title" id="app-modal-title">Âú∫ÊôØÁºñËæëÁ™óÂè£</h4>
+
                     </div>
                     <div class="modal-body">
                         <form class="form-horizontal" role="form" id="edit-app-form">
                             <div class="form-group">
-                                <label for="app-name" class="col-sm-2 control-label">”¶”√±ÍÃ‚</label>
+
+                                <label for="app-name" class="col-sm-2 control-label">Âú∫ÊôØÊ†áÈ¢ò</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control"
-                                           name="app-name" id="app-name" placeholder="”¶”√±ÍÃ‚≤ªƒ‹Œ™ø’"/>
+                                           name="app-name" id="app-name" placeholder="Âú∫ÊôØÊ†áÈ¢ò‰∏çËÉΩ‰∏∫Á©∫"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="app-desc" class="col-sm-2 control-label">”¶”√√Ë ˆ</label>
+                                <label for="app-desc" class="col-sm-2 control-label">Âú∫ÊôØÊèèËø∞</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control"
                                               name="app-desc"
                                               rows="5"
                                               required="required"
-                                              placeholder="ºÚµ•√Ë ˆƒ„µƒ”¶”√£¨≤ªƒ‹Œ™ø’"
+                                              placeholder="ÁÆÄÂçïÊèèËø∞‰Ω†ÁöÑÂú∫ÊôØÔºå‰∏çËÉΩ‰∏∫Á©∫"
                                               id="app-desc"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
-                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-app-form').submit()" id="app-confirm-btn">»∑»œ¥¥Ω®</button>
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-app-form').submit()" id="app-confirm-btn">Á°ÆËÆ§ÂàõÂª∫</button>
                                 </div>
                             </div>
                         </form>
@@ -42,44 +45,45 @@
         </div>
     </div>
 
-    <!-- –¬‘ˆ£Ø±‡º≠  µ—È -->
+
+    <!-- Êñ∞Â¢ûÔºèÁºñËæë ÂÆûÈ™å -->
     <div th:fragment="exp-modal">
         <div class="modal fade" id="exp-modal" tabindex="-1" role="dialog" aria-labelledby="exp-modal-title">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="exp-modal-title">¥´∏–∆˜◊È±‡º≠¥∞ø⁄</h4>
+                        <h4 class="modal-title" id="exp-modal-title">‰º†ÊÑüÂô®ÁªÑÁºñËæëÁ™óÂè£</h4>
                     </div>
                     <div class="modal-body">
                         <form class="form-horizontal" role="form" id="edit-exp-form">
-                            <div class="form-group">
-                                <label for="exp-name" class="col-sm-2 control-label">¥´∏–∆˜◊È±ÍÃ‚</label>
+                            <div class="form-group" id="exp-name-group">
+                                <label for="exp-name" class="col-sm-2 control-label">‰º†ÊÑüÂô®ÁªÑÊ†áÈ¢ò</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control"
-                                           name="exp-name" id="exp-name" placeholder="¥´∏–∆˜◊È±ÍÃ‚≤ªƒ‹Œ™ø’"/>
+                                           name="exp-name" id="exp-name" placeholder="‰º†ÊÑüÂô®ÁªÑÊ†áÈ¢ò‰∏çËÉΩ‰∏∫Á©∫"/>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="exp-desc" class="col-sm-2 control-label">¥´∏–∆˜◊È√Ë ˆ</label>
+                            <div class="form-group" id="exp-desc-group">
+                                <label for="exp-desc" class="col-sm-2 control-label">‰º†ÊÑüÂô®ÁªÑÊèèËø∞</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control"
                                               name="exp-desc"
                                               rows="3"
                                               required="required"
-                                              placeholder="ºÚµ•√Ë ˆƒ„µƒ¥´∏–∆˜◊È£¨≤ªƒ‹Œ™ø’"
+                                              placeholder="ÁÆÄÂçïÊèèËø∞‰Ω†ÁöÑ‰º†ÊÑüÂô®ÁªÑÔºå‰∏çËÉΩ‰∏∫Á©∫"
                                               id="exp-desc"></textarea>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="exp-select" class="col-sm-2 control-label">—°‘Ò¥´∏–∆˜</label>
+                            <div class="form-group" id="exp-select-group">
+                                <label for="exp-select" class="col-sm-2 control-label">ÈÄâÊã©‰º†ÊÑüÂô®</label>
                                 <div class="col-sm-10">
                                     <select class="selectpicker"
                                             multiple="multiple"
                                             data-width="100%"
                                             id="exp-select"
                                             name="exp-select"
-                                            title="—°»°¥´∏–∆˜£¨ø…∂‡—°"
+                                            title="ÈÄâÂèñ‰º†ÊÑüÂô®ÔºåÂèØÂ§öÈÄâ"
                                             data-selected-text-format="count > 3"
                                             data-actions-box="true">
                                     </select>
@@ -87,7 +91,7 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
-                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-exp-form').submit()" id="exp-confirm-btn">»∑»œ¥¥Ω®</button>
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-exp-form').submit()" id="exp-confirm-btn">Á°ÆËÆ§ÂàõÂª∫</button>
                                 </div>
                             </div>
                         </form>
@@ -97,36 +101,37 @@
         </div>
     </div>
 
-    <!-- –¬‘ˆ£¨±‡º≠…Ë±∏ -->
+
+    <!-- Êñ∞Â¢ûÔºåÁºñËæëËÆæÂ§á -->
     <div th:fragment="sensor-modal">
         <div class="modal fade" id="sensor-modal" tabindex="-1" role="dialog" aria-labelledby="sensor-modal-title">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="sensor-modal-title">…Ë±∏±‡º≠¥∞ø⁄</h4>
+                        <h4 class="modal-title" id="sensor-modal-title">ËÆæÂ§áÁºñËæëÁ™óÂè£</h4>
                     </div>
                     <div class="modal-body">
                         <form class="form-horizontal" role="form" id="edit-sensor-form">
                             <div class="form-group">
-                                <label for="sensor-name" class="col-sm-2 control-label">…Ë±∏√˚≥∆</label>
+                                <label for="sensor-name" class="col-sm-2 control-label">ËÆæÂ§áÂêçÁß∞</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" name="sensor-name" id="sensor-name"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="sensor-code" class="col-sm-2 control-label">…Ë±∏±‡∫≈</label>
+                                <label for="sensor-code" class="col-sm-2 control-label">ËÆæÂ§áÁºñÂè∑</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="sensor-code" id="sensor-code" placeholder=" ‰»Î…Ë±∏…œ√Êµƒ±‡∫≈£¨»Á0001"/>
+                                    <input type="text" class="form-control" name="sensor-code" id="sensor-code" placeholder="ËæìÂÖ•ËÆæÂ§á‰∏äÈù¢ÁöÑÁºñÂè∑ÔºåÂ¶Ç0001"/>
                                 </div>
                             </div>
                             <!--<div class="form-group">
-                                <label for="new-sensor-city" class="col-sm-2 control-label">≥« –Œª÷√</label>
+                                <label for="new-sensor-city" class="col-sm-2 control-label">ÂüéÂ∏Ç‰ΩçÁΩÆ</label>
                                 <div class="col-sm-5">
-                                    <input type="text" class="form-control" name="new-sensor-city" id="new-sensor-city" placeholder="≥« –√˚"/>
+                                    <input type="text" class="form-control" name="new-sensor-city" id="new-sensor-city" placeholder="ÂüéÂ∏ÇÂêç"/>
                                 </div>
                                 <div class="col-sm-5">
-                                    <button type="button" class="btn btn-info btn-block" id="positionBtn">ªÒ»°Œª÷√–≈œ¢</button>
+                                    <button type="button" class="btn btn-info btn-block" id="positionBtn">Ëé∑Âèñ‰ΩçÁΩÆ‰ø°ÊÅØ</button>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -138,19 +143,103 @@
                                 </div>
                             </div>-->
                             <div class="form-group">
-                                <label for="sensor-desc" class="col-sm-2 control-label">…Ë±∏√Ë ˆ</label>
+                                <label for="sensor-desc" class="col-sm-2 control-label">ËÆæÂ§áÊèèËø∞</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control"
                                               name="sensor-desc"
                                               rows="5"
                                               required="required"
-                                              placeholder=" ‰»Î…Ë±∏√Ë ˆ"
+                                              placeholder="ËæìÂÖ•ËÆæÂ§áÊèèËø∞"
                                               id="sensor-desc"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
-                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-sensor-form').submit()" id="sensor-confirm-btn">»∑»œ¥¥Ω®</button>
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#edit-sensor-form').submit()" id="sensor-confirm-btn">Á°ÆËÆ§ÂàõÂª∫</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÂèëÂ∏ÉÂÜÖÂÆπ -->
+    <div th:fragment="content-modal">
+        <div class="modal fade" id="content-modal" tabindex="-1" role="dialog" aria-labelledby="content-modal-title">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="content-modal-title">ÂèëÂ∏ÉÂÜÖÂÆπ</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="content-form">
+                            <div class="form-group">
+                                <label for="content-name" class="col-sm-2 control-label">Ê†áÈ¢ò</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control"
+                                           name="content-name" id="content-name" placeholder="ÂÜÖÂÆπÊ†áÈ¢ò‰∏çËÉΩ‰∏∫Á©∫"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content-desc" class="col-sm-2 control-label">‰ªãÁªç</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control"
+                                              name="content-desc"
+                                              rows="3"
+                                              required="required"
+                                              placeholder="ËÆ≤ËÆ≤ÂÖ≥‰∫éÂÜÖÂÆπÁöÑÊïÖ‰∫ãÔºåËÆ©Êõ¥Â§ö‰∫∫‰∫ÜËß£"
+                                              id="content-desc"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content-category-select" class="col-sm-2 control-label">STEMÂàÜÁ±ª</label>
+                                <div class="col-sm-10">
+                                    <select class="selectpicker"
+                                            data-width="100%"
+                                            id="content-category-select"
+                                            name="content-category-select">
+                                        <option value="ÁßëÂ≠¶">ÁßëÂ≠¶</option>
+                                        <option value="ÊäÄÊúØ">ÊäÄÊúØ</option>
+                                        <option value="Â∑•Á®ã">Â∑•Á®ã</option>
+                                        <option value="Êï∞Â≠¶">Êï∞Â≠¶</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Ê†áÁ≠æ</label>
+                                <div class="col-sm-10">
+                                    <div class="content-tag-dropdown">
+                                        <select name="content-tag" id="content-tag" style="display:none" multiple="multiple" placeholder="ËØ∑ÈÄâÊã©"></select>
+                                    </div>
+                                    <div style="margin-top: 5px">
+                                        <span class="label label-primary">Á§∫‰æãtag</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="file-upload-input" class="col-sm-2 control-label">ÂõæÁâá‰∏ä‰º†</label>
+                                <div class="col-sm-10">
+                                    <input id="file-upload-input" type="file" class="file" data-preview-file-type="text" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content-private-select" class="col-sm-2 control-label">ÈöêÁßÅ</label>
+                                <div class="col-sm-10">
+                                    <select class="selectpicker"
+                                            data-width="100%"
+                                            id="content-private-select"
+                                            name="content-private-select">
+                                        <option value="1">ÂÖ¨ÂºÄ-ÊâÄÊúâ‰∫∫ÂèØÁúã</option>
+                                        <option value="0">ÁßÅÂØÜ-‰ªÖËá™Â∑±ÂèØÁúã</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#content-form').submit()" id="content-confirm-btn">ÂèëÂ∏É</button>
                                 </div>
                             </div>
                         </form>

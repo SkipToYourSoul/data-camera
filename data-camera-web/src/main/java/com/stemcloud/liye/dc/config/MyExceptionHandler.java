@@ -15,7 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
  *  filter http status 500
  * @author liye on 2017/11/7
  */
-@ControllerAdvice
+// @ControllerAdvice
 public class MyExceptionHandler {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 

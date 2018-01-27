@@ -44,10 +44,12 @@ public class ChartTimeSeries {
             subMap.put("borderWidth", 5);
             subMap.put("borderType", "dotted");
             subMap.put("opacity", 0.7);
+            subMap.put("id", vd.getId());
             map.put("normal", subMap);
         }else {
             this.name = "无";
             subMap.put("opacity", 1);
+            subMap.put("id", vd.getId());
             map.put("normal", subMap);
         }
         this.itemStyle = map;

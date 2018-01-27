@@ -7,6 +7,7 @@ import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.common.ServerReturnTool;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.DataService;
+<<<<<<< HEAD
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+=======
+import com.stemcloud.liye.dc.service.OssService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+>>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -33,11 +41,13 @@ public class DataController {
 
     private final BaseInfoService baseService;
     private final DataService dataService;
+    private final OssService ossService;
 
     @Autowired
-    public DataController(BaseInfoService baseService, DataService dataService) {
+    public DataController(BaseInfoService baseService, DataService dataService, OssService ossService) {
         this.baseService = baseService;
         this.dataService = dataService;
+        this.ossService = ossService;
     }
 
     @GetMapping("/app")
@@ -110,20 +120,45 @@ public class DataController {
 
     /**
      * 生成用户自定义的实验片段
-     *
      * @param queryParams
      * @return
      */
     @GetMapping("/user-new-recorder")
     Map newContent(@RequestParam Map<String, String> queryParams){
-        long recorderId = Long.parseLong(queryParams.get("recorder-id"));
-        String start = queryParams.get("start");
-        String end = queryParams.get("end");
-        logger.info("[/data/user-new-recorder], id={}, start={}, end={}", recorderId, start, end);
         try {
+            long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+            String start = queryParams.get("start");
+            String end = queryParams.get("end");
+            logger.info("[/data/user-new-recorder], id={}, start={}, end={}", recorderId, start, end);
             return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end));
         } catch (ParseException e) {
             return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新数据标注
+     * @param queryParams
+     * @return
+     */
+    @GetMapping("/user-data-mark")
+    Map addDataMark(@RequestParam Map<String, String> queryParams){
+        try{
+            long id = Long.parseLong(queryParams.get("data-id"));
+            String mark = queryParams.get("data-mark");
+            return ServerReturnTool.serverSuccess(dataService.updateDataMarker(id, mark));
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    @PostMapping("/file-upload")
+    @ResponseBody
+    Map uploadFile(HttpServletRequest request){
+        try{
+            return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, "content"));
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure(e.getCause().getMessage());
         }
     }
 }

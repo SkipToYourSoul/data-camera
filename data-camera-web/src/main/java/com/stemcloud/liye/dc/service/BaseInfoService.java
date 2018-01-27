@@ -4,11 +4,19 @@ import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
+<<<<<<< HEAD
+=======
+import com.stemcloud.liye.dc.dao.data.ContentRepository;
+>>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+<<<<<<< HEAD
+=======
+import com.stemcloud.liye.dc.domain.data.ContentInfo;
+>>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +40,16 @@ public class BaseInfoService {
     private final ExperimentRepository experimentRepository;
     private final TrackRepository trackRepository;
     private final RecorderRepository recorderRepository;
+    private final ContentRepository contentRepository;
 
     @Autowired
-    public BaseInfoService(AppRepository appRepository, SensorRepository sensorRepository, ExperimentRepository experimentRepository, TrackRepository trackRepository, RecorderRepository recorderRepository) {
+    public BaseInfoService(AppRepository appRepository, SensorRepository sensorRepository, ExperimentRepository experimentRepository, TrackRepository trackRepository, RecorderRepository recorderRepository, ContentRepository contentRepository) {
         this.appRepository = appRepository;
         this.sensorRepository = sensorRepository;
         this.experimentRepository = experimentRepository;
         this.trackRepository = trackRepository;
         this.recorderRepository = recorderRepository;
+        this.contentRepository = contentRepository;
     }
 
     // --- APPS
@@ -65,12 +75,8 @@ public class BaseInfoService {
      */
     public Boolean isAppBelongUser(long id, String user) {
         AppInfo app = appRepository.findOne(id);
-        if (app == null){
-            logger.warn("Null app {}, return false", id);
-            return false;
-        }
-        logger.info("Compare user {} with app creator {}", user, app.getCreator());
-        return app.getIsDeleted() == 0 && user.equals(app.getCreator());
+        logger.info("Check user {} has app {}", user, id);
+        return app != null && app.getIsDeleted() == 0 && user.equals(app.getCreator());
     }
 
     /** EXPERIMENT **/
@@ -187,5 +193,18 @@ public class BaseInfoService {
             map.put(eid, list);
         }
         return map;
+    }
+
+    // ---- 内容
+    /**
+     * 判断当前用户是否拥有访问的应用页面的权限
+     * @param id 内容id
+     * @param user 用户
+     * @return true or false
+     */
+    public Boolean isContentCanVisit(long id, String user) {
+        ContentInfo content = contentRepository.findOne(id);
+        logger.info("Check user {} has content {}", user, id);
+        return content != null && content.getIsDeleted() == 0 && (user.equals(content.getOwner()) || content.getIsShared() == 1);
     }
 }

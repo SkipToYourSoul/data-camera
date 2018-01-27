@@ -19,10 +19,7 @@ function recorderPlay() {
 function recorderAction(){
     setTimeLine(++analysisObject.timelineStart, analysisObject.timelineEnd);
     if (analysisObject.timelineStart >= analysisObject.timelineEnd){
-        recorderPause();
-        recorderInterval = null;
-        // 隐藏时间标记
-        $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
+        recorderReset();
     }
 
     function setTimeLine(start, end){
@@ -94,6 +91,8 @@ function recorderReset() {
             series: series
         });
     }
+    // 隐藏时间标记
+    $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
 }
 
 $('#recorder-speed').find('input:radio').change(function(radio){
@@ -214,4 +213,8 @@ function saveDataDesc(){
             message_info("数据请求被拒绝", 'error');
         }
     });
+}
+
+function shareContent() {
+    window.location.href = base_address + "/share?rid=" + analysisObject.currentRecorderId;
 }

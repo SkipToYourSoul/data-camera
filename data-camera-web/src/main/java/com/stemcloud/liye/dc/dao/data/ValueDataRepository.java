@@ -1,8 +1,15 @@
 package com.stemcloud.liye.dc.dao.data;
 
 import com.stemcloud.liye.dc.domain.data.ValueData;
+<<<<<<< HEAD
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
+=======
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
+>>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 
 import java.util.Date;
 import java.util.List;
@@ -55,4 +62,15 @@ public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
      * @return
      */
     List<ValueData> findBySensorIdAndKeyAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, String key, Date startTime, Date endTime);
+
+    /**
+     * 修改数据标注
+     * @param id
+     * @param marker
+     * @return
+     */
+    @Query(value = "UPDATE ValueData v SET v.mark = ?2 WHERE v.id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer updateMarker(long id, String marker);
 }

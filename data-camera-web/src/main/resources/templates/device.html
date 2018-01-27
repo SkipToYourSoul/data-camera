@@ -38,6 +38,7 @@
                         <button class="btn" style="background-color:#35b5eb;color:#fff"  todo="new" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-plus-circle"></i>&nbsp;新增设备</button>
                         <button class="btn" style="background-color:#27c6db;color:#fff" todo="edit" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-info-circle"></i>&nbsp;编辑设备</button>
                         <button class="btn" style="background-color:#fc4b6c;color:#fff" onclick="deleteSensor()"><i class="fa fa-minus-circle"></i>&nbsp;删除设备</button>
+
                     </div>
                     <table id="table"
                            data-select-item-name="select"
@@ -58,7 +59,7 @@
                            data-pagination-pre-text="Previous"
                            data-pagination-next-text="Next"
                            data-pagination-last-text="Last"
-                           >
+                           data-row-style="rowStyle">
                     </table>
                 </div>
             </div>
