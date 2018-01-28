@@ -98,8 +98,10 @@ function recorderReset() {
 $('#recorder-speed').find('input:radio').change(function(radio){
     var speed = radio.target.getAttribute('value');
     var interval = 1000/parseInt(speed);
-    clearInterval(recorderInterval);
-    recorderInterval = setInterval(recorderAction, interval);
+    if (recorderInterval != null){
+        clearInterval(recorderInterval);
+        recorderInterval = setInterval(recorderAction, interval);
+    }
 });
 
 

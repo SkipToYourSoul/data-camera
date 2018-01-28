@@ -23,8 +23,6 @@ import java.lang.reflect.Method;
  *  redis configuration
  * @author liye on 2017/12/11
  */
-@Configuration
-@EnableCaching
 public class RedisConfig extends CachingConfigurerSupport {
     // 继承CachingConfigurerSupport并重写keyGenerator()， 自定义redis-key生成规则，防止缓存key冲突
     @Bean

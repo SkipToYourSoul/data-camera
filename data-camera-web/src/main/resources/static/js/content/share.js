@@ -39,7 +39,7 @@ $('.content-tag-dropdown').dropdown({
 // -- 图片上传
 $("#file-upload-input").fileinput({
     language: 'zh',
-    uploadUrl: data_address + "/file-upload", // server upload action
+    uploadUrl: data_address + "/file-upload?from=content", // server upload action
     allowedFileExtensions: ['jpg', 'png'],
     uploadAsync: true,
     dropZoneEnabled: true,

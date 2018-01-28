@@ -4,14 +4,14 @@
     <div th:fragment="nav">
         <nav th:class="${inIndex}?'navbar navbar-default':'navbar navbar-default navbar-fixed-top'">
             <!-- navbar header -->
-            <div class="navbar-header">
+            <div class="navbar-header" style="margin-left:10%">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="pull-left"><img class="navbar-logo-img" th:src="@{img/logo.png}"/></a>
+               	<a class="pull-left"><img class="navbar-logo-img" th:src="@{img/logo.png}"/></a>
             </div>
 
             <div id="navbar" class="navbar-collapse collapse">
@@ -26,22 +26,21 @@
                 </th:block>
 
                 <!-- login user control -->
-                <!--<div sec:authorize="isAuthenticated()">
+                <div sec:authorize="isAuthenticated()">
                     <ul class="nav navbar-nav pull-right navbar-login-ul">
                         <li><a><i class="fa fa-user-circle fa-fw"></i>&nbsp; 登陆用户:&nbsp; <span sec:authentication="name">ANONYMOUS_USER</span></a></li>
-                        <li th:if="!${inIndex}"><a><i class="fa fa-id-card-o fa-fw"></i>&nbsp; 用户身份:&nbsp;  <span sec:authentication="principal.authorities">[ROLE_USER]</span></a></li>
+                        <li><a><i class="fa fa-id-card-o fa-fw"></i>&nbsp; 用户身份:&nbsp;  <span sec:authentication="principal.authorities">[ROLE_USER]</span></a></li>
                         <li><a th:href="@{/logout}"><i class="fa fa-sign-out fa-fw"></i>&nbsp; 注销</a></li>
-                        <li th:if="${inIndex}"><a th:href="@{/help}"><i class="fa fa-spinner fa-pulse fa-fw"></i>&nbsp; 获得帮助</a></li>
                     </ul>
                 </div>
                 <div sec:authorize="!isAuthenticated()">
                     <ul class="nav navbar-nav pull-right navbar-login-ul">
                         <li><a th:href="@{/login}"><i class="fa fa-sign-in fa-fw"></i>&nbsp; 登陆</a></li>
                         <li th:if="${inIndex}"><a href="#"><i class="fa fa-registered fa-fw"></i>&nbsp; 注册</a></li>
-                        <li th:if="${inIndex}"><a th:href="@{/help}"><i class="fa fa-spinner fa-pulse fa-fw"></i>&nbsp; 获得帮助</a></li>
                     </ul>
-                </div>-->
+                </div>
             </div>
+            
         </nav>
     </div>
 
@@ -58,7 +57,7 @@
     </div>
 
     <div th:fragment="sub-footer">
-        <div class="copyright" style="margin-left:212px">
+        <div class="copyright" style="margin-left:10%">
             Copyright ® 上海STEM云中心 沪ICP备14033392号-1
         </div>
     </div>

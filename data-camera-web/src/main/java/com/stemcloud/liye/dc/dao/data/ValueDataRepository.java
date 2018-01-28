@@ -1,15 +1,10 @@
 package com.stemcloud.liye.dc.dao.data;
 
 import com.stemcloud.liye.dc.domain.data.ValueData;
-<<<<<<< HEAD
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.repository.CrudRepository;
-=======
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
->>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 
 import java.util.Date;
 import java.util.List;

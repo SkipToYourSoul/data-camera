@@ -4,10 +4,8 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
-<<<<<<< HEAD
-=======
+
 import com.stemcloud.liye.dc.domain.data.ContentInfo;
->>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.CommonService;

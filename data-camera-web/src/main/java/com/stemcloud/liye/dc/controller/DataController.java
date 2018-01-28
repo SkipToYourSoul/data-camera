@@ -7,21 +7,12 @@ import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.common.ServerReturnTool;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.DataService;
-<<<<<<< HEAD
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-=======
+
 import com.stemcloud.liye.dc.service.OssService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
->>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -154,9 +145,9 @@ public class DataController {
 
     @PostMapping("/file-upload")
     @ResponseBody
-    Map uploadFile(HttpServletRequest request){
+    Map uploadFile(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try{
-            return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, "content"));
+            return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, queryParams.get("from")));
         } catch (Exception e){
             return ServerReturnTool.serverFailure(e.getCause().getMessage());
         }

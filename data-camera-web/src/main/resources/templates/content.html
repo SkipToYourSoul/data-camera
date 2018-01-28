@@ -45,7 +45,7 @@
                                         <div class="col-sm-3 col-md-3 col-xs-3">
                                             <div class="share-view-container">
                                                 <div class="share-view-photo">
-                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="img-responsive center-block img-rounded"/>
+                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="share-img center-block img-rounded"/>
                                                 </div>
                                                 <div class="share-view-title">
                                                     <div>标题：<a th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a></div>
@@ -75,7 +75,7 @@
                                         <div class="col-sm-3 col-md-3 col-xs-3">
                                             <div class="share-view-container">
                                                 <div class="share-view-photo">
-                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="img-responsive center-block img-rounded"/>
+                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'" class="share-img center-block img-rounded"/>
                                                 </div>
                                                 <div class="share-view-title">
                                                     <div>标题：<a th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a></div>
@@ -181,10 +181,6 @@
     <script th:src="@{source/messenger/messenger.min.js}"></script>
     <script th:src="@{source/validation/formValidation.min.js}"></script>
     <script th:src="@{source/validation/bootstrap.min.js}"></script>
-
-<<<<<<< HEAD
-    <script th:src="@{js/common.js}"></script>
-=======
     <script th:src="@{source/echarts/echarts.common.min.js}"></script>
     <script th:src="@{source/jqueryui/jquery-ui.js}"></script>
     <script th:src="@{source/jqueryui/jquery-ui-slider-pips.js}"></script>
@@ -205,6 +201,6 @@
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-chart.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-action.js}"></script>
     <script th:if="${param.id}" th:src="@{js/content/content-detail.js}"></script>
->>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
+
 </body>
 </html>

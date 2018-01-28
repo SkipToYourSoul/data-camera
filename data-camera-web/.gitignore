@@ -12,4 +12,8 @@ target/
 <<<<<<< HEAD
 =======
 /uploads/
+<<<<<<< HEAD
 >>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
+=======
+src/main/resources/secret
+>>>>>>> d5f02909bd90f9489762de63bc05f0a1e4cebe3d

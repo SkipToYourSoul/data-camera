@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>STEM云传感器用户登陆</title>
+    <title>用户登陆</title>
 
     <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
 
@@ -21,7 +21,7 @@
             <img th:class="!${param.error}?'':'shake-opacity shake-constant shake-constant--hover'" alt="" th:src="@{/img/rocketsignin.png}" />
 
             <div class="login-container">
-                <h1 class="login-title">欢迎登陆STEM云传感器系统</h1>
+                <h1 class="login-title">欢迎登陆DC系统</h1>
                 <span class="text-center login-sub-title">如果是学生用户，请使用教师给你分配的用户名和密码登陆</span>
                 <div class="form-box">
                     <form id="login_form" role="form" name="form" th:action="@{/login}" method="post">
@@ -30,6 +30,7 @@
                             <input class="form-control" name="password" type="password" placeholder="密码"/>
                         </div>
                         <div th:if="${param.error}" class="alert alert-danger animated fadeInUp">用户名密码错误，请重试</div>
+                        <input type="checkbox" name="remember-me" value="true" th:checked="checked" style="height: 20px" /><strong>Remember me</strong>
                         <button type="submit" class="btn btn-success btn-block login">登陆</button>
                     </form>
                 </div>

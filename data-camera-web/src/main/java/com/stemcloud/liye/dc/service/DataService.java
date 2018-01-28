@@ -207,4 +207,14 @@ public class DataService {
         }
         return map;
     }
+
+    /**
+     * 更新数据标注
+     * @param id
+     * @param mark
+     */
+    public int updateDataMarker(long id, String mark){
+        logger.info("Update mark {} of id {}", mark, id);
+        return valueDataRepository.updateMarker(id, mark);
+    }
 }

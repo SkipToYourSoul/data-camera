@@ -4,19 +4,14 @@ import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
-<<<<<<< HEAD
-=======
 import com.stemcloud.liye.dc.dao.data.ContentRepository;
->>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
-<<<<<<< HEAD
-=======
+
 import com.stemcloud.liye.dc.domain.data.ContentInfo;
->>>>>>> 5fcceca1f08a2c802bdc663eb1f7fa4aecc73a09
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
