@@ -1,9 +1,7 @@
 package com.stemcloud.liye.dc.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -158,6 +156,43 @@ public class RedisUtils {
             list.leftPop(k);
             result = true;
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean hashSet(String key, String hashKey, Object hashValue){
+        boolean result = false;
+        try {
+            HashOperations<String, String, Object> hash = redisTemplate.opsForHash();
+            hash.put(key, hashKey, hashValue);
+            result = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object hashGet(String key, String hashKey){
+        try {
+            HashOperations<String, String, Object> hash = redisTemplate.opsForHash();
+            return hash.get(key, hashKey);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean hashRemove(String key, String hashKey) {
+        boolean result = false;
+        try {
+            HashOperations<String, String, Object> hash = redisTemplate.opsForHash();
+            hash.delete(key, hashKey);
+            result = true;
+        } catch (Exception e){
             e.printStackTrace();
         }
         return result;

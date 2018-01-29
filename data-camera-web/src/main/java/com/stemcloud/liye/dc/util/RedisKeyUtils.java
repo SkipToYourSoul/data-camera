@@ -10,11 +10,11 @@ public class RedisKeyUtils {
     private static final String SEP = ":";
     private static final String PREFIX = "dc";
 
-    public static String mkSensorMonitorKey(String sensorCode){
-        return PREFIX + SEP + "monitor" + SEP + sensorCode;
+    public static String mkSensorMonitorKey(){
+        return PREFIX + SEP + "monitor";
     }
 
-    public static String mkSensorRecordKey(String sensorCode){
-        return PREFIX + SEP + "record" + SEP + sensorCode;
+    public static String mkSensorRecordKey(){
+        return PREFIX + SEP + "record";
     }
 }
