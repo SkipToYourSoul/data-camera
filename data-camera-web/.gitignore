@@ -11,6 +11,5 @@ target/
 /src/main/resources/static/img/oceans.mp4
 /uploads/
 src/main/resources/secret
-.classpath
-.project
-.settings
+/.classpath
+/.settings/
