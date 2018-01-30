@@ -5,9 +5,7 @@ import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.base.TrackRepository;
 import com.stemcloud.liye.dc.dao.config.SensorRegisterRepository;
-
 import com.stemcloud.liye.dc.dao.data.ContentRepository;
-
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
@@ -15,14 +13,12 @@ import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.domain.config.SensorRegister;
-
 import com.stemcloud.liye.dc.domain.data.ContentInfo;
-
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 
 import java.util.*;
 
@@ -43,7 +39,6 @@ public class CrudService {
     private final SensorRepository sensorRepository;
     private final SensorRegisterRepository sensorRegisterRepository;
     private final RecorderRepository recorderRepository;
-
     private final ContentRepository contentRepository;
 
     public CrudService(AppRepository appRepository, ExperimentRepository expRepository, TrackRepository trackRepository, SensorRepository sensorRepository, SensorRegisterRepository sensorRegisterRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository, ContentRepository contentRepository) {
@@ -53,7 +48,6 @@ public class CrudService {
         this.sensorRepository = sensorRepository;
         this.sensorRegisterRepository = sensorRegisterRepository;
         this.recorderRepository = recorderRepository;
-
         this.contentRepository = contentRepository;
     }
 
@@ -77,7 +71,6 @@ public class CrudService {
     public AppInfo findApp(Long id){
         return appRepository.findOne(id);
     }
-
     // -------------------------------------------------
 
     // -------------------------------------------------
@@ -101,7 +94,6 @@ public class CrudService {
     public ExperimentInfo findExp(Long id){
         return expRepository.findOne(id);
     }
-
     // -------------------------------------------------
 
     // -------------------------------------------------
@@ -137,7 +129,6 @@ public class CrudService {
     public TrackInfo findTrack(Long id){
         return trackRepository.findOne(id);
     }
-
     // -------------------------------------------------
 
     // -------------------------------------------------
@@ -179,7 +170,6 @@ public class CrudService {
     public void registerSensor(int action, String code){
         sensorRegisterRepository.register(action, code);
     }
-
     // -------------------------------------------------
 
     // -------------------------------------------------
