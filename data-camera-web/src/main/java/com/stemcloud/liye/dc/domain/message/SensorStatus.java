@@ -8,14 +8,14 @@ package com.stemcloud.liye.dc.domain.message;
  */
 public class SensorStatus {
     private String code;
-    private int isMonitor;
+    private int action;
     private long id;
     private long trackId;
     private long sensorConfigId;
 
-    public SensorStatus(String code, int isMonitor, long id, long trackId, long sensorConfigId) {
+    public SensorStatus(String code, int action, long id, long trackId, long sensorConfigId) {
         this.code = code;
-        this.isMonitor = isMonitor;
+        this.action = action;
         this.id = id;
         this.trackId = trackId;
         this.sensorConfigId = sensorConfigId;
@@ -29,12 +29,12 @@ public class SensorStatus {
         this.code = code;
     }
 
-    public int getIsMonitor() {
-        return isMonitor;
+    public int getAction() {
+        return action;
     }
 
-    public void setIsMonitor(int isMonitor) {
-        this.isMonitor = isMonitor;
+    public void setAction(int action) {
+        this.action = action;
     }
 
     public long getId() {

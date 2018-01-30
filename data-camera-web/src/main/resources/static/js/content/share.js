@@ -4,6 +4,64 @@
  *  Description:
  */
 
+// -- 标签选择框
+$('.content-tag-dropdown').dropdown({
+    limitCount: 5,
+    multipleMode: 'label',
+    input: '<input type="text" maxLength="20" placeholder="输入标签">',
+    data: [
+        {
+            "id": 1, // value值
+            "disabled": false, // 是否禁选
+            "selected": false, // 是否选中
+            "name": "温湿度" // 名称
+        },
+        {
+            "id": 2,
+            "disabled": false,
+            "selected": false,
+            "name": "光照"
+        },
+        {
+            "id": 3,
+            "disabled": false,
+            "selected": false,
+            "name": "摄像头"
+        }
+    ],
+    choice: function (event, data) {
+        console.log(arguments,this);
+        console.log(event);
+        console.log(data);
+    }
+});
+
+// -- 图片上传
+$("#file-upload-input").fileinput({
+    language: 'zh',
+    uploadUrl: data_address + "/file-upload?from=content", // server upload action
+    allowedFileExtensions: ['jpg', 'png'],
+    uploadAsync: true,
+    dropZoneEnabled: true,
+    showUpload: false,
+    autoReplace: true,
+    maxFileSize: 1024,
+    maxFileCount: 1
+}).on('fileselect', function (event, files) {
+    // 选择文件后自动上传
+    $("#file-upload-input").fileinput('upload');
+}).on('filesuccessremove', function(event, id) {//点击删除后立即执行
+    $('#fileId').fileinput('refresh');//文件框刷新操作
+    console.info("file remove");
+}).on('fileuploaded', function(event, data, previewId, index) {
+    console.info("file uploaded");
+    if (data.response.code == "0000"){
+        analysisObject.contentImg = data.response.data;
+    } else {
+        commonObject.printExceptionMsg(data.response.data);
+    }
+});
+
 /**
  * 发布内容
  */
@@ -33,7 +91,7 @@ $('#content-form').formValidation({
     $.ajax({
         type: 'post',
         url: crud_address + '/content/new',
-        data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId + "&tags=" + tags + "&share-img=" + analysisObject.contentImg,
+        data: $(this).serialize() + "&recorder-id=" + getQueryString("rid") + "&tags=" + tags + "&share-img=" + analysisObject.contentImg,
         success: function (response) {
             if (response.code == "0000"){
                 window.location.href = base_address + "/content?id=" + response.data['id'];

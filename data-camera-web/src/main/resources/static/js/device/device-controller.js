@@ -92,13 +92,8 @@ function deviceBelongStyle(value, row, index){
 }
 
 // --- sensor operations
-var new_device_text = "确认创建";
-var edit_device_text = "确认修改";
-var $sensor_modal = $('#sensor-modal');
-var $edit_sensor_form = $('#edit-sensor-form');
-var current_sensor_id = -1;
 // --- new, edit and delete sensor
-$edit_sensor_form.formValidation({
+$('#edit-sensor-form').formValidation({
     framework: 'bootstrap',
     icon: {
         valid: 'glyphicon glyphicon-ok',
@@ -112,8 +107,8 @@ $edit_sensor_form.formValidation({
 }).on('success.form.fv', function (evt){
     evt.preventDefault();
     var action = $('#sensor-confirm-btn').text();
-    var url = crud_address + '/sensor/update';
-    var data = edit_device_text == action?$(this).serialize() + "&sensor-id=" + current_sensor_id:$(this).serialize();
+    var url = commonObject.editText == action?crud_address + '/sensor/update':crud_address + '/sensor/new';
+    var data = $(this).serialize() + "&sensor-id=" + deviceObject.currentSensorId + "&device-img=" + deviceObject.deviceImg;
     $.ajax({
         type: 'post',
         url: url,
@@ -122,48 +117,48 @@ $edit_sensor_form.formValidation({
             if (response.code == "0000"){
                 window.location.href = current_address;
             } else if (response.code == "1111") {
-                message_info('操作无效: ' + response.data, "error");
+                commonObject.printExceptionMsg(response.data);
             }
         },
         error: function (response) {
-            message_info("操作失败，失败原因为：" + response, 'error');
+            commonObject.printRejectMsg();
         }
     });
 }).on('err.form.fv', function (evt) {
-    message_info("应用表单提交失败", 'error');
+    commonObject.printRejectMsg();
 });
 
-$sensor_modal.on('shown.bs.modal', function (event) {
+$('#sensor-modal').on('shown.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var action = button.attr('todo');
 
     if (action == "new"){
         // new sensor
-        $('#sensor-confirm-btn').text(new_device_text);
+        $('#sensor-confirm-btn').text(commonObject.newText);
         $('#sensor-name').val("");
         $('#sensor-code').val("").removeAttr("disabled");
         $('#sensor-desc').val("");
     } else if (action == "edit") {
         var selectRow = $('#table').bootstrapTable('getSelections');
         if (selectRow.length == 0){
-            $sensor_modal.modal('hide');
+            $('#sensor-modal').modal('hide');
             message_info("请先在表格中选中设备", "info");
             return;
         }
 
         // edit sensor
-        $('#sensor-confirm-btn').text(edit_device_text);
+        $('#sensor-confirm-btn').text(commonObject.editText);
         $('#sensor-name').val(selectRow[0]['name']);
         $('#sensor-code').val(selectRow[0]['code']).attr("disabled", "disabled");
         $('#sensor-desc').val(selectRow[0]['description']);
-        current_sensor_id = selectRow[0].id;
+        deviceObject.currentSensorId = selectRow[0].id;
     }
 });
 
 function deleteSensor() {
     var selectRow = $('#table').bootstrapTable('getSelections');
     if (selectRow.length == 0){
-        $sensor_modal.modal('hide');
+        $('#sensor-modal').modal('hide');
         message_info("请先在表格中选中设备", "info");
         return;
     }
@@ -203,3 +198,29 @@ function deleteSensor() {
         }
     });
 }
+
+// -- 文件上传服务
+$("#file-upload-input").fileinput({
+    language: 'zh',
+    uploadUrl: data_address + "/file-upload?from=device", // server upload action
+    allowedFileExtensions: ['jpg', 'png'],
+    uploadAsync: true,
+    dropZoneEnabled: true,
+    showUpload: false,
+    autoReplace: true,
+    maxFileSize: 1024,
+    maxFileCount: 1
+}).on('fileselect', function (event, files) {
+    // 选择文件后自动上传
+    $("#file-upload-input").fileinput('upload');
+}).on('filesuccessremove', function(event, id) {//点击删除后立即执行
+    $('#fileId').fileinput('refresh');//文件框刷新操作
+    console.info("file remove");
+}).on('fileuploaded', function(event, data, previewId, index) {
+    console.info("file uploaded");
+    if (data.response.code == "0000"){
+        deviceObject.deviceImg = data.response.data;
+    } else {
+        commonObject.printExceptionMsg(data.response.data);
+    }
+});

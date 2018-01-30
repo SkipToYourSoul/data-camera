@@ -10,3 +10,4 @@ target/
 
 /src/main/resources/static/img/oceans.mp4
 /uploads/
+src/main/resources/secret

@@ -139,7 +139,7 @@ public class ActionService {
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc){
+    public synchronized long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long response = -1;
 
@@ -332,13 +332,23 @@ public class ActionService {
      * @param actionType monitor or recorder
      * @param action 0 or 1
      */
-    private void sendMessageToRedis(long expId, String actionType, int action){
+    private void sendMessageToRedis(long expId, String actionType, int action) throws Exception {
         logger.info("Send message to redis, expId={}, actionType={}, action={}", expId, actionType, action);
         List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         for (SensorInfo sensor : sensors) {
-            String redisKey = MONITOR.equals(actionType)? RedisKeyUtils.mkSensorMonitorKey(sensor.getCode()):RedisKeyUtils.mkSensorRecordKey(sensor.getCode());
-            String redisValue = gson.toJson(new SensorStatus(sensor.getCode(), action, sensor.getId(), sensor.getTrackId(), sensor.getSensorConfig().getId()));
-            redisUtils.lPush(redisKey, redisValue);
+            String redisKey = MONITOR.equals(actionType)? RedisKeyUtils.mkSensorMonitorKey():RedisKeyUtils.mkSensorRecordKey();
+            if (action == 0){
+                boolean result = redisUtils.hashRemove(redisKey, sensor.getCode());
+                if (!result) {
+                    throw new Exception("Redis action failure, alert!!!");
+                }
+            } else if (action == 1){
+                String redisValue = gson.toJson(new SensorStatus(sensor.getCode(), action, sensor.getId(), sensor.getTrackId(), sensor.getSensorConfig().getId()));
+                boolean result = redisUtils.hashSet(redisKey, sensor.getCode(), redisValue);
+                if (!result) {
+                    throw new Exception("Redis action failure, alert!!!");
+                }
+            }
         }
     }
 }
