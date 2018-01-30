@@ -139,6 +139,8 @@ $('#exp-modal').on('show.bs.modal', function (event) {
         $('#exp-confirm-btn').text(commonObject.newText);
         $('#exp-name').val("");
         $('#exp-desc').val("");
+        $('#exp-name-group').attr("hidden", false);
+        $('#exp-desc-group').attr("hidden", false);
         $('#exp-select-group').attr("hidden", false);
     } else if (todo == "edit"){
         $('#exp-confirm-btn').text(commonObject.editText);
