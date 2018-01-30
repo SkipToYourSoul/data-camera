@@ -14,7 +14,6 @@
     <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
     <link rel="stylesheet" th:href="@{source/table/bootstrap-table.min.css}"/>
     <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
-
     <link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui.css}"/>
     <link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui-slider-pips.css}"/>
     <link rel="stylesheet" th:href="@{source/messenger/messenger.css}"/>
@@ -22,12 +21,10 @@
 
     <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
     <link rel="stylesheet" th:href="@{css/v1/content.css}"/>
-
 </head>
 <body>
     <div class="navbar-wrapper" th:include="module/common::nav">
     </div>
-
 
     <div class="container" th:if="!${param.id}">
         <div class="row" style="margin-top: 70px;">
@@ -181,6 +178,7 @@
     <script th:src="@{source/messenger/messenger.min.js}"></script>
     <script th:src="@{source/validation/formValidation.min.js}"></script>
     <script th:src="@{source/validation/bootstrap.min.js}"></script>
+    
     <script th:src="@{source/echarts/echarts.common.min.js}"></script>
     <script th:src="@{source/jqueryui/jquery-ui.js}"></script>
     <script th:src="@{source/jqueryui/jquery-ui-slider-pips.js}"></script>
@@ -201,6 +199,5 @@
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-chart.js}"></script>
     <script th:if="${param.id}" th:src="@{js/app/app-analysis-action.js}"></script>
     <script th:if="${param.id}" th:src="@{js/content/content-detail.js}"></script>
-
 </body>
 </html>

@@ -28,7 +28,7 @@
         <div class="row" style="margin-top: 70px;">
             <div class="col-sm-12">
                 <div class="device-page-table" style="margin-left:10%">
-                    <div id="toolbar" >
+                    <div id="toolbar">
                         <button class="btn" style="background-color:#35b5eb;color:#fff"  todo="new" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-plus-circle"></i>&nbsp;新增设备</button>
                         <button class="btn" style="background-color:#27c6db;color:#fff" todo="edit" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-info-circle"></i>&nbsp;编辑设备</button>
                         <button class="btn" style="background-color:#fc4b6c;color:#fff" onclick="deleteSensor()"><i class="fa fa-minus-circle"></i>&nbsp;删除设备</button>
@@ -63,7 +63,6 @@
     </div>
     </div>
    
-
     <div th:include="module/modal::sensor-modal"></div>
 
     <script th:src="@{source/jquery.min.js}"></script>

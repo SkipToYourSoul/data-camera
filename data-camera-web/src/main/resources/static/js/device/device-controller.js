@@ -8,9 +8,7 @@
 $('#table').bootstrapTable({
     data: sensors,
     rowStyle:function(row,index){  
-         
-       return console.log("qerewq") 
-         
+        
     },  
     columns: [{
         field: 'radio',
