@@ -34,18 +34,17 @@
     <div id="app-loading"></div>
     <div class="navbar-wrapper" th:include="module/common::nav">
     </div>
-
-    <div class="container-fluid">
+<div>
+    <div class="container-fluid" style="width:90%;margin-left:10%">
         <div class="row">
             <!-- 左侧sidebar -->
-            <div class="col-sm-3 col-md-2 col-xs-3 sidebar-panel scroll">
+            <div class="col-sm-3 col-md-2 col-xs-3">
                 <div class="sidebar-content">
                     <!-- 管理页面图片 -->
-                    <img th:if="!${param.id}" th:src="@{/img/index/nav2.png}" class="img-responsive sidebar-img" alt=""/>
-
+                    <!-- <img th:if="!${param.id}" th:src="@{/img/index/nav11.png}" class="img-responsive" alt=""/> -->
                     <!-- 内容介绍 -->
                     <div class="sidebar-info">
-                        <div th:if="!${param.id}" class="info-title">欢迎来到场景管理页面
+                        <div th:if="!${param.id}" class="info-title">WELCOME
                         </div>
                         <div th:if="${param.id}" class="info-title">
                             <div th:text="|场景：${app.name}|"></div>
@@ -65,7 +64,7 @@
 
                     <!-- 操作按钮 -->
                     <div class="sidebar-buttons">
-                        <button th:if="!${param.id}" type="button" class="btn btn-success btn-large" data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
+                        <button th:if="!${param.id}" type="button" class="btn" style="background-color:#fff ;color:#36b5eb;" data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
                         <div class="btn-group">
                             <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑场景</button>
                             <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除场景</button>
@@ -125,10 +124,19 @@
                 </div>
             </div>
 
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 col-xs-9 col-xs-offset-3 main-panel scroll">
-                <div class="main-content">
+            <div class="col-sm-9  col-md-9 col-xs-9" style="padding:0px" >
+                <div>
                     <div th:if="!${param.id}" id="app-management">
-                        <img th:src="@{/img/quickstart.jpg}" class="img-responsive" alt="xxx1"/>
+                        <img th:src="@{/img/quickstart.jpg}" class="img-responsive" style="max-width" alt="xxx1"/>
+                        <div style="min-height:170px;background-image:url('img/app-bottom.png');">
+                        	<div>
+                        		<div style="padding-top:30px;padding-left:110px;color:#fff;font-size:24px">优秀案例</div>
+                        		<div style="margin-top:10px;padding-left:110px;color:#fff;font-size:14px">小字描述优秀案例的内容做简要概括</div>
+                        		<div style="margin-top:10px;padding-left:110px;">
+                        			<button class="btn" style="background-color:#fff ;color:#36b5eb;">点击查看</button>
+                        		</div>
+                        	</div>
+                        </div>
                     </div>
                     <div th:if="${param.id}">
                         <ul class="nav nav-pills" role="tablist" id="app-main-tab">
@@ -144,7 +152,7 @@
             </div>
         </div>
     </div>
-
+</div>
     <div th:include="module/modal::app-modal"></div>
     <div th:include="module/modal::exp-modal"></div>
 

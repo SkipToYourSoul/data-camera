@@ -7,6 +7,9 @@
 // --- table settings
 $('#table').bootstrapTable({
     data: sensors,
+    rowStyle:function(row,index){  
+        
+    },  
     columns: [{
         field: 'radio',
         radio: 'true'

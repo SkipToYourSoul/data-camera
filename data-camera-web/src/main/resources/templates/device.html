@@ -27,13 +27,14 @@
     <div class="container-fluid">
         <div class="row" style="margin-top: 70px;">
             <div class="col-sm-12">
-                <div class="device-page-table">
+                <div class="device-page-table" style="margin-left:10%">
                     <div id="toolbar">
-                        <button class="btn btn-success" todo="new" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-plus-circle"></i>&nbsp;新增设备</button>
-                        <button class="btn btn-warning" todo="edit" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-info-circle"></i>&nbsp;编辑设备</button>
-                        <button class="btn btn-danger" onclick="deleteSensor()"><i class="fa fa-minus-circle"></i>&nbsp;删除设备</button>
+                        <button class="btn" style="background-color:#35b5eb;color:#fff"  todo="new" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-plus-circle"></i>&nbsp;新增设备</button>
+                        <button class="btn" style="background-color:#27c6db;color:#fff" todo="edit" data-toggle="modal" data-target="#sensor-modal"><i class="fa fa-info-circle"></i>&nbsp;编辑设备</button>
+                        <button class="btn" style="background-color:#fc4b6c;color:#fff" onclick="deleteSensor()"><i class="fa fa-minus-circle"></i>&nbsp;删除设备</button>
                     </div>
                     <table id="table"
+                   		   data-classes="table"
                            data-select-item-name="select"
                            data-sort-name="code"
                            data-sort-order="desc"
@@ -57,12 +58,11 @@
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <div th:include="module/common::sub-footer"></div>
-        </div>
+       <div class="row footer">
+        <div th:include="module/common::sub-footer"></div>
     </div>
-
+    </div>
+   
     <div th:include="module/modal::sensor-modal"></div>
 
     <script th:src="@{source/jquery.min.js}"></script>

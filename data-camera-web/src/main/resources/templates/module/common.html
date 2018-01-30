@@ -4,7 +4,7 @@
     <div th:fragment="nav">
         <nav th:class="${inIndex}?'navbar navbar-default':'navbar navbar-default navbar-fixed-top'">
             <!-- navbar header -->
-            <div class="navbar-header">
+            <div class="navbar-header" style="margin-left:10%">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
@@ -20,7 +20,7 @@
                     <ul class="nav navbar-nav">
                         <li><a th:href="@{/index}">首页</a></li>
                         <li th:class="${inApp}?'active':''"><a th:href="@{/app}">场景</a></li>
-                        <li th:class="${inDevice}?'active':''"><a th:href="@{/device}">传感器</a></li>
+                        <li th:class="${inDevice}?'active':''"><a th:href="@{/device}">设备</a></li>
                         <li th:class="${inContent}?'active':''"><a th:href="@{/content}">内容</a></li>
                     </ul>
                 </th:block>
@@ -40,6 +40,7 @@
                     </ul>
                 </div>
             </div>
+            
         </nav>
     </div>
 
@@ -56,7 +57,7 @@
     </div>
 
     <div th:fragment="sub-footer">
-        <div class="copyright" style="text-align: center; ">
+        <div class="copyright" style="margin-left:10%">
             Copyright ® 上海STEM云中心 沪ICP备14033392号-1
         </div>
     </div>
