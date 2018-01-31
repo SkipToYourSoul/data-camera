@@ -22,8 +22,7 @@
     <link rel="stylesheet" th:href="@{source/shake/csshake.min.css}"/>
     <link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui.css}"/>
     <link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui-slider-pips.css}"/>
-    <link rel="stylesheet" th:href="@{source/jqueryui/jquery.dropdown.css}"/>
-    <link rel="stylesheet" th:href="@{source/upload/fileinput.css}"/>
+    <link rel="stylesheet" th:href="@{source/jqueryui/multi-select.css}"/>
 
     <link rel="stylesheet" th:href="@{source/messenger/messenger.css}"/>
     <link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}"/>
@@ -35,117 +34,125 @@
     <div id="app-loading"></div>
     <div class="navbar-wrapper" th:include="module/common::nav">
     </div>
-
-    <div class="container-fluid">
-        <div class="row">
-            <!-- 左侧sidebar -->
-            <div class="col-sm-3 col-md-2 col-xs-3 sidebar-panel scroll">
-                <div class="sidebar-content">
-                    <!-- 管理页面图片 -->
-                    <img th:if="!${param.id}" th:src="@{/img/index/nav2.png}" class="img-responsive sidebar-img" alt=""/>
-
-                    <!-- 内容介绍 -->
-                    <div class="sidebar-info">
-                        <div th:if="!${param.id}" class="info-title">欢迎来到场景管理页面
-                        </div>
-                        <div th:if="${param.id}" class="info-title">
-                            <div th:text="|场景：${app.name}|"></div>
-                            <a data-toggle="collapse" href="#app-info" aria-expanded="false" aria-controls="app-info">查看详情</a>
-                        </div>
-                        <div class="info-description">
-                            <div th:if="!${param.id}">
-                                在这里可以看到你账户下的设备及场景的相关统计
+    <div>
+        <div class="container-fluid" style="width:90%;margin-left:10%">
+            <div class="row">
+                <!-- 左侧sidebar -->
+                <div class="col-sm-3 col-md-2 col-xs-3">
+                    <div class="sidebar-content">
+                        <!-- 管理页面图片 -->
+                        <!-- <img th:if="!${param.id}" th:src="@{/img/index/nav11.png}" class="img-responsive" alt=""/> -->
+                        <!-- 内容介绍 -->
+                        <div class="sidebar-info">
+                            <div th:if="!${param.id}" class="info-title">WELCOME
                             </div>
-                            <div th:if="${param.id}" class="collapse" id="app-info">
-                                <div th:text="|场景编号: ${app.id}|"></div>
-                                <div th:text="|创建时间: ${#dates.format(app.createTime, 'yyyy-MM-dd HH:mm:ss')}|"></div>
-                                <div th:text="|场景描述: ${app.description}|"></div>
+                            <div th:if="${param.id}" class="info-title">
+                                <div th:text="|场景：${app.name}|"></div>
+                                <a data-toggle="collapse" href="#app-info" aria-expanded="false" aria-controls="app-info">查看详情</a>
+                            </div>
+                            <div class="info-description">
+                                <div th:if="!${param.id}">
+                                    在这里可以看到你账户下的设备及场景的相关统计
+                                </div>
+                                <div th:if="${param.id}" class="collapse" id="app-info">
+                                    <div th:text="|场景编号: ${app.id}|"></div>
+                                    <div th:text="|创建时间: ${#dates.format(app.createTime, 'yyyy-MM-dd HH:mm:ss')}|"></div>
+                                    <div th:text="|场景描述: ${app.description}|"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 操作按钮 -->
-                    <div class="sidebar-buttons">
-                        <button th:if="!${param.id}" type="button" class="btn btn-success btn-large" data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
-                        <div class="btn-group">
-                            <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑场景</button>
-                            <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除场景</button>
+                        <!-- 操作按钮 -->
+                        <div class="sidebar-buttons">
+                            <button th:if="!${param.id}" type="button" class="btn" style="background-color:#fff ;color:#36b5eb;" data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
+                            <div class="btn-group">
+                                <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#app-modal" todo="edit"><i class="fa fa-id-badge"></i>&nbsp;编辑场景</button>
+                                <button th:if="${param.id}" type="button" class="btn btn-default btn-sm" onclick="deleteApp(this)"><i class="fa fa-trash"></i>&nbsp;删除场景</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 场景列表 -->
-                    <div class="sidebar-menu" id="app-menu">
-                        <ul class="nav main-menu">
-                            <li th:class="${param.id}?'':'active'">
-                                <a th:href="@{/app}"><i class="glyphicon glyphicon-home"></i>&nbsp; 场景管理页面</a>
-                            </li>
-                        </ul>
-                        <strong>场景列表</strong><span class="badge pull-right" th:text="${#maps.size(apps)}">0</span>
-                        <ul class="nav">
-                            <th:block th:each="entry,index:${apps}">
-                                <li th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
-                                    <a th:text="${entry.value.name}" th:href="@{/app(id=${entry.key})}" th:class="|app-${index.count}|"></a>
+                        <!-- 场景列表 -->
+                        <div class="sidebar-menu" id="app-menu">
+                            <ul class="nav main-menu">
+                                <li th:class="${param.id}?'':'active'">
+                                    <a th:href="@{/app}"><i class="glyphicon glyphicon-home"></i>&nbsp; 场景管理页面</a>
                                 </li>
-                            </th:block>
-                        </ul>
-                    </div>
-
-                    <!-- 片段列表 -->
-                    <div class="sidebar-menu2" id="content-menu" th:if="${param.id}" hidden="hidden">
-                        <div class="menu-title">
-                            我的场景
+                            </ul>
+                            <strong>场景列表</strong><span class="badge pull-right" th:text="${#maps.size(apps)}">0</span>
+                            <ul class="nav">
+                                <th:block th:each="entry,index:${apps}">
+                                    <li th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
+                                        <a th:text="${entry.value.name}" th:href="@{/app(id=${entry.key})}" th:class="|app-${index.count}|"></a>
+                                    </li>
+                                </th:block>
+                            </ul>
                         </div>
-                        <th:block th:each="entry,index:${apps}">
-                            <div class="row" style="padding: 5px 0 0 0">
-                                <div class="col-sm-2" style="padding-top: 5px">
-                                    <a role="button" data-toggle="collapse" th:href="|#recorder-${index.count}|" aria-expanded="true" style="color: #000000;">
-                                        <i th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-caret-square-o-down':'fa fa-caret-square-o-right'"></i>
-                                    </a>
-                                </div>
-                                <div class="col-sm-10" style="padding: 0 10px 0 0">
-                                    <a type="button" class="btn menu-btn btn-block" th:href="@{/app(id=${entry.key},tab=2)}" th:text="${entry.value.name}"></a>
-                                </div>
-                            </div>
 
-                            <div th:if="${#httpServletRequest.getParameter('id') eq ''+entry.key}" class="menu-content collapse in" th:id="|recorder-${index.count}|">
-                                <!-- 该场景没有片段记录数据 -->
-                                <div th:if="${not #maps.containsKey(recorders, entry.key)}"
-                                     class="alert alert-warning my-alter" role="alert">没有可选的数据片段</div>
-                                <!-- 遍历片段记录数据 -->
-                                <div class="com-sm-10 col-sm-offset-2">
-                                    <ul class="nav" th:if="${#maps.containsKey(recorders, entry.key)}">
-                                        <th:block th:each="recorder,index:${recorders[entry.key]}">
-                                            <li th:if="${recorder.isUserGen eq 0 and recorder.isRecorder eq 0}" th:data="${recorder.id}">
-                                                <a th:href="|#${recorder.id}|" th:text="|${recorder.name} ${#dates.format(recorder.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.endTime, 'HH:mm:ss')}|"></a></li>
-                                        </th:block>
-                                    </ul>
-                                </div>
+                        <!-- 片段列表 -->
+                        <div class="sidebar-menu2" id="content-menu" th:if="${param.id}" hidden="hidden">
+                            <div class="menu-title">
+                                我的场景
                             </div>
-                        </th:block>
+                            <th:block th:each="entry,index:${apps}">
+                                <div class="row" style="padding: 5px 0 0 0">
+                                    <div class="col-sm-2" style="padding-top: 5px">
+                                        <a role="button" data-toggle="collapse" th:href="|#recorder-${index.count}|" aria-expanded="true" style="color: #000000;">
+                                            <i th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-caret-square-o-down':'fa fa-caret-square-o-right'"></i>
+                                        </a>
+                                    </div>
+                                    <div class="col-sm-10" style="padding: 0 10px 0 0">
+                                        <a type="button" class="btn menu-btn btn-block" th:href="@{/app(id=${entry.key},tab=2)}" th:text="${entry.value.name}"></a>
+                                    </div>
+                                </div>
+
+                                <div th:if="${#httpServletRequest.getParameter('id') eq ''+entry.key}" class="menu-content collapse in" th:id="|recorder-${index.count}|">
+                                    <!-- 该场景没有片段记录数据 -->
+                                    <div th:if="${not #maps.containsKey(recorders, entry.key)}"
+                                         class="alert alert-warning my-alter" role="alert">没有可选的数据片段</div>
+                                    <!-- 遍历片段记录数据 -->
+                                    <div class="com-sm-10 col-sm-offset-2">
+                                        <ul class="nav" th:if="${#maps.containsKey(recorders, entry.key)}">
+                                            <th:block th:each="recorder,index:${recorders[entry.key]}">
+                                                <li th:if="${recorder.isUserGen eq 0 and recorder.isRecorder eq 0}" th:data="${recorder.id}">
+                                                    <a th:href="|#${recorder.id}|" th:text="|${recorder.name} ${#dates.format(recorder.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.endTime, 'HH:mm:ss')}|"></a></li>
+                                            </th:block>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 col-xs-9 col-xs-offset-3 main-panel scroll">
-                <div class="main-content">
-                    <div th:if="!${param.id}" id="app-management">
-                        <img th:src="@{/img/quickstart.jpg}" class="img-responsive" alt="xxx1"/>
-                    </div>
-                    <div th:if="${param.id}">
-                        <ul class="nav nav-pills" role="tablist" id="app-main-tab">
-                            <li role="presentation" class="active"><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
-                            <li role="presentation" class=""><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">分析模式</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane active in fade app-tab-pane-content"></div>
-                            <div th:include="app/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
+                <div class="col-sm-9  col-md-9 col-xs-9" style="padding:0px" >
+                    <div>
+                        <div th:if="!${param.id}" id="app-management">
+                            <img th:src="@{/img/quickstart.jpg}" class="img-responsive" style="max-width" alt="xxx1"/>
+                            <div style="min-height:170px;background-image:url('img/app-bottom.png');">
+                                <div>
+                                    <div style="padding-top:30px;padding-left:110px;color:#fff;font-size:24px">优秀案例</div>
+                                    <div style="margin-top:10px;padding-left:110px;color:#fff;font-size:14px">小字描述优秀案例的内容做简要概括</div>
+                                    <div style="margin-top:10px;padding-left:110px;">
+                                        <button class="btn" style="background-color:#fff ;color:#36b5eb;">点击查看</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${param.id}">
+                            <ul class="nav nav-pills" role="tablist" id="app-main-tab">
+                                <li role="presentation" class="active"><a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">实验模式</a></li>
+                                <li role="presentation" class=""><a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab">分析模式</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div th:include="app/app-experiment::app-experiment" id="app-experiment" role="tabpanel" class="tab-pane active in fade app-tab-pane-content"></div>
+                                <div th:include="app/app-analysis::app-analysis" id="app-analysis" role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <div th:include="module/modal::app-modal"></div>
     <div th:include="module/modal::exp-modal"></div>
 
@@ -196,16 +203,13 @@
     <script th:src="@{source/jqueryui/jquery-ui.js}"></script>
     <script th:src="@{source/jqueryui/jquery-ui-slider-pips.js}"></script>
     <script th:src="@{source/jqueryui/jquery.dropdown.js}"></script>
+    <script th:src="@{source/jqueryui/jquery.multi-select.js}"></script>
+    <script th:src="@{source/jqueryui/jquery.quicksearch.js}"></script>
 
     <script th:src="@{source/messenger/messenger.min.js}"></script>
     <script th:src="@{source/messenger/messenger-theme-future.js}"></script>
     <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
     <script th:src="@{source/bootbox/bootbox.min.js}"></script>
-
-    <!-- upload -->
-    <script th:src="@{source/upload/fileinput.js}"></script>
-    <script th:src="@{source/upload/theme.js}"></script>
-    <script th:src="@{source/upload/zh.js}"></script>
 
     <script th:src="@{source/validation/formValidation.min.js}"></script>
     <script th:src="@{source/validation/bootstrap.min.js}"></script>

@@ -26,9 +26,14 @@ var commonObject = (function () {
         console.warn("后台服务异常，原因为: " + e);
     };
 
+    var newObjectText = "确认创建";
+    var editObjectText = "确认修改";
+
     return {
         printRejectMsg: ajaxRejectMsg,
-        printExceptionMsg: ajaxExceptionMsg
+        printExceptionMsg: ajaxExceptionMsg,
+        newText: newObjectText,
+        editText: editObjectText
     }
 })();
 
@@ -156,63 +161,60 @@ function inAppPage(){
         }
     });
 
-    // -- 标签选择框
-    $('.content-tag-dropdown').dropdown({
-        limitCount: 5,
-        multipleMode: 'label',
-        input: '<input type="text" maxLength="20" placeholder="输入标签">',
-        data: [
-            {
-                "id": 1, // value值
-                "disabled": false, // 是否禁选
-                "selected": false, // 是否选中
-                "name": "温湿度" // 名称
-            },
-            {
-                "id": 2,
-                "disabled": false,
-                "selected": false,
-                "name": "光照"
-            },
-            {
-                "id": 3,
-                "disabled": false,
-                "selected": false,
-                "name": "摄像头"
+    // -- 添加传感器时的多选框
+    initExpSelect();
+    function initExpSelect(){
+        var $exp_select = $('#exp-select');
+        var valueHtml = '<optgroup label="分组：数值型传感器">';
+        var videoHtml = '<optgroup label="分组：摄像头">';
+        sensors.forEach(function (sensor, index) {
+            var id = sensor['id'];
+            var type = sensor['sensorConfig']['type'];
+            var text = sensor['name'];
+            if (type == 1){
+                if (freeSensors.hasOwnProperty(id)){
+                    valueHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+                } else {
+                    text += "(已绑定)";
+                    valueHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
+                }
+            } else if (type == 2){
+                if (freeSensors.hasOwnProperty(id)){
+                    videoHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+                } else {
+                    text += "(已绑定)";
+                    videoHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '</option>';
+                }
             }
-        ],
-        choice: function (event, data) {
-            console.log(arguments,this);
-            console.log(event);
-            console.log(data);
-        }
-    });
+        });
+        valueHtml += '</optgroup>';
+        videoHtml += '</optgroup>';
+        $exp_select.html(valueHtml + videoHtml);
 
-    // -- 图片上传
-    $("#file-upload-input").fileinput({
-        language: 'zh',
-        uploadUrl: data_address + "/file-upload", // server upload action
-        allowedFileExtensions: ['jpg', 'png'],
-        uploadAsync: true,
-        dropZoneEnabled: false,
-        showUpload: false,
-        autoReplace: true,
-        maxFileSize: 1024,
-        maxFileCount: 1
-    }).on('fileselect', function (event, files) {
-        // 选择文件后自动上传
-        $("#file-upload-input").fileinput('upload');
-    }).on('filesuccessremove', function(event, id) {//点击删除后立即执行
-        $('#fileId').fileinput('refresh');//文件框刷新操作
-        console.info("file remove");
-    }).on('fileuploaded', function(event, data, previewId, index) {
-        console.info("file uploaded");
-        if (data.response.code == "0000"){
-            analysisObject.contentImg = data.response.data;
-        } else {
-            commonObject.printExceptionMsg(data.response.data);
-        }
-    });
+        $exp_select.multiSelect({
+            selectableHeader: "<input type='text' class='form-control muti-select-search-input' autocomplete='off' placeholder='try search'>",
+            selectionHeader: "<div style='height: 40px'><strong>已选择的传感器</strong></div>",
+            afterInit: function(ms){
+                var that = this,
+                    $selectableSearch = that.$selectableUl.prev(),
+                    selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)';
+
+                that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+                    .on('keydown', function(e){
+                        if (e.which === 40){
+                            that.$selectableUl.focus();
+                            return false;
+                        }
+                    });
+            },
+            afterSelect: function(){
+                this.qs1.cache();
+            },
+            afterDeselect: function(){
+                this.qs1.cache();
+            }
+        });
+    }
 }
 
 var appObject = (function () {
@@ -329,9 +331,6 @@ var expObject = (function (){
         recorderTimestamp[key] = value;
     };
 
-    var newObjectText = "确认创建";
-    var editObjectText = "确认修改";
-
     var currentExpId = 0;
 
     return {
@@ -339,8 +338,15 @@ var expObject = (function (){
         setNewTime: setNewTime,
         recorderTimestamp: recorderTimestamp,
         setRecorderTime: setRecorderTime,
-        newObjectText: newObjectText,
-        editObjectText: editObjectText,
         currentExpId: currentExpId
     };
+})();
+
+var deviceObject = (function () {
+    var currentSensorId = -1;
+    var deviceImg = "";
+    return {
+        currentSensorId: currentSensorId,
+        deviceImg: deviceImg
+    }
 })();

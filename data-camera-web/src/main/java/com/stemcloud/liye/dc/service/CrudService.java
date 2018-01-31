@@ -132,8 +132,8 @@ public class CrudService {
 
     // -------------------------------------------------
     /** 传感器 **/
-    public long saveSensor(SensorInfo sensor){
-        return sensorRepository.save(sensor).getId();
+    public SensorInfo saveSensor(SensorInfo sensor){
+        return sensorRepository.save(sensor);
     }
 
     public void deleteSensor(Long id, String code){

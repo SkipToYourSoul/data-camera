@@ -1,8 +1,10 @@
 package com.stemcloud.liye.dc.socket;
 
 import com.stemcloud.liye.dc.common.PropKit;
-import com.stemcloud.liye.dc.socket.codec.PacketDecoder;
+import com.stemcloud.liye.dc.socket.codec.PacketCodec;
 import com.stemcloud.liye.dc.socket.handler.ReceiveDataHandler;
+import com.stemcloud.liye.dc.socket.service.HandleDataService;
+import com.stemcloud.liye.dc.socket.service.Service;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -26,6 +28,7 @@ public final class NettyServer implements Server {
     public static final NettyServer I = new NettyServer();
 
     private AtomicBoolean started = new AtomicBoolean(false);
+    private Service service = new HandleDataService();
     private EventLoopGroup boss;
     private EventLoopGroup worker;
     private ChannelFuture channelFuture;
@@ -52,9 +55,12 @@ public final class NettyServer implements Server {
                         .childHandler(new ChannelInitializer<Channel>() {
                             @Override
                             protected void initChannel(Channel ch) throws Exception {
-                                ch.pipeline().addLast("LengthFieldDecoder", new LengthFieldBasedFrameDecoder(MAX_FRAME_LENGTH, 40, 4));
-                                ch.pipeline().addLast("PacketDecoder", new PacketDecoder());
-                                ch.pipeline().addLast("ServerHandler", new ReceiveDataHandler());
+                                ch.pipeline().addLast("LengthFieldDecoder",
+                                        new LengthFieldBasedFrameDecoder(MAX_FRAME_LENGTH, 20, 4));
+                                ch.pipeline().addLast("PacketCodec",
+                                        new PacketCodec());
+                                ch.pipeline().addLast("ServerHandler",
+                                        new ReceiveDataHandler(service, Threads.RECEIVER_DATA_HANDLER));
                             }
                         });
 
@@ -100,6 +106,7 @@ public final class NettyServer implements Server {
         if (worker != null) {
             worker.shutdownGracefully();
         }
+        Threads.shutdown();
     }
 
     @Override

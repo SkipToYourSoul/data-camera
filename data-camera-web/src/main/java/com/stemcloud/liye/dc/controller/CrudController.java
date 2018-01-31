@@ -246,75 +246,93 @@ public class CrudController {
         }
     }
 
-    @PostMapping("/sensor/update")
+    /**
+     * 新增设备
+     * @param queryParams
+     * @param request
+     * @return
+     */
+    @PostMapping("/sensor/new")
     public Map newSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        SensorInfo sensor = null;
         try {
+            SensorInfo sensor = new SensorInfo();
             String user = commonService.getCurrentLoginUser(request);
-            String sensorId = "sensor-id";
-            String sensorName = "sensor-name";
-            String sensorCode = "sensor-code";
-            String sensorDesc = "sensor-desc";
-            if (!queryParams.containsKey(sensorId)){
-                sensor = new SensorInfo();
-                SensorRegister sensorRegister = crudService.findRegister(queryParams.get(sensorCode));
-                if (sensorRegister == null){
-                    return ServerReturnTool.serverFailure("传感器编号错误，系统未能识别该编号");
-                } else if (sensorRegister.getIsRegistered() == 1){
-                    return ServerReturnTool.serverFailure("该编号已被绑定，无法再次新建");
-                }
-                sensor.setCode(queryParams.get(sensorCode));
-                sensor.setSensorConfig(sensorRegister.getSensorConfig());
-                crudService.registerSensor(1, queryParams.get(sensorCode));
-            } else {
-                Long id = Long.parseLong(queryParams.get(sensorId));
-                sensor = crudService.findSensor(id);
-                if (sensor == null){
-                    return ServerReturnTool.serverFailure("参数错误");
-                }
+
+            // 查看注册表是否已注册该设备
+            SensorRegister sensorRegister = crudService.findRegister(queryParams.get("sensor-code"));
+            if (sensorRegister == null){
+                return ServerReturnTool.serverFailure("传感器编号错误，系统未能识别该编号");
+            } else if (sensorRegister.getIsRegistered() == 1){
+                return ServerReturnTool.serverFailure("该编号已被其他用户绑定，无法新增");
             }
+            sensor.setCode(queryParams.get("sensor-code"));
+            sensor.setSensorConfig(sensorRegister.getSensorConfig());
+            String img = queryParams.get("device-img");
+            if (!img.trim().isEmpty()){
+                sensor.setImg(img);
+            }
+            crudService.registerSensor(1, queryParams.get("sensor-code"));
 
             sensor.setCreator(user);
-            sensor.setName(queryParams.get(sensorName));
-            sensor.setDescription(queryParams.get(sensorDesc));
-
-            String city = "city";
-            String latitude = "latitude";
-            String longitude = "longitude";
-            if (queryParams.containsKey(latitude)){
-                sensor.setLatitude(Double.valueOf(queryParams.get(latitude)));
-            }
-            if (queryParams.containsKey(longitude)){
-                sensor.setLatitude(Double.valueOf(queryParams.get(longitude)));
-            }
-            if (queryParams.containsKey(city)){
-                sensor.setCity(queryParams.get(city));
-            }
-
-            Long id = crudService.saveSensor(sensor);
-            logger.info("USER " + user + " UPDATE SENSOR " + id);
+            sensor.setName(queryParams.get("sensor-name"));
+            sensor.setDescription(queryParams.get("sensor-desc"));
+            SensorInfo newSensor = crudService.saveSensor(sensor);
+            logger.info("User {} new sensor {}", user, newSensor.getId());
+            return ServerReturnTool.serverSuccess(newSensor);
         } catch (Exception e){
-            logger.error("EDIT SENSOR", e);
-            return ServerReturnTool.serverFailure("后台数据错误");
+            logger.error("[/sensor/new]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
         }
-
-        return ServerReturnTool.serverSuccess(sensor.getId());
     }
 
+    /**
+     * 更新设备信息
+     * @param queryParams
+     * @param request
+     * @return
+     */
+    @PostMapping("/sensor/update")
+    public Map updateSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+        try {
+            String user = commonService.getCurrentLoginUser(request);
+            Long id = Long.parseLong(queryParams.get("sensor-id"));
+            SensorInfo sensor = crudService.findSensor(id);
+            if (sensor == null || !sensor.getCreator().equals(user)){
+                return ServerReturnTool.serverFailure("参数错误");
+            }
+            String img = queryParams.get("device-img");
+            if (!img.trim().isEmpty()){
+                sensor.setImg(img);
+            }
+            sensor.setCreator(user);
+            sensor.setName(queryParams.get("sensor-name"));
+            sensor.setDescription(queryParams.get("sensor-desc"));
+            SensorInfo newSensor = crudService.saveSensor(sensor);
+            logger.info("User {} update sensor {}", user, newSensor.getId());
+            return ServerReturnTool.serverSuccess(newSensor);
+        } catch (Exception e){
+            logger.error("[/sensor/update]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
+
+    /**
+     * 删除设备
+     * @param queryParams
+     * @param request
+     * @return
+     */
     @GetMapping("/sensor/delete")
     public Map deleteSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
-        if (!queryParams.containsKey("sensor-id") || Long.parseLong(queryParams.get("sensor-id")) < 0){
-            return ServerReturnTool.serverFailure("参数错误");
-        }
         try {
             String user = commonService.getCurrentLoginUser(request);
             Long sensorId = Long.parseLong(queryParams.get("sensor-id"));
-            logger.info("USER " + user + " DELETE TRACK " + sensorId);
             crudService.deleteSensor(sensorId, queryParams.get("sensor-code"));
+            logger.info("User {} delete sensor {}", user, sensorId);
+            return ServerReturnTool.serverSuccess(sensorId);
         } catch (Exception e){
-            return ServerReturnTool.serverFailure("后台数据错误");
+            return ServerReturnTool.serverFailure(e.getMessage());
         }
-        return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("sensor-id")));
     }
 
     /**

@@ -26,6 +26,20 @@ public class MysqlRepository {
     private static String SENSOR_INFO_TBL = "dc_base_sensor_info";
     private static String EXP_INFO_TBL = "dc_base_experiment_info";
 
+    public static int[] saveValueDatas(Map<String, Object> datas){
+        Long sensorId = (Long) datas.get("sensorId");
+        Long trackId = (Long) datas.get("trackId");
+        if (sensorId != null && trackId != null){
+            // save
+            datas.remove("sensorId");
+            datas.remove("trackId");
+            int[] results = new int[datas.size()];
+            datas.forEach((k, v) -> saveValueData(sensorId, trackId, k, (Double)v));
+            return results;
+        }
+        return new int[0];
+    }
+
     public static int saveValueData(long sensorId, long trackId, String key, Double value){
         String sql = String.format("INSERT INTO %s (data_key, data_value, sensor_id, track_id, create_time) VALUES (?,?,?,?,?)", VALUE_DATA_TBL);
         DruidPooledConnection conn = null;

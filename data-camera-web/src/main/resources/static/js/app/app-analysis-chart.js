@@ -9,7 +9,6 @@
 // -- 入口函数，初始化数据图表以及视频
 function initRecorderContentDom(recorderId){
     console.info("Request recorder: " + recorderId);
-    
     var recorder = findRecorderInfo(recorderId);
     if (recorder == null){
         console.log("Null data recorder");
