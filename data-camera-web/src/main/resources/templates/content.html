@@ -20,18 +20,23 @@
     <link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}"/>
 
     <link rel="stylesheet" th:href="@{css/bsq/main.css}"/>
-    <link rel="stylesheet" th:href="@{css/v1/content.css}"/>
+    <link rel="stylesheet" th:href="@{css/bsq/content.css}"/>
 </head>
+<style type="text/css">
+	body {
+		background-color: #F1F3FA;
+	}
+</style>
 <body>
     <div class="navbar-wrapper" th:include="module/common::nav">
     </div>
 
-    <div class="container" th:if="!${param.id}">
+    <div class="container" style="background-color: #FFFFFF; padding: 30px 20px" th:if="!${param.id}">
         <div class="row" style="margin-top: 80px;">
             <div th:if="!${param.id}" id="content-preview" class="content-preview">
-                <div class="col-sm-12 col-md-12 col-xs-12">
+                <div class="container">
                     <ul class="nav nav-pills" role="tablist">
-                        <li role="presentation" class="active"><a href="#my-share" aria-controls="my-share" role="tab" data-toggle="tab">我的发布</a></li>
+                        <li role="presentation" class="active" style="border-right: 2px solid #000; padding-right: 15px"><a href="#my-share" aria-controls="my-share" role="tab" data-toggle="tab">我的发布</a></li>
                         <li role="presentation" class=""><a href="#hot-share" aria-controls="hot-share" role="tab" data-toggle="tab">热门发布</a></li>
                     </ul>
                     <div class="tab-content">

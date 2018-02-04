@@ -211,26 +211,26 @@ public class ViewController {
         return "content";
     }
 
-    @GetMapping("/share")
-    public String shareContent(@RequestParam(value = "rid", required = false) Long rid,
-                               Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String currentUser = commonService.getCurrentLoginUser(request);
-        if (currentUser == null){
-            logger.warn("[/share], no login user, redirect to /login");
-            response.sendRedirect(request.getContextPath() + "/login");
-            return "login";
-        }
-        if (rid == null){
-            logger.warn("[/share], unsupport url");
-            response.sendRedirect(request.getContextPath() + "/index");
-            return "index";
-        }
-        RecorderInfo recorderInfo = crudService.findRecorder(rid);
-        model.addAttribute("recorder", recorderInfo);
-        model.addAttribute("inContent", true);
-
-        return "share";
-    }
+//    @GetMapping("/share")
+//    public String shareContent(@RequestParam(value = "rid", required = false) Long rid,
+//                               Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        String currentUser = commonService.getCurrentLoginUser(request);
+//        if (currentUser == null){
+//            logger.warn("[/share], no login user, redirect to /login");
+//            response.sendRedirect(request.getContextPath() + "/login");
+//            return "login";
+//        }
+//        if (rid == null){
+//            logger.warn("[/share], unsupport url");
+//            response.sendRedirect(request.getContextPath() + "/index");
+//            return "index";
+//        }
+//        RecorderInfo recorderInfo = crudService.findRecorder(rid);
+//        model.addAttribute("recorder", recorderInfo);
+//        model.addAttribute("inContent", true);
+//
+//        return "share";
+//    }
 
     @GetMapping("/denied")
     public String denied(HttpServletRequest request) {
@@ -249,4 +249,12 @@ public class ViewController {
         logger.info("In login.html");
         return "login";
     }
+    
+    //新增内容页
+    @GetMapping("/share")
+    public String newContent(){
+    	logger.info("In share.html");
+		return "share";
+    }
+    
 }

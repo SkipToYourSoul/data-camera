@@ -64,7 +64,8 @@ body {
 .footer{
     background-color: #35b5eb;
     /* bybsq */
-    position:absolute;
+    position:fixed;
+    z-index:101;
     bottom:0; 
     width:100%;
 }

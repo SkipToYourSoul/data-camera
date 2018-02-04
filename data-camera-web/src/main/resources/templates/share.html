@@ -1,147 +1,155 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
-    <title>内容发布</title>
-    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
+<title>内容发布</title>
+<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
 
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
-    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
-    <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
-    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}"/>
+<!-- Bootstrap core CSS -->
+<link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}" />
+<link rel="stylesheet"
+	th:href="@{source/bootstrap/font-awesome.min.css}" />
+<link rel="stylesheet"
+	th:href="@{source/validation/formValidation.min.css}" />
+<link rel="stylesheet"
+	th:href="@{source/bootstrap/bootstrap-select.min.css}" />
 
-    <link rel="stylesheet" th:href="@{source/jqueryui/jquery.dropdown.css}"/>
-    <link rel="stylesheet" th:href="@{source/upload/fileinput.css}"/>
+<link rel="stylesheet" th:href="@{source/jqueryui/jquery.dropdown.css}" />
+<link rel="stylesheet" th:href="@{source/upload/fileinput.css}" />
 
-    <link rel="stylesheet" th:href="@{source/messenger/messenger.css}"/>
-    <link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}"/>
+<link rel="stylesheet" th:href="@{source/messenger/messenger.css}" />
+<link rel="stylesheet"
+	th:href="@{source/messenger/messenger-theme-air.css}" />
 
-    <link rel="stylesheet" th:href="@{css/v1/main.css}"/>
+<link rel="stylesheet" th:href="@{css/bsq/main.css}" />
+<link rel="stylesheet" th:href="@{css/bsq/share.css}" />
 
-    <style type="text/css">
-        body{
-            background-color: #F1F3FA;
-        }
-        .publish-img{
-            padding: 5px;
-        }
-        .publish-recorder{
-            padding: 5px;
-        }
-    </style>
+<style type="text/css">
+body {
+	background-color: #F1F3FA;
+}
+
+.publish-img {
+	padding: 5px;
+}
+
+.publish-recorder {
+	padding: 5px;
+}
+</style>
 </head>
 <body>
-    <div id="app-loading"></div>
-    <div class="navbar-wrapper" th:include="module/common::nav">
-    </div>
+	<div id="app-loading"></div>
+	<div class="navbar-wrapper" th:include="module/common::nav"></div>
 
-    <div class="container" style="background-color: #FFFFFF; padding: 30px 20px">
-        <div class="row" style="margin-top: 70px">
-            <div class="col-md-3 col-sm-3 col-xs-3">
-                <div class="publish-img">
-                    <img th:src="@{/img/publishing.jpg}" class="img-responsive center-block img-rounded"/>
-                </div>
-                <div class="publish-recorder">
-                    <h3 th:text="${recorder.name}"></h3>
-                    <h5 th:text="${recorder.description}"></h5>
-                </div>
-            </div>
-            <div class="col-md-9 col-sm-9 col-xs-9">
-                <form class="form-horizontal" role="form" id="content-form">
-                    <div class="form-group">
-                        <label for="content-name" class="col-sm-2 control-label">标题</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control"
-                                   name="content-name" id="content-name" placeholder="内容标题不能为空"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="content-desc" class="col-sm-2 control-label">介绍</label>
-                        <div class="col-sm-10">
-                                    <textarea class="form-control"
-                                              name="content-desc"
-                                              rows="3"
-                                              required="required"
-                                              placeholder="讲讲关于内容的故事，让更多人了解"
-                                              id="content-desc"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="content-category-select" class="col-sm-2 control-label">STEM分类</label>
-                        <div class="col-sm-10">
-                            <select class="selectpicker"
-                                    data-width="100%"
-                                    id="content-category-select"
-                                    name="content-category-select">
-                                <option value="科学">科学</option>
-                                <option value="技术">技术</option>
-                                <option value="工程">工程</option>
-                                <option value="数学">数学</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">标签</label>
-                        <div class="col-sm-10">
-                            <div class="content-tag-dropdown">
-                                <select name="content-tag" id="content-tag" style="display:none" multiple="multiple" placeholder="请选择"></select>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span class="label label-primary">示例tag</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="file-upload-input" class="col-sm-2 control-label">封面上传</label>
-                        <div class="col-sm-10">
-                            <input id="file-upload-input" type="file" class="file" data-preview-file-type="text" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="content-private-select" class="col-sm-2 control-label">隐私</label>
-                        <div class="col-sm-10">
-                            <select class="selectpicker"
-                                    data-width="100%"
-                                    id="content-private-select"
-                                    name="content-private-select">
-                                <option value="1">公开-所有人可看</option>
-                                <option value="0">私密-仅自己可看</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-10 col-sm-offset-2">
-                            <button type="button" class="btn btn-success btn-block" onclick="$('#content-form').submit()" id="content-confirm-btn">发布</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+	<div class="container"
+		style="background-color: #FFFFFF; padding: 30px 20px">
+		<div class="row" style="margin-top: 70px">
+			<div class="col-md-3 col-sm-3 col-xs-3">
+				<div class=""></div>
+				<div class="publish-img">
+					<img th:src="@{/img/note.png}"
+						class="img-responsive center-block img-rounded" />
+				</div>
+				<div class="publish-recorder">
+					<!--    <h3 th:text="${recorder.name}"></h3>
+                    <h5 th:text="${recorder.description}"></h5> -->
+				</div>
+			</div>
+			<div class="col-md-9 col-sm-9 col-xs-9">
+				<form class="form-horizontal" role="form" id="content-form">
+					<div class="form-group">
+						<label for="file-upload-input" class="col-sm-2 control-label">封面</label>
+						<div class="col-sm-10">
+							<input id="file-upload-input" type="file" class="file"
+								data-preview-file-type="text" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="content-name" class="col-sm-2 control-label">标题</label>
+						<div class="col-sm-10">
+							<input type="text" class="newi-control" name="content-name"
+								id="content-name" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="content-desc" class="col-sm-2 control-label">介绍</label>
+						<div class="col-sm-10">
+							<textarea class="newt-control" name="content-desc" rows="3"
+								required="required" id="content-desc"></textarea>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="content-category-select"
+							class="col-sm-2 control-label">分类</label>
+						<div class="col-sm-10">
+							<select class="selectpicker cuspicker" data-width="65%"
+								id="content-category-select" name="content-category-select">
+								<option value="科学">科学</option>
+								<option value="技术">技术</option>
+								<option value="工程">工程</option>
+								<option value="数学">数学</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">标签</label>
+						<div class="col-sm-10">
+							<div class="content-tag-dropdown">
+								<select name="content-tag" id="content-tag"
+									style="display: none" multiple="multiple" placeholder="请选择"></select>
+							</div>
+							<div style="margin-top: 5px">
+								<span class="label label-primary">示例tag</span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="content-private-select" class="col-sm-2 control-label">隐私</label>
+						<div class="col-sm-10">
+							<select class="selectpicker cuspicker" data-width="65%"
+								id="content-private-select" name="content-private-select">
+								<option value="1">公开-所有人可看</option>
+								<option value="0">私密-仅自己可看</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group" style="margin-bottom:60px" >
+						<div class="col-sm-10 col-sm-offset-2">
+							<button type="button" class="btn btn-success btn-block"
+								onclick="$('#content-form').submit()" id="content-confirm-btn">发布</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="row footer">
+		<div th:include="module/common::sub-footer"></div>
+	</div>
 
-    <script th:src="@{source/jquery.min.js}"></script>
-    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
-    <script th:inline="javascript">
+	<script th:src="@{source/jquery.min.js}"></script>
+	<script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+	<script th:inline="javascript">
         var recorder = [[${recorder}]];
     </script>
 
-    <script th:src="@{source/jqueryui/jquery.dropdown.js}"></script>
-    <script th:src="@{source/messenger/messenger.min.js}"></script>
-    <script th:src="@{source/messenger/messenger-theme-future.js}"></script>
-    <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
+	<script th:src="@{source/jqueryui/jquery.dropdown.js}"></script>
+	<script th:src="@{source/messenger/messenger.min.js}"></script>
+	<script th:src="@{source/messenger/messenger-theme-future.js}"></script>
+	<script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
 
-    <!-- upload -->
-    <script th:src="@{source/upload/fileinput.js}"></script>
-    <script th:src="@{source/upload/theme.js}"></script>
-    <script th:src="@{source/upload/zh.js}"></script>
+	<!-- upload -->
+	<script th:src="@{source/upload/fileinput.js}"></script>
+	<script th:src="@{source/upload/theme.js}"></script>
+	<script th:src="@{source/upload/zh.js}"></script>
 
-    <script th:src="@{source/validation/formValidation.min.js}"></script>
-    <script th:src="@{source/validation/bootstrap.min.js}"></script>
+	<script th:src="@{source/validation/formValidation.min.js}"></script>
+	<script th:src="@{source/validation/bootstrap.min.js}"></script>
 
-    <script th:src="@{js/common.js}"></script>
-    <script th:src="@{js/content/share.js}"></script>
+	<script th:src="@{js/common.js}"></script>
+	<script th:src="@{js/content/share.js}"></script>
 </body>
 </html>
