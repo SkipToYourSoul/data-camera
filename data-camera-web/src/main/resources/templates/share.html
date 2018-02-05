@@ -43,19 +43,19 @@ body {
 <body>
 	<div id="app-loading"></div>
 	<div class="navbar-wrapper" th:include="module/common::nav"></div>
-
+	
 	<div class="container"
 		style="background-color: #FFFFFF; padding: 30px 20px">
 		<div class="row" style="margin-top: 70px">
 			<div class="col-md-3 col-sm-3 col-xs-3">
-				<div class=""></div>
+				<div class="publish-text">发布中......</div>
 				<div class="publish-img">
 					<img th:src="@{/img/note.png}"
 						class="img-responsive center-block img-rounded" />
 				</div>
 				<div class="publish-recorder">
-					<!--    <h3 th:text="${recorder.name}"></h3>
-                    <h5 th:text="${recorder.description}"></h5> -->
+					<h3 th:text="${recorder.name}"></h3>
+					<h5 th:text="${recorder.description}"></h5>
 				</div>
 			</div>
 			<div class="col-md-9 col-sm-9 col-xs-9">
@@ -116,9 +116,10 @@ body {
 							</select>
 						</div>
 					</div>
-					<div class="form-group" style="margin-bottom:60px" >
+					<div class="form-group" style="margin-bottom:60px">
 						<div class="col-sm-10 col-sm-offset-2">
-							<button type="button" class="btn btn-success btn-block"
+							<button type="button" class="btn"
+								style="background-color: #35b5eb; color: #fff"
 								onclick="$('#content-form').submit()" id="content-confirm-btn">发布</button>
 						</div>
 					</div>

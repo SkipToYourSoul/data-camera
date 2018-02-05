@@ -3,20 +3,21 @@ body{
 }
 
 .content-preview{
-    padding: 5px;
+	padding: 5px;
 }
 
 .share-view{
-    margin-top: 5px;
-    padding: 5px 0;
+    margin-top: 2px;
+    padding: 5px 15px;
     margin-bottom: 20px;
 }
 
 .share-view-container{
     background-color: #FFFFFF;
     padding: 5px 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+ /*    border-radius: 10px; */
+    margin-bottom: 4px;
+    
 }
 
 .share-view-photo{
@@ -26,8 +27,8 @@ body{
 }
 
 .share-img {
-    max-height: 100px;
-    max-width: 100%;
+    width: 100%;
+    max-height:100%;
     display: block;
 }
 
@@ -38,10 +39,10 @@ body{
 }
 
 .share-view-info{
-    padding-top: 10px;
+/*     padding-top: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #eeeeee;
-}
+    */
+} 
 
 .share-view-user{
     padding-top: 5px;
@@ -141,4 +142,67 @@ body{
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
     color: #35b5eb;
     background-color: #fff;
+}
+
+.content-title{
+	font-size:18px;
+	color:#000;
+}
+
+.content-des{
+	color:#bebebe;
+	font-size:14px;
+	margin-top:8px;
+}
+
+.content-tag{
+	margin-top:8px;
+}
+
+.content-category{
+	margin-top:8px;
+	padding-bottom:4px;
+	border-bottom:solid 1px #f5f5f5;
+}
+
+.content-time{
+	color:#bebebe;
+	font-size:12px;
+}
+
+.content-icon{
+	font-size:16px;
+	color:#bebebe;
+}
+
+.content-num{
+	font-size:16px;
+	color:#8ed6f4;
+}
+
+.content-owner{
+	font-size:14px;
+	color:#bebebe;
+	margin-left:15px;
+}
+
+.content-d{
+	font-size:13px;
+	color:#000;
+}
+
+.content-d-des{
+	margin-top:20px;
+	padding:20px 0 40px 0;
+	border-top:solid 1px #f5f5f5;
+	color:#cecece;
+	
+}
+
+.head-img{
+	margin-top:90px;
+	border-radius:50%;
+	width:70px;
+	height:70px;
+	background-image:url(../../img/app-bottom.png);
 }
