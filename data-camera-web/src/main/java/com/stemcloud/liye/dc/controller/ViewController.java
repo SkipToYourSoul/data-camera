@@ -248,5 +248,5 @@ public class ViewController {
     public String login(){
         logger.info("In login.html");
         return "login";
-    }
+    }  
 }

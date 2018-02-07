@@ -14,22 +14,23 @@ body {
 }
 
 .navbar .navbar-nav>li>a {
-    color: #828587;
+    color: #000;
     height: 60px;
     line-height: 60px;
     font-size:16px;
+    font-weight:300;
     padding-top:0;
     padding-bottom:0;
 }
 
 .navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>.open>a:focus {
-    color: #FFFFFF;
-    background-color: rgba(74, 145, 244, 0.7);
+    color: #36b5eb;
+ 	background-color:#fff
 }
 
 .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
-    color: #FFFFFF;
-    background-color: #337ab7;
+    color: #36b5eb;
+    background-color:#fff
 }
 
 .navbar a, .dropdown-menu>li>a, .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover, .navbar-toggle{
@@ -40,9 +41,9 @@ body {
     height: 60px;
 }
 
-.navbar-login-ul {
+/* .navbar-login-ul {
     border-left:solid 1px #d9d9de;
-}
+} */
 
 /* 通用：滚动条样式 */
 .scroll::-webkit-scrollbar {
@@ -64,9 +65,9 @@ body {
     background-color: #35b5eb;
     /* bybsq */
     position:fixed;
+    z-index:101;
     bottom:0; 
     width:100%;
-    z-index:101;
 }
 
 .content-about-us {
