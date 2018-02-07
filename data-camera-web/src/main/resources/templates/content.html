@@ -291,7 +291,7 @@ body {
 					<div style="border-bottom: 1px solid #f5f5f5; color: #35b5eb; font-size: 14px; padding-top: 20px; padding-bottom: 20px">其他作品</div>
 					<div style="margin-top: 20px">
 						<th:block th:each="otherContent,index:${userHotContent}">
-							<div th:if="${index.count%2 eq 1 and index.count lt 5}">
+							<div class="row" th:if="${index.count%2 eq 1 and index.count lt 5}">
 								<div class="share-view-photo col-md-6">
 									<img
 											th:src="${userHotContent.get(index.count).img}?${userHotContent.get(index.count).img}:'img/logo.png'"
