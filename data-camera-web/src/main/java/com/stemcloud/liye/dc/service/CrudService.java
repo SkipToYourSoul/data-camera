@@ -227,6 +227,10 @@ public class CrudService {
         return contentRepository.findByOwnerAndIsDeleted(user, 0);
     }
 
+    public List<ContentInfo> selectUserHotContent(String user){
+        return contentRepository.findTop10ByOwnerAndIsDeletedOrderByLikeDesc(user, 0);
+    }
+
     public List<ContentInfo> selectHotContent(){
         return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeDesc(1, 0);
     }

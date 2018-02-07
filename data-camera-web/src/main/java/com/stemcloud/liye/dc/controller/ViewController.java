@@ -205,7 +205,11 @@ public class ViewController {
                 return "index";
             }
             ContentInfo currentContent = crudService.findContent(id);
+            List<ContentInfo> userHotContent = crudService.selectUserHotContent(currentContent.getOwner());
+            userHotContent.remove(currentContent);
+
             model.addAttribute("currentContent", currentContent);
+            model.addAttribute("userHotContent", userHotContent);
         }
 
         return "content";

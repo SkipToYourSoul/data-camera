@@ -115,7 +115,7 @@
 						</div>
 
 						<!-- 片段列表 -->
-						<div class="sidebar-menu2" id="content-menu" th:if="${param.id}">
+						<div class="sidebar-menu2" id="content-menu" th:if="${param.id}" hidden="hidden">
 							<div class="menu-title">我的场景</div>
 							<th:block th:each="entry,index:${apps}">
 								<div class="row" style="padding: 5px 0 0 0">

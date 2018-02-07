@@ -35,11 +35,10 @@ body {
 <body>
 	<div class="navbar-wrapper" th:include="module/common::nav"></div>
 
-	<div class="container" style="background-color: #FFFFFF; padding: 0"
-		th:if="!${param.id}">
+    <!-- 内容概览 -->
+	<div class="container" style="background-color: #FFFFFF; padding: 0" th:if="!${param.id}">
 		<div class="row" style="margin-top: 80px;">
-			<div th:if="!${param.id}" id="content-preview"
-				class="content-preview">
+			<div th:if="!${param.id}" id="content-preview" class="content-preview">
 				<div class="container" style="padding: 20px 0">
 					<ul class="nav nav-pills" role="tablist">
 						<li role="presentation" class="active"
@@ -49,8 +48,8 @@ body {
 							aria-controls="hot-share" role="tab" data-toggle="tab">热门发布</a></li>
 					</ul>
 				</div>
-				<div class="container"
-					style="background-color: #f3f3f3; padding: 0px">
+                <!-- 我的发布 -->
+                <div class="container" style="background-color: #f3f3f3; padding: 0px">
 					<div class="tab-content">
 						<div id="my-share" role="tabpanel" class="tab-pane active in fade">
 							<div class="share-view">
@@ -77,10 +76,15 @@ body {
 														</div>
 														<div class="content-des" th:text="${content.description}|"></div>
 														<div class="content-tag">
-															<span class="label label-default"
-																style="background-color: #e8e8e8; color: #c0c0c0"
-																th:text="|${'标签:'+content.tag}|">Default</span>
-														</div>
+                                                            <th:block th:if="${#strings.isEmpty(content.tag)}">
+                                                                <!-- todo: 标签为空 -->
+                                                            </th:block>
+                                                            <th:block th:each="tag,index:${#strings.listSplit(content.tag,',')}">
+                                                                <span class="label label-default"
+                                                                      style="background-color: #e8e8e8; color: #c0c0c0"
+                                                                      th:text="|${'标签:'+tag}|">Default</span>
+                                                            </th:block>
+                                                        </div>
 														<div class="content-category"
 															th:text="|${content.category}|"></div>
 													</div>
@@ -124,9 +128,14 @@ body {
 														<div class="content-des"
 															th:text="|${content.description}|"></div>
 														<div class="content-tag">
-															<span class="label label-default"
-																style="background-color: #e8e8e8; color: #c0c0c0"
-																th:text="|${'标签:'+content.tag}|">Default</span>
+                                                            <th:block th:if="${#strings.isEmpty(content.tag)}">
+                                                                <!-- todo: 标签为空 -->
+                                                            </th:block>
+                                                            <th:block th:each="tag,index:${#strings.listSplit(content.tag,',')}">
+                                                                <span class="label label-default"
+                                                                      style="background-color: #e8e8e8; color: #c0c0c0"
+                                                                      th:text="|${'标签:'+tag}|">Default</span>
+                                                            </th:block>
 														</div>
 														<div class="content-category"
 															th:text="|${content.category}|"></div>
@@ -158,6 +167,7 @@ body {
 		</div>
 	</div>
 
+    <!-- 详细内容展示 -->
 	<div class="container" th:if="${param.id}">
 		<div class="row" style="margin-top: 80px;">
 			<div class="col-md-8" style="">
@@ -181,9 +191,14 @@ body {
 									<!-- <div th:text="|分类：${currentContent.category}|"></div> -->
 									<!--<div th:text="|标签：${currentContent.tag}|"></div> -->
 									<div class="content-tag">
-										<span class="label label-default"
-											style="background-color: #e8e8e8; color: #c0c0c0"
-											th:text="|标签:${currentContent.tag}|">Default</span>
+                                        <th:block th:if="${#strings.isEmpty(currentContent.tag)}">
+                                            <!-- todo: 标签为空 -->
+                                        </th:block>
+                                        <th:block th:each="tag,index:${#strings.listSplit(currentContent.tag,',')}">
+                                            <span class="label label-default"
+                                                  style="background-color: #e8e8e8; color: #c0c0c0"
+                                                  th:text="|${'标签:'+tag}|">Default</span>
+                                        </th:block>
 									</div>
 								</div>
 								<!-- 	<div class="share-view-info">
@@ -260,44 +275,37 @@ body {
 				style="background-color: #fff; min-height: 600px; padding-bottom: 50px;">
 				<div style="margin-left: 40%; margin-right: 40%">
 					<div class="head-img"></div>
-					<div style="text-align: center; margin-top: 15px">李美丽</div>
+					<div style="text-align: center; margin-top: 15px" th:text="|${currentContent.owner}|"></div>
 				</div>
 				<div>
 					<div class="content-tag">
-						<span class="label label-default"
-							style="background-color: #e8e8e8; color: #c0c0c0"
-							th:text="|标签:${currentContent.tag}|">Default</span>
+                        <th:block th:if="${#strings.isEmpty(currentContent.tag)}">
+                            <!-- todo: 标签为空 -->
+                        </th:block>
+                        <th:block th:each="tag,index:${#strings.listSplit(currentContent.tag,',')}">
+							<span class="label label-default"
+								  style="background-color: #e8e8e8; color: #c0c0c0"
+								  th:text="|${'标签:'+tag}|">Default</span>
+                        </th:block>
 					</div>
-					<div
-						style="border-bottom: 1px solid #f5f5f5; color: #35b5eb; font-size: 14px; padding-top: 20px; padding-bottom: 20px">
-						其他作品</div>
+					<div style="border-bottom: 1px solid #f5f5f5; color: #35b5eb; font-size: 14px; padding-top: 20px; padding-bottom: 20px">其他作品</div>
 					<div style="margin-top: 20px">
-						<div class="share-view-photo col-md-6">
-							<img
-								th:src="${currentContent.img}?${currentContent.img}:'img/logo.png'"
-								class="img-responsive center-block" />
-							<div class="content-title" th:text="${currentContent.title}"></div>
-						</div>
-						<div class="share-view-photo col-md-6">
-							<img
-								th:src="${currentContent.img}?${currentContent.img}:'img/logo.png'"
-								class="img-responsive center-block" />
-							<div class="content-title" th:text="${currentContent.title}"></div>
-						</div>
-					</div>
-					<div>
-						<div class="share-view-photo col-md-6">
-							<img
-								th:src="${currentContent.img}?${currentContent.img}:'img/logo.png'"
-								class="img-responsive center-block" />
-							<div class="content-title" th:text="${currentContent.title}"></div>
-						</div>
-						<div class="share-view-photo col-md-6">
-							<img
-								th:src="${currentContent.img}?${currentContent.img}:'img/logo.png'"
-								class="img-responsive center-block" />
-							<div class="content-title" th:text="${currentContent.title}"></div>
-						</div>
+						<th:block th:each="otherContent,index:${userHotContent}">
+							<div th:if="${index.count%2 eq 1 and index.count lt 5}">
+								<div class="share-view-photo col-md-6">
+									<img
+											th:src="${userHotContent.get(index.count).img}?${userHotContent.get(index.count).img}:'img/logo.png'"
+											class="img-responsive center-block" />
+									<div class="content-title" th:text="${userHotContent.get(index.count).title}"></div>
+								</div>
+								<div class="share-view-photo col-md-6" th:if="${#lists.size(userHotContent) gt index.count}">
+									<img
+											th:src="${userHotContent.get(index.count+1).img}?${userHotContent.get(index.count+1).img}:'img/logo.png'"
+											class="img-responsive center-block" />
+									<div class="content-title" th:text="${userHotContent.get(index.count+1).title}"></div>
+								</div>
+							</div>
+						</th:block>
 					</div>
 				</div>
 			</div>

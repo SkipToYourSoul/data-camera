@@ -24,6 +24,14 @@ public interface ContentRepository extends CrudRepository<ContentInfo, Long> {
     List<ContentInfo> findByOwnerAndIsDeleted(String owner, int isDeleted);
 
     /**
+     * 查询用户热门内容
+     * @param owner
+     * @param isDeleted
+     * @return
+     */
+    List<ContentInfo> findTop10ByOwnerAndIsDeletedOrderByLikeDesc(String owner, int isDeleted);
+
+    /**
      * 查询分享的热门内容
      * @param isShared
      * @param isDeleted
