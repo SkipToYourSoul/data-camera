@@ -62,7 +62,7 @@ public class HandleDataService implements Service {
             // 处理监控
             Map<String, Object> meta = JSON.parseObject(json);
             Map<String, Object> data = packet.asJson();
-            meta.putAll(data);
+            meta.put("data", data);
             MysqlRepository.saveValueDatas(meta);
         }
 
@@ -77,7 +77,7 @@ public class HandleDataService implements Service {
             // 处理记录
             Map<String, Object> meta = JSON.parseObject(json);
             Map<String, Object> data = packet.asJson();
-            meta.putAll(data);
+            meta.put("data", data);
             MysqlRepository.saveValueDatas(meta);
         }
 

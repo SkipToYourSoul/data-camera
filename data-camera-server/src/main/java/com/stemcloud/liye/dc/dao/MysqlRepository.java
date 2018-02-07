@@ -26,18 +26,17 @@ public class MysqlRepository {
     private static String SENSOR_INFO_TBL = "dc_base_sensor_info";
     private static String EXP_INFO_TBL = "dc_base_experiment_info";
 
-    public static int[] saveValueDatas(Map<String, Object> datas){
-        Long sensorId = (Long) datas.get("sensorId");
+    public static Integer[] saveValueDatas(Map<String, Object> datas){
+        Long sensorId = (Long) datas.get("id");
         Long trackId = (Long) datas.get("trackId");
+        Map<String, Object> data = (Map<String, Object>)datas.get("data");
         if (sensorId != null && trackId != null){
             // save
-            datas.remove("sensorId");
-            datas.remove("trackId");
-            int[] results = new int[datas.size()];
-            datas.forEach((k, v) -> saveValueData(sensorId, trackId, k, (Double)v));
-            return results;
+            List<Integer> results = new ArrayList<>(data.size());
+            data.forEach((k, v) -> results.add(saveValueData(sensorId, trackId, k, (Double)v)));
+            return results.toArray(new Integer[results.size()]);
         }
-        return new int[0];
+        return new Integer[0];
     }
 
     public static int saveValueData(long sensorId, long trackId, String key, Double value){
