@@ -42,11 +42,11 @@
 				</ul>
 			</div>
 			<div sec:authorize="!isAuthenticated()">
-				<ul class="nav navbar-nav navbar-login-ul" style="margin-left: 40%">
+				<ul class="nav navbar-nav navbar-login-ul" style="margin-left: 35%">
 					<li th:if="${inIndex}"><a th:href="@{/login}">联系我们</a></li>
-					<li><a th:href="@{/login}">登陆</a></li>
+					<li><a th:href="@{/login}">登录</a></li>
 					<li th:if="${inIndex}"><a href="#">&nbsp; 注册</a></li>
-					<!-- <li><label><input placeholder="搜索热门场景" /></label></li> -->
+ 					<li><label class="search-label"><input class="search-input" placeholder="搜索热门场景" /><i class="fa fa-search search-icon"></i></label></li>
 				</ul>
 			</div>
 		</div>

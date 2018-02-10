@@ -27,44 +27,47 @@
 
             <!-- 遍历构造实验panel -->
             <th:block th:each="experiment,expIndex:${experiments}">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+                <div class="">
+                    <div class="panel-heading" style="border-bottom:solid 1px #eee;border-top:solid 1px #eee">
                         <div class="panel-title">
                             <!-- 标题 -->
+                            <a th:text="|传感器组：${experiment.value.name}|" th:data="${experiment.key}" data-toggle="modal" data-target="#exp-modal" todo="edit" from="modify-desc"></a>
                             <a role="button" data-toggle="collapse" th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
-                                <i class="fa fa-arrows-v"></i>&nbsp;
+                                <i class="fa fa-sort-desc"></i>&nbsp;
                             </a>
-                            <a th:text="|传感器组：${experiment.value.name} - |" th:data="${experiment.key}" data-toggle="modal" data-target="#exp-modal" todo="edit" from="modify-desc"></a>
                             <!-- 状态栏 -->
-                            <small th:text="${experiment.value.description}" style="color: #9d9d9d"></small>
+                           <!--  <small th:text="${experiment.value.description}" style="color: #9d9d9d"></small>
                             <span class="pull-right">
                                 <span class="label label-default" th:id="|experiment-es-${experiment.key}|">非监控</span>
                                 <span class="label label-default" th:id="|experiment-rs-${experiment.key}|">非录制</span>
+                            </span> -->
+                             <!-- 实验状态和操作栏 -->
+                            <span class="app-exp-status">
+                                <!-- 按钮组 -->
+                                    <button style="color:#fc4a6c" th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="btn btn-sm" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">
+                                    <i class="fa fa-eye"></i></button>
+                                    <button style="color:#26c6db" th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="btn btn-sm" th:data="${experiment.key}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.key}|">
+                                    <i class="fa fa-camera-retro"></i></button>
+                                <div class="btn-group">
+                                    <button class="btn btn-default btn-sm" th:data="${experiment.key}"
+                                            data-toggle="modal" data-target="#exp-modal" todo="edit" from="modify-sensor"><i class="fa fa-plus"></i></button>
+                                                                               <button class="btn btn-default btn-sm" th:data="${experiment.key}"
+                                            data-toggle="modal" data-target="#exp-modal" todo="edit" from="modify-sensor"><i class="fa fa-minus"></i></button>
+								</div>
+								<button class="btn btn-default btn-sm"
+										th:data="${experiment.key}" onclick="deleteExp(this)">
+										<i class="fa fa-trash"></i>
+								</button>
                             </span>
                         </div>
                     </div>
-                    <div th:id="|exp-${experiment.key}|" class="panel-collapse collapse in" role="tabpanel">
-                        <div class="panel-body my-panel-body">
-                            <!-- 实验状态和操作栏 -->
-                            <div class="app-exp-status">
-                                <!-- 按钮组 -->
-                                <span class="btn-group">
-                                    <button class="btn btn-default btn-sm" th:data="${experiment.key}"
-                                            data-toggle="modal" data-target="#exp-modal" todo="edit" from="modify-sensor"><i class="fa fa-plus"></i></button>
-                                    <button class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="deleteExp(this)"><i class="fa fa-trash"></i></button>
-                                    <button th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="expMonitor(this)" th:id="|experiment-monitor-${experiment.key}|">
-                                    <i class="fa fa-eye"></i></button>
-                                    <button th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}" class="btn btn-default btn-sm" th:data="${experiment.key}" onclick="expRecorder(this)" th:id="|experiment-recorder-${experiment.key}|">
-                                    <i class="fa fa-camera-retro"></i></button>
-                                </span>
-                            </div>
-
+                    <div style="margin-top:20px"  th:id="|exp-${experiment.key}|" class="panel-collapse collapse in" role="tabpanel">
+                        <div class="panel-body">
                             <!-- 实验图表和数据 -->
                             <div class="app-exp-content">
                                 <div th:if="${#lists.isEmpty(experiment.value.trackInfoList)}"
                                      class="alert alert-info my-alert" role="alert">
                                     TIPS: 传感器组中暂无任何传感器，点击上方“+”按钮可添加传感器:)</div>
-
                                 <th:block th:each="track,trackIndex:${experiment.value.trackInfoList}">
                                     <div class="track">
                                         <!-- 轨迹信息 -->
