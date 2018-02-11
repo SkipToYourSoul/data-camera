@@ -106,7 +106,7 @@
 								<th:block th:each="entry,index:${apps}">
 									<li
 										th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''"><a
-										th:text="${entry.value.name}"
+										th:text="|O ${entry.value.name}|"
 										th:href="@{/app(id=${entry.key})}"
 										th:class="|app-${index.count}|"></a></li>
 								</th:block>

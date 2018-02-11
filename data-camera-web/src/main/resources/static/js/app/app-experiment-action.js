@@ -513,12 +513,13 @@ function allRecord(){
  * @param exp_id
  */
 function pageStartMonitor(exp_id){
+    console.info("Page start monitor: " + exp_id);
     var exp_state_dom = $('#experiment-es-' + exp_id);
     var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
 
     isExperimentMonitor[exp_id] = 1;
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-    exp_monitor_btn.removeClass('btn-default').addClass('btn-success');
+    /*exp_monitor_btn.removeClass('btn-default').addClass('btn-success');*/
 
     doInterval(exp_id);
 }
@@ -532,7 +533,7 @@ function pageStopMonitor(exp_id){
 
     isExperimentMonitor[exp_id] = 0;
     $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-default').text('非监控');
-    $('#experiment-monitor-' + exp_id).removeClass('btn-success').addClass('btn-default');
+    /*$('#experiment-monitor-' + exp_id).removeClass('btn-success').addClass('btn-default');*/
 
     clearInterval(exp_monitor_interval[exp_id]);
     delete exp_monitor_interval[exp_id];
@@ -550,7 +551,7 @@ function pageStartRecord(exp_id) {
     var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
 
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-    exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
+    /*exp_recorder_btn.removeClass('btn-default').addClass('btn-success');*/
 
     expObject.setRecorderTime(exp_id, [new Date().Format("yyyy-MM-dd HH:mm:ss")]);
     isExperimentRecorder[exp_id] = 1;
@@ -563,7 +564,7 @@ function pageStartRecord(exp_id) {
 function pageStopRecorder(exp_id){
     console.info("Page stop recorder: " + exp_id);
     $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-default').text('非录制');
-    $('#experiment-recorder-' + exp_id).removeClass('btn-success').addClass('btn-default');
+    /*$('#experiment-recorder-' + exp_id).removeClass('btn-success').addClass('btn-default');*/
     isExperimentRecorder[exp_id] = 0;
     expObject.setRecorderTime(exp_id, []);
 }

@@ -365,7 +365,7 @@ body{
     font-weight: 600;
     height:40px;
     line-height:40px;
-    margin-left:60%;
+    margin-left:55%;
 }
 
 .app-exp-status button{
@@ -426,7 +426,7 @@ body{
 
 .track .track-statistics{
     border-radius: 5%;
-    background-color: rgba(154, 154, 154, 0.1);
+    border: 2px solid rgba(154, 154, 154, 0.1);
     padding: 10px 5px;
 }
 
@@ -436,9 +436,8 @@ body{
 }
 
 .track .track-statistics .content-now-text{
-    padding-left: 20px;
     font-size: 28px;
-    color: #d43f3a;
+    color: #35b5eb;
     font-weight: 600;
 }
 
