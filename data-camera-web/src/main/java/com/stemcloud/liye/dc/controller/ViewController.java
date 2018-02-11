@@ -252,5 +252,10 @@ public class ViewController {
     public String login(){
         logger.info("In login.html");
         return "login";
-    }  
+    }
+
+    @GetMapping("/test")
+    public String test(){
+        return "test";
+    }
 }
