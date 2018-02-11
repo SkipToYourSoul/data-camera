@@ -26,7 +26,7 @@ function initTreeDom(){
     var nodeTemplate = $go(go.Node, "Horizontal",
         { selectionChanged: nodeSelectionChanged },  // this event handler is defined below
         $go(go.Panel, "Auto",
-            $go(go.Shape, "RoundedRectangle", { fill: "#1F4963", stroke: null }),
+            $go(go.Shape, "RoundedRectangle", { fill: "#35b5eb", stroke: null }),
             $go(go.TextBlock,
                 { font: "bold 14px Helvetica, bold Arial, sans-serif",
                     stroke: "white", margin: 10 },

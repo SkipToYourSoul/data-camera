@@ -255,7 +255,8 @@ function buildAnalysisChartOption(data, legend) {
                     silent: true,
                     itemStyle: {
                         normal: {
-                            color: '#DCDCDC'
+                            color: '#35b5eb',
+                            opacity: 0.5
                         }
                     },
                     data: [[{

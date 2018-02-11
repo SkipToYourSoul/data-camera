@@ -731,6 +731,8 @@ button.ui-button::-moz-focus-inner {
 	cursor: default;
 	-ms-touch-action: none;
 	touch-action: none;
+	/* custom define */
+	border-radius: 10px;
 }
 .ui-slider .ui-slider-range {
 	position: absolute;
@@ -908,8 +910,11 @@ body .ui-tooltip {
 	color: #444444;
 }
 .ui-widget-header {
-	border: 1px solid #dddddd;
-	background: #dddddd url("images/ui-bg_highlight-soft_50_dddddd_1x100.png") 50% 50% repeat-x;
+	/*border: 1px solid #dddddd;*/
+	/*background: #dddddd url("images/ui-bg_highlight-soft_50_dddddd_1x100.png") 50% 50% repeat-x;*/
+	/* custom define */
+	border: 1px solid #35b5eb;
+	background: #35b5eb;
 	color: #444444;
 	font-weight: bold;
 }
@@ -928,8 +933,13 @@ body .ui-tooltip {
 works properly when clicked or hovered */
 html .ui-button.ui-state-disabled:hover,
 html .ui-button.ui-state-disabled:active {
-	border: 1px solid #dddddd;
-	background: #f6f6f6 url("images/ui-bg_highlight-soft_100_f6f6f6_1x100.png") 50% 50% repeat-x;
+	/*border: 1px solid #dddddd;
+	background: #f6f6f6 url("images/ui-bg_highlight-soft_100_f6f6f6_1x100.png") 50% 50% repeat-x;*/
+
+	/* custom define */
+	border: 1px solid #35b5eb;
+	background: #35b5eb;
+
 	font-weight: bold;
 	color: #0073ea;
 }

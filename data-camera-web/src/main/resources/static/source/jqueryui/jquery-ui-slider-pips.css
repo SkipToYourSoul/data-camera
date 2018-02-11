@@ -309,7 +309,9 @@
 
 .ui-slider-pips [class*=ui-slider-pip-selected] {
     font-weight: bold;
-    color: #FF7A00;
+    /*color: #FF7A00;*/
+
+    color: #35b5eb;
 }
 
 .ui-slider-pips .ui-slider-pip-inrange {
@@ -317,7 +319,9 @@
 }
 
 .ui-slider-pips .ui-slider-pip-selected-2 {
-    color: #E70081;
+    /*color: #E70081;*/
+
+    color: #35b5eb;
 }
 
 .ui-slider-pips [class*=ui-slider-pip-selected] .ui-slider-line,
