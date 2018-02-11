@@ -106,3 +106,33 @@ body {
     line-height: 53px;
     clear: both;
 }
+
+.search-label{
+	margin-left:30px;
+	height:50px;
+	line-height:60px
+}
+
+.search-input{
+	line-height:35px;
+	height:35px;
+	background-color:#e1e2e9;
+	border:none;
+ 	padding:10px;
+ 	font-size:12px;
+ 	font-weight:1;
+}
+
+.search-icon{
+	line-height:35px;
+	height:35px;
+	background-color:#e1e2e9;
+	padding-right:10px;
+	color:#35b5eb;
+}
+
+/* 按钮系列 */
+.btn-blue{
+	color:#fff;
+	background-color:#35b5eb
+}

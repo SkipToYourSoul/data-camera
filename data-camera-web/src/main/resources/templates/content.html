@@ -53,13 +53,13 @@ body {
 					<div class="tab-content">
 						<div id="my-share" role="tabpanel" class="tab-pane active in fade">
 							<div class="share-view">
-								<div class="row">
+								<div class="row" >
 									<th:block th:each="content,index:${userContent}">
 										<div class="col-sm-12 col-md-12 col-xs-12">
-											<div class="share-view-container row">
+											<div class="share-view-container row" style="padding:20px 30px">
 												<div class="share-view-photo col-md-2">
 													<img th:src="${content.img}?${content.img}:'img/logo.png'"
-														class="share-img img-rounded" />
+														class="share-img" />
 												</div>
 												<div class="col-md-10">
 													<div class="share-view-title">

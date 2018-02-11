@@ -40,10 +40,10 @@
 	<div id="app-loading"></div>
 	<div class="navbar-wrapper" th:include="module/common::nav"></div>
 	<div>
-		<div class="container-fluid" style="width: 90%; margin-left: 10%">
-			<div class="row" style="margin-top: 10px;">
+		<div>
+			<div style="margin-top: 10px;">
 				<!-- 左侧sidebar -->
-				<div class="col-sm-3 col-md-2 col-xs-3">
+				<div class="col-sm-3 col-md-3 col-xs-3" style="padding: 0">
 					<div class="sidebar-content">
 						<!-- 管理页面图片 -->
 						<!-- <img th:if="!${param.id}" th:src="@{/img/index/nav11.png}" class="img-responsive" alt=""/> -->
@@ -95,39 +95,44 @@
 						<div class="sidebar-menu" id="app-menu">
 							<ul class="nav main-menu">
 								<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><i
-										class="glyphicon glyphicon-home"></i>&nbsp; 场景管理页面</a></li>
+										class="glyphicon glyphicon-home"></i>&nbsp; 我的场景</a></li>
 							</ul>
 							<div class="btn"
 								style="background-color: #36b5eb; width: 95%; color: #fff; margin-left: 3%; text-align: left">
-								<i class="fa fa-bars"></i>场景列表
+								<i class="fa fa-bars"></i>场景列表<i
+									class="fa fa-angle-down pull-right"></i>
 							</div>
 							<ul class="nav" style="padding-left: 10px">
 								<th:block th:each="entry,index:${apps}">
 									<li
-										th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
-										<!-- 	<i class="fa fa-genderless col-md-1"></i> --> <a
+										th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''"><a
 										th:text="${entry.value.name}"
 										th:href="@{/app(id=${entry.key})}"
-										th:class="|app-${index.count}|"></a>
-									</li>
+										th:class="|app-${index.count}|"></a></li>
 								</th:block>
 							</ul>
 						</div>
 
 						<!-- 片段列表 -->
-						<div class="sidebar-menu2" id="content-menu" th:if="${param.id}" hidden="hidden">
-							<div class="menu-title">我的场景</div>
+						<div class="sidebar-menu2" id="content-menu" th:if="${param.id}"
+							hidden="hidden">
+							<div class="main-menu">
+								<i class="glyphicon glyphicon-home"></i>&nbsp;场景管理页面
+							</div>
 							<th:block th:each="entry,index:${apps}">
-								<div class="row" style="padding: 5px 0 0 0">
-									<div class="col-sm-2" style="padding-top: 5px">
-										<a role="button" data-toggle="collapse"
-											th:href="|#recorder-${index.count}|" aria-expanded="true"
-											style="color: #000000;"> <i
+								<div class="row" style="padding: 5px 0 0 0;">
+									<div class="col-sm-2 btn" style="padding-top: 5px;">
+										<a role="button"
+											style="width: 95%; color: #fff; margin-left: 3%; text-align: left"
+											data-toggle="collapse" th:href="|#recorder-${index.count}|"
+											aria-expanded="true"> <i
 											th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-caret-square-o-down':'fa fa-caret-square-o-right'"></i>
 										</a>
 									</div>
 									<div class="col-sm-10" style="padding: 0 10px 0 0">
-										<a type="button" class="btn menu-btn btn-block"
+										<a type="button"
+											style="background-color: #36b5eb; color: #fff; text-align: left; border: none"
+											class="btn menu-btn btn-block"
 											th:href="@{/app(id=${entry.key},tab=2)}"
 											th:text="${entry.value.name}"></a>
 									</div>
@@ -159,45 +164,43 @@
 					</div>
 				</div>
 
-				<div class="col-sm-9 col-md-9 col-xs-9">
-					<div>
-						<div th:if="!${param.id}" id="app-management">
-							<!-- <img th:src="@{/img/quickstart.jpg}" alt="xxx1" />-->
-							<div
-								style="background-image: url(img/quickstart.jpg); width: 100%; min-height: 700px"></div>
-							<div
-								style="min-height: 170px; width: 100%; background-image: url('img/app-bottom.png');">
-								<div>
-									<div
-										style="padding-top: 30px; padding-left: 110px; color: #fff; font-size: 24px">优秀案例</div>
-									<div
-										style="margin-top: 10px; padding-left: 110px; color: #fff; font-size: 14px">小字描述优秀案例的内容做简要概括</div>
-									<div style="margin-top: 10px; padding-left: 110px;">
-										<button class="btn"
-											style="background-color: #fff; color: #36b5eb;">点击查看</button>
-									</div>
+				<div class="col-sm-9 col-md-9 col-xs-9" style="padding: 0">
+					<div th:if="!${param.id}" id="app-management">
+						<!-- <img th:src="@{/img/quickstart.jpg}" alt="xxx1" />-->
+						<div
+							style="background-image: url(img/quickstart.jpg); width: 100%; min-height: 700px"></div>
+						<div
+							style="min-height: 170px; width: 100%; background-image: url('img/app-bottom.png');">
+							<div>
+								<div
+									style="padding-top: 30px; padding-left: 110px; color: #fff; font-size: 24px">优秀案例</div>
+								<div
+									style="margin-top: 10px; padding-left: 110px; color: #fff; font-size: 14px">小字描述优秀案例的内容做简要概括</div>
+								<div style="margin-top: 10px; padding-left: 110px;">
+									<button class="btn"
+										style="background-color: #fff; color: #36b5eb;">点击查看</button>
 								</div>
 							</div>
 						</div>
-						<div th:if="${param.id}"
-							style="background-color: #fff; min-height: 500px; padding: 20px 20px">
-							<ul class="nav nav-pills" role="tablist" id="app-main-tab">
-								<li role="presentation" class="active"
-									style="border-right: 2px solid #000; padding-right: 15px"><a
-									href="#app-experiment" aria-controls="app-experiment"
-									role="tab" data-toggle="tab">试验模式</a></li>
-								<li role="presentation" class=""><a href="#app-analysis"
-									aria-controls="app-analysis" role="tab" data-toggle="tab"
-									style="padding-left: 25px">分析模式</a></li>
-							</ul>
-							<div class="tab-content">
-								<div th:include="app/app-experiment::app-experiment"
-									id="app-experiment" role="tabpanel"
-									class="tab-pane active in fade app-tab-pane-content"></div>
-								<div th:include="app/app-analysis::app-analysis"
-									id="app-analysis" role="tabpanel"
-									class="tab-pane fade app-tab-pane-content"></div>
-							</div>
+					</div>
+					<div th:if="${param.id}"
+						style="background-color: #fff; min-height: 500px; padding: 20px 0">
+						<ul class="nav nav-pills" role="tablist" id="app-main-tab">
+							<li role="presentation" class="active"
+								style="border-right: 2px solid #000; padding-right: 15px"><a
+								href="#app-experiment" aria-controls="app-experiment" role="tab"
+								data-toggle="tab">试验模式</a></li>
+							<li role="presentation" class=""><a href="#app-analysis"
+								aria-controls="app-analysis" role="tab" data-toggle="tab"
+								style="padding-left: 25px">分析模式</a></li>
+						</ul>
+						<div class="tab-content">
+							<div th:include="app/app-experiment::app-experiment"
+								id="app-experiment" role="tabpanel"
+								class="tab-pane active in fade app-tab-pane-content"></div>
+							<div th:include="app/app-analysis::app-analysis"
+								id="app-analysis" role="tabpanel"
+								class="tab-pane fade app-tab-pane-content"></div>
 						</div>
 					</div>
 				</div>
