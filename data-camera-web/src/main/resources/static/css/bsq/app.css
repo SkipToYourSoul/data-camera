@@ -110,7 +110,6 @@ body {
 
 .sidebar-menu ul li { /* 
     border-bottom: 1px solid #f0f4f7; */
-	
 }
 
 .sidebar-menu ul li:last-child {
@@ -143,6 +142,14 @@ body {
 	/* 	margin-left: -5px */
 	border-bottom: none;
 	color: #35b5eb
+}
+
+.sidebar-menu ul li div:hover {
+	color: #68c8f0;
+}
+
+.sidebar-menu ul li.active div {
+	color: #68c8f0;
 }
 
 .sidebar-menu2 {
@@ -284,6 +291,7 @@ body {
 .app-analysis-chart-dom .chart-dom .my-panel {
 	border-radius: 0;
 	margin-bottom: 0;
+	border: 0;
 }
 
 .app-analysis-chart-dom .chart-dom .my-panel-heading {
@@ -459,9 +467,9 @@ body {
 /* 覆盖nav-pill样式 */
 .nav-pills>li>a {
 	color: #000;
-	font-weight: 600px;
-	padding-top: 0px;
-	padding-bottom: 0px;
+	font-weight: 600;
+	padding-top: 0;
+	padding-bottom: 0;
 	font-size: 18px;
 }
 
@@ -515,7 +523,7 @@ body {
 	padding-left: 33px;
 }
 
-.my-panel-head: {
+.my-panel-head {
 	background-color: #fff;
 }
 

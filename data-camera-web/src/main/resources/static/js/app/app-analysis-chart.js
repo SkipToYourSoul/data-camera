@@ -242,8 +242,8 @@ function initRecorderContentDom(recorderId){
  */
 function generate(panelId, title, contentId) {
     return '<div class="panel panel-default my-panel">' +
-        '<div class="my-panel-heading">' +
-        '<div class="panel-title">' +
+        '<div class="my-panel-head">' +
+        '<div class="panel-title my-panel-title">' +
         '<a role="button" data-toggle="collapse" href="#' + panelId + '" aria-expanded="true"><i class="fa fa-arrows-v"></i>&nbsp; ' + title + '</a>' +
         '</div></div>' +
         '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
