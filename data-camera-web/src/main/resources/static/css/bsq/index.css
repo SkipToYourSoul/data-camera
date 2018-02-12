@@ -1,26 +1,31 @@
-.main-text{
-	position:absolute;
-	top:230px;
-	left:30%;
-	right:30%;
-	z-index:201;
-	text-align:center;
+.main-text {
+	position: absolute;
+	top: 230px;
+	left: 30%;
+	right: 30%;
+	z-index: 201;
+	text-align: center;
 }
 
-.btn-main{
-	background-color:#35b5eb;
-	color:#fff;
+.btn-main {
+	background-color: #35b5eb;
+	color: #fff;
 }
 
-.sub-title{
-	width:30%;
-	margin-left:35%;
-	font-size:12px;
+.sub-title {
+	width: 30%;
+	margin-left: 35%;
+	font-size: 12px;
 }
 
-.index-point{
-	background-color:#35b5eb;
-	width:10px;
-	height:10px;
-	border-radius:50%;
+.index-point {
+	background-color: #35b5eb;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+
+.nav-title {
+	color: #35b5eb;
+	margin-top: 20px
 }

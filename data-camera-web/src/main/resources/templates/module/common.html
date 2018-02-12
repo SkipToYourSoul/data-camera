@@ -6,30 +6,35 @@
 		th:class="${inIndex}?'navbar navbar-default':'navbar navbar-default navbar-fixed-top'"
 		style="padding: 10px 0px 10px 0px;">
 		<!-- navbar header -->
-		<div class="navbar-header" style="margin-left: 10%">
-			<button type="button" class="navbar-toggle collapsed"
-				data-toggle="collapse" data-target="#navbar" aria-expanded="false"
-				aria-controls="navbar">
-				<span class="sr-only">Toggle navigation</span> <span
-					class="icon-bar"></span> <span class="icon-bar"></span> <span
-					class="icon-bar"></span>
-			</button>
-			<a class="pull-left"><img class="navbar-logo-img"
-				th:src="@{img/logo.png}" /></a>
+		<div
+			class="col-sm-6 col-md-6 col-xs-6 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="pull-left"><img class="navbar-logo-img"
+					th:src="@{img/logo.png}" /></a>
+			</div>
+
+			<div id="navbar" class="navbar-collapse collapse">
+				<th:block th:if="!${inIndex}">
+					<!-- nav bar -->
+					<ul class="nav navbar-nav" style="margin-left: 20px">
+						<li><a th:href="@{/index}">首页</a></li>
+						<li th:class="${inApp}?'active':''"><a th:href="@{/app}">场景</a></li>
+						<li th:class="${inDevice}?'active':''"><a
+							th:href="@{/device}">设备</a></li>
+						<li th:class="${inContent}?'active':''"><a
+							th:href="@{/content}">内容</a></li>
+					</ul>
+				</th:block>
+			</div>
 		</div>
-
-		<div id="navbar" class="navbar-collapse collapse">
-			<th:block th:if="!${inIndex}">
-				<!-- nav bar -->
-				<ul class="nav navbar-nav" style="margin-left: 20px">
-					<li><a th:href="@{/index}">首页</a></li>
-					<li th:class="${inApp}?'active':''"><a th:href="@{/app}">场景</a></li>
-					<li th:class="${inDevice}?'active':''"><a th:href="@{/device}">设备</a></li>
-					<li th:class="${inContent}?'active':''"><a
-						th:href="@{/content}">内容</a></li>
-				</ul>
-			</th:block>
-
+		<div class="col-sm-5 col-md-5 col-xs-5">
 			<!-- login user control -->
 			<div sec:authorize="isAuthenticated()">
 				<ul class="nav navbar-nav pull-right navbar-login-ul">
@@ -42,15 +47,16 @@
 				</ul>
 			</div>
 			<div sec:authorize="!isAuthenticated()">
-				<ul class="nav navbar-nav navbar-login-ul" style="margin-left: 35%">
+				<ul class="nav navbar-nav navbar-login-ul">
 					<li th:if="${inIndex}"><a th:href="@{/login}">联系我们</a></li>
 					<li><a th:href="@{/login}">登录</a></li>
 					<li th:if="${inIndex}"><a href="#">&nbsp; 注册</a></li>
- 					<li><label class="search-label"><input class="search-input" placeholder="搜索热门场景" /><i class="fa fa-search search-icon"></i></label></li>
+					<li><label class="search-label"><input
+							class="search-input" placeholder="搜索热门场景" /><i
+							class="fa fa-search search-icon"></i></label></li>
 				</ul>
 			</div>
 		</div>
-
 	</nav>
 </div>
 
