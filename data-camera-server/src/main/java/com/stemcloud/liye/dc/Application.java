@@ -18,14 +18,14 @@ import java.sql.SQLException;
  */
 public class Application {
     public static void main(String[] args) throws InterruptedException, SQLException {
-//        System.out.println("Init resources");
-//        GlobalVariables.sensorConfigMap = MysqlRepository.loadSensorConfigMap();
-//
-//        System.out.println("Init scheduler");
-//        QuartzManager.addJob("test", SensorMonitorJob.class, 5);
-//
-//        System.out.println("Init random generator");
-//        new RandomGenerator().allSensor();
-        Server._default().start();
+        System.out.println("Init resources");
+        GlobalVariables.sensorConfigMap = MysqlRepository.loadSensorConfigMap();
+
+        System.out.println("Init scheduler");
+        QuartzManager.addJob("test", SensorMonitorJob.class, 5);
+
+        System.out.println("Init random generator");
+        new RandomGenerator().allSensor();
+        // Server._default().start();
     }
 }
