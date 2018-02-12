@@ -136,3 +136,29 @@ body {
 	color:#fff;
 	background-color:#35b5eb
 }
+
+.btn-pink{
+	background-color: #fc4a6c; 
+	color: #fff
+}
+
+.btn-pink1{
+	color: #fff;
+	background-color: #fc4b6c;
+}
+
+.btn-blue1{
+	background-color: #26c6db;
+	color: #fff;
+}
+
+.btn-square{
+	background-color: #35b5eb;
+	width: 50px; height: 50px; 
+	color: #fff; 
+	border: 0px solid #fff;
+}
+
+.btn-white{
+	color:#36b5eb;
+}
