@@ -136,7 +136,7 @@ public class DataService {
      * @param start 数据截取起点
      * @param end 数据截取终点
      */
-    public Long generateUserContent(long recorderId, String start, String end) throws ParseException {
+    public Long generateUserContent(long recorderId, String start, String end, String name, String desc) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         RecorderInfo recorder = recorderRepository.findOne(recorderId);
@@ -144,8 +144,8 @@ public class DataService {
 
         // 保存新的实验记录
         RecorderInfo newRecorder = new RecorderInfo();
-        newRecorder.setName("来自片段{" + recorder.getName() + "}");
-        newRecorder.setDescription("子片段描述");
+        newRecorder.setName(name);
+        newRecorder.setDescription(desc);
         newRecorder.setStartTime(sdf.parse(start));
         newRecorder.setEndTime(sdf.parse(end));
         newRecorder.setExpId(recorder.getExpId());

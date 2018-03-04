@@ -258,11 +258,11 @@ var analysisObject = (function () {
         video[key] = value;
     };
 
-    // -- 当前片段的时间轴数据
+    // -- 当前片段的时间轴数据，如：2018-03-04 00:00:00
     var timeline = [];
     var timelineStart, timelineEnd;
 
-    // -- 当前片段的时间秒数数据
+    // -- 当前片段的时间秒数数据，如：00:00
     var secondLine = [];
 
     // -- node 数据

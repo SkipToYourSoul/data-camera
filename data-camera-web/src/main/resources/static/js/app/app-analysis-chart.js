@@ -83,37 +83,7 @@ function initRecorderContentDom(recorderId){
         }).slider("float", {
             labels: analysisObject.secondLine
         }).on("slidechange", function(e,ui) {
-            $('#recorder-current-time').html(analysisObject.secondLine[ui.values[0]]);
-            $('#recorder-total-time').html(analysisObject.secondLine[ui.values[1]]);
-            if (recorderInterval != null){
-                // 正在回放数据，不进行高亮片段更新，进行标记线更新
-                var line = [{
-                    xAxis: analysisObject.timeline[ui.values[0]]
-                }];
-                Object.keys(analysisObject.chart).forEach(function (i) {
-                    var series = analysisObject.chart[i].getOption()['series'];
-                    series[0]['markLine']['data'] = line;
-                    analysisObject.chart[i].setOption({
-                        series: series
-                    });
-                });
-            } else {
-                // 正常状态，进行标记区域更新
-                analysisObject.timelineStart = ui.values[0];
-                analysisObject.timelineEnd = ui.values[1];
-                var mark = [[{
-                    xAxis: analysisObject.timeline[analysisObject.timelineStart]
-                }, {
-                    xAxis: analysisObject.timeline[analysisObject.timelineEnd]
-                }]];
-                Object.keys(analysisObject.chart).forEach(function (i) {
-                    var series = analysisObject.chart[i].getOption()['series'];
-                    series[0]['markArea']['data'] = mark;
-                    analysisObject.chart[i].setOption({
-                        series: series
-                    });
-                });
-            }
+            slideChange(e, ui);
         });
         
         // chart
@@ -199,7 +169,7 @@ function initRecorderContentDom(recorderId){
             var videoOption = videoData[vSensorId]['option'];
             var videoId = 'video-' + vSensorId;
             var videoDomId = 'video-dom-' + vSensorId;
-            $dom2.append(generate(videoDomId + '-' + (vCount++), "video from sensor " + vSensorId, videoDomId));
+            $dom2.append(generate(videoDomId + '-' + (vCount++), "视频", videoDomId));
 
             if (videoOption['sources'] != null){
                 $('#' + videoDomId).append('<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video>');

@@ -37,7 +37,8 @@ public class Video {
         private List<Map> sources;
         private List<String> techOrder;
         private String preload = "auto";
-        private boolean controls = true;
+        private boolean controls = false;
+        private boolean loop = false;
 
         private VideoConfig(String poster, final String src){
             if (poster != null) {

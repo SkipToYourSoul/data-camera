@@ -319,14 +319,15 @@ body {
 .app-analysis-chart-dom .video-dom .my-panel {
 	border-radius: 0;
 	margin-bottom: 0;
+	border: 0;
 }
 
 .app-analysis-chart-dom .video-dom .my-panel-heading {
 	padding: 5px 15px;
 	color: #333;
 	background-color: #f5f5f5;
-	border-color: #ddd;
-	border-bottom: 1px solid transparent;
+	/*border-color: #ddd;
+	border-bottom: 1px solid transparent;*/
 }
 
 .app-analysis-info-dom {

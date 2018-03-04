@@ -14,6 +14,12 @@ function recorderPlay() {
     recorderInterval = setInterval(recorderAction, interval);
     $('#play-btn').attr('disabled', 'disabled');
     $('#pause-btn').removeAttr('disabled');
+
+    // 播放视频
+    Object.keys(analysisObject.video).forEach(function (i) {
+        var video = analysisObject.video[i];
+        video.play();
+    });
 }
 
 function recorderAction(){
@@ -66,6 +72,12 @@ function recorderPause() {
     clearInterval(recorderInterval);
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
+
+    // 暂停视频
+    Object.keys(analysisObject.video).forEach(function (i) {
+        var video = analysisObject.video[i];
+        video.pause();
+    });
 }
 
 function recorderReset() {
@@ -93,6 +105,55 @@ function recorderReset() {
     }
     // 隐藏时间标记
     $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
+
+    // 重置视频
+    Object.keys(analysisObject.video).forEach(function (i) {
+        var video = analysisObject.video[i];
+        video.pause();
+        video.currentTime(0);
+    });
+}
+
+function slideChange(e, ui) {
+    // 时间轴标注
+    $('#recorder-current-time').html(analysisObject.secondLine[ui.values[0]]);
+    $('#recorder-total-time').html(analysisObject.secondLine[ui.values[1]]);
+
+    // 图表状态
+    if (recorderInterval != null){
+        // 正在回放数据，不进行高亮片段更新，进行标记线更新
+        var line = [{
+            xAxis: analysisObject.timeline[ui.values[0]]
+        }];
+        Object.keys(analysisObject.chart).forEach(function (i) {
+            var series = analysisObject.chart[i].getOption()['series'];
+            series[0]['markLine']['data'] = line;
+            analysisObject.chart[i].setOption({
+                series: series
+            });
+        });
+    } else {
+        // 正常状态，进行标记区域更新
+        analysisObject.timelineStart = ui.values[0];
+        analysisObject.timelineEnd = ui.values[1];
+        var mark = [[{
+            xAxis: analysisObject.timeline[analysisObject.timelineStart]
+        }, {
+            xAxis: analysisObject.timeline[analysisObject.timelineEnd]
+        }]];
+        Object.keys(analysisObject.chart).forEach(function (i) {
+            var series = analysisObject.chart[i].getOption()['series'];
+            series[0]['markArea']['data'] = mark;
+            analysisObject.chart[i].setOption({
+                series: series
+            });
+        });
+        // 视频时间调整
+        Object.keys(analysisObject.video).forEach(function (i) {
+            var video = analysisObject.video[i];
+            video.currentTime(ui.values[0]);
+        });
+    }
 }
 
 $('#recorder-speed').find('input:radio').change(function(radio){
@@ -102,6 +163,12 @@ $('#recorder-speed').find('input:radio').change(function(radio){
         clearInterval(recorderInterval);
         recorderInterval = setInterval(recorderAction, interval);
     }
+
+    // 调整视频速度
+    Object.keys(analysisObject.video).forEach(function (i) {
+        var video = analysisObject.video[i];
+        video.playbackRate(parseInt(speed));
+    });
 });
 
 
@@ -145,12 +212,13 @@ function deleteContent() {
  * 生成用户自定义的数据片段
  */
 function generateNewContent() {
-    var dialog_message = '<p>数据起始时间：' + analysisObject.timeline[analysisObject.timelineStart] + '</p>';
-    dialog_message += '<p>数据结束时间：' + analysisObject.timeline[analysisObject.timelineEnd] + '</p>';
+    var dialogMessage = '<label>片段时间</label><p>' + analysisObject.timeline[analysisObject.timelineStart] + ' - ' + analysisObject.timeline[analysisObject.timelineEnd] + '</p>';
+    dialogMessage += '<label>片段名</label><input type="text" class="form-control" id="user-new-recorder-name"/>';
+    dialogMessage += '<label>片段描述</label><input type="text" class="form-control" id="user-new-recorder-desc"/>';
 
     var dialog = bootbox.dialog({
         title: '即将生成新的数据片段，记录如下',
-        message: dialog_message,
+        message: dialogMessage,
         buttons: {
             cancel: {
                 label: '<i class="fa fa-times"></i>取消',
@@ -160,6 +228,12 @@ function generateNewContent() {
                 label: '<i class="fa fa-check"></i>确认生成',
                 className: 'btn-info',
                 callback: function(){
+                    var name = $('#user-new-recorder-name').val();
+                    var desc = $('#user-new-recorder-desc').val();
+                    if (name.length == 0){
+                        message_info('片段名不能为空', 'info');
+                        return;
+                    }
                     message_info('内容生成中', 'info');
                     $.ajax({
                         type: 'get',
@@ -167,13 +241,15 @@ function generateNewContent() {
                         data: {
                             "recorder-id": analysisObject.currentRecorderId,
                             "start": analysisObject.timeline[analysisObject.timelineStart],
-                            "end": analysisObject.timeline[analysisObject.timelineEnd]
+                            "end": analysisObject.timeline[analysisObject.timelineEnd],
+                            "name": name,
+                            "desc": desc
                         },
                         success: function (response) {
                             if (response.code == "1111"){
                                 message_info('操作无效: ' + response.data, "error");
                             } else if (response.code == "0000"){
-                                window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
+                                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
                             }
                         },
                         error: function (response) {
