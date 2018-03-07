@@ -119,6 +119,19 @@ function getQueryString(name) {
     return null;
 }
 
+/**
+ * 新增浏览器窗口大小监控事件、调整echarts图表大小
+ * @param charts
+ */
+function onChartResize(charts) {
+    Object.keys(charts).forEach(function (id) {
+        if (echarts.getInstanceByDom(document.getElementById(id)) != null){
+            var chart = charts[id];
+            chart.resize();
+        }
+    })
+}
+
 // --- APP PAGE
 function inAppPage(){
     var $loader = $("#app-loading");

@@ -8,15 +8,19 @@
 
 // -- 入口函数，初始化数据图表以及视频
 function initRecorderContentDom(recorderId){
-    console.info("Request recorder: " + recorderId);
+    // 清空之前可能存在的轮询
+    if (recorderInterval != null){
+        clearInterval(recorderInterval);
+    }
+
+    // 找出当前片段并填写片段描述
+    console.info("请求数据片段: ", recorderId);
     var recorder = findRecorderInfo(recorderId);
     if (recorder == null){
-        console.log("Null data recorder");
+        console.log("请求数据片段失败");
         window.location.href = current_address + "?id=" + app['id'] + "&tab=2";
         return;
     }
-
-    // 获取数据片段描述
     var $appAnalysisDesc = $('#app-analysis-desc');
     $appAnalysisDesc.val(recorder['description']);
 
@@ -53,7 +57,7 @@ function initRecorderContentDom(recorderId){
             $('.app-analysis-info-dom').attr("hidden", true);
         }
 
-        // timeline
+        // 初始化timeline
         analysisObject.timeline = generateTimeList(minTime, maxTime);
         analysisObject.timelineStart = 0; analysisObject.timelineEnd = analysisObject.timeline.length - 1;
         analysisObject.secondLine = generateSecondList(minTime, maxTime);
@@ -86,7 +90,7 @@ function initRecorderContentDom(recorderId){
             slideChange(e, ui);
         });
         
-        // chart
+        // 初始化chart
         var $dom = $('#app-analysis-chart');
         $dom.empty();
         Object.keys(chartData).forEach(function (sensorId) {
@@ -95,14 +99,9 @@ function initRecorderContentDom(recorderId){
             Object.keys(data).forEach(function (legend) {
                 var chartId = "chart-" + recorderId + '-' + sensorId + '-' + legend;
                 $dom.append(generate(sensorId +'-'+new Date().getTime(), legend, chartId));
-                chartWidth = $('#' + chartId).width();
-            });
-            Object.keys(data).forEach(function (legend) {
-                var chartId = "chart-" + recorderId + '-' + sensorId + '-' + legend;
                 if (echarts.getInstanceByDom(document.getElementById(chartId)) == null){
                     var chart = echarts.init(document.getElementById(chartId), "", opts = {
-                        height: 100,
-                        width: chartWidth
+                        height: 100
                     });
                     chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
                     chart.on('dblclick', function (params) {
@@ -150,22 +149,24 @@ function initRecorderContentDom(recorderId){
                 }
             });
         });
+        // 为chart添加resize监听(echarts初始化width若写死，则无法resize)
+        onChartResize(analysisObject.chart);
+        $(window).resize(function() {
+            onChartResize(analysisObject.chart);
+        });
         
-        // video
+        // 初始化video
         var $dom2 = $('#app-analysis-video');
         // -- clear dom content
-        for (var domId in analysisObject.video){
-            videojs(domId).dispose();
-            console.log("Dispose video " + domId);
-            delete analysisObject.video[domId];
-        }
+        Object.keys(analysisObject.video).forEach(function (id) {
+            videojs(id).dispose();
+            delete analysisObject.video[id];
+            console.log("Dispose video ", id);
+        });
         $dom2.empty();
         var vCount = 0;
         // -- generate new content
-        for (var vSensorId in videoData){
-            if (!videoData.hasOwnProperty(vSensorId)){
-                continue;
-            }
+        Object.keys(videoData).forEach(function (vSensorId) {
             var videoOption = videoData[vSensorId]['option'];
             var videoId = 'video-' + vSensorId;
             var videoDomId = 'video-dom-' + vSensorId;
@@ -177,14 +178,13 @@ function initRecorderContentDom(recorderId){
                     videojs.log('The video player ' + videoId + ' is ready');
                     analysisObject.setVideo(videoId, this);
                 });
-
             } else {
                 var progressBar = '<div class="progress">' +
                     '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">' +
                     '<span class="sr-only">45% Complete</span></div></div>';
                 $('#' + videoDomId).append('<div id=' + videoId + '> <p class="text-center">视频来自设备(编号：' + vSensorId + ')，上传中</p>' + progressBar + '</div>');
             }
-        }
+        });
     }
 
     /**
