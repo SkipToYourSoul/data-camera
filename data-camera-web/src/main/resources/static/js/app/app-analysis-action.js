@@ -28,7 +28,9 @@ function recorderAction(){
         recorderReset();
     }
 
+    // 每次轮询更新时间轴以及图表
     function setTimeLine(start, end){
+        // 更新时间轴
         $(".slider")
             .slider({values: [start, end]})
             .slider("pips", "refresh")
@@ -41,21 +43,20 @@ function recorderAction(){
         Object.keys(analysisObject.chart).forEach(function (i) {
             var series = analysisObject.chart[i].getOption()['series'];
             var chartData = analysisObject.getChartData()[i];
-            series[0]['data'] = getNewChartData(chartData);
+            var currentChartData = series[0]['data'];
+            series[0]['data'] = getNewChartData(chartData, currentChartData);
             series[0]['markArea']['data'] = [];
             analysisObject.chart[i].setOption({
                 series: series
             });
         });
 
-        function getNewChartData(d){
+        function getNewChartData(d, cd){
             var n = [];
-            // find point
-            var point = 0;
-            for (var j=0; j<d.length; j++){
+            var startPoint = (cd.length == d.length)?0:cd.length - 1;
+            for (var j=startPoint; j<d.length; j++){
                 if (d[j]['value'][0] > analysisObject.timeline[start] + '.000'){
-                    point = j;
-                    n = d.slice(0, point);
+                    n = d.slice(0, j);
                     n.push(d[d.length - 1]);
                     if (n[n.length - 1]['value'].length == 2){
                         n[n.length - 1]['value'].pop();
@@ -90,7 +91,7 @@ function recorderReset() {
         .slider("pips", "refresh")
         .slider("float", "refresh");
     // 重置chart数据
-    for (var i in analysisObject.chart){
+    Object.keys(analysisObject.chart).forEach(function (i) {
         var series = analysisObject.chart[i].getOption()['series'];
         series[0]['data'] = analysisObject.getChartData()[i];
         series[0]['markArea']['data'] = [[{
@@ -102,7 +103,7 @@ function recorderReset() {
         analysisObject.chart[i].setOption({
             series: series
         });
-    }
+    });
     // 隐藏时间标记
     $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
 
@@ -213,7 +214,7 @@ function deleteContent() {
  */
 function generateNewContent() {
     var dialogMessage = '<label>片段时间</label><p>' + analysisObject.timeline[analysisObject.timelineStart] + ' - ' + analysisObject.timeline[analysisObject.timelineEnd] + '</p>';
-    dialogMessage += '<label>片段名</label><input type="text" class="form-control" id="user-new-recorder-name"/>';
+    dialogMessage += '<label>片段名</label><input type="text" class="form-control" id="user-new-recorder-name" placeholder="长度不超过10"/>';
     dialogMessage += '<label>片段描述</label><input type="text" class="form-control" id="user-new-recorder-desc"/>';
 
     var dialog = bootbox.dialog({
@@ -231,8 +232,7 @@ function generateNewContent() {
                     var name = $('#user-new-recorder-name').val();
                     var desc = $('#user-new-recorder-desc').val();
                     if (name.length == 0){
-                        message_info('片段名不能为空', 'info');
-                        return;
+                        name = "新片段";
                     }
                     message_info('内容生成中', 'info');
                     $.ajax({

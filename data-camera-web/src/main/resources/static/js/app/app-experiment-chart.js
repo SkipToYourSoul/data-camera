@@ -5,13 +5,12 @@
  *      初始化实验页面
  */
 
-function initExperiment(){
-    // 判断加载状态
-    if (appObject.iFe == false){
-        console.log("Not the first time in experiment");
+function initExperiment(iFi){
+    if (iFi == false) {
+        // 不是第一次加载
         return;
     } else {
-        appObject.iFe = false;
+        expObject.iFi = false;
     }
 
     // -- 初始化实验轨迹、传感器绑定信息
@@ -33,6 +32,7 @@ function initExperiment(){
                     var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
                     var chart = echarts.init(document.getElementById(chart_dom), "", opts = {height: 150});
                     chart.setOption(buildExperimentChartOption(legend));
+                    expObject.setChart(chart_dom, chart);
                 });
             } else if (track_type == 2){
 
@@ -96,6 +96,11 @@ function initExperiment(){
                 }
             });
         });
+    });
+
+    // 为chart添加resize监听
+    $(window).resize(function() {
+        onChartResize(expObject.chart);
     });
 
     // -- 初始化实验监控和录制状态

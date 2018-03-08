@@ -7,15 +7,14 @@
  */
 
 // -- 入口函数，初始化树形图
-function initTreeDom(){
-    // 判断加载状态
-    if (appObject.iFa == false){
-        console.log("Not the first time in analysis");
+function initTreeDom(iFi){
+    if (iFi == false) {
+        // 不是第一次加载
         return;
     } else {
-        appObject.iFa = false;
+        analysisObject.iFi = false;
     }
-    
+
     if (!recorders.hasOwnProperty(app['id'])){
         console.log("Empty data recorders in this app.");
         return;
@@ -27,10 +26,7 @@ function initTreeDom(){
         { selectionChanged: nodeSelectionChanged },  // this event handler is defined below
         $go(go.Panel, "Auto",
             $go(go.Shape, "RoundedRectangle", { fill: "#35b5eb", stroke: null }),
-            $go(go.TextBlock,
-                { font: "bold 14px Helvetica, bold Arial, sans-serif",
-                    stroke: "white", margin: 10 },
-                new go.Binding("text", "name"))
+            $go(go.TextBlock, { font: "bold 14px Microsoft YaHei, 微软雅黑, Microsoft YaHei, Hiragino Sans GB, sans-serif", stroke: "white", margin: 10 }, new go.Binding("text", "name"))
         ),
         $go("TreeExpanderButton")
     );
@@ -106,7 +102,6 @@ function findParent(id) {
 function nodeSelectionChanged(node) {
     if (node.isSelected && node.data.key != analysisObject.currentRecorderId) {
         var target = findParent(node.data.key) + '';
-        console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
         showRecorderContent(target, node.data.key);
     }
 }
@@ -114,7 +109,6 @@ function nodeSelectionChanged(node) {
 // -- 边栏菜单点击事件
 $('.menu-content ul li').click(function (e) {
     var target = $(e.target).parent().attr('data');
-    console.log("Click the menu: " + target);
     showRecorderContent(target, target);
 });
 
@@ -127,32 +121,25 @@ function showRecorderContent(target, node){
     // 更新当前recorder id
     analysisObject.currentRecorderId = node;
 
-    // 只展示当前选中的树形图
-    var dom = $('.app-analysis-tree-group').find('.app-analysis-tree-dom');
-    for (var index=0; index<dom.length; index++){
-        var $dom = $(dom[index]);
-        if ($dom.attr('data') == target){
-            console.log("Show tree-dom:" + $dom.attr('data'));
-            $dom.attr("hidden", false);
-        } else {
-            // console.log("Hide tree-dom:" + $dom.attr('data'));
-            $dom.attr("hidden", true);
-        }
-    }
     // 展示数据图表
     $('.app-analysis-chart-dom').attr("hidden", false);
     initRecorderContentDom(node);
 
-    // 激活菜单
-    var menu = $('.menu-content ul li');
-    for (var index=0; index<menu.length; index++){
-        var $menu = $(menu[index]);
-        if ($menu.attr('data') == target){
-            console.log("Active li:" + $menu.attr('data'));
-            $menu.addClass('active');
+    // 只展示当前选中的树形图
+    $('.app-analysis-tree-group').find('.app-analysis-tree-dom').each(function () {
+        if ($(this).attr('data') == target){
+            $(this).attr("hidden", false);
         } else {
-            // console.log("InActive li:" + $menu.attr('data'));
-            $menu.removeClass('active');
+            $(this).attr("hidden", true);
         }
-    }
+    });
+
+    // 激活菜单
+    $('.menu-content ul li').each(function () {
+        if ($(this).attr('data') == target){
+            $(this).addClass('active');
+        } else {
+            $(this).removeClass('active');
+        }
+    });
 }
