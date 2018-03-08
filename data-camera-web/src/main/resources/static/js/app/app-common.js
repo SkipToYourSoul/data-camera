@@ -136,7 +136,7 @@ var expObject = (function (){
 })();
 
 // 初始化APP页面信息
-if (app != null) {
+if (typeof(app) != "undefined" && null != app) {
     inAppPage();
 }
 
