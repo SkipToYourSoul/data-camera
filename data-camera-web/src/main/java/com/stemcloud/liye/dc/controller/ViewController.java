@@ -215,6 +215,18 @@ public class ViewController {
         return "content";
     }
 
+    @GetMapping("/hot-content")
+    public String hotContent(Model model, HttpServletRequest request) {
+        model.addAttribute("inContent", true);
+        String currentUser = commonService.getCurrentLoginUser(request);
+        List<ContentInfo> userContent = crudService.selectUserContent(currentUser);
+        List<ContentInfo> hotContent = crudService.selectHotContent();
+
+        model.addAttribute("userContent", userContent);
+        model.addAttribute("hotContent", hotContent);
+        return "hot-content";
+    }
+
     @GetMapping("/share")
     public String shareContent(@RequestParam(value = "rid", required = false) Long rid,
                                Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {

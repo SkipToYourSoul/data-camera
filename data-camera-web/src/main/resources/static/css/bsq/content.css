@@ -144,6 +144,24 @@ body{
     background-color: #fff;
 }
 
+.content-menu{
+    padding: 20px 0;
+    background-color: #FFFFFF;
+    margin-left: -5%;
+    margin-right: -5%;
+}
+
+.content-filter {
+    height: 50px;
+    padding: 10px;
+    margin: 5px -5% 0 -5%;
+}
+
+.content-show{
+    margin-left: -5%;
+    margin-right: -5%;
+}
+
 .content-title{
 	font-size:18px;
 	color:#000;
@@ -157,6 +175,15 @@ body{
 
 .content-tag{
 	margin-top:8px;
+}
+
+.content-tag span {
+    margin-right: 5px;
+}
+
+.content-tag-style{
+    background-color: #e8e8e8;
+    color: #c0c0c0
 }
 
 .content-category{

@@ -110,14 +110,9 @@
                                                 <div class="col-md-10">
                                                     <div class="share-view-title">
                                                         <div>
-                                                            <a class="content-title"
-                                                               th:href="@{/content(id=${content.id})}"
-                                                               th:text="${content.title}"></a> <span
-                                                                class="content-owner"
-                                                                th:text="|发布作者：${content.owner}|"></span>
+                                                            <a class="content-title" th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a> <span class="content-owner" th:text="|发布作者：${content.owner}|"></span>
                                                         </div>
-                                                        <div class="content-des"
-                                                             th:text="|${content.description}|"></div>
+                                                        <div class="content-des" th:text="|${content.description}|"></div>
                                                         <div class="content-tag">
                                                             <th:block th:if="${#strings.isEmpty(content.tag)}">
                                                                 <!-- todo: 标签为空 -->
@@ -130,21 +125,15 @@
                                                                           th:text="|${'标签:'+tag}|">Default</span>
                                                             </th:block>
                                                         </div>
-                                                        <div class="content-category"
-                                                             th:text="|${content.category}|"></div>
+                                                        <div class="content-category" th:text="|${content.category}|"></div>
                                                     </div>
                                                     <div class="share-view-info">
-                                                            <span class="share-view-user"> <span
-                                                                    class="content-time"
-                                                                    th:text="${'发布时间：'+#dates.format(content.createTime, 'YYYY-mm-dd HH:mm:ss')}"></span>
-                                                            </span> <span class="pull-right"> <i
-                                                            class="fa fa-user-o content-icon"></i>&nbsp;<span
-                                                            th:text="${content.view}" class="content-num"></span> <i
-                                                            class="fa fa-commenting-o content-icon"></i>&nbsp;<span
-                                                            th:text="${content.comment}" class="content-num"></span>
-                                                                <i class="fa fa-heart-o content-icon"></i>&nbsp;<span
-                                                                th:text="${content.like}" class="content-num"></span>
-                                                            </span>
+                                                        <span class="share-view-user"> <span class="content-time" th:text="${'发布时间：'+#dates.format(content.createTime, 'YYYY-mm-dd HH:mm:ss')}"></span></span>
+                                                        <span class="pull-right">
+                                                            <i class="fa fa-user-o content-icon"></i>&nbsp;<span th:text="${content.view}" class="content-num"></span>
+                                                            <i class="fa fa-commenting-o content-icon"></i>&nbsp;<span th:text="${content.comment}" class="content-num"></span>
+                                                            <i class="fa fa-heart-o content-icon"></i>&nbsp;<span th:text="${content.like}" class="content-num"></span>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
