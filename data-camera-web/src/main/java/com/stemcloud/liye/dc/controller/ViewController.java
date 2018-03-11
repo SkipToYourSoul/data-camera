@@ -261,8 +261,8 @@ public class ViewController {
     }
 
     @GetMapping("/login")
-    public String login(){
-        logger.info("In login.html");
+    public String login(HttpServletRequest request){
+        logger.info("In login.html, from {}", request.getRequestURI());
         return "login";
     }
 

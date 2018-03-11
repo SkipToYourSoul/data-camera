@@ -124,9 +124,9 @@ body{
 /* 覆盖nav-pill样式 */
 .nav-pills>li>a {
   color:#000;
-  font-weight:600px;
-  padding-top:0px;
-  padding-bottom:0px;
+  font-weight:600;
+  padding-top:0;
+  padding-bottom:0;
   font-size:18px;
 }
 
@@ -144,6 +144,23 @@ body{
     background-color: #fff;
 }
 
+/* 宽度调整，当宽度小于一定值时，上侧菜单会叠加 */
+@media (min-width: 1024px) {
+    .content-container{
+        margin-top: 80px;
+        background-color: #F1F3FA;
+        padding: 0;
+    }
+}
+
+@media (max-width: 1024px) {
+    .content-container{
+        margin-top: 140px;
+        background-color: #F1F3FA;
+        padding: 0;
+    }
+}
+
 .content-menu{
     padding: 20px 0;
     background-color: #FFFFFF;
@@ -152,9 +169,8 @@ body{
 }
 
 .content-filter {
-    height: 50px;
-    padding: 10px;
-    margin: 5px -5% 0 -5%;
+    padding: 0;
+    margin: 10px -5% 10px -5%;
 }
 
 .content-show{

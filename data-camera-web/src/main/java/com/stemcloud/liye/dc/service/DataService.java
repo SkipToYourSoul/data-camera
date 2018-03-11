@@ -3,14 +3,12 @@ package com.stemcloud.liye.dc.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
+import com.stemcloud.liye.dc.dao.data.ContentRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
-import com.stemcloud.liye.dc.domain.data.RecorderDevices;
-import com.stemcloud.liye.dc.domain.data.RecorderInfo;
-import com.stemcloud.liye.dc.domain.data.ValueData;
-import com.stemcloud.liye.dc.domain.data.VideoData;
+import com.stemcloud.liye.dc.domain.data.*;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
 import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.domain.view.Video;
@@ -37,13 +35,15 @@ public class DataService {
     private final ValueDataRepository valueDataRepository;
     private final RecorderRepository recorderRepository;
     private final VideoDataRepository videoDataRepository;
+    private final ContentRepository contentRepository;
 
     @Autowired
-    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
+    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository, ContentRepository contentRepository) {
         this.sensorRepository = sensorRepository;
         this.valueDataRepository = valueDataRepository;
         this.recorderRepository = recorderRepository;
         this.videoDataRepository = videoDataRepository;
+        this.contentRepository = contentRepository;
     }
 
     /**
@@ -216,5 +216,13 @@ public class DataService {
     public int updateDataMarker(long id, String mark){
         logger.info("Update mark {} of id {}", mark, id);
         return valueDataRepository.updateMarker(id, mark);
+    }
+
+    public List<ContentInfo> getSearchContent(String search) {
+        List<ContentInfo> content = new ArrayList<ContentInfo>();
+        if (search.trim().isEmpty()) {
+            return content;
+        }
+        return contentRepository.findByIsSharedAndIsDeletedAndTitleLikeOrderByLikeDesc(1,0,'%' + search + '%');
     }
 }

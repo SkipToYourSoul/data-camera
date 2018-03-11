@@ -38,46 +38,44 @@
             <div th:if="!${param.id}" id="content-preview" class="content-preview">
                 <div class="" style="padding: 20px 0">
                     <ul class="nav nav-pills" role="tablist">
-                        <li role="presentation" class="active" style="border-right: 2px solid #000;"><a href="#my-share" aria-controls="my-share" role="tab" data-toggle="tab">我的发布</a></li>
-                        <li role="presentation" class=""><a href="#hot-share" aria-controls="hot-share" role="tab" data-toggle="tab">热门发布</a></li>
+                        <li role="presentation" class="active" style="border-right: 2px solid #000;"><a th:href="@{/content}">我的发布</a></li>
+                        <li role="presentation" class=""><a th:href="@{/hot-content}">热门发布</a></li>
                     </ul>
                 </div>
                 <div style="background-color: #f3f3f3; padding: 0">
-                    <div class="tab-content">
-                        <!-- 我的发布 -->
-                        <div id="my-share" role="tabpanel" class="tab-pane active in fade">
-                            <div class="share-view">
-                                <th:block th:each="content,index:${userContent}">
-                                    <div class="share-view-container row" style="padding: 20px 30px">
-                                        <div class="share-view-photo col-md-2">
-                                            <img th:src="${content.img}?${content.img}:'img/logo.png'" class="share-img"/>
+                    <!-- 我的发布 -->
+                    <div id="my-share" class="share-view">
+                        <th:block th:each="content,index:${userContent}">
+                            <div class="share-view-container row" style="padding: 20px 30px">
+                                <div class="share-view-photo col-md-2">
+                                    <img th:src="${content.img}?${content.img}:'img/note.png'" class="share-img"/>
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="share-view-title">
+                                        <div>
+                                            <a class="content-title" th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a>
+                                            <div class="pull-right">
+                                                <button class="btn btn-default btn-sm" th:data="${content.id}" onclick="deleteMyView(this)">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="col-md-10">
-                                            <div class="share-view-title">
-                                                <div>
-                                                    <a class="content-title" th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a>
-                                                    <div class="pull-right">
-                                                        <button class="btn btn-default btn-sm" th:data="${content.id}" onclick="deleteMyView(this)">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="content-des" th:text="${content.description}|"></div>
-                                                <div class="content-tag">
-                                                    <th:block th:if="${#strings.isEmpty(content.tag)}">
-                                                        <!-- todo: 标签为空 -->
-                                                        <span class="label label-default" style="background-color: #e8e8e8; color: #c0c0c0">无标签</span>
-                                                    </th:block>
-                                                    <th:block th:each="tag,index:${#strings.listSplit(content.tag,',')}">
+                                        <div class="content-des" th:text="${content.description}|"></div>
+                                        <div class="content-tag">
+                                            <th:block th:if="${#strings.isEmpty(content.tag)}">
+                                                <!-- todo: 标签为空 -->
+                                                <span class="label label-default" style="background-color: #e8e8e8; color: #c0c0c0">无标签</span>
+                                            </th:block>
+                                            <th:block th:each="tag,index:${#strings.listSplit(content.tag,',')}">
                                                                 <span class="label label-default"
                                                                       style="background-color: #e8e8e8; color: #c0c0c0"
                                                                       th:text="|${'标签:'+tag}|">Default</span>
-                                                    </th:block>
-                                                </div>
-                                                <div class="content-category" th:text="|${content.category}|"></div>
-                                            </div>
+                                            </th:block>
+                                        </div>
+                                        <div class="content-category" th:text="|${content.category}|"></div>
+                                    </div>
 
-                                            <div class="share-view-user">
+                                    <div class="share-view-user">
                                                         <span class="content-time"
                                                               th:text="${'发布时间：'+#dates.format(content.createTime, 'YYYY-MM-dd HH:mm:ss')}"></span>
                                                         <span class="pull-right"><i
@@ -88,60 +86,10 @@
                                                             <i class="fa fa-heart-o content-icon"></i>&nbsp;<span
                                                                     class="content-num"
                                                                     th:text="${content.like}"></span> </span>
-                                            </div>
-                                        </div>
                                     </div>
-                                </th:block>
-                            </div>
-                        </div>
-
-                        <!-- 热门发布 -->
-                        <div id="hot-share" role="tabpanel" class="tab-pane fade">
-                            <div class="share-view">
-                                <div class="row">
-                                    <th:block th:each="content,index:${hotContent}">
-                                        <div class="col-sm-12 col-md-12 col-xs-12">
-                                            <div class="share-view-container row"
-                                                 style="padding: 20px 30px">
-                                                <div class="share-view-photo col-md-2">
-                                                    <img th:src="${content.img}?${content.img}:'img/logo.png'"
-                                                         class="share-img center-block"/>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="share-view-title">
-                                                        <div>
-                                                            <a class="content-title" th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a> <span class="content-owner" th:text="|发布作者：${content.owner}|"></span>
-                                                        </div>
-                                                        <div class="content-des" th:text="|${content.description}|"></div>
-                                                        <div class="content-tag">
-                                                            <th:block th:if="${#strings.isEmpty(content.tag)}">
-                                                                <!-- todo: 标签为空 -->
-                                                                <span class="label label-default" style="background-color: #e8e8e8; color: #c0c0c0">无标签</span>
-                                                            </th:block>
-                                                            <th:block
-                                                                    th:each="tag,index:${#strings.listSplit(content.tag,',')}">
-                                                                    <span class="label label-default"
-                                                                          style="background-color: #e8e8e8; color: #c0c0c0"
-                                                                          th:text="|${'标签:'+tag}|">Default</span>
-                                                            </th:block>
-                                                        </div>
-                                                        <div class="content-category" th:text="|${content.category}|"></div>
-                                                    </div>
-                                                    <div class="share-view-info">
-                                                        <span class="share-view-user"> <span class="content-time" th:text="${'发布时间：'+#dates.format(content.createTime, 'YYYY-mm-dd HH:mm:ss')}"></span></span>
-                                                        <span class="pull-right">
-                                                            <i class="fa fa-user-o content-icon"></i>&nbsp;<span th:text="${content.view}" class="content-num"></span>
-                                                            <i class="fa fa-commenting-o content-icon"></i>&nbsp;<span th:text="${content.comment}" class="content-num"></span>
-                                                            <i class="fa fa-heart-o content-icon"></i>&nbsp;<span th:text="${content.like}" class="content-num"></span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </th:block>
                                 </div>
                             </div>
-                        </div>
+                        </th:block>
                     </div>
                 </div>
             </div>
@@ -159,7 +107,7 @@
                         <div class="row">
                             <div class="share-view-photo col-md-2">
                                 <img
-                                        th:src="${currentContent.img}?${currentContent.img}:'img/logo.png'"
+                                        th:src="${currentContent.img}?${currentContent.img}:'img/note.png'"
                                         class="img-responsive center-block img-rounded"/>
                             </div>
                             <div class="col-md-10">
@@ -171,8 +119,6 @@
                                             <span class="content-d"
                                                   th:text="|发布时间：${#dates.format(currentContent.createTime, 'YYYY.MM.dd HH:mm:ss')}"></span>
                                     </div>
-                                    <!-- <div th:text="|分类：${currentContent.category}|"></div> -->
-                                    <!--<div th:text="|标签：${currentContent.tag}|"></div> -->
                                     <div class="content-tag">
                                         <th:block th:if="${#strings.isEmpty(currentContent.tag)}">
                                             <!-- todo: 标签为空 -->
@@ -185,14 +131,6 @@
                                         </th:block>
                                     </div>
                                 </div>
-                                <!-- 	<div class="share-view-info">
-                            <i class="fa fa-user-o"></i>&nbsp;<span
-                                th:text="${currentContent.view}"></span> <i
-                                class="fa fa-commenting-o"></i>&nbsp;<span
-                                th:text="${currentContent.comment}"></span> <i
-                                class="fa fa-heart-o"></i>&nbsp;<span
-                                th:text="${currentContent.like}"></span>
-                        </div> -->
                             </div>
                         </div>
                         <div class="content-d-des"
@@ -294,7 +232,7 @@
                                 <div class="share-view-photo col-md-6"
                                      th:if="${#lists.size(userHotContent) gt index.count}">
                                     <img
-                                            th:src="${userHotContent.get(index.count+1).img}?${userHotContent.get(index.count+1).img}:'img/logo.png'"
+                                            th:src="${userHotContent.get(index.count+1).img}?${userHotContent.get(index.count+1).img}:'img/note.png'"
                                             class="img-responsive center-block"/>
                                     <div class="content-title"
                                          th:text="${userHotContent.get(index.count+1).title}"></div>

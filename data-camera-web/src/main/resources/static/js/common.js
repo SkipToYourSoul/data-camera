@@ -55,7 +55,11 @@ function message_info(text, type) {
 
 // parse 2017-08-17T18:16:31.000+08:00 to 2017-08-17 18:16:31
 function parseTime(time) {
-    return time.split('.')[0].replace('T', ' ');
+    if (typeof (time) == "number"){
+        return new Date(time).Format("yyyy-MM-dd HH:mm:ss");
+    } else if (typeof (time) == "string"){
+        return time.split('.')[0].replace('T', ' ');
+    }
 }
 
 // --- rewrite format function, new Date(xx,xx,xx).Format("yyyy-MM-dd HH:mm:ss")

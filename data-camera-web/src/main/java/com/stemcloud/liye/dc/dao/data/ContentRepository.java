@@ -29,7 +29,7 @@ public interface ContentRepository extends CrudRepository<ContentInfo, Long> {
      * @param isDeleted
      * @return
      */
-    List<ContentInfo> findTop10ByOwnerAndIsDeletedOrderByLikeDesc(String owner, int isDeleted);
+    List<ContentInfo> findByOwnerAndIsDeletedOrderByLikeDesc(String owner, int isDeleted);
 
     /**
      * 查询分享的热门内容
@@ -38,6 +38,15 @@ public interface ContentRepository extends CrudRepository<ContentInfo, Long> {
      * @return
      */
     List<ContentInfo> findTop50ByIsSharedAndIsDeletedOrderByLikeDesc(int isShared, int isDeleted);
+
+    /**
+     * 查询关键词相关内容
+     * @param isShared
+     * @param isDeleted
+     * @param search
+     * @return
+     */
+    List<ContentInfo> findByIsSharedAndIsDeletedAndTitleLikeOrderByLikeDesc(int isShared, int isDeleted, String search);
 
     /**
      * delete content

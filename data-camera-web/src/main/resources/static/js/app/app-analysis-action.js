@@ -213,12 +213,12 @@ function deleteContent() {
  * 生成用户自定义的数据片段
  */
 function generateNewContent() {
-    var dialogMessage = '<label>片段时间</label><p>' + analysisObject.timeline[analysisObject.timelineStart] + ' - ' + analysisObject.timeline[analysisObject.timelineEnd] + '</p>';
-    dialogMessage += '<label>片段名</label><input type="text" class="form-control" id="user-new-recorder-name" placeholder="长度不超过10"/>';
-    dialogMessage += '<label>片段描述</label><input type="text" class="form-control" id="user-new-recorder-desc"/>';
+    var dialogMessage = '<div class="row">';
+    dialogMessage += '<label class="col-sm-2">片段名</label><div class="col-sm-10" style="margin-bottom: 10px"><input type="text" class="form-control" id="user-new-recorder-name" placeholder="长度不超过10"/></div>';
+    dialogMessage += '<label class="col-sm-2">片段描述</label><div class="col-sm-10"><input type="text" class="form-control" id="user-new-recorder-desc"/></div></div>';
 
     var dialog = bootbox.dialog({
-        title: '即将生成新的数据片段，记录如下',
+        title: '即将生成新数据片段，时间为<br/><b>' + analysisObject.timeline[analysisObject.timelineStart] + ' - ' + analysisObject.timeline[analysisObject.timelineEnd] + '</b>',
         message: dialogMessage,
         buttons: {
             cancel: {
