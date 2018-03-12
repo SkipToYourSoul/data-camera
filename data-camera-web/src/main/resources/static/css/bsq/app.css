@@ -541,3 +541,12 @@ body {
 	color: #fff;
 	font-size: 14px
 }
+
+.app-group-title{
+	color:#000;
+}
+
+.app-group-title:hover{
+	color:#000;
+	text-decoration:none;
+}

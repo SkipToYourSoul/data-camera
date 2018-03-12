@@ -32,14 +32,14 @@
 				<div class="panel-heading"
 					style="border-bottom: solid 1px #eee; border-top: solid 1px #eee">
 					<div class="panel-title row">
-						<div class="col-sm-9 col-md-9 col-xs-9" style="line-height:40px;">
+						<div class="col-sm-8 col-md-8 col-xs-8" style="line-height:40px;">
 							<!-- 标题 -->
 							<a th:text="|传感器组：${experiment.value.name}|"
 								th:data="${experiment.key}" data-toggle="modal"
-								data-target="#exp-modal" todo="edit" from="modify-desc"></a> <a
+								data-target="#exp-modal" todo="edit" from="modify-desc" class="app-group-title"></a> <a class="app-group-title"
 								role="button" data-toggle="collapse"
 								th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
-								&nbsp;<i class="fa fa-sort-desc"></i>
+								&nbsp;<i class="fa fa-sort"></i>
 							</a>
 							<!-- 实验状态和操作栏 -->
 							<span> <span class="label label-default"
@@ -48,15 +48,15 @@
 								th:id="|experiment-rs-${experiment.key}|">非录制</span>
 							</span>
 						</div>
-						<div class="col-sm-3 col-md-3 col-xs-3">
-							<div class="app-exp-status"> <!-- 按钮组 -->
+						<div class="col-sm-4 col-md-4 col-xs-4">
+							<div class="app-exp-status pull-right">
 								<div class="btn-group">
 									<button style="color: #fc4a6c; background-color: transparent"
 										th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}"
 										class="btn btn-sm" th:data="${experiment.key}"
 										onclick="expMonitor(this)"
 										th:id="|experiment-monitor-${experiment.key}|">
-										<i class="fa fa-eye"></i>
+										<img th:src="@{/img/eye.png}" style="width:26px;height:16px;"/>
 									</button>
 									<button style="color: #26c6db; background-color: transparent"
 										th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}"
@@ -73,10 +73,15 @@
 										<i class="fa fa-plus"></i>
 									</button>
 									<button class="btn btn-default btn-sm"
-										th:data="${experiment.key}" onclick="deleteExp(this)">
-										<i class="fa fa-trash"></i>
+											th:data="${experiment.key}" data-toggle="modal"
+											data-target="#exp-modal" todo="edit" from="modify-sensor">
+										<i class="fa fa-minus"></i>
 									</button>
 								</div>
+								<button class="btn btn-default btn-sm"
+										th:data="${experiment.key}" onclick="deleteExp(this)">
+									<i class="fa fa-trash"></i>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -117,10 +122,10 @@
 											<div class="panel panel-default my-panel">
 												<div class="my-panel-head">
 													<div class="panel-title my-panel-title">
-														<a role="button" data-toggle="collapse"
+														<a role="button" data-toggle="collapse" class="app-group-title"
 															th:href="@{|#exp-${experiment.key}-${track.id}-${dim}|}"
-															aria-expanded="true"> <i class="fa fa-arrows-v"></i>&nbsp;
-															<span
+															aria-expanded="true">
+															<span class="app-group-title"
 															th:text="|${dim}(${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)})|"></span>
 														</a>
 													</div>
