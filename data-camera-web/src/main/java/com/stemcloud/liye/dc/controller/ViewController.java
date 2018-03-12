@@ -243,7 +243,6 @@ public class ViewController {
         }
         RecorderInfo recorderInfo = crudService.findRecorder(rid);
         model.addAttribute("recorder", recorderInfo);
-        model.addAttribute("inContent", true);
 
         return "share";
     }

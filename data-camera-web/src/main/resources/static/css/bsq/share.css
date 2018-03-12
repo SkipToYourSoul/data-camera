@@ -1,3 +1,7 @@
+body {
+	background-color: #F1F3FA;
+}
+
 .newi-control {
 	display: block;
 	width: 65%;
@@ -67,4 +71,16 @@ label {
 	text-align:center;
 	color:#35b5eb;
 	font-size:18px;
+}
+
+.publish-img {
+	padding: 5px;
+}
+.publish-recorder {
+	padding: 5px;
+}
+
+.avatar-img {
+	height: 100px;
+	width: 100px;
 }
