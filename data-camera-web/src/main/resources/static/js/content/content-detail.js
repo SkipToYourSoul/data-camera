@@ -4,6 +4,10 @@
  *  Description:
  */
 
+$(function () {
+    
+});
+
 initContentDetailDom();
 
 function initContentDetailDom(){

@@ -1,0 +1,77 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+	<!-- 数据片段展示图，用于场景分析页面以及内容详情页面 -->
+	<div th:fragment="app-recorder-content">
+		<div class="app-analysis-chart-dom" hidden="hidden">
+			<!-- 操作栏 -->
+			<div class="analysis-sub-content" id="content-handle-bar">
+				<div class="action-bar wi8">
+					<!-- 播放、暂停 -->
+					<div class="btn-group mbtn-group">
+						<button class="btn btn-default no-radius" onclick="recorderPlay()" id="play-btn">
+							<i class="fa fa-play"></i>
+						</button>
+						<button class="btn btn-default no-radius" onclick="recorderPause()" id="pause-btn" disabled="disabled">
+							<i class="fa fa-pause"></i>
+						</button>
+					</div>
+					<!-- 重置 -->
+					<button class="btn btn-default no-radius" onclick="recorderReset()" id="reset-btn">
+						<i class="fa fa-repeat"></i>
+					</button>
+					<!-- 播放速度 -->
+					<div class="btn-group" data-toggle="buttons" id="recorder-speed">
+						<label class="btn active"> <input type="radio"
+														  name="options" id="option1" autocomplete="off"
+														  checked="checked" value="1" /> X1
+						</label> <label class="btn"> <input type="radio" name="options"
+															id="option2" autocomplete="off" value="2" /> X2
+					</label> <label class="btn"> <input type="radio" name="options"
+														id="option3" autocomplete="off" value="4" /> X4
+					</label>
+					</div>
+					<!-- 记录时间 -->
+						<span class="record-time">
+							<span id="recorder-current-time">00:00</span>/<span id="recorder-total-time">-</span>
+						</span>
+					<!-- 内容操作 -->
+					<div class="pull-right" th:if="${inApp}">
+						<div class="btn-group">
+							<button class="btn btn-blue" onclick="generateNewContent()">
+								<i class="fa fa-save"></i>&nbsp;保存
+							</button>
+							<button class="btn btn-default" onclick="deleteContent()" id="delete-btn">
+								<i class="fa fa-trash"></i>&nbsp;删除
+							</button>
+							<button class="btn btn-default" onclick="shareContent()">
+								<i class="fa fa-share"></i>&nbsp;分享
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- 时间轴栏 -->
+				<div class="timeline-dom wi8" id="timeline-slider">
+					<div class="slider"></div>
+				</div>
+			</div>
+			<!-- 数据显示栏 -->
+			<div class="analysis-sub-content">
+				<!-- 通知栏 -->
+				<div class="wi8" id="app-analysis-info"></div>
+				<!-- 图表显示栏 -->
+				<div class="chart-dom wi8" id="app-analysis-chart"></div>
+				<!-- 视频显示栏 -->
+				<div class="video-dom wi8" id="app-analysis-video"></div>
+				<!-- 片段描述 -->
+				<div class="description-dom wi8" th:if="${inApp}">
+					<div class="desc-title">试验描述</div>
+					<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
+					<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 5px">
+						<i class="fa fa-save"></i>&nbsp;保存
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

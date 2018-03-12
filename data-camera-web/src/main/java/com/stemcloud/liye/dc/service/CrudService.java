@@ -232,7 +232,7 @@ public class CrudService {
     }
 
     public List<ContentInfo> selectHotContent(){
-        return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeDesc(1, 0);
+        return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeAndCreateTimeDesc();
     }
 
     public void deleteContent(long id){

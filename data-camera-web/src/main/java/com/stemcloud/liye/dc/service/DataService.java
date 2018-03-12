@@ -96,8 +96,7 @@ public class DataService {
             }
             chartValues.addAll(dataList);
         }
-        Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
-                = transferChartData(chartValues);
+        Map<Long, Map<String, List<ChartTimeSeries>>> chartMap = transferChartData(chartValues);
 
         // -- 将不同数据段的数据对齐
         long maxDataTime = endTime.getTime();

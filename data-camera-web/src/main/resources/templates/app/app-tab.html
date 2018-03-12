@@ -14,9 +14,6 @@
 					onclick="allRecord()" id="all-record-btn">
 					<i class="fa fa-video-camera"></i>&nbsp;全局录制
 				</button>
-				<!--   <button class="btn btn-default" data-toggle="modal" data-target="#exp-modal" todo="new">
-                    <i class="fa fa-plus-circle"></i>&nbsp;添加传感器组</button>
-                <a class="btn btn-default" th:href="@{/device}"><i class="fa fa-plus-circle"></i>&nbsp;添加新设备</a> -->
 			</div>
 			<button class="col-sm-2 col-md-2 col-xs-2 pull-right btn-square" data-toggle="modal"
 				data-target="#exp-modal" todo="new">
@@ -44,12 +41,6 @@
 								th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
 								&nbsp;<i class="fa fa-sort-desc"></i>
 							</a>
-							<!-- 状态栏 -->
-							<!--  <small th:text="${experiment.value.description}" style="color: #9d9d9d"></small>
-                            <span class="pull-right">
-                                <span class="label label-default" th:id="|experiment-es-${experiment.key}|">非监控</span>
-                                <span class="label label-default" th:id="|experiment-rs-${experiment.key}|">非录制</span>
-                            </span> -->
 							<!-- 实验状态和操作栏 -->
 							<span> <span class="label label-default"
 								th:id="|experiment-es-${experiment.key}|">非监控</span> <span
@@ -209,6 +200,34 @@
 					</div>
 				</div>
 			</th:block>
+		</div>
+	</div>
+
+	<div th:fragment="app-analysis">
+		<div class="col-sm-12 col-md-12 col-xs-12" style="padding: 0; background-color: #f4f6f9;">
+			<!-- 片段关系树形图 -->
+			<div class="app-analysis-tree-group analysis-sub-content">
+				<!-- 该场景没有片段记录数据 -->
+				<div th:if="${not #maps.containsKey(recorders, app.id)}"
+					 class="alert alert-warning my-info wi8" role="alert">暂无可展示的数据片段</div>
+				<!-- 遍历片段记录数据 -->
+				<th:block th:each="recorder,index:${recorders[app.id]}">
+					<div
+							th:if="${recorder.isUserGen eq 0 and recorder.isRecorder eq 0}"
+							class="app-analysis-tree-dom wi8" th:data="${recorder.id}"
+							style="background-color: #fff;">
+						<div class="tree-info">
+							<span th:text="${recorder.name}"></span> <span
+								th:text="|数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></span>
+						</div>
+						<div class="tree-chart" th:id="|tree-chart-${recorder.id}|"
+							 style="background-color: #fff; margin: 10px 0px"></div>
+					</div>
+				</th:block>
+			</div>
+
+			<div th:include="app/app-module::app-recorder-content">
+			</div>
 		</div>
 	</div>
 </body>
