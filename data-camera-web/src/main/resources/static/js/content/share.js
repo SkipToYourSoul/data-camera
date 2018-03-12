@@ -94,6 +94,9 @@ $(function () {
             tags.push(selectedTags[index]['text']);
         }
         var avatar = $('.avatar-group').find('input:radio:checked').attr("src");
+        if (avatar == null) {
+            avatar = "/camera/img/avatar/01.jpg";
+        }
 
         $.ajax({
             type: 'post',

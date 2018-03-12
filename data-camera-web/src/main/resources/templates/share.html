@@ -27,9 +27,9 @@
     <div class="navbar-wrapper" th:include="module/common::nav"></div>
 
     <div class="container"
-         style="background-color: #FFFFFF; padding: 30px 20px">
-        <div class="row" style="margin-top: 70px">
-            <div class="col-md-3 col-sm-3 col-xs-3">
+         style="background-color: #FFFFFF; padding: 10px 20px 30px">
+        <div class="row" style="margin-top: 0">
+            <div class="col-md-3 col-sm-3 col-xs-3" style="padding-right: 0">
                 <div class="publish-text">发布中......</div>
                 <div class="publish-img">
                     <img th:src="@{/img/note.png}"
@@ -40,7 +40,7 @@
                     <h5 th:text="${recorder.description}"></h5>
                 </div>
             </div>
-            <div class="col-md-9 col-sm-9 col-xs-9">
+            <div class="col-md-9 col-sm-9 col-xs-9" style="padding-left: 0">
                 <form class="form-horizontal" role="form" id="content-form">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">封面</label>
@@ -51,25 +51,25 @@
                             <div style="margin-bottom: 5px">
                                 <input type="radio" name="img" th:src="@{/img/avatar/01.jpg}" checked="checked"/>
                                 <img th:src="@{/img/avatar/01.jpg}" class="img-responsive img-thumbnail avatar-img"/>
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/02.jpg}"/>
                                 <img th:src="@{/img/avatar/02.jpg}" class="img-responsive img-thumbnail avatar-img"/>
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/03.jpg}"/>
                                 <img th:src="@{/img/avatar/03.jpg}" class="img-responsive img-thumbnail avatar-img"/>
                             </div>
                             <div style="margin-bottom: 5px">
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/04.jpg}"/>
                                 <img th:src="@{/img/avatar/04.jpg}" class="img-responsive img-thumbnail avatar-img"/>
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/05.jpg}"/>
                                 <img th:src="@{/img/avatar/05.jpg}" class="img-responsive img-thumbnail avatar-img"/>
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/06.jpg}"/>
                                 <img th:src="@{/img/avatar/06.jpg}" class="img-responsive img-thumbnail avatar-img"/>
                             </div>
                             <div>
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/07.jpg}"/>
                                 <img th:src="@{/img/avatar/07.jpg}" class="img-responsive img-thumbnail avatar-img"/>
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/08.jpg}"/>
                                 <img th:src="@{/img/avatar/08.jpg}" class="img-responsive img-thumbnail avatar-img"/>
-                                <input type="radio" name="img"/>
+                                <input type="radio" name="img" th:src="@{/img/avatar/09.jpg}"/>
                                 <img th:src="@{/img/avatar/09.jpg}" class="img-responsive img-thumbnail avatar-img"/>
                             </div>
                         </div>
@@ -135,7 +135,7 @@
             </div>
         </div>
     </div>
-    <div class="row footer">
+    <div class="footer">
         <div th:include="module/common::sub-footer"></div>
     </div>
 

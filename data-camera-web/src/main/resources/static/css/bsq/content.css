@@ -147,7 +147,6 @@ body{
 /* 宽度调整，当宽度小于一定值时，上侧菜单会叠加 */
 @media (min-width: 1024px) {
     .content-container{
-        margin-top: 80px;
         background-color: #F1F3FA;
         padding: 0;
     }
@@ -155,7 +154,6 @@ body{
 
 @media (max-width: 1024px) {
     .content-container{
-        margin-top: 140px;
         background-color: #F1F3FA;
         padding: 0;
     }

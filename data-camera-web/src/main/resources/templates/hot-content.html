@@ -17,28 +17,27 @@
     <link rel="stylesheet" th:href="@{css/bsq/content.css}"/>
 </head>
 <body>
-    <div class="navbar-wrapper" th:include="module/common::nav"></div>
-
     <div class="minirefresh-wrap" id="content-minirefresh">
         <div class="minirefresh-scroll" style="background-color: #F1F3FA;">
+            <div class="navbar-wrapper" th:include="module/common::nav"></div>
             <div class="container content-container">
                 <div id="content-filter" class="content-filter">
                     <div class="row">
                         <div class="col-sm-4" style="padding-right: 2px">
                             <div class="btn-group" data-toggle="buttons" id="content-search-category">
-                                <label class="btn btn-primary active">
+                                <label class="btn btn-info active">
                                     <input type="radio" name="options" autocomplete="off" checked="checked" value="全部"/>全部
                                 </label>
-                                <label class="btn btn-primary">
+                                <label class="btn btn-info">
                                     <input type="radio" name="options" autocomplete="off" value="科学"/>科学
                                 </label>
-                                <label class="btn btn-primary">
+                                <label class="btn btn-info">
                                     <input type="radio" name="options" autocomplete="off" value="技术"/>技术
                                 </label>
-                                <label class="btn btn-primary">
+                                <label class="btn btn-info">
                                     <input type="radio" name="options" autocomplete="off" value="工程"/>工程
                                 </label>
-                                <label class="btn btn-primary">
+                                <label class="btn btn-info">
                                     <input type="radio" name="options" autocomplete="off" value="数学"/>数学
                                 </label>
                             </div>
