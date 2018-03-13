@@ -538,7 +538,7 @@ function pageStopMonitor(exp_id){
     clearInterval(exp_monitor_interval[exp_id]);
     delete exp_monitor_interval[exp_id];
 
-    $('.content-value-' + exp_id).html('-');
+    $('.current-content-value-' + exp_id).html('-');
 }
 
 /**

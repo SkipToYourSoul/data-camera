@@ -194,36 +194,48 @@ function deleteExp(evt) {
     });
 }
 
+$('#exp-del-modal').on('show.bs.modal', function (event) {
+    var expId = $(event.relatedTarget).attr('data');
+    var tracks = experiments[expId]['trackInfoList'];
+
+    // 更改删除select的内容
+    var template = "";
+    if (tracks.length == 0){
+        template += '<option disabled="disabled">没有可以删除的轨迹</option>'
+    } else {
+        tracks.forEach(function (track) {
+            var text = track['sensor']==null?'空轨迹 - ' + track['id']:'轨迹绑定 - ' + track['sensor']['name'];
+            template += '<option value="' + track['id'] + '">' + text + '</option>';
+        })
+    }
+    $('#exp-del-select').html(template).multiSelect('refresh');
+
+    if (isExperimentMonitor.hasOwnProperty(expId) && isExperimentMonitor[expId] == 1) {
+        message_info("当前传感器组处于监控状态，不支持删除操作", "info");
+        $('#exp-del-btn').attr('disabled', true);
+    } else {
+        $('#exp-del-btn').attr('disabled', false);
+    }
+});
+
 /**
  * 删除轨迹
  * @param evt
  */
 function deleteTrack(evt) {
-    var trackId = evt.getAttribute('data');
-    bootbox.confirm({
-        title: "删除轨迹",
-        message: "确认删除轨迹吗? 轨迹相关的数据也会被删除",
-        buttons: {
-            cancel: { label: '<i class="fa fa-times"></i> 取消' },
-            confirm: { label: '<i class="fa fa-check"></i> 确认删除' }
-        },
-        callback: function (result) {
-            if (result){
-                $.ajax({
-                    type: 'get',
-                    url: crud_address + '/track/delete?track-id=' + trackId,
-                    success: function (response) {
-                        if (response.code == "0000"){
-                            window.location.href = current_address + "?id=" + app['id'];
-                        } else if (response.code == "1111") {
-                            commonObject.printExceptionMsg(response.data);
-                        }
-                    },
-                    error: function () {
-                        commonObject.printRejectMsg();
-                    }
-                });
+    var delTracks = $('#exp-del-select').val();
+    $.ajax({
+        type: 'get',
+        url: crud_address + '/track/delete?ids=' + delTracks,
+        success: function (response) {
+            if (response.code == "0000"){
+                window.location.href = current_address + "?id=" + app['id'];
+            } else if (response.code == "1111") {
+                commonObject.printExceptionMsg(response.data);
             }
+        },
+        error: function () {
+            commonObject.printRejectMsg();
         }
     });
 }
