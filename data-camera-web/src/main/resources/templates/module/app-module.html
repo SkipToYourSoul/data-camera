@@ -62,11 +62,17 @@
 				<div class="video-dom wi8" id="app-analysis-video"></div>
 				<!-- 片段描述 -->
 				<div class="description-dom wi8" th:if="${inApp}">
-					<div class="desc-title">试验描述</div>
-					<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
-					<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 5px">
-						<i class="fa fa-save"></i>&nbsp;保存
-					</button>
+					<div style="margin-bottom: 10px">
+						<label class="desc-title">试验标题</label>
+						<input class="newi-control" id="app-analysis-title"/>
+					</div>
+					<div>
+						<label class="desc-title">试验描述</label>
+						<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
+						<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 5px">
+							<i class="fa fa-save"></i>&nbsp;保存
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>

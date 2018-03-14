@@ -129,7 +129,7 @@ function getQueryString(name) {
  */
 function onChartResize(charts) {
     Object.keys(charts).forEach(function (id) {
-        if (echarts.getInstanceByDom(document.getElementById(id)) != null){
+        if (null != echarts.getInstanceByDom(document.getElementById(id)) && typeof(echarts.getInstanceByDom(document.getElementById(id))) != "undefine" ){
             var chart = charts[id];
             chart.resize();
         }

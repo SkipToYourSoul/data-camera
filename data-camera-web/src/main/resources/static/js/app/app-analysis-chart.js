@@ -19,6 +19,7 @@ function initRecorderContentDom(recorderId){
     // 填写片段描述
     recorders[app['id']].forEach(function (recorder) {
         if (recorder['id'] == recorderId){
+            $('#app-analysis-title').val(recorder['name']);
             $('#app-analysis-desc').val(recorder['description']);
             console.info("加载片段描述成功：", recorder['description']);
         }
@@ -39,6 +40,9 @@ function askForRecorderDataAndInitDom(recorderId) {
     });
     $dom.empty();
     $dom2.empty();
+    Object.keys(analysisObject.chart).forEach(function (id) {
+        delete analysisObject.chart[id];
+    });
 
     // 异步请求实验片段数据
     $.ajax({
@@ -217,7 +221,8 @@ function generate(panelId, title, contentId) {
     return '<div class="panel panel-default my-panel">' +
         '<div class="my-panel-head">' +
         '<div class="panel-title my-panel-title">' +
-        '<a role="button" data-toggle="collapse" href="#' + panelId + '" aria-expanded="true"><i class="fa fa-arrows-v"></i>&nbsp; ' + title + '</a>' +
+        '<span>' + title + '&nbsp;</span>' +
+        '<a data-toggle="collapse" href="#' + panelId + '" aria-expanded="true"><i class="fa fa-sort"></i></a>' +
         '</div></div>' +
         '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
         '<div class="panel-body my-panel-body"><div id="' + contentId + '"></div></div>' +

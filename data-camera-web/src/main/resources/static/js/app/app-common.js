@@ -120,7 +120,6 @@ var expObject = (function (){
     var setChart = function (key, value) {
         chart[key] = value;
     };
-
     var currentExpId = 0;
 
     return {

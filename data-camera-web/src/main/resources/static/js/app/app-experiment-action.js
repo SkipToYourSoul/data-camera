@@ -538,7 +538,23 @@ function pageStopMonitor(exp_id){
     clearInterval(exp_monitor_interval[exp_id]);
     delete exp_monitor_interval[exp_id];
 
+    // 清空状态数据
     $('.current-content-value-' + exp_id).html('-');
+    $('.content-value-' + exp_id).html('-');
+
+    // 清空echart数据
+    Object.keys(expObject.chart).forEach(function (dom) {
+        var expId = dom.split('-')[2];
+        if (exp_id == expId) {
+            var chart = echarts.getInstanceByDom(document.getElementById(dom));
+            var series = chart.getOption()['series'];
+            series[0]['data'] = [];
+            series[0]['markArea']['data'] = [];
+            chart.setOption({
+                series: series
+            });
+        }
+    });
 }
 
 /**

@@ -71,6 +71,7 @@ function recorderAction(){
 
 function recorderPause() {
     clearInterval(recorderInterval);
+    recorderInterval = null;
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
 
@@ -134,9 +135,10 @@ function slideChange(e, ui) {
             });
         });
     } else {
-        // 正常状态，进行标记区域更新
         analysisObject.timelineStart = ui.values[0];
         analysisObject.timelineEnd = ui.values[1];
+
+        // 正常状态，进行标记区域更新
         var mark = [[{
             xAxis: analysisObject.timeline[analysisObject.timelineStart]
         }, {
@@ -149,6 +151,7 @@ function slideChange(e, ui) {
                 series: series
             });
         });
+
         // 视频时间调整
         Object.keys(analysisObject.video).forEach(function (i) {
             var video = analysisObject.video[i];
@@ -266,12 +269,14 @@ function generateNewContent() {
  * 保存更新数据片段描述
  */
 function saveDataDesc(){
+    var $appAnalysisTitle = $('#app-analysis-title');
     var $appAnalysisDesc = $('#app-analysis-desc');
 
     $.ajax({
         type: 'get',
         url: crud_address + '/recorder/desc',
         data: {
+            "title": $appAnalysisTitle.val(),
             "desc": $appAnalysisDesc.val(),
             "id": analysisObject.currentRecorderId
         },
@@ -280,6 +285,7 @@ function saveDataDesc(){
                 message_info("保存成功", "success");
                 for (var index=0; index<recorders[app['id']].length; index++){
                     if (recorders[app['id']][index]['id'] == analysisObject.currentRecorderId){
+                        recorders[app['id']][index]['name'] = $appAnalysisTitle.val();
                         recorders[app['id']][index]['description'] = $appAnalysisDesc.val();
                     }
                 }

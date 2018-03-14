@@ -33,8 +33,8 @@
 						<div class="col-sm-8 col-md-8 col-xs-8" style="line-height:40px;">
 							<!-- 标题 -->
 							<a th:text="|传感器组：${experiment.value.name}|"
-								th:data="${experiment.key}" data-toggle="modal"
-								data-target="#exp-modal" todo="edit" from="modify-desc" class="app-group-title"></a> <a class="app-group-title"
+								th:data="${experiment.key}" class="app-group-title"></a>
+							<a class="app-group-title"
 								role="button" data-toggle="collapse"
 								th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
 								&nbsp;<i class="fa fa-sort"></i>
@@ -76,10 +76,17 @@
 										<i class="fa fa-minus"></i>
 									</button>
 								</div>
-								<button class="btn btn-default btn-sm"
-										th:data="${experiment.key}" onclick="deleteExp(this)">
-									<i class="fa fa-trash"></i>
-								</button>
+								<div class="btn-group">
+									<button class="btn btn-default btn-sm"
+											th:data="${experiment.key}" data-toggle="modal"
+											data-target="#exp-modal" todo="edit" from="modify-desc">
+										<i class="fa fa-refresh"></i>
+									</button>
+									<button class="btn btn-default btn-sm"
+											th:data="${experiment.key}" onclick="deleteExp(this)">
+										<i class="fa fa-trash"></i>
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -96,20 +103,14 @@
 									<!-- 轨迹信息 -->
 									<div class="track-info" th:switch="${track.type}">
 										<div class="title">
-											<span th:case="0" th:text="|未绑定传感器的轨迹|"></span> <span
+											<!--<span th:case="0" th:text="|未绑定传感器的轨迹|"></span> <span
 												th:case="1" th:text="|可绑定数值型传感器的轨迹|"></span> <span
 												th:case="2" th:text="|可绑定摄像头的轨迹|"></span> <span
-												class="track-bound">绑定的传感器：
+												class="track-bound">绑定的传感器：-->
 											<!-- 设备绑定 -->
-											<a href="#"
-												th:id="|track-bound-${track.id}|" data-type="select"
+											<a href="#" style="margin-left: 20px" th:id="|track-bound-${track.id}|" data-type="select"
 												data-title="绑定设备"></a>
-											</span>
-											<!-- 轨迹删除 -->
-											<!--<button class="btn btn-default btn-xs pull-right"
-												th:data="${track.id}" onclick="deleteTrack(this)">
-												<i class="fa fa-close"></i>
-											</button>-->
+											<!--</span>-->
 										</div>
 									</div>
 
@@ -228,7 +229,7 @@
 				</th:block>
 			</div>
 
-			<div th:include="app/app-module::app-recorder-content">
+			<div th:include="module/app-module::app-recorder-content">
 			</div>
 		</div>
 	</div>

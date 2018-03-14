@@ -367,8 +367,9 @@ public class CrudController {
         try {
             String user = commonService.getCurrentLoginUser(request);
             long recorderId = Long.parseLong(queryParams.get("id"));
+            String title = queryParams.get("title");
             String desc = queryParams.get("desc");
-            crudService.updateRecorderDescription(recorderId, desc);
+            crudService.updateRecorderDescription(recorderId, title, desc);
             logger.info("User {} update recorder {}'s name to {}", user, recorderId, desc);
             return ServerReturnTool.serverSuccess(desc);
         } catch (Exception e){

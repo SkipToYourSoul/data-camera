@@ -339,7 +339,11 @@ body {
 	margin-left: -10px;
 	margin-right: -10px;
 	font-size: 14px;
-	font-weight: 600;
+	font-weight: 500;
+}
+
+.track .track-info .title {
+
 }
 
 .track .track-bound {

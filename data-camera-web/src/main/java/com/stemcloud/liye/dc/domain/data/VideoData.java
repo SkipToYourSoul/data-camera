@@ -31,6 +31,17 @@ public class VideoData {
     @Column(name = "video_poster")
     private String videoPost;
 
+    public VideoData() {
+    }
+
+    public VideoData(long trackId, long sensorId, RecorderInfo recorderInfo, String videoPath, String videoPost) {
+        this.trackId = trackId;
+        this.sensorId = sensorId;
+        this.recorderInfo = recorderInfo;
+        this.videoPath = videoPath;
+        this.videoPost = videoPost;
+    }
+
     public long getId() {
         return id;
     }

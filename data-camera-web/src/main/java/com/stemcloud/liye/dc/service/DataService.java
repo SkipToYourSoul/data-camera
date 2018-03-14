@@ -68,7 +68,7 @@ public class DataService {
     }
 
     /**
-     *
+     * 获取数据片段的数据
      * @param recorderId
      * @return MAP
      *  key: SensorType
@@ -86,16 +86,14 @@ public class DataService {
 
         // -- value data for chart
         List<ValueData> chartValues = new ArrayList<ValueData>();
+        List<Long> sensorIds = new ArrayList<Long>();
         for (RecorderDevices device: devices){
-            long sensorId = device.getSensor();
-            List<ValueData> dataList = valueDataRepository.findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
-                    sensorId, startTime, endTime
-            );
-            if (dataList.size() == 0){
-                continue;
-            }
-            chartValues.addAll(dataList);
+            sensorIds.add(device.getSensor());
         }
+        List<ValueData> dataList = valueDataRepository.findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                sensorIds, startTime, endTime
+        );
+        chartValues.addAll(dataList);
         Map<Long, Map<String, List<ChartTimeSeries>>> chartMap = transferChartData(chartValues);
 
         // -- 将不同数据段的数据对齐
@@ -153,7 +151,24 @@ public class DataService {
         newRecorder.setIsUserGen(1);
         newRecorder.setParentId(recorderId);
         newRecorder.setDevices(new Gson().toJson(devices));
-        return recorderRepository.save(newRecorder).getId();
+        long newR = recorderRepository.save(newRecorder).getId();
+
+        // 若有视频，则在video表中生成记录
+        for (RecorderDevices device : devices) {
+            if (device.getLegends().size() == 1 && "视频".equals(device.getLegends().get(0))) {
+                List<VideoData> videos = videoDataRepository.findByRecorderInfo(recorder);
+                List<VideoData> newVideos = new ArrayList<VideoData>();
+                for (VideoData video : videos) {
+                    VideoData newVideo = new VideoData(video.getTrackId(), video.getSensorId(),
+                            newRecorder, video.getVideoPath(),video.getVideoPost());
+                    newVideos.add(newVideo);
+                }
+                videoDataRepository.save(newVideos);
+                break;
+            }
+        }
+
+        return newR;
     }
 
     /**

@@ -181,8 +181,8 @@ public class CrudService {
         recorderRepository.updateName(id, name);
     }
 
-    public void updateRecorderDescription(long id, String description){
-        recorderRepository.updateDescription(id, description);
+    public void updateRecorderDescription(long id, String title, String description){
+        recorderRepository.updateDescription(id, title, description);
     }
 
     public void deleteAllRecorder(long id){
