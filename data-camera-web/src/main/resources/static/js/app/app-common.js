@@ -38,6 +38,9 @@ var analysisObject = (function () {
         video[key] = value;
     };
 
+    // -- 视频的起始时间，主要用于控制子片段视频的播放
+    var videoStartTime = 0;
+
     // -- 当前片段的时间轴数据，如：2018-03-04 00:00:00
     var timeline = [];
     var timelineStart, timelineEnd;
@@ -75,6 +78,7 @@ var analysisObject = (function () {
         getChartData: getChartData,
         video: video,
         setVideo: setVideo,
+        videoStartTime: videoStartTime,
         timeline: timeline,
         timelineStart: timelineStart,
         timelineEnd: timelineEnd,

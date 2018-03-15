@@ -165,6 +165,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                         var parentRid = findParent(recorderId);
                         var time = new Date(parseTime(recorders[recorderId]['startTime'])).getTime() -
                             new Date(parseTime(recorders[parentRid]['startTime'])).getTime();
+                        analysisObject.videoStartTime = time/1000;
                         this.currentTime(time/1000);
                     });
                 } else {

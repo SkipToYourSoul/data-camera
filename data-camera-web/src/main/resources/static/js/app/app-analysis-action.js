@@ -113,7 +113,7 @@ function recorderReset() {
     Object.keys(analysisObject.video).forEach(function (i) {
         var video = analysisObject.video[i];
         video.pause();
-        video.currentTime(0);
+        video.currentTime(analysisObject.videoStartTime);
     });
 }
 
@@ -171,7 +171,7 @@ function slideChange(e, ui) {
     function updateVideoTime() {
         Object.keys(analysisObject.video).forEach(function (i) {
             var video = analysisObject.video[i];
-            video.currentTime(ui.values[0]);
+            video.currentTime(ui.values[0] + analysisObject.videoStartTime);
         });
     }
 }
