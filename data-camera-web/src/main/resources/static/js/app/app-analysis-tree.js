@@ -15,8 +15,8 @@ function initTreeDom(iFi){
         analysisObject.iFi = false;
     }
 
-    if (!recorders.hasOwnProperty(app['id'])){
-        console.log("Empty data recorders in this app.");
+    console.log("场景数据片段: ", recorders);
+    if (isEmptyObject(recorders) || null == recorders){
         return;
     }
 
@@ -37,14 +37,14 @@ function initTreeDom(iFi){
 
     // Construct node data
     var rData = {};
-    var appRecorders = recorders[app['id']];
     // 构造节点关系
-    appRecorders.forEach(function (recorder, index) {
-        analysisObject.rDataMap[recorder['id']] = recorder['parentId'];
+    Object.keys(recorders).forEach(function (rid) {
+        var recorder = recorders[rid];
+        analysisObject.rDataMap[rid] = recorder['parentId'];
     });
     // 数据构造
-    appRecorders.forEach(function (recorder, index) {
-        var rid = recorder['id'];
+    Object.keys(recorders).forEach(function (rid) {
+        var recorder = recorders[rid];
         var name = recorder['name'];
         var parentId = recorder['parentId'];
         var ancestor = findParent(rid);
@@ -62,19 +62,19 @@ function initTreeDom(iFi){
     });
 
     // 画图
-    appRecorders.forEach(function (recorder, index) {
-        var id = recorder['id'];
+    Object.keys(recorders).forEach(function (rid) {
+        var recorder = recorders[rid];
         if (recorder['isUserGen'] == 0 && recorder['isRecorder'] == 0){
             var myDiagram =
-                $go(go.Diagram, "tree-chart-" + id,
+                $go(go.Diagram, "tree-chart-" + rid,
                     {
                         initialAutoScale: go.Diagram.UniformToFill,
                         initialContentAlignment: go.Spot.LeftCenter,
                         isReadOnly: false,  // do not allow users to modify or select in this view
                         allowSelect: true,
                         allowMove: false,
-                        allowVerticalScroll: rData[id].length >= 5,
-                        allowHorizontalScroll: rData[id].length >= 5,
+                        allowVerticalScroll: rData[rid].length >= 5,
+                        allowHorizontalScroll: rData[rid].length >= 5,
                         allowZoom: true,
                         // define the layout for the diagram
                         layout: $go(go.TreeLayout, { nodeSpacing: 5, layerSpacing: 30 })
@@ -84,7 +84,7 @@ function initTreeDom(iFi){
             myDiagram.model = $go(go.TreeModel, {
                 isReadOnly: true,  // don't allow the user to delete or copy nodes
                 // build up the tree in an Array of node data
-                nodeDataArray: rData[id]
+                nodeDataArray: rData[rid]
             });
         }
     });

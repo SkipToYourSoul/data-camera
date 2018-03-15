@@ -7,8 +7,13 @@
 $(function(){
     // lazy loading设置
     var refreshTime = 0;
-    var filter = "全部";
+    var stemFilter = "全部";
+    var tagFilter = "全部";
     var showContent = hotContent;
+
+    function inFilter(stem, tags) {
+        return !!((tags.indexOf(tagFilter) != -1 || tagFilter == "全部") && (stem == stemFilter || stemFilter == "全部"));
+    }
 
     var myRefreshContent = new MiniRefresh({
         container: '#content-minirefresh',
@@ -35,18 +40,21 @@ $(function(){
     }
 
     // 切换过滤器
-    $('#content-search-category').find('[type=radio]').change(function () {
-        filter = $(this).val();
-        var $contentGroup = $('.content-category');
-        for (var i = 0; i < $contentGroup.length; i++) {
-            var text = $($contentGroup[i]).text();
-            console.info(text);
-            if (text == filter || "全部" == filter) {
-                $($contentGroup[i]).parents('.hot-content-container').attr('hidden',false);
-            } else {
-                $($contentGroup[i]).parents('.hot-content-container').attr('hidden',true);
+    $('.content-filter ul li').click(function () {
+        $(this).addClass('active').siblings().removeClass("active");
+        stemFilter = $('.stem-filter li.active').text();
+        tagFilter = $('.tag-filter li.active').text();
+        showContent.forEach(function (content) {
+            var $template = $('.content-id-' + content['id']);
+            if ($template.length != 0) {
+                if (inFilter(content['category'], content['tag'])) {
+                    $template.attr('hidden',false);
+                } else {
+                    $template.attr('hidden',true);
+                }
+                console.log("load template" + content['id']);
             }
-        }
+        });
         myRefreshContent.triggerUpLoading();
     });
 
@@ -62,7 +70,8 @@ $(function(){
                 if (response.code == "0000") {
                     $('#content-data').empty();
                     refreshTime = 0;
-                    filter = $('#content-search-category').find('input:radio:checked').val();
+                    stemFilter = $('.stem-filter li.active').text();
+                    tagFilter = $('.tag-filter li.active').text();
                     showContent = response.data;
                     myRefreshContent.triggerUpLoading();
                 } else if (response.code == "1111") {
@@ -78,13 +87,13 @@ $(function(){
     });
 
     function appendContentData(content) {
+        console.log("init load template" + content['id']);
         var template = '';
-        if (content['category'] == filter || "全部" == filter){
-            template = '<div class="col-sm-12 col-md-12 col-xs-12 hot-content-container">'
+        if (inFilter(content['category'], content['tag'])) {
+            template = '<div class="col-sm-12 col-md-12 col-xs-12 hot-content-container content-id-' + content['id'] + '">';
         } else {
-            template = '<div class="col-sm-12 col-md-12 col-xs-12 hot-content-container" hidden="hidden">'
+            template = '<div class="col-sm-12 col-md-12 col-xs-12 hot-content-container content-id-' + content['id'] + '" hidden="hidden">'
         }
-
         template += '<div class="share-view-container row" style="padding: 20px 30px">';
         // -- 图片
         if (content['img'] != null){

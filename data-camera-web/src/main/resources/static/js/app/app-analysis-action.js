@@ -12,6 +12,7 @@ var recorderInterval = null;
 function recorderPlay() {
     var interval = 1000/parseInt($('#recorder-speed').find('.active input').val());
     recorderInterval = setInterval(recorderAction, interval);
+    analysisObject.playStatus = "play";
     $('#play-btn').attr('disabled', 'disabled');
     $('#pause-btn').removeAttr('disabled');
 
@@ -71,7 +72,7 @@ function recorderAction(){
 
 function recorderPause() {
     clearInterval(recorderInterval);
-    recorderInterval = null;
+    analysisObject.playStatus = "pause";
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
 
@@ -84,7 +85,7 @@ function recorderPause() {
 
 function recorderReset() {
     clearInterval(recorderInterval);
-    recorderInterval = null;
+    analysisObject.playStatus = "normal";
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
     $(".slider")
@@ -122,8 +123,22 @@ function slideChange(e, ui) {
     $('#recorder-total-time').html(analysisObject.secondLine[ui.values[1]]);
 
     // 图表状态
-    if (recorderInterval != null){
-        // 正在回放数据，不进行高亮片段更新，进行标记线更新
+    if (analysisObject.playStatus == "play") {
+        updateMarkLine();
+    } else if (analysisObject.playStatus == "pause") {
+        analysisObject.timelineStart = ui.values[0];
+        analysisObject.timelineEnd = ui.values[1];
+        updateMarkLine();
+        updateVideoTime();
+    } else if (analysisObject.playStatus == "normal") {
+        analysisObject.timelineStart = ui.values[0];
+        analysisObject.timelineEnd = ui.values[1];
+        updateMarkArea();
+        updateVideoTime();
+    }
+
+    // 进行标记线更新
+    function updateMarkLine() {
         var line = [{
             xAxis: analysisObject.timeline[ui.values[0]]
         }];
@@ -134,11 +149,10 @@ function slideChange(e, ui) {
                 series: series
             });
         });
-    } else {
-        analysisObject.timelineStart = ui.values[0];
-        analysisObject.timelineEnd = ui.values[1];
+    }
 
-        // 正常状态，进行标记区域更新
+    // 进行标记区域更新
+    function updateMarkArea() {
         var mark = [[{
             xAxis: analysisObject.timeline[analysisObject.timelineStart]
         }, {
@@ -151,8 +165,10 @@ function slideChange(e, ui) {
                 series: series
             });
         });
+    }
 
-        // 视频时间调整
+    // 视频时间调整
+    function updateVideoTime() {
         Object.keys(analysisObject.video).forEach(function (i) {
             var video = analysisObject.video[i];
             video.currentTime(ui.values[0]);
@@ -283,12 +299,12 @@ function saveDataDesc(){
         success: function (response) {
             if (response.code == "0000"){
                 message_info("保存成功", "success");
-                for (var index=0; index<recorders[app['id']].length; index++){
-                    if (recorders[app['id']][index]['id'] == analysisObject.currentRecorderId){
-                        recorders[app['id']][index]['name'] = $appAnalysisTitle.val();
-                        recorders[app['id']][index]['description'] = $appAnalysisDesc.val();
+                Object.keys(recorders).forEach(function (rid) {
+                    if (rid == analysisObject.currentRecorderId) {
+                        recorders[rid]['name'] = $appAnalysisTitle.val();
+                        recorders[rid]['description'] = $appAnalysisDesc.val();
                     }
-                }
+                });
             } else if (response.code == "1111") {
                 message_info('操作无效: ' + response.data, "error");
             }

@@ -12,16 +12,18 @@ function initRecorderContentDom(recorderId){
     if (recorderInterval != null){
         clearInterval(recorderInterval);
     }
+    analysisObject.playStatus = "normal";
 
     // 初始化片段数据，构造dom
     askForRecorderDataAndInitDom(recorderId);
 
     // 填写片段描述
-    recorders[app['id']].forEach(function (recorder) {
-        if (recorder['id'] == recorderId){
+    Object.keys(recorders).forEach(function (rid) {
+        if (rid == recorderId){
+            var recorder = recorders[rid];
             $('#app-analysis-title').val(recorder['name']);
             $('#app-analysis-desc').val(recorder['description']);
-            console.info("加载片段描述成功：", recorder['description']);
+            console.info("加载片段描述成功：", recorder['name'], " - ", recorder['description']);
         }
     });
 }
@@ -159,6 +161,11 @@ function askForRecorderDataAndInitDom(recorderId) {
                     videojs(videoId, videoOption, function () {
                         videojs.log('The video player ' + videoId + ' is ready');
                         analysisObject.setVideo(videoId, this);
+                        // 如果是某个片段的子片段，需要设置起始时间
+                        var parentRid = findParent(recorderId);
+                        var time = new Date(parseTime(recorders[recorderId]['startTime'])).getTime() -
+                            new Date(parseTime(recorders[parentRid]['startTime'])).getTime();
+                        this.currentTime(time/1000);
                     });
                 } else {
                     var progressBar = '<div class="progress">' +

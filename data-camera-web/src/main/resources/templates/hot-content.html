@@ -22,33 +22,34 @@
             <div class="navbar-wrapper" th:include="module/common::nav"></div>
             <div class="container content-container">
                 <div id="content-filter" class="content-filter">
-                    <div class="row">
-                        <div class="col-sm-4" style="padding-right: 2px">
-                            <div class="btn-group" data-toggle="buttons" id="content-search-category">
-                                <label class="btn btn-info active">
-                                    <input type="radio" name="options" autocomplete="off" checked="checked" value="全部"/>全部
-                                </label>
-                                <label class="btn btn-info">
-                                    <input type="radio" name="options" autocomplete="off" value="科学"/>科学
-                                </label>
-                                <label class="btn btn-info">
-                                    <input type="radio" name="options" autocomplete="off" value="技术"/>技术
-                                </label>
-                                <label class="btn btn-info">
-                                    <input type="radio" name="options" autocomplete="off" value="工程"/>工程
-                                </label>
-                                <label class="btn btn-info">
-                                    <input type="radio" name="options" autocomplete="off" value="数学"/>数学
-                                </label>
+                    <div class="content-filter-wrapper">
+                        <span class="category-name">学科：</span>
+                        <ul class="category-list list-inline stem-filter">
+                            <li class="active">全部</li>
+                            <li>科学</li>
+                            <li>技术</li>
+                            <li>工程</li>
+                            <li>数学</li>
+                        </ul>
+                    </div>
+                    <div class="content-filter-wrapper">
+                        <span class="category-name">标签：</span>
+                        <ul class="category-list list-inline tag-filter">
+                            <li class="active">全部</li>
+                            <li>温湿度</li>
+                            <li>光照</li>
+                            <li>摄像头</li>
+                        </ul>
+                    </div>
+                    <div class="content-filter-wrapper" style="border: none">
+                        <div class="input-group" style="width: 250px;">
+                            <input type="text" class="form-control" name="search" id="content-search-input" placeholder="搜索共享内容" />
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default" id="content-search-btn"><i class="fa fa-search"></i></button>
                             </div>
                         </div>
-                        <div class="col-sm-4 col-sm-offset-3" style="padding-right: 2px; padding-left: 2px;">
-                            <input type="text" class="form-control" name="search" id="content-search-input" placeholder="搜索共享内容" />
-                        </div>
-                        <div class="col-sm-1" style="padding-left: 2px">
-                            <button type="button" class="btn btn-default btn-block" id="content-search-btn">搜索</button>
-                        </div>
                     </div>
+
                 </div>
                 <div class="content-menu">
                     <ul class="nav nav-pills" role="tablist">

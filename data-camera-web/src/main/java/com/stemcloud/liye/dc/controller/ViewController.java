@@ -152,8 +152,8 @@ public class ViewController {
             model.addAttribute("sensors", baseInfoService.getOnlineSensor(user));
 
             // --- RECORDER:
-            Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
-            model.addAttribute("recorders", recorders);
+            // Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
+            model.addAttribute("recorders", baseInfoService.getRecordersOfApp(id));
         }
 
         return "app";

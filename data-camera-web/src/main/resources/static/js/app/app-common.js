@@ -51,8 +51,8 @@ var analysisObject = (function () {
     // -- 实验片段信息
     var currentRecorderId = null;
 
-    // -- 标记是否正在回放
-    var playStatus = false;
+    // -- 标记是否正在回放 (play, pause, normal)
+    var playStatus = "normal";
 
     var shareSelectedTags = [];
     var addTag = function (tag) {
@@ -149,11 +149,11 @@ $(function () {
         // --- 若有数据片段标识，则展示数据
         var recorder = getQueryString("recorder");
         if (recorder != null){
-            for (var index=0; index<recorders[app['id']].length; index++){
-                if (recorders[app['id']][index]['id'] == recorder){
+            Object.keys(recorders).forEach(function (rid) {
+                if (recorder == rid){
                     showRecorderContent(findParent(recorder) + '', recorder);
                 }
-            }
+            });
         }
 
         // -- tab页面切换时切换菜单
