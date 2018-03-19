@@ -200,9 +200,15 @@ body{
 }
 
 .head-img{
-	margin-top:90px;
+	margin:90px 30% 0 30%;
 	border-radius:50%;
-	width:70px;
-	height:70px;
+	width:90px;
+	height:90px;
 	background-image:url(../../img/app-bottom.png);
+}
+
+.btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus,
+	.btn-group>.btn:hover {
+	color: #35b5eb;
+	box-shadow: none;
 }

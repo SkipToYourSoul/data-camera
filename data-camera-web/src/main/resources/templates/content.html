@@ -178,7 +178,7 @@ body {
 		class="container col-sm-10 col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1 col-sm-offset-1"
 		th:if="${param.id}">
 		<div class="row" style="margin-top: 80px;">
-			<div class="col-md-8">
+			<div class="col-md-9">
 				<div class="">
 					<div class="share-view-container">
 						<div class="row">
@@ -190,7 +190,7 @@ body {
 							<div class="col-md-10">
 								<div class="share-view-title">
 									<div class="content-title" th:text="${currentContent.title}"></div>
-									<div class="share-view-user" style="margin-top: 20px">
+									<div class="share-view-user" style="margin-top: 5px">
 										<div class="content-d" th:text="|作者：${currentContent.owner}|"></div>
 
 										<span class="content-d"
@@ -198,7 +198,7 @@ body {
 									</div>
 									<!-- <div th:text="|分类：${currentContent.category}|"></div> -->
 									<!--<div th:text="|标签：${currentContent.tag}|"></div> -->
-									<div class="content-tag">
+									<div class="content-tag" style="margin-top: 20px">
 										<th:block th:if="${#strings.isEmpty(currentContent.tag)}">
 											<!-- todo: 标签为空 -->
 										</th:block>
@@ -223,38 +223,38 @@ body {
 						<div class="content-d-des"
 							th:text="|${currentContent.description}|"></div>
 					</div>
-					<div class="return-text">
+					<!-- <div class="return-text">
 						<i class="fa fa-hand-o-left"></i>&nbsp; <a th:href="@{/content}">返回内容页</a>
-					</div>
+					</div> -->
 					<div>
 						<div id="content-detail" class="content-detail">
 							<!-- 数据展示图 -->
 							<div class="app-analysis-chart-dom">
 								<!-- 操作栏 -->
 								<div class="action-bar" style="background-color: #fff">
-									<div class="btn-group">
-										<button class="btn btn-default" onclick="recorderPlay()"
+									<div class="btn-group mbtn-group">
+										<button class="btn btn-default no-radius" onclick="recorderPlay()"
 											id="play-btn">
 											<i class="fa fa-play"></i>
 										</button>
-										<button class="btn btn-default" onclick="recorderPause()"
+										<button class="btn btn-default no-radius" onclick="recorderPause()"
 											id="pause-btn" disabled="disabled">
 											<i class="fa fa-pause"></i>
 										</button>
-										<button class="btn btn-default" onclick="recorderReset()"
+										</div>
+										<button class="btn btn-default no-radius" onclick="recorderReset()"
 											id="reset-btn">
-											<i class="fa fa-reply"></i>
+											<i class="fa fa-repeat"></i>
 										</button>
-									</div>
 									<div class="btn-group" data-toggle="buttons"
 										id="recorder-speed">
-										<label class="btn btn-default active"> <input
+										<label class="btn active"> <input
 											type="radio" name="options" id="option1" autocomplete="off"
 											checked="checked" value="1" /> X1
-										</label> <label class="btn btn-default"> <input type="radio"
+										</label> <label class="btn"> <input type="radio"
 											name="options" id="option2" autocomplete="off" value="2" />
 											X2
-										</label> <label class="btn btn-default"> <input type="radio"
+										</label> <label class="btn"> <input type="radio"
 											name="options" id="option3" autocomplete="off" value="4" />
 											X4
 										</label>
@@ -280,9 +280,9 @@ body {
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4"
+			<div class="col-md-3"
 				style="background-color: #fff; min-height: 600px; padding-bottom: 50px;">
-				<div style="margin-left: 40%; margin-right: 40%">
+				<div>
 					<div class="head-img"></div>
 					<div style="text-align: center; margin-top: 15px"
 						th:text="|${currentContent.owner}|"></div>

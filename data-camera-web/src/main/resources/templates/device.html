@@ -33,14 +33,14 @@
 					<div id="toolbar">
 						<button class="btn btn-blue" todo="new" data-toggle="modal"
 							data-target="#sensor-modal">
-							<i class="fa fa-plus-circle"></i>&nbsp;新增设备
+							 <img th:src="@{/img/icons/add_device.png}" class="icon"/>&nbsp;新增设备
 						</button>
 						<button class="btn btn-blue1" todo="edit" data-toggle="modal"
 							data-target="#sensor-modal">
-							<i class="fa fa-info-circle"></i>&nbsp;编辑设备
+							 <img th:src="@{/img/icons/edit_device.png}" class="icon"/>&nbsp;编辑设备
 						</button>
 						<button class="btn btn-pink" onclick="deleteSensor()">
-							<i class="fa fa-minus-circle"></i>&nbsp;删除设备
+							 <img th:src="@{/img/icons/delete_device.png}" class="icon"/>&nbsp;删除设备
 						</button>
 					</div>
 					<table id="table" data-classes="table"

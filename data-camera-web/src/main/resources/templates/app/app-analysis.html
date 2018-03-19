@@ -59,14 +59,14 @@
 							</span>
 							<div class="pull-right">
 								<button class="btn btn-blue" onclick="generateNewContent()">
-									<i class="fa fa-save"></i>&nbsp;保存
+									<img th:src="@{/img/icons/save.png}" class="icon"/>&nbsp;保存
 								</button>
 								<div class="btn-group">
 									<button class="btn btn-default" onclick="deleteContent()">
-										<i class="fa fa-trash"></i>
+									<img th:src="@{/img/icons/delete.png}" class="icon" style="width:10px;"/>
 									</button>
 									<button class="btn btn-default" onclick="shareContent()">
-										<i class="fa fa-share"></i>
+										<img th:src="@{/img/icons/plane.png}" class="icon"/>
 									</button>
 								</div>
 							</div>
@@ -87,7 +87,7 @@
 							<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
 							<button class="btn btn-blue" onclick="saveDataDesc()"
 								style="margin-top: 5px">
-								<i class="fa fa-save"></i>&nbsp;保存
+								<img th:src="@{/img/icons/save.png}" class="icon"/>&nbsp;保存
 							</button>
 						</div>
 					</div>

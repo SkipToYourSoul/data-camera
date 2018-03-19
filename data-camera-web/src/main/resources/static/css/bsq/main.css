@@ -162,3 +162,13 @@ body {
 .btn-white{
 	color:#36b5eb;
 }
+
+.icon{
+	width:15px;
+	height:15px;
+}
+
+.no-radius {
+	border-radius: 0px;
+}
+

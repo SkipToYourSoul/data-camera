@@ -7,7 +7,7 @@
 			<div class="col-sm-10 col-md-10 col-xs-10" style="line-height: 50px">
 				<button class="btn btn-pink"
 					onclick="allMonitor()" id="all-monitor-btn">
-				 <i class="fa fa-eye"></i>&nbsp;全局监控
+				 <img th:src="@{/img/icons/eye1.png}" class="icon" style="height:10px"/>&nbsp;全局监控
 				</button>
 				<button class="btn btn-blue1"
 					style="margin-left: 20px"
@@ -20,7 +20,7 @@
 			</div>
 			<button class="col-sm-2 col-md-2 col-xs-2 pull-right btn-square" data-toggle="modal"
 				data-target="#exp-modal" todo="new">
-				<i class="fa fa-plus"></i>
+				 <img th:src="@{/img/icons/add.png}" class="icon"/>
 			</button>
 		</div>
 
@@ -83,7 +83,7 @@
 								</div>
 									<button class="btn btn-default btn-sm"
 										th:data="${experiment.key}" onclick="deleteExp(this)">
-										<i class="fa fa-trash"></i>
+									 <img th:src="@{/img/icons/delete.png}" class="icon" style="width:10px;"/>
 									</button>
 							</div>
 						</div>
