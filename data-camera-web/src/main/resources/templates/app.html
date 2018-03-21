@@ -132,7 +132,7 @@
 											th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-caret-square-o-down':'fa fa-caret-square-o-right'"></i>
 										</a>
 									</div> -->
-							<div style="padding: 5px 0 15px 15px;">
+							<div style="padding: 5px 0 15px 15px;font-weight:bold;">
 								<a class="no-de" type="button"
 									th:href="@{/app(id=${entry.key},tab=2)}">
 									<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-circle':'fa fa-circle-o'"></span>

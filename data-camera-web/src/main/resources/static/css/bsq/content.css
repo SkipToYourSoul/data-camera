@@ -27,15 +27,13 @@ body{
 }
 
 .share-img {
-    width: 100%;
-    max-height:100%;
+    width: 180px;
+    max-height:180px;
     display: block;
 }
 
 .share-view-title{
-    padding-top: 10px;
     font-weight: 600;
-    line-height: 1.8;
 }
 
 .share-view-info{
@@ -59,11 +57,11 @@ body{
 
 .app-analysis-chart-dom{
     min-height: 300px;
-    padding: 10px 5px;
+    padding: 10px 0;
 }
 
 .app-analysis-chart-dom .action-bar{
-    padding: 0 10px 5px 10px;
+    padding: 10px;
 }
 
 .app-analysis-chart-dom .record-time{
@@ -149,6 +147,12 @@ body{
 	color:#000;
 }
 
+.info-content-title{
+	font-size:16px;
+	color:#000;
+	margin:15px 0;
+}
+
 .content-des{
 	color:#bebebe;
 	font-size:14px;
@@ -200,7 +204,7 @@ body{
 }
 
 .head-img{
-	margin:90px 30% 0 30%;
+	margin:90px auto 0 auto;
 	border-radius:50%;
 	width:90px;
 	height:90px;
@@ -211,4 +215,9 @@ body{
 	.btn-group>.btn:hover {
 	color: #35b5eb;
 	box-shadow: none;
+}
+
+.content-img{
+	width:130px;
+	height:130px;
 }
