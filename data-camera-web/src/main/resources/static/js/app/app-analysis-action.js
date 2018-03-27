@@ -44,24 +44,23 @@ function recorderAction(){
         Object.keys(analysisObject.chart).forEach(function (i) {
             var series = analysisObject.chart[i].getOption()['series'];
             var chartData = analysisObject.getChartData()[i];
-            var currentChartData = series[0]['data'];
-            series[0]['data'] = getNewChartData(chartData, currentChartData);
+            // var currentChartData = series[0]['data'];
+            series[0]['data'] = updateChartData(chartData);
             series[0]['markArea']['data'] = [];
             analysisObject.chart[i].setOption({
                 series: series
             });
         });
 
-        function getNewChartData(d, cd){
+        function updateChartData(d) {
             var n = [];
-            var startPoint = (cd.length == d.length)?0:cd.length - 1;
-            for (var j=startPoint; j<d.length; j++){
-                if (d[j]['value'][0] > analysisObject.timeline[start] + '.000'){
-                    n = d.slice(0, j);
-                    n.push(d[d.length - 1]);
-                    if (n[n.length - 1]['value'].length == 2){
-                        n[n.length - 1]['value'].pop();
-                    }
+            for (var index = 0; index < d.length; index ++) {
+                if (d[index]['value'][0] > analysisObject.timeline[start] + '.000'){
+                    n = d.slice(0, index);
+                    var lastPoint = d[d.length - 1];
+                    n.push({
+                        value: [lastPoint['value'][0]]
+                    });
                     break;
                 }
             }
@@ -121,18 +120,17 @@ function slideChange(e, ui) {
     // 时间轴标注
     $('#recorder-current-time').html(analysisObject.secondLine[ui.values[0]]);
     $('#recorder-total-time').html(analysisObject.secondLine[ui.values[1]]);
+    analysisObject.timelineStart = ui.values[0];
+    analysisObject.timelineEnd = ui.values[1];
 
     // 图表状态
     if (analysisObject.playStatus == "play") {
         updateMarkLine();
+        updateVideoTime();
     } else if (analysisObject.playStatus == "pause") {
-        analysisObject.timelineStart = ui.values[0];
-        analysisObject.timelineEnd = ui.values[1];
         updateMarkLine();
         updateVideoTime();
     } else if (analysisObject.playStatus == "normal") {
-        analysisObject.timelineStart = ui.values[0];
-        analysisObject.timelineEnd = ui.values[1];
         updateMarkArea();
         updateVideoTime();
     }
@@ -231,55 +229,43 @@ function deleteContent() {
 /**
  * 生成用户自定义的数据片段
  */
-function generateNewContent() {
-    var dialogMessage = '<div class="row">';
-    dialogMessage += '<label class="col-sm-2">片段名</label><div class="col-sm-10" style="margin-bottom: 10px"><input type="text" class="form-control" id="user-new-recorder-name" placeholder="长度不超过10"/></div>';
-    dialogMessage += '<label class="col-sm-2">片段描述</label><div class="col-sm-10"><input type="text" class="form-control" id="user-new-recorder-desc"/></div></div>';
-
-    var dialog = bootbox.dialog({
-        title: '即将生成新数据片段，时间为<br/><b>' + analysisObject.timeline[analysisObject.timelineStart] + ' - ' + analysisObject.timeline[analysisObject.timelineEnd] + '</b>',
-        message: dialogMessage,
-        buttons: {
-            cancel: {
-                label: '<i class="fa fa-times"></i>取消',
-                className: 'btn-danger'
-            },
-            ok: {
-                label: '<i class="fa fa-check"></i>确认生成',
-                className: 'btn-info',
-                callback: function(){
-                    var name = $('#user-new-recorder-name').val();
-                    var desc = $('#user-new-recorder-desc').val();
-                    if (name.length == 0){
-                        name = "新片段";
-                    }
-                    message_info('内容生成中', 'info');
-                    $.ajax({
-                        type: 'get',
-                        url: data_address + "/user-new-recorder",
-                        data: {
-                            "recorder-id": analysisObject.currentRecorderId,
-                            "start": analysisObject.timeline[analysisObject.timelineStart],
-                            "end": analysisObject.timeline[analysisObject.timelineEnd],
-                            "name": name,
-                            "desc": desc
-                        },
-                        success: function (response) {
-                            if (response.code == "1111"){
-                                message_info('操作无效: ' + response.data, "error");
-                            } else if (response.code == "0000"){
-                                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
-                            }
-                        },
-                        error: function (response) {
-                            message_info('数据请求被拒绝', "error");
-                        }
-                    });
-                }
+$('#new-data-recorder-form').formValidation({
+    framework: 'bootstrap',
+    icon: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove'
+    },
+    fields: {
+        'new-recorder-name': {validators: {notEmpty: {message: '不能为空'},
+        stringLength: {max: 10}}}
+    }
+}).on('success.form.fv', function (evt){
+    evt.preventDefault();
+    message_info('内容生成中', 'info');
+    $.ajax({
+        type: 'get',
+        url: data_address + "/user-new-recorder",
+        data: {
+            "recorder-id": analysisObject.currentRecorderId,
+            "start": analysisObject.timeline[analysisObject.timelineStart],
+            "end": analysisObject.timeline[analysisObject.timelineEnd],
+            "name": $('#new-recorder-name').val(),
+            "desc": $('#new-recorder-desc').val()
+        },
+        success: function (response) {
+            if (response.code == "1111"){
+                commonObject.printExceptionMsg(response.data);
+            } else if (response.code == "0000"){
+                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
             }
+        },
+        error: function (response) {
+            commonObject.printRejectMsg();
         }
     });
-}
+}).on('err.form.fv', function (evt) {
+    commonObject.printRejectMsg();
+});
 
 /**
  * 保存更新数据片段描述

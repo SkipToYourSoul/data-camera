@@ -343,7 +343,7 @@ body {
 }
 
 .track .track-info .title {
-
+	padding-left: 6px;
 }
 
 .track .track-bound {

@@ -35,7 +35,7 @@
 					<!-- 内容操作 -->
 					<div class="pull-right" th:if="${inApp}">
 						<div class="btn-group">
-							<button class="btn btn-blue" onclick="generateNewContent()">
+							<button class="btn btn-blue" data-toggle="modal" data-target="#new-data-recorder-modal">
 								<i class="fa fa-save"></i>&nbsp;保存
 							</button>
 							<button class="btn btn-default" onclick="deleteContent()" id="delete-btn">

@@ -172,4 +172,43 @@
         </div>
     </div>
 
+    <!-- 生成新的数据片段 -->
+    <div th:fragment="new-data-recorder">
+        <div class="modal fade" id="new-data-recorder-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">生成新数据片段</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="new-data-recorder-form">
+                            <div class="form-group">
+                                <label for="new-recorder-name" class="col-sm-2 control-label">片段名</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="newi-control"
+                                           name="new-recorder-name" id="new-recorder-name"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-recorder-desc" class="col-sm-2 control-label">片段描述</label>
+                                <div class="col-sm-10">
+                                    <textarea class="newt-control"
+                                              name="app-desc"
+                                              rows="5"
+                                              placeholder="描述你的数据"
+                                              id="new-recorder-desc"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <button type="button" class="btn btn-info btn-block" onclick="$('#new-data-recorder-form').submit()">确认生成</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </html>
