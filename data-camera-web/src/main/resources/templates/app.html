@@ -1,45 +1,38 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
-<title>DATA CAMERA场景页</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
+	<title>DATA CAMERA场景页</title>
+	<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
 
-<!-- Bootstrap core CSS -->
-<link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}" />
-<link rel="stylesheet"
-	th:href="@{source/bootstrap/bootstrap-select.min.css}" />
+	<!-- Bootstrap core CSS -->
+	<link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}" />
+	<link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}" />
 
-<link rel="stylesheet"
-	th:href="@{source/bootstrap/font-awesome.min.css}" />
-<link rel="stylesheet" th:href="@{source/loading/fakeLoader.css}" />
-<link rel="stylesheet"
-	th:href="@{source/validation/formValidation.min.css}" />
+	<link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}" />
+	<link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}" />
 
-<link rel="stylesheet" th:href="@{source/video/video-js.min.css}" />
-<link rel="stylesheet" th:href="@{source/timeline/timeline.css}" />
-<link rel="stylesheet"
-	th:href="@{source/datepicker/bootstrap-datetimepicker.min.css}" />
-<link rel="stylesheet" th:href="@{source/table/bootstrap-editable.css}" />
-<link rel="stylesheet" th:href="@{source/shake/csshake.min.css}" />
-<link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui.css}" />
-<link rel="stylesheet"
-	th:href="@{source/jqueryui/jquery-ui-slider-pips.css}" />
-<link rel="stylesheet" th:href="@{source/jqueryui/multi-select.css}" />
+	<link rel="stylesheet" th:href="@{source/video/video-js.min.css}" />
+	<link rel="stylesheet" th:href="@{source/timeline/timeline.css}" />
+	<link rel="stylesheet" th:href="@{source/datepicker/bootstrap-datetimepicker.min.css}" />
+	<link rel="stylesheet" th:href="@{source/table/bootstrap-editable.css}" />
+	<link rel="stylesheet" th:href="@{source/shake/csshake.min.css}" />
+	<link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui.css}" />
+	<link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui-slider-pips.css}" />
+	<link rel="stylesheet" th:href="@{source/jqueryui/multi-select.css}" />
 
-<link rel="stylesheet" th:href="@{source/messenger/messenger.css}" />
-<link rel="stylesheet"
-	th:href="@{source/messenger/messenger-theme-air.css}" />
+	<link rel="stylesheet" th:href="@{source/messenger/messenger.css}" />
+	<link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}" />
 
-<link rel="stylesheet" th:href="@{css/bsq/main.css}" />
-<link rel="stylesheet" th:href="@{css/bsq/app.css}" />
+	<link rel="stylesheet" th:href="@{css/bsq/main.css}" />
+	<link rel="stylesheet" th:href="@{css/bsq/app.css}" />
+	<link rel="stylesheet" th:href="@{css/bsq/app-content.css}" />
 </head>
 <body>
-	<div id="app-loading"></div>
 	<div class="navbar-wrapper" th:include="module/common::nav"></div>
-	<div style="margin-top: 10px;">
+	<div style="margin-top: 3px;">
 		<!-- 左侧sidebar -->
 		<div class="col-sm-3 col-md-3 col-xs-3" style="padding: 0;">
 			<div class="sidebar-content">
@@ -64,7 +57,6 @@
 							</div>
 						</div>
 					</div>
-
 					<!-- 操作按钮 -->
 					<div>
 						<div class="sidebar-buttons">
@@ -90,7 +82,7 @@
 				<!-- 场景列表 -->
 				<div class="sidebar-menu" id="app-menu">
 					<ul class="nav main-menu">
-						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"> <img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 我的场景</a></li>
+						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 我的场景</a></li>
 					</ul>
 					<div class="btn app-list">
 						<i class="fa fa-bars"></i>&nbsp;场景列表<i
@@ -115,9 +107,6 @@
 					<ul class="nav main-menu">
 						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
 					</ul>
-					<!-- <div class="nav main-menu">
-								<i class="glyphicon glyphicon-home"></i>&nbsp;场景管理页面
-							</div> -->
 					<div class="btn app-list">
 						<i class="fa fa-bars"></i>&nbsp;场景列表<i
 							class="fa fa-angle-down pull-right"
@@ -125,14 +114,8 @@
 					</div>
 					<th:block th:each="entry,index:${apps}">
 						<div class="nav" style="padding-left: 20px;">
-							<!-- <div class="col-sm-2" style="padding-top: 5px;">
-										<a role="button"
-											data-toggle="collapse" th:href="|#recorder-${index.count}|"
-											aria-expanded="true"> <i
-											th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-caret-square-o-down':'fa fa-caret-square-o-right'"></i>
-										</a>
-									</div> -->
 							<div style="padding: 5px 0 15px 15px;font-weight:bold;">
+
 								<a class="no-de" type="button"
 									th:href="@{/app(id=${entry.key},tab=2)}">
 									<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-circle':'fa fa-circle-o'"></span>
@@ -145,27 +128,23 @@
 							class="menu-content collapse in"
 							th:id="|recorder-${index.count}|">
 							<!-- 该场景没有片段记录数据 -->
-							<div th:if="${not #maps.containsKey(recorders, entry.key)}"
+							<div th:if="${#maps.isEmpty(recorders)}"
 								class="alert alert-warning my-alter" role="alert">没有可选的数据片段</div>
 							<!-- 遍历片段记录数据 -->
-							<div>
-								<ul class="nav"
-									th:if="${#maps.containsKey(recorders, entry.key)}">
-									<th:block th:each="recorder,index:${recorders[entry.key]}">
-										<li style="padding: 5px 0px 5px 50px;"
-											th:if="${recorder.isUserGen eq 0 and recorder.isRecorder eq 0}"
-											th:data="${recorder.id}">
-												<div  th:data="${recorder.id}" th:href="|#${recorder.id}|">
-													<div style="font-size:13px;" th:text="|${recorder.name}|">
-													</div>
-													<div style="font-size:13px;"
-															th:if="${recorder.isUserGen eq 0 and recorder.isRecorder eq 0}"
-															th:text="|${#dates.format(recorder.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.endTime, 'HH:mm:ss')}|"></div>
-												</div>
-											</li>
-									</th:block>
-								</ul>
-							</div>
+							<ul class="nav" th:if="${not #maps.isEmpty(recorders)}">
+								<th:block th:each="recorder,index:${recorders}">
+									<li style="font-size: 9px; padding: 5px 0px 5px 50px;"
+										th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}"
+										th:data="${recorder.key}">
+										<div th:data="${recorder.key}" th:href="|#${recorder.key}|">
+											<div th:text="|${recorder.value.name}|">
+											</div>
+											<div th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}"
+													th:text="|${#dates.format(recorder.value.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.value.endTime, 'HH:mm:ss')}|"></div>
+										</div>
+									</li>
+								</th:block>
+							</ul>
 						</div>
 					</th:block>
 				</div>
@@ -173,6 +152,7 @@
 		</div>
 
 		<div class="col-sm-9 col-md-9 col-xs-9" style="padding: 0">
+			<!-- 管理页面的内容展示 -->
 			<div th:if="!${param.id}" id="app-management">
 				<!-- <img th:src="@{/img/quickstart.jpg}" alt="xxx1" />-->
 				<div
@@ -188,29 +168,28 @@
 					</div>
 				</div>
 			</div>
-			<div th:if="${param.id}"
-				style="background-color: #fff; min-height: 500px; padding: 20px 0">
+			<!-- 具体应用页面的内容展示 -->
+			<div th:if="${param.id}" style="background-color: #fff; min-height: 500px; padding: 20px 0">
 				<ul class="nav nav-pills" role="tablist" id="app-main-tab">
-					<li role="presentation" class="active"
-						style="border-right: 2px solid #000; padding-right: 15px"><a
-						href="#app-experiment" aria-controls="app-experiment" role="tab"
-						data-toggle="tab">试验模式</a></li>
-					<li role="presentation" class=""><a href="#app-analysis"
-						aria-controls="app-analysis" role="tab" data-toggle="tab"
-						style="padding-left: 25px">分析模式</a></li>
+					<li role="presentation" th:class="${#httpServletRequest.getParameter('tab') eq '2'}?'':'active'"
+						style="border-right: 2px solid #000; padding-right: 15px">
+						<a href="#app-experiment" aria-controls="app-experiment" role="tab" data-toggle="tab">试验模式</a></li>
+					<li role="presentation" th:class="${#httpServletRequest.getParameter('tab') eq '2'}?'active':''">
+						<a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab" style="padding-left: 25px">分析模式</a></li>
 				</ul>
 				<div class="tab-content">
-					<div th:include="app/app-experiment::app-experiment"
-						id="app-experiment" role="tabpanel"
-						class="tab-pane active in fade app-tab-pane-content"></div>
-					<div th:include="app/app-analysis::app-analysis" id="app-analysis"
-						role="tabpanel" class="tab-pane fade app-tab-pane-content"></div>
+					<div th:include="module/app-tab::app-experiment" id="app-experiment" role="tabpanel"
+						 th:class="${#httpServletRequest.getParameter('tab') eq '2'}?'tab-pane fade app-tab-pane-content':'tab-pane active in fade app-tab-pane-content'"></div>
+					<div th:include="module/app-tab::app-analysis" id="app-analysis" role="tabpanel"
+						 th:class="${#httpServletRequest.getParameter('tab') eq '2'}?'tab-pane fade active in app-tab-pane-content':'tab-pane fade app-tab-pane-content'"></div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div th:include="module/modal::app-modal"></div>
 	<div th:include="module/modal::exp-modal"></div>
+	<div th:include="module/modal::exp-del-modal"></div>
+	<div th:include="module/modal::new-data-recorder"></div>
 
 	<script th:src="@{source/jquery.min.js}"></script>
 	<script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
@@ -225,8 +204,8 @@
         tracks:
             key = track_id
             value = trackInfo
-        recorder:
-            key = app_id
+        recorders:
+            key = recorderId
             value = recorderInfo
         isExperimentMonitor:
             key = exp_id
@@ -252,7 +231,6 @@
         var expRecorderTime = [[${expRecorderTime}]];
     </script>
 
-	<script th:src="@{source/loading/fakeLoader.js}"></script>
 	<script th:src="@{source/jqueryui/jquery-ui.js}"></script>
 	<script th:src="@{source/jqueryui/jquery-ui-slider-pips.js}"></script>
 	<script th:src="@{source/jqueryui/jquery.dropdown.js}"></script>
@@ -278,17 +256,12 @@
 
 	<script th:src="@{js/common.js}"></script>
 	<script th:if="${param.id}" th:src="@{js/chart.js}"></script>
-	<script th:src="@{js/app/app-controller.js}"></script>
 	<script th:if="${param.id}" th:src="@{js/app/app-experiment-chart.js}"></script>
 	<script th:if="${param.id}" th:src="@{js/app/app-experiment-action.js}"></script>
 	<script th:if="${param.id}" th:src="@{js/app/app-analysis-action.js}"></script>
 	<script th:if="${param.id}" th:src="@{js/app/app-analysis-chart.js}"></script>
 	<script th:if="${param.id}" th:src="@{js/app/app-analysis-tree.js}"></script>
-
-	<script type="text/javascript">
-        if (app != null) {
-            inAppPage();
-        }
-    </script>
+	<script th:src="@{js/app/app-controller.js}"></script>
+	<script th:src="@{js/app/app-common.js}"></script>
 </body>
 </html>

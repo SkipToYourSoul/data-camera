@@ -152,8 +152,8 @@ public class ViewController {
             model.addAttribute("sensors", baseInfoService.getOnlineSensor(user));
 
             // --- RECORDER:
-            Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
-            model.addAttribute("recorders", recorders);
+            // Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
+            model.addAttribute("recorders", baseInfoService.getRecordersOfApp(id));
         }
 
         return "app";
@@ -215,6 +215,18 @@ public class ViewController {
         return "content";
     }
 
+    @GetMapping("/hot-content")
+    public String hotContent(Model model, HttpServletRequest request) {
+        model.addAttribute("inContent", true);
+        String currentUser = commonService.getCurrentLoginUser(request);
+        List<ContentInfo> userContent = crudService.selectUserContent(currentUser);
+        List<ContentInfo> hotContent = crudService.selectHotContent();
+
+        model.addAttribute("userContent", userContent);
+        model.addAttribute("hotContent", hotContent);
+        return "hot-content";
+    }
+
     @GetMapping("/share")
     public String shareContent(@RequestParam(value = "rid", required = false) Long rid,
                                Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -231,7 +243,6 @@ public class ViewController {
         }
         RecorderInfo recorderInfo = crudService.findRecorder(rid);
         model.addAttribute("recorder", recorderInfo);
-        model.addAttribute("inContent", true);
 
         return "share";
     }
@@ -249,8 +260,8 @@ public class ViewController {
     }
 
     @GetMapping("/login")
-    public String login(){
-        logger.info("In login.html");
+    public String login(HttpServletRequest request){
+        logger.info("In login.html, from {}", request.getRequestURI());
         return "login";
     }
 

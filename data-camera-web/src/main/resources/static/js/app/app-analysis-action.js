@@ -12,6 +12,7 @@ var recorderInterval = null;
 function recorderPlay() {
     var interval = 1000/parseInt($('#recorder-speed').find('.active input').val());
     recorderInterval = setInterval(recorderAction, interval);
+    analysisObject.playStatus = "play";
     $('#play-btn').attr('disabled', 'disabled');
     $('#pause-btn').removeAttr('disabled');
 
@@ -28,7 +29,9 @@ function recorderAction(){
         recorderReset();
     }
 
+    // 每次轮询更新时间轴以及图表
     function setTimeLine(start, end){
+        // 更新时间轴
         $(".slider")
             .slider({values: [start, end]})
             .slider("pips", "refresh")
@@ -41,25 +44,23 @@ function recorderAction(){
         Object.keys(analysisObject.chart).forEach(function (i) {
             var series = analysisObject.chart[i].getOption()['series'];
             var chartData = analysisObject.getChartData()[i];
-            series[0]['data'] = getNewChartData(chartData);
+            // var currentChartData = series[0]['data'];
+            series[0]['data'] = updateChartData(chartData);
             series[0]['markArea']['data'] = [];
             analysisObject.chart[i].setOption({
                 series: series
             });
         });
 
-        function getNewChartData(d){
+        function updateChartData(d) {
             var n = [];
-            // find point
-            var point = 0;
-            for (var j=0; j<d.length; j++){
-                if (d[j]['value'][0] > analysisObject.timeline[start] + '.000'){
-                    point = j;
-                    n = d.slice(0, point);
-                    n.push(d[d.length - 1]);
-                    if (n[n.length - 1]['value'].length == 2){
-                        n[n.length - 1]['value'].pop();
-                    }
+            for (var index = 0; index < d.length; index ++) {
+                if (d[index]['value'][0] > analysisObject.timeline[start] + '.000'){
+                    n = d.slice(0, index);
+                    var lastPoint = d[d.length - 1];
+                    n.push({
+                        value: [lastPoint['value'][0]]
+                    });
                     break;
                 }
             }
@@ -70,6 +71,7 @@ function recorderAction(){
 
 function recorderPause() {
     clearInterval(recorderInterval);
+    analysisObject.playStatus = "pause";
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
 
@@ -82,7 +84,7 @@ function recorderPause() {
 
 function recorderReset() {
     clearInterval(recorderInterval);
-    recorderInterval = null;
+    analysisObject.playStatus = "normal";
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
     $(".slider")
@@ -90,7 +92,7 @@ function recorderReset() {
         .slider("pips", "refresh")
         .slider("float", "refresh");
     // 重置chart数据
-    for (var i in analysisObject.chart){
+    Object.keys(analysisObject.chart).forEach(function (i) {
         var series = analysisObject.chart[i].getOption()['series'];
         series[0]['data'] = analysisObject.getChartData()[i];
         series[0]['markArea']['data'] = [[{
@@ -102,7 +104,7 @@ function recorderReset() {
         analysisObject.chart[i].setOption({
             series: series
         });
-    }
+    });
     // 隐藏时间标记
     $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
 
@@ -110,7 +112,7 @@ function recorderReset() {
     Object.keys(analysisObject.video).forEach(function (i) {
         var video = analysisObject.video[i];
         video.pause();
-        video.currentTime(0);
+        video.currentTime(analysisObject.videoStartTime);
     });
 }
 
@@ -118,10 +120,23 @@ function slideChange(e, ui) {
     // 时间轴标注
     $('#recorder-current-time').html(analysisObject.secondLine[ui.values[0]]);
     $('#recorder-total-time').html(analysisObject.secondLine[ui.values[1]]);
+    analysisObject.timelineStart = ui.values[0];
+    analysisObject.timelineEnd = ui.values[1];
 
     // 图表状态
-    if (recorderInterval != null){
-        // 正在回放数据，不进行高亮片段更新，进行标记线更新
+    if (analysisObject.playStatus == "play") {
+        updateMarkLine();
+        updateVideoTime();
+    } else if (analysisObject.playStatus == "pause") {
+        updateMarkLine();
+        updateVideoTime();
+    } else if (analysisObject.playStatus == "normal") {
+        updateMarkArea();
+        updateVideoTime();
+    }
+
+    // 进行标记线更新
+    function updateMarkLine() {
         var line = [{
             xAxis: analysisObject.timeline[ui.values[0]]
         }];
@@ -132,10 +147,10 @@ function slideChange(e, ui) {
                 series: series
             });
         });
-    } else {
-        // 正常状态，进行标记区域更新
-        analysisObject.timelineStart = ui.values[0];
-        analysisObject.timelineEnd = ui.values[1];
+    }
+
+    // 进行标记区域更新
+    function updateMarkArea() {
         var mark = [[{
             xAxis: analysisObject.timeline[analysisObject.timelineStart]
         }, {
@@ -148,10 +163,13 @@ function slideChange(e, ui) {
                 series: series
             });
         });
-        // 视频时间调整
+    }
+
+    // 视频时间调整
+    function updateVideoTime() {
         Object.keys(analysisObject.video).forEach(function (i) {
             var video = analysisObject.video[i];
-            video.currentTime(ui.values[0]);
+            video.currentTime(ui.values[0] + analysisObject.videoStartTime);
         });
     }
 }
@@ -211,78 +229,68 @@ function deleteContent() {
 /**
  * 生成用户自定义的数据片段
  */
-function generateNewContent() {
-    var dialogMessage = '<label>片段时间</label><p>' + analysisObject.timeline[analysisObject.timelineStart] + ' - ' + analysisObject.timeline[analysisObject.timelineEnd] + '</p>';
-    dialogMessage += '<label>片段名</label><input type="text" class="form-control" id="user-new-recorder-name"/>';
-    dialogMessage += '<label>片段描述</label><input type="text" class="form-control" id="user-new-recorder-desc"/>';
-
-    var dialog = bootbox.dialog({
-        title: '即将生成新的数据片段，记录如下',
-        message: dialogMessage,
-        buttons: {
-            cancel: {
-                label: '<i class="fa fa-times"></i>取消',
-                className: 'btn-danger'
-            },
-            ok: {
-                label: '<i class="fa fa-check"></i>确认生成',
-                className: 'btn-info',
-                callback: function(){
-                    var name = $('#user-new-recorder-name').val();
-                    var desc = $('#user-new-recorder-desc').val();
-                    if (name.length == 0){
-                        message_info('片段名不能为空', 'info');
-                        return;
-                    }
-                    message_info('内容生成中', 'info');
-                    $.ajax({
-                        type: 'get',
-                        url: data_address + "/user-new-recorder",
-                        data: {
-                            "recorder-id": analysisObject.currentRecorderId,
-                            "start": analysisObject.timeline[analysisObject.timelineStart],
-                            "end": analysisObject.timeline[analysisObject.timelineEnd],
-                            "name": name,
-                            "desc": desc
-                        },
-                        success: function (response) {
-                            if (response.code == "1111"){
-                                message_info('操作无效: ' + response.data, "error");
-                            } else if (response.code == "0000"){
-                                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
-                            }
-                        },
-                        error: function (response) {
-                            message_info('数据请求被拒绝', "error");
-                        }
-                    });
-                }
+$('#new-data-recorder-form').formValidation({
+    framework: 'bootstrap',
+    icon: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove'
+    },
+    fields: {
+        'new-recorder-name': {validators: {notEmpty: {message: '不能为空'},
+        stringLength: {max: 10}}}
+    }
+}).on('success.form.fv', function (evt){
+    evt.preventDefault();
+    message_info('内容生成中', 'info');
+    $.ajax({
+        type: 'get',
+        url: data_address + "/user-new-recorder",
+        data: {
+            "recorder-id": analysisObject.currentRecorderId,
+            "start": analysisObject.timeline[analysisObject.timelineStart],
+            "end": analysisObject.timeline[analysisObject.timelineEnd],
+            "name": $('#new-recorder-name').val(),
+            "desc": $('#new-recorder-desc').val()
+        },
+        success: function (response) {
+            if (response.code == "1111"){
+                commonObject.printExceptionMsg(response.data);
+            } else if (response.code == "0000"){
+                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
             }
+        },
+        error: function (response) {
+            commonObject.printRejectMsg();
         }
     });
-}
+}).on('err.form.fv', function (evt) {
+    commonObject.printRejectMsg();
+});
 
 /**
  * 保存更新数据片段描述
  */
 function saveDataDesc(){
+    var $appAnalysisTitle = $('#app-analysis-title');
     var $appAnalysisDesc = $('#app-analysis-desc');
 
     $.ajax({
         type: 'get',
         url: crud_address + '/recorder/desc',
         data: {
+            "title": $appAnalysisTitle.val(),
             "desc": $appAnalysisDesc.val(),
             "id": analysisObject.currentRecorderId
         },
         success: function (response) {
             if (response.code == "0000"){
                 message_info("保存成功", "success");
-                for (var index=0; index<recorders[app['id']].length; index++){
-                    if (recorders[app['id']][index]['id'] == analysisObject.currentRecorderId){
-                        recorders[app['id']][index]['description'] = $appAnalysisDesc.val();
+                Object.keys(recorders).forEach(function (rid) {
+                    if (rid == analysisObject.currentRecorderId) {
+                        recorders[rid]['name'] = $appAnalysisTitle.val();
+                        recorders[rid]['description'] = $appAnalysisDesc.val();
                     }
-                }
+                });
             } else if (response.code == "1111") {
                 message_info('操作无效: ' + response.data, "error");
             }

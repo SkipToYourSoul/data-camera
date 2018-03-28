@@ -27,6 +27,15 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
     RecorderInfo findByExpIdAndIsRecorderAndIsDeleted(long expId, int inRecorder, int isDeleted);
 
     /**
+     * 寻找当前场景下所有记录片段
+     * @param appId
+     * @param inRecorder
+     * @param isDeleted
+     * @return
+     */
+    List<RecorderInfo> findByAppIdAndIsRecorderAndIsDeletedOrderByIdDesc(long appId, int inRecorder, int isDeleted);
+
+    /**
      * find online recorder
      * @param isDeleted
      * @return
@@ -80,10 +89,10 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
      * @param desc
      * @return
      */
-    @Query(value = "UPDATE RecorderInfo r SET r.description = ?2 WHERE id = ?1")
+    @Query(value = "UPDATE RecorderInfo r SET r.name = ?2, r.description = ?3 WHERE id = ?1")
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    Integer updateDescription(long id, String desc);
+    Integer updateDescription(long id, String title, String desc);
 
     /**
      * delete content

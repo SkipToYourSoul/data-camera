@@ -13,26 +13,26 @@
                     <div class="modal-body">
                         <form class="form-horizontal" role="form" id="edit-app-form">
                             <div class="form-group">
-                                <label for="app-name" class="col-sm-2 control-label">场景标题</label>
+                                <label for="app-name" class="col-sm-2 control-label">标题</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control"
-                                           name="app-name" id="app-name" placeholder="场景标题不能为空"/>
+                                    <input type="text" class="newi-control"
+                                           name="app-name" id="app-name"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="app-desc" class="col-sm-2 control-label">场景描述</label>
+                                <label for="app-desc" class="col-sm-2 control-label">描述</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control"
+                                    <textarea class="newt-control"
                                               name="app-desc"
                                               rows="5"
                                               required="required"
-                                              placeholder="简单描述你的场景，不能为空"
+                                              placeholder="简单描述你的场景"
                                               id="app-desc"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
-                                    <button type="button" class="btn btn-primary btn-block" onclick="$('#edit-app-form').submit()" id="app-confirm-btn">确认创建</button>
+                                    <button type="button" class="btn btn-info btn-block" onclick="$('#edit-app-form').submit()" id="app-confirm-btn">确认创建</button>
                                 </div>
                             </div>
                         </form>
@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <!-- 新增／编辑 实验 -->
+    <!-- 新增/编辑 传感器组 -->
     <div th:fragment="exp-modal">
         <div class="modal fade" id="exp-modal" tabindex="-1" role="dialog" aria-labelledby="exp-modal-title">
             <div class="modal-dialog" role="document">
@@ -54,35 +54,66 @@
                     <div class="modal-body">
                         <form class="form-horizontal" role="form" id="edit-exp-form">
                             <div class="form-group" id="exp-name-group">
-                                <label for="exp-name" class="col-sm-2 control-label">传感器组标题</label>
+                                <label for="exp-name" class="col-sm-2 control-label">标题</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control"
-                                           name="exp-name" id="exp-name" placeholder="传感器组标题不能为空"/>
+                                    <input type="text" class="newi-control" name="exp-name" id="exp-name"/>
                                 </div>
                             </div>
                             <div class="form-group" id="exp-desc-group">
-                                <label for="exp-desc" class="col-sm-2 control-label">传感器组描述</label>
+                                <label for="exp-desc" class="col-sm-2 control-label">描述</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control"
+                                    <textarea class="newt-control"
                                               name="exp-desc"
                                               rows="3"
                                               required="required"
-                                              placeholder="简单描述你的传感器组，不能为空"
+                                              placeholder="简单描述你的传感器组"
                                               id="exp-desc"></textarea>
                                 </div>
                             </div>
                             <div class="form-group" id="exp-select-group">
-                                <label for="exp-select" class="col-sm-2 control-label">添加传感器</label>
+                                <label for="exp-add-select" class="col-sm-2 control-label">添加设备</label>
                                 <div class="col-sm-10">
-                                    <select multiple="multiple" id="exp-select" name="exp-select"></select>
+                                    <select multiple="multiple" id="exp-add-select" name="exp-select"></select>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
-                                    <button type="button" class="btn btn-primary btn-block" onclick="$('#edit-exp-form').submit()" id="exp-confirm-btn">确认创建</button>
+                                    <button type="button" class="btn btn-info btn-block" onclick="$('#edit-exp-form').submit()" id="exp-confirm-btn">确认创建</button>
                                 </div>
                             </div>
                         </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <a type="button" th:href="@{/device}" class="btn btn-info">去激活新设备</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="exp-del-modal">
+        <div class="modal fade" id="exp-del-modal" tabindex="-1" role="dialog" aria-labelledby="exp-modal-title">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">删除传感器组中的轨迹</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="exp-del-select" class="col-sm-2 control-label">选择设备</label>
+                                <div class="col-sm-10" style="margin-bottom: 10px;">
+                                    <select multiple="multiple" id="exp-del-select" name="exp-select"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <button type="button" class="btn btn-info btn-block" id="exp-del-btn" onclick="deleteTrack()">确认删除</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,27 +132,27 @@
                     <div class="modal-body">
                         <form class="form-horizontal" role="form" id="edit-sensor-form">
                             <div class="form-group">
-                                <label for="sensor-name" class="col-sm-2 control-label">设备名称</label>
+                                <label for="sensor-name" class="col-sm-2 control-label">名称</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="sensor-name" id="sensor-name"/>
+                                    <input type="text" class="newi-control" name="sensor-name" id="sensor-name"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="sensor-code" class="col-sm-2 control-label">设备编号</label>
+                                <label for="sensor-code" class="col-sm-2 control-label">编号</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="sensor-code" id="sensor-code" placeholder="输入设备上面的编号，如0001"/>
+                                    <input type="text" class="newi-control" name="sensor-code" id="sensor-code" placeholder="输入设备上面的编号，如0001"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="file-upload-input" class="col-sm-2 control-label">设备图片</label>
+                                <label for="file-upload-input" class="col-sm-2 control-label">图片</label>
                                 <div class="col-sm-10">
                                     <input id="file-upload-input" type="file" class="file" data-preview-file-type="text" />
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="sensor-desc" class="col-sm-2 control-label">设备描述</label>
+                                <label for="sensor-desc" class="col-sm-2 control-label">描述</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control"
+                                    <textarea class="newt-control"
                                               name="sensor-desc"
                                               rows="5"
                                               required="required"
@@ -131,7 +162,7 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-10 col-sm-offset-2">
-                                    <button type="button" class="btn btn-primary btn-block" onclick="$('#edit-sensor-form').submit()" id="sensor-confirm-btn">确认创建</button>
+                                    <button type="button" class="btn btn-info btn-block" onclick="$('#edit-sensor-form').submit()" id="sensor-confirm-btn">确认创建</button>
                                 </div>
                             </div>
                         </form>
@@ -141,4 +172,43 @@
         </div>
     </div>
 
+    <!-- 生成新的数据片段 -->
+    <div th:fragment="new-data-recorder">
+        <div class="modal fade" id="new-data-recorder-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">生成新数据片段</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="new-data-recorder-form">
+                            <div class="form-group">
+                                <label for="new-recorder-name" class="col-sm-2 control-label">片段名</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="newi-control"
+                                           name="new-recorder-name" id="new-recorder-name"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-recorder-desc" class="col-sm-2 control-label">片段描述</label>
+                                <div class="col-sm-10">
+                                    <textarea class="newt-control"
+                                              name="app-desc"
+                                              rows="5"
+                                              placeholder="描述你的数据"
+                                              id="new-recorder-desc"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <button type="button" class="btn btn-info btn-block" onclick="$('#new-data-recorder-form').submit()">确认生成</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </html>

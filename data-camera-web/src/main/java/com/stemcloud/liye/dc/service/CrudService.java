@@ -181,8 +181,8 @@ public class CrudService {
         recorderRepository.updateName(id, name);
     }
 
-    public void updateRecorderDescription(long id, String description){
-        recorderRepository.updateDescription(id, description);
+    public void updateRecorderDescription(long id, String title, String description){
+        recorderRepository.updateDescription(id, title, description);
     }
 
     public void deleteAllRecorder(long id){
@@ -228,11 +228,11 @@ public class CrudService {
     }
 
     public List<ContentInfo> selectUserHotContent(String user){
-        return contentRepository.findTop10ByOwnerAndIsDeletedOrderByLikeDesc(user, 0);
+        return contentRepository.findByOwnerAndIsDeletedOrderByLikeDesc(user, 0);
     }
 
     public List<ContentInfo> selectHotContent(){
-        return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeDesc(1, 0);
+        return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeAndCreateTimeDesc();
     }
 
     public void deleteContent(long id){

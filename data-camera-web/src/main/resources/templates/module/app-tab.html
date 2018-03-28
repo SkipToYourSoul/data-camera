@@ -14,9 +14,6 @@
 					onclick="allRecord()" id="all-record-btn">
 					<i class="fa fa-video-camera"></i>&nbsp;全局录制
 				</button>
-				<!--   <button class="btn btn-default" data-toggle="modal" data-target="#exp-modal" todo="new">
-                    <i class="fa fa-plus-circle"></i>&nbsp;添加传感器组</button>
-                <a class="btn btn-default" th:href="@{/device}"><i class="fa fa-plus-circle"></i>&nbsp;添加新设备</a> -->
 			</div>
 			<button class="col-sm-2 col-md-2 col-xs-2 pull-right btn-square" data-toggle="modal"
 				data-target="#exp-modal" todo="new">
@@ -26,24 +23,23 @@
 
 		<div class="app-exp-container wi8">
 			<!-- 场景下没有实验 -->
-			<div th:if="${#maps.isEmpty(experiments)}"
-				class="alert alert-info my-alert" role="alert">TIPS:
+			<div th:if="${#maps.isEmpty(experiments)}" class="alert alert-info my-alert" role="alert">TIPS:
 				场景中还没有传感器组，请点击上方“添加传感器组”按钮可进行相关操作:)</div>
 
 			<!-- 遍历构造实验panel -->
 			<th:block th:each="experiment,expIndex:${experiments}">
-				<div class="panel-heading"
-					style="border-bottom: solid 1px #eee; border-top: solid 1px #eee">
+				<div class="panel-heading" style="border-bottom: solid 1px #eee; border-top: solid 1px #eee">
 					<div class="panel-title row">
 						<div class="col-sm-8 col-md-8 col-xs-8" style="line-height:40px;">
 							<!-- 标题 -->
-							<a  th:text="|传感器组|"
-								th:data="${experiment.key}" data-toggle="modal"
-								data-target="#exp-modal" todo="edit" from="modify-desc" class="app-group-title"></a> <a class="app-group-title"
-								role="button" data-toggle="collapse"
+							<!-- 根据设计而改 -->
+							<a th:text="|传感器组|"
+								th:data="${experiment.key}" class="app-group-title"></a>
+							 <a class="app-group-title"
+							role="button" data-toggle="collapse"
 								th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
 								&nbsp;<i class="fa fa-sort"></i>
-							</a>
+							</a> 
 							<!-- 实验状态和操作栏 -->
 							<span> <span class="label label-default"
 								th:id="|experiment-es-${experiment.key}|">非监控</span> <span
@@ -74,11 +70,18 @@
 										th:data="${experiment.key}" data-toggle="modal"
 										data-target="#exp-modal" todo="edit" from="modify-sensor">
 										<i class="fa fa-plus"></i>
-									</button>
+									</button>							
 									<button class="btn btn-default btn-sm"
-										th:data="${experiment.key}" data-toggle="modal"
-										data-target="#exp-modal" todo="edit" from="modify-sensor">
+											th:data="${experiment.key}" data-toggle="modal"
+											data-target="#exp-del-modal">
 										<i class="fa fa-minus"></i>
+									</button>
+								</div>
+								<div class="btn-group">
+									<button class="btn btn-default btn-sm"
+											th:data="${experiment.key}" data-toggle="modal"
+											data-target="#exp-modal" todo="edit" from="modify-desc">
+										<i class="fa fa-refresh"></i>
 									</button>
 								</div>
 									<button class="btn btn-default btn-sm"
@@ -89,48 +92,44 @@
 						</div>
 					</div>
 				</div>
-				<div th:id="|exp-${experiment.key}|"
-					class="panel-collapse collapse in" role="tabpanel">
+				<div th:id="|exp-${experiment.key}|" class="panel-collapse collapse in" role="tabpanel">
 					<div class="panel-body" style="padding: 5px">
 						<!-- 实验图表和数据 -->
 						<div class="app-exp-content">
 							<div th:if="${#lists.isEmpty(experiment.value.trackInfoList)}"
 								class="alert alert-info my-alert" role="alert">TIPS:
 								传感器组中暂无任何传感器，点击上方“+”按钮可添加传感器:)</div>
-							<th:block
-								th:each="track,trackIndex:${experiment.value.trackInfoList}">
+							<th:block th:each="track,trackIndex:${experiment.value.trackInfoList}">
 								<div class="track">
 									<!-- 轨迹信息 -->
 									<div class="track-info" th:switch="${track.type}">
 										<div class="title">
-											<!-- <span th:case="0" th:text="|未绑定传感器的轨迹|"></span> <span
+											<!--<span th:case="0" th:text="|未绑定传感器的轨迹|"></span> <span
 												th:case="1" th:text="|可绑定数值型传感器的轨迹|"></span> <span
-												th:case="2" th:text="|可绑定摄像头的轨迹|"></span> --> 
-												<span> <!-- 绑定的传感器： --><!--  <a href="#"
-												th:id="|track-bound-${track.id}|" data-type="select"
+												th:case="2" th:text="|可绑定摄像头的轨迹|"></span> <span
+												class="track-bound">绑定的传感器：-->
+											<!-- 设备绑定 -->
+											<!-- 根据设计下面两行注释 -->
+											<!-- <span>传感器：&nbsp;</span> 
+											 <a href="#" th:id="|track-bound-${track.id}|" data-type="select"
 												data-title="绑定设备"></a> -->
-											</span>
-										<!-- 	<button class="btn btn-default btn-xs pull-right"
-												th:data="${track.id}" onclick="deleteTrack(this)">
-												<i class="fa fa-close"></i>
-											</button> -->
 										</div>
 									</div>
 
 									<!-- 图表及统计信息, 遍历传感器维度 -->
 									<div th:if="${track.sensor == null}" style="height: 50px"></div>
-									<div class="track-content"  th:if="${track.sensor != null}">
-										<th:block
-											th:each="dim,dimIndex:${#strings.listSplit(track.sensor.sensorConfig.dimension,';')}">
-											<div class="panel panel-default my-panel" >
+									<div class="track-content" th:if="${track.sensor != null}">
+										<th:block th:each="dim,dimIndex:${#strings.listSplit(track.sensor.sensorConfig.dimension,';')}">
+											<div class="panel panel-default my-panel">
 												<div class="my-panel-head">
 													<div class="panel-title my-panel-title">
-														<a role="button" data-toggle="collapse" class="app-group-title"
-															th:href="@{|#exp-${experiment.key}-${track.id}-${dim}|}"
-															aria-expanded="true"> <!-- <i class="fa fa-arrows-v"></i>&nbsp; -->
-															<span class="app-group-title"
-															th:text="|${dim}(${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)})|"></span>
-														</a>
+														<span class="app-group-title"
+															  th:text="|${dim}(${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)})|"></span>
+														<span class="pull-right">
+															<a data-toggle="collapse" th:href="@{|#exp-${experiment.key}-${track.id}-${dim}|}" aria-expanded="true">
+																<i class="fa fa-sort-down" style="color: #9d9d9d;"></i>
+															</a>
+														</span>
 													</div>
 												</div>
 												<div th:id="|exp-${experiment.key}-${track.id}-${dim}|"
@@ -140,11 +139,9 @@
 															<!-- 轨迹绑定的传感器内容，包括：未绑定，数值型，摄像头 -->
 															<div class="col-xs-9 col-sm-9 col-md-9"
 																th:switch="${track.type}">
-																<div
-																	th:id="|experiment-track-${experiment.key}-${track.id}-${dim}|"
+																<div th:id="|experiment-track-${experiment.key}-${track.id}-${dim}|"
 																	class="track-chart">
 																	<div th:case="1">
-																		<strong>轨迹加载中</strong>
 																	</div>
 																	<div th:case="2">
 																		<div class="text-center">
@@ -166,7 +163,7 @@
 																		class="text-center" th:text="${dim}"></div>
 																	<div class="content-now-text" th:switch="${track.type}">
 																		<div class="text-center">
-																			<span th:class="|content-value-${experiment.key}|"
+																			<span th:class="|current-content-value-${experiment.key}|"
 																				th:id="|experiment-now-${experiment.key}-${track.id}-${dim}|">-</span>
 																			<span
 																				th:text="${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)}"></span>
@@ -208,6 +205,34 @@
 					</div>
 				</div>
 			</th:block>
+		</div>
+	</div>
+
+	<div th:fragment="app-analysis">
+		<div class="col-sm-12 col-md-12 col-xs-12" style="padding: 0; background-color: #f4f6f9;">
+			<!-- 片段关系树形图 -->
+			<div class="app-analysis-tree-group analysis-sub-content">
+				<!-- 该场景没有片段记录数据 -->
+				<div th:if="${#maps.isEmpty(recorders)}"
+					 class="alert alert-warning my-info wi8" role="alert">暂无可展示的数据片段</div>
+				<!-- 遍历片段记录数据 -->
+				<th:block th:each="entry,index:${recorders}">
+					<div
+							th:if="${entry.value.isUserGen eq 0 and entry.value.isRecorder eq 0}"
+							class="app-analysis-tree-dom wi8" th:data="${entry.key}"
+							style="background-color: #fff;">
+						<div class="tree-info">
+							<span th:text="${entry.value.name}"></span> <span
+								th:text="|数据时间： ${#dates.format(entry.value.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(entry.value.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></span>
+						</div>
+						<div class="tree-chart" th:id="|tree-chart-${entry.value.id}|"
+							 style="background-color: #fff; margin: 10px 0"></div>
+					</div>
+				</th:block>
+			</div>
+
+			<div th:include="module/app-module::app-recorder-content">
+			</div>
 		</div>
 	</div>
 </body>

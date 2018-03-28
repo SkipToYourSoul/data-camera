@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <title>DATA CAMERA内容页</title>
+
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/minirefresh/minirefresh.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/messenger/messenger.css}"/>
+    <link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}"/>
+
+    <link rel="stylesheet" th:href="@{css/bsq/main.css}"/>
+    <link rel="stylesheet" th:href="@{css/bsq/content.css}"/>
+</head>
+<body>
+    <div class="minirefresh-wrap" id="content-minirefresh">
+        <div class="minirefresh-scroll" style="background-color: #F1F3FA;">
+            <div class="navbar-wrapper" th:include="module/common::nav"></div>
+            <div class="container content-container">
+                <div id="content-filter" class="content-filter">
+                    <div class="content-filter-wrapper">
+                        <span class="category-name">学科：</span>
+                        <ul class="category-list list-inline stem-filter">
+                            <li class="active">全部</li>
+                            <li>科学</li>
+                            <li>技术</li>
+                            <li>工程</li>
+                            <li>数学</li>
+                        </ul>
+                    </div>
+                    <div class="content-filter-wrapper">
+                        <span class="category-name">标签：</span>
+                        <ul class="category-list list-inline tag-filter">
+                            <li class="active">全部</li>
+                            <li>温湿度</li>
+                            <li>光照</li>
+                            <li>摄像头</li>
+                        </ul>
+                    </div>
+                    <div class="content-filter-wrapper" style="border: none">
+                        <div class="input-group" style="width: 250px;">
+                            <input type="text" class="form-control" name="search" id="content-search-input" placeholder="搜索共享内容" />
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default" id="content-search-btn"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="content-menu">
+                    <ul class="nav nav-pills" role="tablist">
+                        <li role="presentation" class="" style="border-right: 2px solid #000;"><a th:href="@{/content}">我的发布</a></li>
+                        <li role="presentation" class="active"><a th:href="@{/hot-content}">热门发布</a></li>
+                    </ul>
+                </div>
+                <div class="share-view content-show">
+                    <div id="content-data" class="row">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<script th:src="@{source/jquery.min.js}"></script>-->
+    <script th:src="@{source/jquery-2.2.4.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+    <script th:src="@{source/minirefresh/minirefresh.min.js}"></script>
+    <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/messenger/messenger-theme-future.js}"></script>
+
+    <script th:inline="javascript">
+        var userContent = [[${userContent}]];
+        var hotContent = [[${hotContent}]];
+    </script>
+
+    <script th:src="@{js/common.js}"></script>
+    <script th:src="@{js/content/hot-content.js}"></script>
+</body>
+</html>

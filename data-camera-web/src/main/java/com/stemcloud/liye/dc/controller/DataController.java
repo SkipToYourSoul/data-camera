@@ -153,4 +153,13 @@ public class DataController {
             return ServerReturnTool.serverFailure(e.getCause().getMessage());
         }
     }
+
+    @GetMapping("/search-hot-content")
+    Map searchHotContent(@RequestParam String search) {
+        try{
+            return ServerReturnTool.serverSuccess(dataService.getSearchContent(search));
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
 }

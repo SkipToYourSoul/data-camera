@@ -1,7 +1,7 @@
 /** app css **/
 body {
 	background: #F1F3FA;
-	padding-top: 60px;
+	/*padding-top: 60px;*/
 }
 
 /* 场景页面主布局样式 */
@@ -241,100 +241,11 @@ body {
 	width: 100%;
 }
 
-.app-analysis-chart-dom {
-	/*    border: 1px solid #9d9d9d; */
-	min-height: 300px;
-	padding: 10px 0;
-}
-
-.app-analysis-chart-dom .action-bar {
-	padding: 0 10px 5px 10px;
-}
-
-.app-analysis-chart-dom .record-time {
-	font-weight: 600;
-	padding-right: 20px;
-	padding-left: 5px;
-}
-
-.app-analysis-chart-dom .timeline-dom {
-	padding: 10px 25px 10px 40px;
-}
-
-/* timeline 自定义样式 */
-#timeline-slider .ui-slider-tip {
-	/*visibility: visible;*/
-	opacity: 1;
-	top: -20px;
-	width: 60px;
-	height: 15px;
-	line-height: 15px;
-	margin-left: -30px;
-}
-
-#timeline-slider .ui-slider-pip-first .ui-slider-label {
-	/*margin-left: -10px;
-    width: 120px;*/
-	
-}
-
-#timeline-slider .ui-slider-pip-last .ui-slider-label {
-	/*margin-left: -20px;
-    width: 120px;*/
-	
-}
-
-.app-analysis-chart-dom .chart-dom {
-	
-}
-
-.app-analysis-chart-dom .chart-dom .my-panel {
-	border-radius: 0;
-	margin-bottom: 0;
-	border: 0;
-}
-
-.app-analysis-chart-dom .chart-dom .my-panel-heading {
-	padding: 5px 15px;
-	color: #333;
-	background-color: #f5f5f5;
-	border-color: #ddd;
-	border-bottom: 1px solid transparent;
-}
-
-.app-analysis-chart-dom .chart-dom .my-panel-body {
-	padding: 0;
-}
-
-.app-analysis-chart-dom .description-dom {
-	padding: 10px 5px;
-	font-weight: 600;
-}
-
-.app-analysis-chart-dom .description-dom .desc-title {
-	font-size: 18px;
-	margin-bottom: 5px;
-}
-
-.app-analysis-chart-dom .video-dom .my-panel {
-	border-radius: 0;
-	margin-bottom: 0;
-	border: 0;
-}
-
-.app-analysis-chart-dom .video-dom .my-panel-heading {
-	padding: 5px 15px;
-	color: #333;
-	background-color: #f5f5f5;
-	/*border-color: #ddd;
-	border-bottom: 1px solid transparent;*/
-}
-
 .app-analysis-info-dom {
 	padding: 5px 20px;
 }
 
-/** 场景实验页面样式 app-experiment.html **/
+/** 场景实验页面样式 app-tab.html **/
 .app-exp-action-bar {
 	margin-bottom: 5px;
 	padding: 5px 15px;
@@ -349,6 +260,23 @@ body {
 
 .wi8 {
 	width: 80%;
+}
+
+.newi-control {
+	display: block;
+	width: 100%;
+	height: 34px;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #555;
+	background: #f5f5f5 none;
+	border: solid 1px #f5f5f5;
+	-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow
+	ease-in-out .15s;
+	-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out
+	.15s;
+	transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
 .newt-control {
@@ -407,11 +335,15 @@ body {
 }
 
 .track .track-info {
-	padding: 5px 20px;
+	padding: 0;
 	margin-left: -10px;
 	margin-right: -10px;
 	font-size: 14px;
-	font-weight: 600;
+	font-weight: 500;
+}
+
+.track .track-info .title {
+	padding-left: 6px;
 }
 
 .track .track-bound {
@@ -511,17 +443,6 @@ body {
 
 .tab-content {
 	min-height: 634px;
-}
-
-.my-panel-title {
-	background-color: #fff;
-	color: #35b5eb;
-	font-size: 22px;
-	padding-left: 33px;
-}
-
-.my-panel-head {
-	background-color: #fff;
 }
 
 .app-title {

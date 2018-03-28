@@ -1,310 +1,162 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-<title>DATA CAMERA内容页</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <title>DATA CAMERA内容页</title>
 
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
 
-<!-- Bootstrap core CSS -->
-<link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}" />
-<link rel="stylesheet"
-	th:href="@{source/bootstrap/bootstrap-select.min.css}" />
-<link rel="stylesheet"
-	th:href="@{source/bootstrap/font-awesome.min.css}" />
-<link rel="stylesheet" th:href="@{source/table/bootstrap-table.min.css}" />
-<link rel="stylesheet"
-	th:href="@{source/validation/formValidation.min.css}" />
-<link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui.css}" />
-<link rel="stylesheet"
-	th:href="@{source/jqueryui/jquery-ui-slider-pips.css}" />
-<link rel="stylesheet" th:href="@{source/messenger/messenger.css}" />
-<link rel="stylesheet"
-	th:href="@{source/messenger/messenger-theme-air.css}" />
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/table/bootstrap-table.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/validation/formValidation.min.css}"/>
+    <link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui.css}"/>
+    <link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui-slider-pips.css}"/>
+    <link rel="stylesheet" th:href="@{source/messenger/messenger.css}"/>
+    <link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}"/>
+    <link rel="stylesheet" th:href="@{source/minirefresh/minirefresh.min.css}"/>
 
-<link rel="stylesheet" th:href="@{css/bsq/main.css}" />
-<link rel="stylesheet" th:href="@{css/bsq/content.css}" />
+    <link rel="stylesheet" th:href="@{css/bsq/main.css}"/>
+    <link rel="stylesheet" th:href="@{css/bsq/content.css}"/>
+    <link rel="stylesheet" th:href="@{css/bsq/app-content.css}" />
 </head>
 <style type="text/css">
-body {
-	background-color: #F1F3FA;
-}
+    body {
+        background-color: #F1F3FA;
+    }
 </style>
 <body>
-	<div class="navbar-wrapper" th:include="module/common::nav"></div>
+    <div class="navbar-wrapper" th:include="module/common::nav"></div>
+    <!-- 内容概览 -->
+    <div class="container col-sm-10 col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1 col-sm-offset-1"
+         style="background-color: #FFF; padding: 0" th:if="!${param.id}">
+            <div th:if="!${param.id}" id="content-preview" class="content-preview">
+                <div class="" style="padding: 20px 0">
+                    <ul class="nav nav-pills" role="tablist">
+                        <li role="presentation" class="active" style="border-right: 2px solid #000;"><a th:href="@{/content}">我的发布</a></li>
+                        <li role="presentation" class=""><a th:href="@{/hot-content}">热门发布</a></li>
+                    </ul>
+                </div>
+                <div style="background-color: #f3f3f3; padding: 0">
+                    <!-- 我的发布 -->
+                    <div id="my-share" class="share-view">
+                        <th:block th:each="content,index:${userContent}">
+                            <div class="share-view-container row">
+                                <div class="share-view-photo col-md-2">
+                                    <img th:src="${content.img}?${content.img}:'img/note.png'" class="share-img center-block"/>
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="share-view-title">
+                                        <div>
+                                            <a class="content-title" th:href="@{/content(id=${content.id})}" th:text="${content.title}"></a>
+                                            <div class="pull-right">
+                                                <button class="btn btn-default btn-sm" th:data="${content.id}" onclick="deleteMyView(this)">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="content-des" th:text="${content.description}|"></div>
+                                        <div class="content-tag">
+                                            <th:block th:if="${#strings.isEmpty(content.tag)}">
+                                                <!-- todo: 标签为空 -->
+                                                <span class="label label-default content-tag-style">无标签</span>
+                                            </th:block>
+                                            <th:block th:each="tag,index:${#strings.listSplit(content.tag,',')}">
+                                                                <span class="label label-default content-tag-style"
+                                                                      th:text="|${'标签:'+tag}|">Default</span>
+                                            </th:block>
+                                        </div>
+                                        <div class="content-category" th:text="|${content.category}|"></div>
+                                    </div>
 
-	<!-- 内容概览 -->
-	<div
-		class="container col-sm-10 col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1 col-sm-offset-1"
-		style="background-color: #FFFFFF; padding: 0" th:if="!${param.id}">
-		<div style="margin-top: 80px;">
-			<div th:if="!${param.id}" id="content-preview"
-				class="content-preview">
-				<div class="" style="padding: 20px 0">
-					<ul class="nav nav-pills" role="tablist">
-						<li role="presentation" class="active"
-							style="border-right: 2px solid #000;"><a href="#my-share"
-							aria-controls="my-share" role="tab" data-toggle="tab">我的发布</a></li>
-						<li role="presentation" class=""><a href="#hot-share"
-							aria-controls="hot-share" role="tab" data-toggle="tab">热门发布</a></li>
-					</ul>
-				</div>
-				<!-- 我的发布 -->
-				<div style="background-color: #f3f3f3; padding: 0px">
-					<div class="tab-content">
-						<div id="my-share" role="tabpanel" class="tab-pane active in fade">
-							<div class="share-view">
-								<div>
-									<th:block th:each="content,index:${userContent}">
-										<div>
-											<div class="share-view-container row"
-												style="padding: 20px 30px">
-												<div class="share-view-photo col-md-2">
-													<img th:src="${content.img}?${content.img}:'img/logo.png'"
-														class="share-img" />
-												</div>
-												<div class="col-md-10">
-													<div class="share-view-title">
-														<div>
-															<a class="content-title"
-																th:href="@{/content(id=${content.id})}"
-																th:text="${content.title}"></a>
-															<div class="pull-right">
-																<button class="btn btn-default btn-sm"
-																	th:data="${content.id}" onclick="deleteMyView(this)">
-																	<i class="fa fa-trash"></i>
-																</button>
-															</div>
-														</div>
-														<div class="content-des" th:text="${content.description}|"></div>
-														<div class="content-tag">
-															<th:block th:if="${#strings.isEmpty(content.tag)}">
-																<!-- todo: 标签为空 -->
-															</th:block>
-															<th:block
-																th:each="tag,index:${#strings.listSplit(content.tag,',')}">
-																<span class="label label-default"
-																	style="background-color: #e8e8e8; color: #777"
-																	th:text="|${'标签:'+tag}|">Default</span>
-															</th:block>
-														</div>
-														<div class="content-category"
-															th:text="|${content.category}|"></div>
-													</div>
+                                    <div class="share-view-user">
+                                        <span class="content-time"
+                                              th:text="${'发布时间：'+#dates.format(content.createTime, 'YYYY-MM-dd HH:mm:ss')}"></span>
+                                        <span class="pull-right"><i
+                                                class="fa fa-user-o content-icon"></i>&nbsp;<span
+                                                class="content-num" th:text="${content.view}"></span> <i
+                                                class="fa fa-commenting-o content-icon"></i>&nbsp;<span
+                                                class="content-num" th:text="${content.comment}"></span>
+                                            <i class="fa fa-heart-o content-icon"></i>&nbsp;<span
+                                                    class="content-num"
+                                                    th:text="${content.like}"></span> </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+    </div>
 
-													<div class="share-view-user">
-														<span class="content-time"
-															th:text="${'发布时间：'+#dates.format(content.createTime, 'YYYY-MM-dd HH:mm:ss')}"></span>
-														<span class="pull-right"><i
-															class="fa fa-user-o content-icon"></i>&nbsp;<span
-															class="content-num" th:text="${content.view}"></span> <i
-															class="fa fa-commenting-o content-icon"></i>&nbsp;<span
-															class="content-num" th:text="${content.comment}"></span>
-															<i class="fa fa-heart-o content-icon"></i>&nbsp;<span
-															class="content-num" th:text="${content.like}"></span> </span>
-													</div>
-												</div>
-											</div>
-										</div>
-									</th:block>
-								</div>
-							</div>
-						</div>
-						<div id="hot-share" role="tabpanel" class="tab-pane fade">
-							<div class="share-view">
-								<div class="row">
-									<th:block th:each="content,index:${hotContent}">
-										<div class="col-sm-12 col-md-12 col-xs-12">
-											<div class="share-view-container row"
-												style="padding: 20px 30px">
-												<div class="share-view-photo col-md-2">
-													<img th:src="${content.img}?${content.img}:'img/logo.png'"
-														class="share-img center-block" />
-												</div>
-												<div class="col-md-10">
-													<div class="share-view-title">
-														<div>
-															<a class="content-title"
-																th:href="@{/content(id=${content.id})}"
-																th:text="${content.title}"></a> <span
-																class="content-owner" th:text="|发布作者：${content.owner}|"></span>
-														</div>
-														<div class="content-des"
-															th:text="|${content.description}|"></div>
-														<div class="content-tag">
-															<th:block th:if="${#strings.isEmpty(content.tag)}">
-																<!-- todo: 标签为空 -->
-															</th:block>
-															<th:block
-																th:each="tag,index:${#strings.listSplit(content.tag,',')}">
-																<span class="label label-default"
-																	style="background-color: #e8e8e8; color: #777"
-																	th:text="|${'标签:'+tag}|">Default</span>
-															</th:block>
-														</div>
-														<div class="content-category"
-															th:text="|${content.category}|"></div>
-													</div>
-													<div class="share-view-info">
-														<span class="share-view-user"> <span
-															class="content-time"
-															th:text="${'发布时间：'+#dates.format(content.createTime, 'YYYY-mm-dd HH:mm:ss')}"></span>
-														</span> <span class="pull-right"> <i
-															class="fa fa-user-o content-icon"></i>&nbsp;<span
-															th:text="${content.view}" class="content-num"></span> <i
-															class="fa fa-commenting-o content-icon"></i>&nbsp;<span
-															th:text="${content.comment}" class="content-num"></span>
-															<i class="fa fa-heart-o content-icon"></i>&nbsp;<span
-															th:text="${content.like}" class="content-num"></span>
-														</span>
-													</div>
-												</div>
-											</div>
-										</div>
-									</th:block>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- 详细内容展示 -->
-	<div
-		class="container col-sm-10 col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1 col-sm-offset-1"
-		th:if="${param.id}">
-		<div class="row" style="margin-top: 80px;">
-			<div class="col-md-9">
-				<div class="">
-					<div class="share-view-container">
-						<div class="row">
-							<div class="share-view-photo col-md-2" style="margin-left:25px">
-								<img
-									th:src="${currentContent.img}?${currentContent.img}:'img/logo.png'"
-									class="center-block content-img" />
-							</div>
-							<div class="col-md-9">
-								<div class="share-view-title"  style="height:130px">
+    <!-- 详细内容展示 -->
+    <div class="container col-sm-10 col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1 col-sm-offset-1" th:if="${param.id}">
+        <div class="row">
+            <div class="col-md-9" >
+                <div class="">
+                    <div class="share-view-container" style="padding-left:20px">
+                        <div class="row" style="margin-top:20px;">
+                            <div class="share-view-photo col-md-2">
+                                <img th:src="${currentContent.img}?${currentContent.img}:'img/note.png'"
+                                        class="center-block content-img"/>
+                            </div>
+                            <div class="col-md-9">
+								<div class="share-view-title">
 									<div class="content-title" th:text="${currentContent.title}"></div>
-									<div class="share-view-user" style="margin-top: 5px">
+									<div class="share-view-user">
 										<div class="content-d" th:text="|作者：${currentContent.owner}|"></div>
-
 										<span class="content-d"
 											th:text="|发布时间：${#dates.format(currentContent.createTime, 'YYYY.MM.dd HH:mm:ss')}"></span>
 									</div>
-									<!-- <div th:text="|分类：${currentContent.category}|"></div> -->
-									<!--<div th:text="|标签：${currentContent.tag}|"></div> -->
-									<div class="content-tag" style="margin-top: 35px">
+								<!-- 按设计图这两个部分没有 -->
+								<!-- 	<div th:text="|分类：${currentContent.category}|"></div> -->
+								<!-- 	<div th:text="|标签：${currentContent.tag}|"></div> -->
+									<div class="content-tag" style="">
 										<th:block th:if="${#strings.isEmpty(currentContent.tag)}">
-											<!-- todo: 标签为空 -->
+						  					<span class="label label-default content-tag-style">无标签</span>
 										</th:block>
 										<th:block
 											th:each="tag,index:${#strings.listSplit(currentContent.tag,',')}">
-											<span class="label label-default"
-												style="background-color: #e8e8e8; color: #777"
+											<span class="label label-default content-tag-style"
 												th:text="|${'标签:'+tag}|">Default</span>
 										</th:block>
 									</div>
-								</div>
-								<!-- 	<div class="share-view-info">
-							<i class="fa fa-user-o"></i>&nbsp;<span
-								th:text="${currentContent.view}"></span> <i
-								class="fa fa-commenting-o"></i>&nbsp;<span
-								th:text="${currentContent.comment}"></span> <i
-								class="fa fa-heart-o"></i>&nbsp;<span
-								th:text="${currentContent.like}"></span>
-						</div> -->
-							</div>
 						</div>
-						<div class="content-d-des" style="margin-left:25px"
-							th:text="|${currentContent.description}|"></div>
-					</div>
-					<!-- <div class="return-text">
-						<i class="fa fa-hand-o-left"></i>&nbsp; <a th:href="@{/content}">返回内容页</a>
-					</div> -->
-					<div>
-						<div id="content-detail" class="content-detail">
-							<!-- 数据展示图 -->
-							<div class="app-analysis-chart-dom">
-								<!-- 操作栏 -->
-								<div style="background-color: #fff">
-								<div class="action-bar" style="background-color: #fff">
-									<div class="btn-group mbtn-group" style="margin-left:25px">
-										<button class="btn btn-default no-radius" onclick="recorderPlay()"
-											id="play-btn">
-											<i class="fa fa-play"></i>
-										</button>
-										<button class="btn btn-default no-radius" onclick="recorderPause()"
-											id="pause-btn" disabled="disabled">
-											<i class="fa fa-pause"></i>
-										</button>
-										</div>
-										<button class="btn btn-default no-radius" onclick="recorderReset()"
-											id="reset-btn">
-											<i class="fa fa-repeat"></i>
-										</button>
-									<div class="btn-group" data-toggle="buttons"
-										id="recorder-speed">
-										<label class="btn active"> <input
-											type="radio" name="options" id="option1" autocomplete="off"
-											checked="checked" value="1" /> X1
-										</label> <label class="btn"> <input type="radio"
-											name="options" id="option2" autocomplete="off" value="2" />
-											X2
-										</label> <label class="btn"> <input type="radio"
-											name="options" id="option3" autocomplete="off" value="4" />
-											X4
-										</label>
-									</div>
-									<span class="record-time"> <span
-										id="recorder-current-time">00:00</span>/<span
-										id="recorder-total-time">-</span>
-									</span>
-								</div>
-								<!-- 时间轴栏 -->
-								<div class="timeline-dom" id="timeline-slider"
-									style="background-color: #fff; margin-top: 5px">
-									<div class="slider"></div>
-								</div>
-								</div>
-								
-								<!-- 图表显示栏 -->
-								<div class="chart-dom" id="app-analysis-chart"
-									style="background-color: #fff; margin-top: 5px"></div>
-								<!-- 视频显示栏 -->
-								<div class="video-dom" id="app-analysis-video"
-									style="background-color: #fff; margin-top: 5px"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-3"
-				style="background-color: #fff; min-height: 600px; padding-bottom: 50px;">
+						</div>		
+                        </div>
+                        <div class="content-d-des"
+                             th:text="|${currentContent.description}|"></div>
+                    </div>
+                    <div class="return-text">
+                        <i class="fa fa-hand-o-left"></i>&nbsp; <a th:href="@{/content}">返回内容页</a>
+                    </div>
+                    <div style="margin-top: 5px;" th:include="module/app-module::app-recorder-content">
+                    </div>
+                </div>
+            </div>
+         	<div class="col-md-3 content-user">
 				<div>
 					<div class="head-img"></div>
-					<div style="text-align: center; margin-top: 15px"
+					<div class="username"
 						th:text="|${currentContent.owner}|"></div>
 				</div>
 				<div>
 					<div class="content-tag">
 						<th:block th:if="${#strings.isEmpty(currentContent.tag)}">
-							<!-- todo: 标签为空 -->
+					 		 <span class="label label-default content-tag-style">无标签</span>
 						</th:block>
 						<th:block
 							th:each="tag,index:${#strings.listSplit(currentContent.tag,',')}">
-							<span class="label label-default"
-								style="background-color: #e8e8e8; color: #777"
+							<span class="label label-default content-tag-style"
 								th:text="|${'标签:'+tag}|">Default</span>
 						</th:block>
 					</div>
-					<div
-						style="border-bottom: 1px solid #f5f5f5; color: #35b5eb; font-size: 14px; padding-top: 20px; padding-bottom: 20px">其他作品</div>
-					<div style="margin-top: 20px">
+                    <div class="content-other">其他作品</div>
+					<div class="other-works">
 						<th:block th:each="otherContent,index:${userHotContent}">
 							<div class="row"
 								th:if="${index.count%2 eq 1 and index.count lt 5}">
@@ -325,43 +177,44 @@ body {
 								</div>
 							</div>
 						</th:block>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script th:src="@{source/jquery.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
 
-	<script th:src="@{source/jquery.min.js}"></script>
-	<script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+    <script th:src="@{source/table/bootstrap-table.min.js}"></script>
+    <script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
+    <script th:src="@{source/bootbox/bootbox.min.js}"></script>
 
-	<script th:src="@{source/table/bootstrap-table.min.js}"></script>
-	<script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
-	<script th:src="@{source/bootbox/bootbox.min.js}"></script>
+    <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/validation/formValidation.min.js}"></script>
+    <script th:src="@{source/validation/bootstrap.min.js}"></script>
 
-	<script th:src="@{source/messenger/messenger.min.js}"></script>
-	<script th:src="@{source/validation/formValidation.min.js}"></script>
-	<script th:src="@{source/validation/bootstrap.min.js}"></script>
+    <script th:src="@{source/echarts/echarts.common.min.js}"></script>
+    <script th:src="@{source/jqueryui/jquery-ui.js}"></script>
+    <script th:src="@{source/jqueryui/jquery-ui-slider-pips.js}"></script>
+    <script th:src="@{source/messenger/messenger.min.js}"></script>
+    <script th:src="@{source/messenger/messenger-theme-future.js}"></script>
+    <script th:src="@{source/minirefresh/minirefresh.min.js}"></script>
 
-	<script th:src="@{source/echarts/echarts.common.min.js}"></script>
-	<script th:src="@{source/jqueryui/jquery-ui.js}"></script>
-	<script th:src="@{source/jqueryui/jquery-ui-slider-pips.js}"></script>
-	<script th:src="@{source/messenger/messenger.min.js}"></script>
-	<script th:src="@{source/messenger/messenger-theme-future.js}"></script>
-
-	<script th:inline="javascript">
+    <script th:inline="javascript">
         var userContent = [[${userContent}]];
         var hotContent = [[${hotContent}]];
         var currentContent = [[${currentContent}]];
     </script>
 
-	<script th:src="@{js/common.js}"></script>
-	<script th:if="!${param.id}" th:src="@{js/content/content-view.js}"></script>
+    <script th:src="@{js/common.js}"></script>
+    <script th:src="@{js/app/app-common.js}"></script>
+    <script th:if="!${param.id}" th:src="@{js/content/content-view.js}"></script>
 
-	<script th:if="${param.id}" th:src="@{js/chart.js}"></script>
-	<!-- 暂时共用，后续考虑分开 -->
-	<script th:if="${param.id}" th:src="@{js/app/app-analysis-chart.js}"></script>
-	<script th:if="${param.id}" th:src="@{js/app/app-analysis-action.js}"></script>
-	<script th:if="${param.id}" th:src="@{js/content/content-detail.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/chart.js}"></script>
+    <!-- 暂时共用，后续考虑分开 -->
+    <script th:if="${param.id}" th:src="@{js/app/app-analysis-chart.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/app/app-analysis-action.js}"></script>
+    <script th:if="${param.id}" th:src="@{js/content/content-detail.js}"></script>
 </body>
 </html>

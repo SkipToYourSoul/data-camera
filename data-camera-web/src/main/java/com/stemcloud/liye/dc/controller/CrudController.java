@@ -1,5 +1,6 @@
 package com.stemcloud.liye.dc.controller;
 
+import com.google.gson.Gson;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
@@ -193,18 +194,19 @@ public class CrudController {
 
     /**
      * 删除轨迹
-     * @param queryParams
+     * @param ids
      * @param request
      * @return
      */
     @GetMapping("/track/delete")
-    public Map deleteTrack(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+    public Map deleteTrack(@RequestParam List<String> ids, HttpServletRequest request){
         try {
             String user = commonService.getCurrentLoginUser(request);
-            Long trackId = Long.parseLong(queryParams.get("track-id"));
-            logger.info("User {} delete track {}", user, trackId);
-            crudService.deleteTrack(trackId);
-            return ServerReturnTool.serverSuccess(trackId);
+            logger.info("User {} delete track {}", user, new Gson().toJson(ids));
+            for (String id : ids){
+                crudService.deleteTrack(Long.parseLong(id));
+            }
+            return ServerReturnTool.serverSuccess(ids.size());
         } catch (Exception e){
             logger.error("[/track/delete]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
@@ -365,8 +367,9 @@ public class CrudController {
         try {
             String user = commonService.getCurrentLoginUser(request);
             long recorderId = Long.parseLong(queryParams.get("id"));
+            String title = queryParams.get("title");
             String desc = queryParams.get("desc");
-            crudService.updateRecorderDescription(recorderId, desc);
+            crudService.updateRecorderDescription(recorderId, title, desc);
             logger.info("User {} update recorder {}'s name to {}", user, recorderId, desc);
             return ServerReturnTool.serverSuccess(desc);
         } catch (Exception e){

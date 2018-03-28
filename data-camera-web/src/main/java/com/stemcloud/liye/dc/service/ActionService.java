@@ -170,8 +170,8 @@ public class ActionService {
             recorderInfo.setIsRecorder(1);
             recorderInfo.setStartTime(new Date());
             recorderInfo.setDevices(new Gson().toJson(devices));
-            recorderInfo.setName("实验{" + experiment.getName() + "}的片段");
-            recorderInfo.setDescription("实验{" + experiment.getName() + "}的描述");
+            recorderInfo.setName(experiment.getName());
+            recorderInfo.setDescription(experiment.getName());
             recorderRepository.save(recorderInfo);
         } else if (action == 0){
             // --- end recorder
@@ -286,7 +286,7 @@ public class ActionService {
             if (hasSensor){
                 boolean noChange = (action == 1 && exp.getIsMonitor() == 1) || (action == 0 && exp.getIsMonitor() == 0);
                 if (!noChange){
-                    changeMonitorState(exp.getId(), action, isSave, dataTime, name + "来自传感器组{" + exp.getName() + "}", desc);
+                    changeMonitorState(exp.getId(), action, isSave, dataTime, name, desc);
                     expIds.add(exp.getId());
                     logger.info("Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
@@ -315,7 +315,7 @@ public class ActionService {
                         changeRecorderState(exp.getId(), 0, isSave, dataTime, "", "");
                         changeRecorderState(exp.getId(), action, 0, 0, "", "");
                     } else {
-                        changeRecorderState(exp.getId(), action, isSave, dataTime, name + "来自传感器组{" + exp.getName() + "}", desc);
+                        changeRecorderState(exp.getId(), action, isSave, dataTime, name, desc);
                     }
                     expIds.add(exp.getId());
                     logger.info("Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
