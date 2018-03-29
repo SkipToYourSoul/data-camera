@@ -38,7 +38,7 @@ function recorderAction(){
             .slider("float", "refresh");
 
         // 显示时间标记
-        $("#timeline-slider").find(".ui-slider-tip").css("visibility", "visible");
+        /*$("#timeline-slider").find(".ui-slider-tip").css("visibility", "visible");*/
 
         // 重置chart数据
         Object.keys(analysisObject.chart).forEach(function (i) {

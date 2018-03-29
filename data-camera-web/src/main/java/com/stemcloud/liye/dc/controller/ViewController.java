@@ -210,6 +210,10 @@ public class ViewController {
 
             model.addAttribute("currentContent", currentContent);
             model.addAttribute("userHotContent", userHotContent);
+
+            Map<Long, RecorderInfo> map = new HashMap<Long, RecorderInfo>(1);
+            map.put(currentContent.getRecorderInfo().getId(), currentContent.getRecorderInfo());
+            model.addAttribute("recorders", map);
         }
 
         return "content";

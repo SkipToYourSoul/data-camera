@@ -37,7 +37,7 @@ function initTreeDom(iFi){
 
     // Construct node data
     var rData = {};
-    // 构造节点关系
+    // 构造数据片段间的节点关系
     Object.keys(recorders).forEach(function (rid) {
         var recorder = recorders[rid];
         analysisObject.rDataMap[rid] = recorder['parentId'];
@@ -88,14 +88,6 @@ function initTreeDom(iFi){
             });
         }
     });
-}
-
-function findParent(id) {
-    if (analysisObject.rDataMap[id] == -1){
-        return id;
-    } else {
-        return findParent(analysisObject.rDataMap[id]);
-    }
 }
 
 // -- node选中事件

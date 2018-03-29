@@ -40,7 +40,7 @@
 				<!-- <img th:if="!${param.id}" th:src="@{/img/index/nav11.png}" class="img-responsive" alt=""/> -->
 				<!-- 内容介绍 -->
 				<div class="sidebar-top">
-					<div class="sidebar-info" style="padding: 0px">
+					<div class="sidebar-info" style="padding: 0">
 						<div th:if="!${param.id}" class="info-title">WELCOME</div>
 						<div th:if="${param.id}" class="info-title">
 							<div th:text="|场景：${app.name}|" style="font-size: 16px"></div>
@@ -64,18 +64,11 @@
 								class="btn sidebar-buttons"
 								style="background-color: #fff; color: #36b5eb; font-weight: 1px"
 								data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
-						</div>
-						<div class="row">
-							<div class="col-md-3 col-sm-3">
-								<button th:if="${param.id}" type="button"
+							<button th:if="${param.id}" type="button"
 									class="btn btn-sm btn-white" data-toggle="modal"
 									data-target="#app-modal" todo="edit">编辑场景</button>
-							</div>
-							<div class="col-md-2 col-sm-2"></div>
-							<div class="col-md-3 col-sm-3">
-								<button th:if="${param.id}" type="button"
+							<button th:if="${param.id}" type="button"
 									class="btn btn-sm btn-pink1" onclick="deleteApp(this)">删除场景</button>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -115,7 +108,6 @@
 					<th:block th:each="entry,index:${apps}">
 						<div class="nav" style="padding-left: 20px;">
 							<div style="padding: 5px 0 15px 15px;font-weight:bold;">
-
 								<a class="no-de" type="button"
 									th:href="@{/app(id=${entry.key},tab=2)}">
 									<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-circle':'fa fa-circle-o'"></span>

@@ -38,7 +38,7 @@ var commonObject = (function () {
 })();
 
 $._messengerDefaults = {
-    extraClasses: 'messenger-fixed messenger-on-top',
+    extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
     theme: 'air'
 };
 

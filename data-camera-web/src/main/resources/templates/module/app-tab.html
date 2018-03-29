@@ -104,10 +104,6 @@
 									<!-- 轨迹信息 -->
 									<div class="track-info" th:switch="${track.type}">
 										<div class="title">
-											<!--<span th:case="0" th:text="|未绑定传感器的轨迹|"></span> <span
-												th:case="1" th:text="|可绑定数值型传感器的轨迹|"></span> <span
-												th:case="2" th:text="|可绑定摄像头的轨迹|"></span> <span
-												class="track-bound">绑定的传感器：-->
 											<!-- 设备绑定 -->
 											<!-- 根据设计下面两行注释 -->
 											<!-- <span>传感器：&nbsp;</span> 
@@ -137,30 +133,14 @@
 													<div class="panel-body my-panel-body">
 														<div class="row" >
 															<!-- 轨迹绑定的传感器内容，包括：未绑定，数值型，摄像头 -->
-															<div class="col-xs-9 col-sm-9 col-md-9"
-																th:switch="${track.type}">
-																<div th:id="|experiment-track-${experiment.key}-${track.id}-${dim}|"
-																	class="track-chart">
-																	<div th:case="1">
-																	</div>
-																	<div th:case="2">
-																		<div class="text-center">
-																			<h1 style="color: #ac2925" class="shake-slow">摄像头已连接</h1>
-																		</div>
-																	</div>
-																	<div th:case="0">
-																		<div class="alert alert-warning my-alter" role="alert">TIPS:
-																			当前轨迹暂未绑定任何传感器，将不会产生数据</div>
-																	</div>
+															<div class="col-xs-9 col-sm-9 col-md-9">
+																<div th:id="|experiment-track-${experiment.key}-${track.id}-${dim}|" class="track-chart">
 																</div>
 															</div>
 															<!-- 轨迹绑定的传感器内容的统计信息 -->
-															<div class="col-xs-3 col-sm-3 col-md-3"
-																style="padding-top: 10px;">
+															<div class="col-xs-3 col-sm-3 col-md-3" style="padding-top: 10px;">
 																<div class="track-statistics" th:switch="${track.type}">
-																	<div
-																		style="font-size: 24px; font-weight: 600; padding-bottom: 5px"
-																		class="text-center" th:text="${dim}"></div>
+																	<div style="font-size: 24px; font-weight: 600; padding-bottom: 5px" class="text-center" th:text="${dim}"></div>
 																	<div class="content-now-text" th:switch="${track.type}">
 																		<div class="text-center">
 																			<span th:class="|current-content-value-${experiment.key}|"

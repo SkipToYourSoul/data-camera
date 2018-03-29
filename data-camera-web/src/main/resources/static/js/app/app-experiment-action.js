@@ -514,14 +514,19 @@ function allRecord(){
  */
 function pageStartMonitor(exp_id){
     console.info("Page start monitor: " + exp_id);
-    var exp_state_dom = $('#experiment-es-' + exp_id);
-    var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
 
+    var exp_state_dom = $('#experiment-es-' + exp_id);
     isExperimentMonitor[exp_id] = 1;
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-    /*exp_monitor_btn.removeClass('btn-default').addClass('btn-success');*/
 
     doInterval(exp_id);
+
+    // 模拟视频播放
+    Object.keys(expObject.video).forEach(function (id) {
+        if (id.split('-')[2] == exp_id) {
+            videojs(id).play();
+        }
+    });
 }
 
 /**
@@ -553,6 +558,13 @@ function pageStopMonitor(exp_id){
             chart.setOption({
                 series: series
             });
+        }
+    });
+
+    // 模拟视频播放
+    Object.keys(expObject.video).forEach(function (id) {
+        if (id.split('-')[2] == exp_id) {
+            videojs(id).pause();
         }
     });
 }

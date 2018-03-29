@@ -151,6 +151,7 @@ public class DataService {
         newRecorder.setIsUserGen(1);
         newRecorder.setParentId(recorderId);
         newRecorder.setDevices(new Gson().toJson(devices));
+        newRecorder.setStartSeconds( (sdf.parse(start).getTime() - recorder.getStartTime().getTime())/1000 + recorder.getStartSeconds() );
         long newR = recorderRepository.save(newRecorder).getId();
 
         // 若有视频，则在video表中生成记录

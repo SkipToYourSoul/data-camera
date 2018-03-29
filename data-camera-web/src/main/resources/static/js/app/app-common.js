@@ -126,6 +126,13 @@ var expObject = (function (){
     };
     var currentExpId = 0;
 
+    // -- 视频dom，临时演示用
+    var video = {};
+
+    var setVideo = function (key, value) {
+        video[key] = value;
+    };
+
     return {
         iFi: iFi,
         newestTimestamp: newestTimestamp,
@@ -134,7 +141,9 @@ var expObject = (function (){
         setRecorderTime: setRecorderTime,
         currentExpId: currentExpId,
         chart: chart,
-        setChart: setChart
+        setChart: setChart,
+        video: video,
+        setVideo: setVideo
     };
 })();
 
@@ -257,4 +266,12 @@ function initExpSelect(){
             this.qs1.cache();
         }
     });
+}
+
+function findParent(id) {
+    if (analysisObject.rDataMap[id] == -1){
+        return id;
+    } else {
+        return findParent(analysisObject.rDataMap[id]);
+    }
 }

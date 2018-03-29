@@ -29,15 +29,35 @@ function initExperiment(iFi){
             if (track_type == 1) {
                 // --- value sensor
                 legends.forEach(function (legend) {
-                    var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
-                    var chart = echarts.init(document.getElementById(chart_dom), "", opts = {height: 150});
+                    var dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
+                    var chart = echarts.init(document.getElementById(dom), "", opts = {height: 150});
                     chart.setOption(buildExperimentChartOption(legend));
-                    expObject.setChart(chart_dom, chart);
+                    expObject.setChart(dom, chart);
                 });
             } else if (track_type == 2){
-
+                // --- 视频直播
+                Object.keys(expObject.video).forEach(function (id) {
+                    videojs(id).dispose();
+                    delete expObject.video[id];
+                });
+                legends.forEach(function (legend) {
+                    var dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
+                    var videoId = "experiment-video-" + exp_id + "-" + track_id;
+                    $('#' + dom).html('<div style="padding: 10px">' +
+                        '<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
+                    var video = videojs(videoId, {
+                        controls: false,
+                        /*poster: "/camera/img/oceans.png",*/
+                        preload: "auto",
+                        loop: true,
+                        sources: [{src: "/camera/img/oceans.mp4", type: "video/mp4"}],
+                        techOrder: ["html5", "flash"]
+                    }, function () {
+                    });
+                    expObject.setVideo(videoId, video);
+                });
             } else if (track_type == 0){
-
+                
             }
 
             // init track bound sensor
@@ -110,23 +130,25 @@ function initExperiment(iFi){
 function initActionStatus(){
     // -- 更改实验状态（如果在监控或录制状态）
     Object.keys(isExperimentMonitor).forEach(function (id) {
-        var exp_monitor_btn = $('#experiment-monitor-' + id);
         var exp_monitor_dom = $('#experiment-es-' + id);
-        var exp_recorder_btn = $('#experiment-recorder-' + id);
         var exp_recorder_dom = $('#experiment-rs-' + id);
 
         if (isExperimentMonitor[id] == 1){
             exp_monitor_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-            exp_monitor_btn.removeClass('btn-default').addClass('btn-success');
 
             if (isExperimentRecorder[id] == 1){
                 exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-                exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
-
                 expObject.setRecorderTime(id, [expRecorderTime[id]]);
                 expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
             }
             doInterval(id);
+
+            // 模拟视频播放
+            Object.keys(expObject.video).forEach(function (vid) {
+                if (vid.split('-')[2] == id) {
+                    videojs(vid).play();
+                }
+            });
         }
     });
 }

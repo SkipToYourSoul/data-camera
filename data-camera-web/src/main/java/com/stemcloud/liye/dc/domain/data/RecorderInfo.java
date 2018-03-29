@@ -53,6 +53,9 @@ public class RecorderInfo {
     @Column(name = "parent_id", columnDefinition = "INT DEFAULT -1")
     private long parentId = -1;
 
+    @Column(name = "start_seconds", columnDefinition = "INT DEFAULT 0")
+    private long startSeconds = 0;
+
     public long getId() {
         return id;
     }
@@ -147,5 +150,13 @@ public class RecorderInfo {
 
     public void setParentId(long parentId) {
         this.parentId = parentId;
+    }
+
+    public long getStartSeconds() {
+        return startSeconds;
+    }
+
+    public void setStartSeconds(long startSeconds) {
+        this.startSeconds = startSeconds;
     }
 }

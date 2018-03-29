@@ -34,7 +34,7 @@ function askForRecorderDataAndInitDom(recorderId) {
     var $dom2 = $('#app-analysis-video');
 
     // -- clear old dom content
-    $infoDom.html('<div style="padding: 0 20px">' +
+    $infoDom.html('<div style="padding:10px">' +
         '<div class="alert alert-info" role="alert"><b>数据加载中</b></div></div>');
     Object.keys(analysisObject.video).forEach(function (id) {
         videojs(id).dispose();
@@ -162,11 +162,8 @@ function askForRecorderDataAndInitDom(recorderId) {
                         videojs.log('The video player ' + videoId + ' is ready');
                         analysisObject.setVideo(videoId, this);
                         // 如果是某个片段的子片段，需要设置起始时间
-                        var parentRid = findParent(recorderId);
-                        var time = new Date(parseTime(recorders[recorderId]['startTime'])).getTime() -
-                            new Date(parseTime(recorders[parentRid]['startTime'])).getTime();
-                        analysisObject.videoStartTime = time/1000;
-                        this.currentTime(time/1000);
+                        analysisObject.videoStartTime = recorders[recorderId]['startSeconds'];
+                        this.currentTime(recorders[recorderId]['startSeconds']);
                     });
                 } else {
                     var progressBar = '<div class="progress">' +
@@ -228,7 +225,7 @@ function generateTimeLine(minTime, maxTime) {
 function generate(panelId, title, contentId) {
     return '<div class="panel panel-default my-panel">' +
         '<div class="my-panel-head">' +
-        '<div class="panel-title my-panel-title" style="margin-left:30px;margin-top:10px;">' +
+        '<div class="panel-title my-panel-title" style="margin-left:20px;margin-top:10px;">' +
         '<a role="button" data-toggle="collapse" href="#' + panelId + '" aria-expanded="true" class="app-group-title" style="color:#000"> ' + title + '</a>' +
         '</div></div>' +
         '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
