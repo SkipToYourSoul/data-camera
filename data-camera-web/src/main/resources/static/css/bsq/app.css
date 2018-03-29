@@ -42,7 +42,7 @@ body {
 
 .sidebar-top {
 	padding: 20px 20px 10px 20px;
-	background-image: url(../../img/app-welcome.png)
+	background: url(../../img/app-welcome.png) no-repeat;
 }
 
 /* 场景页面左侧导航样式 */
@@ -420,6 +420,12 @@ body {
 	{
 	color: #35b5eb;
 	background-color: #fff;
+}
+
+.btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus,
+	.btn-group>.btn:hover {
+	color: #35b5eb;
+	box-shadow: none;
 }
 
 .sidebar-menu ul li>a {

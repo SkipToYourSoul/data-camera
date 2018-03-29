@@ -94,7 +94,7 @@ $(function(){
         } else {
             template = '<div class="col-sm-12 col-md-12 col-xs-12 hot-content-container content-id-' + content['id'] + '" hidden="hidden">'
         }
-        template += '<div class="share-view-container row" style="padding: 20px 30px">';
+        template += '<div class="share-view-container row">';
         // -- 图片
         if (content['img'] != null){
             template += '<div class="share-view-photo col-md-2"><img src="' + content['img'] + '" class="share-img center-block"/></div>';

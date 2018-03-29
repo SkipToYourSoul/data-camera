@@ -57,7 +57,6 @@
 							</div>
 						</div>
 					</div>
-
 					<!-- 操作按钮 -->
 					<div>
 						<div class="sidebar-buttons">
@@ -83,8 +82,7 @@
 				<!-- 场景列表 -->
 				<div class="sidebar-menu" id="app-menu">
 					<ul class="nav main-menu">
-						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><i
-								class="glyphicon glyphicon-home"></i>&nbsp; 场景管理页面</a></li>
+						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 我的场景</a></li>
 					</ul>
 					<div class="btn app-list">
 						<i class="fa fa-bars"></i>&nbsp;场景列表<i
@@ -107,8 +105,7 @@
 				<div class="sidebar-menu" id="content-menu" th:if="${param.id}"
 					hidden="hidden">
 					<ul class="nav main-menu">
-						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><i
-								class="glyphicon glyphicon-home"></i>&nbsp; 场景管理页面</a></li>
+						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
 					</ul>
 					<div class="btn app-list">
 						<i class="fa fa-bars"></i>&nbsp;场景列表<i
@@ -117,7 +114,8 @@
 					</div>
 					<th:block th:each="entry,index:${apps}">
 						<div class="nav" style="padding-left: 20px;">
-							<div style="padding: 5px 0 15px 15px;">
+							<div style="padding: 5px 0 15px 15px;font-weight:bold;">
+
 								<a class="no-de" type="button"
 									th:href="@{/app(id=${entry.key},tab=2)}">
 									<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-circle':'fa fa-circle-o'"></span>
@@ -157,8 +155,10 @@
 			<!-- 管理页面的内容展示 -->
 			<div th:if="!${param.id}" id="app-management">
 				<!-- <img th:src="@{/img/quickstart.jpg}" alt="xxx1" />-->
-				<div style="background-image: url(img/quickstart.jpg); width: 100%; height: 600px"></div>
-				<div style="min-height: 170px; width: 100%; background-image: url('img/app-bottom.png');">
+				<div
+					style="background: url(img/quickstart.jpg) no-repeat; width: 100%; height: 600px"></div>
+				<div
+					style="min-height: 170px; width: 100%; background: url(img/app-bottom.png) no-repeat;">
 					<div>
 						<div class="app-title">优秀案例</div>
 						<div class="app-summary">小字描述优秀案例的内容做简要概括</div>

@@ -6,6 +6,11 @@ body{
 /* 	padding: 5px; */
 }
 
+.content-container{
+	 background-color: #FFF; 
+	 padding: 0;
+}
+
 .share-view{
     margin-top: 2px;
     padding: 5px 15px;
@@ -14,9 +19,9 @@ body{
 
 .share-view-container{
     background-color: #FFFFFF;
-    padding: 5px 10px;
- /*    border-radius: 10px; */
+    padding: 20px 30px;
     margin-bottom: 4px;
+    
     
 }
 
@@ -27,15 +32,14 @@ body{
 }
 
 .share-img {
-    width: 100%;
-    max-height:100%;
+    width: 180px;
+    max-height:180px;
     display: block;
 }
 
 .share-view-title{
-    padding-top: 10px;
     font-weight: 600;
-    line-height: 1.8;
+  	height：130px;
 }
 
 .share-view-info{
@@ -46,6 +50,7 @@ body{
 
 .share-view-user{
     padding-top: 5px;
+    margin-top:5px;
     min-height: 35px;
 }
 
@@ -59,11 +64,11 @@ body{
 
 .app-analysis-chart-dom{
     min-height: 300px;
-    padding: 10px 5px;
+    padding: 10px 0;
 }
 
 .app-analysis-chart-dom .action-bar{
-    padding: 0 10px 5px 10px;
+    padding: 10px;
 }
 
 .app-analysis-chart-dom .record-time{
@@ -216,6 +221,12 @@ body{
 	color:#000;
 }
 
+.info-content-title{
+	font-size:16px;
+	color:#000;
+	margin:15px 0;
+}
+
 .content-des{
 	color:#bebebe;
 	font-size:14px;
@@ -223,7 +234,7 @@ body{
 }
 
 .content-tag{
-	margin-top:8px;
+	margin-top:35px;
 }
 
 .content-tag span {
@@ -232,7 +243,7 @@ body{
 
 .content-tag-style{
     background-color: #e8e8e8;
-    color: #c0c0c0
+    color: #777
 }
 
 .content-category{
@@ -276,9 +287,43 @@ body{
 }
 
 .head-img{
-	margin-top:90px;
+	margin:90px auto 0 auto;
 	border-radius:50%;
-	width:70px;
-	height:70px;
+	width:90px;
+	height:90px;
 	background-image:url(../../img/app-bottom.png);
+}
+
+.btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus,
+	.btn-group>.btn:hover {
+	color: #35b5eb;
+	box-shadow: none;
+}
+
+.content-img{
+	width:130px;
+	height:130px;
+}
+
+.content-user{
+	background-color: #fff;
+	 min-height: 600px; 
+	 padding-bottom: 50px;
+}
+
+.username{
+	text-align: center; 
+	margin-top: 15px;
+}
+
+.content-other{
+	border-bottom: 1px solid #f5f5f5;
+	color: #35b5eb; 
+	font-size: 14px; 
+	padding-top: 20px; 
+	padding-bottom: 20px;
+}
+
+.other-works{
+	margin-top:20px;
 }

@@ -228,9 +228,8 @@ function generateTimeLine(minTime, maxTime) {
 function generate(panelId, title, contentId) {
     return '<div class="panel panel-default my-panel">' +
         '<div class="my-panel-head">' +
-        '<div class="panel-title my-panel-title">' +
-        '<span>' + title + '&nbsp;</span>' +
-        '<a data-toggle="collapse" href="#' + panelId + '" aria-expanded="true"><i class="fa fa-sort"></i></a>' +
+        '<div class="panel-title my-panel-title" style="margin-left:30px;margin-top:10px;">' +
+        '<a role="button" data-toggle="collapse" href="#' + panelId + '" aria-expanded="true" class="app-group-title" style="color:#000"> ' + title + '</a>' +
         '</div></div>' +
         '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
         '<div class="panel-body my-panel-body"><div id="' + contentId + '"></div></div>' +

@@ -1,0 +1,108 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+	<div th:fragment="app-analysis">
+		<div>
+			<div class="col-sm-12 col-md-12 col-xs-12"
+				style="padding: 0; background-color: #f4f6f9;">
+				<!-- 片段关系树形图 -->
+				<div class="app-analysis-tree-group analysis-sub-content">
+					<!-- 该场景没有片段记录数据 -->
+					<div th:if="${not #maps.containsKey(recorders, app.id)}"
+						class="alert alert-warning my-info wi8" role="alert">暂无可展示的数据片段</div>
+					<!-- 遍历片段记录数据 -->
+					<th:block th:each="recorder,index:${recorders[app.id]}">
+						<div
+							th:if="${recorder.isUserGen eq 0 and recorder.isRecorder eq 0}"
+							class="app-analysis-tree-dom wi8" th:data="${recorder.id}"
+							style="background-color: #fff;">
+							<div class="tree-info">
+								<span th:text="${recorder.name}"></span> <span
+									th:text="|数据时间： ${#dates.format(recorder.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(recorder.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></span>
+							</div>
+							<div class="tree-chart" th:id="|tree-chart-${recorder.id}|"
+								style="background-color: #fff; margin: 10px 0px"></div>
+						</div>
+					</th:block>
+				</div>
+
+				<!-- 数据展示图 -->
+				<div class="app-analysis-chart-dom" hidden="hidden">
+					<!-- 操作栏 -->
+					<div class="analysis-sub-content">
+						<div class="action-bar wi8">
+							<div class="btn-group mbtn-group">
+								<button class="btn btn-default no-radius" onclick="recorderPlay()"
+									id="play-btn">
+									<i class="fa fa-play"></i>
+								</button>
+								<button class="btn btn-default no-radius" onclick="recorderPause()"
+									id="pause-btn" disabled="disabled">
+									<i class="fa fa-pause"></i>
+								</button>
+							</div>
+							<button class="btn btn-default no-radius" onclick="recorderReset()"
+								id="reset-btn">
+								<i class="fa fa-repeat"></i>
+							</button>
+							<div class="btn-group" data-toggle="buttons" id="recorder-speed">
+								<label class="btn active"> <input type="radio"
+									name="options" id="option1" autocomplete="off"
+									checked="checked" value="1" /> X1
+								</label> <label class="btn"> <input type="radio" name="options"
+									id="option2" autocomplete="off" value="2" /> X2
+								</label> <label class="btn"> <input type="radio" name="options"
+									id="option3" autocomplete="off" value="4" /> X4
+								</label>
+							</div>
+							<span class="record-time">
+								<span id="recorder-current-time">00:00</span>/<span id="recorder-total-time">-</span>
+							</span>
+							<div class="pull-right">
+								<button class="btn btn-blue" onclick="generateNewContent()">
+									<img th:src="@{/img/icons/save.png}" class="icon"/>&nbsp;保存
+								</button>
+								<div class="btn-group">
+									<button class="btn btn-default" onclick="deleteContent()">
+									<img th:src="@{/img/icons/delete.png}" class="icon" style="width:10px;"/>
+									</button>
+									<button class="btn btn-default" onclick="shareContent()">
+										<img th:src="@{/img/icons/plane.png}" class="icon"/>
+									</button>
+								</div>
+							</div>
+						</div>
+						<!-- 时间轴栏 -->
+						<div class="timeline-dom wi8" id="timeline-slider">
+							<div class="slider"></div>
+						</div>
+					</div>
+					<div class="analysis-sub-content">
+						<!-- 图表显示栏 -->
+						<div class="chart-dom wi8" id="app-analysis-chart"></div>
+						<!-- 视频显示栏 -->
+						<div class="video-dom wi8" id="app-analysis-video"></div>
+						<!-- 片段描述 -->
+						<div class="description-dom wi8">
+							<div class="desc-title">试验描述</div>
+							<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
+							<button class="btn btn-blue" onclick="saveDataDesc()"
+								style="margin-top: 5px">
+								<img th:src="@{/img/icons/save.png}" class="icon"/>&nbsp;保存
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- 数据展示图 -->
+				<div class="app-analysis-info-dom" hidden="hidden">
+					<button class="btn btn-default" onclick="deleteContent()">
+						<i class="fa fa-trash"></i>
+					</button>
+					<div class="alert alert-warning" role="alert"
+						style="margin-top: 10px">该数据片段无数据</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

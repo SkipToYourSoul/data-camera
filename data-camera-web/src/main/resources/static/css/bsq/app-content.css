@@ -6,7 +6,8 @@
 }
 
 .app-analysis-chart-dom .action-bar {
-    padding: 0 10px 5px 10px;
+    padding:10px 25px 5px 10px;
+    background:#fff;
 }
 
 .app-analysis-chart-dom .record-time {
@@ -17,6 +18,7 @@
 
 .app-analysis-chart-dom .timeline-dom {
     padding: 10px 25px 10px 40px;
+    background:#fff;
 }
 
 /* timeline 自定义样式 */
@@ -47,9 +49,11 @@
 }
 
 .app-analysis-chart-dom .chart-dom .my-panel {
+	padding:10px 0;
+	margin-top:10px;
     border-radius: 0;
-    margin-bottom: 0;
     border: 0;
+   
 }
 
 .app-analysis-chart-dom .chart-dom .my-panel-heading {
@@ -92,7 +96,6 @@
     background-color: #fff;
     color: #35b5eb;
     font-size: 22px;
-    padding-left: 33px;
 }
 
 .my-panel-head {
