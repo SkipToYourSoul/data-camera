@@ -28,39 +28,43 @@ public class HandleDataService implements Service {
     public void handle(ChannelHandlerContext context, Packet packet) {
         LOG.info("handle packet -> '{}'", packet);
 
+        if (handle(packet)){
+            Packet ack = packet.ack(AckResult.OK);
+            context.channel().write(ack);
+        }else {
+            Packet ack = packet.ack(AckResult.FAILED);
+            context.channel().write(ack);
+        }
+    }
+
+    public boolean handle(Packet packet){
         if (packet.isValue()){
             // 如果是文本
             try {
-                handleTxtMonitor(context, packet);
-                handleTxtRecord(context, packet);
-                Packet ack = packet.ack(AckResult.OK);
-                context.channel().write(ack);
+                handleTxtMonitor(packet);
+                handleTxtRecord(packet);
+                return true;
             }catch (Exception e){
                 LOG.error("handleTxtMonitor error, packet is '{}'", packet, e);
-                Packet ack = packet.ack(AckResult.FAILED);
-                context.channel().write(ack);
+                return false;
             }
         }else if (packet.isVideo()){
             // 如果是视频, 先预留
             LOG.info("video data.");
-            Packet ack = packet.ack(AckResult.OK);
-            context.channel().write(ack);
+            return true;
         } else {
             LOG.warn("wrong type of data type. skip it");
-            Packet ack = packet.ack(AckResult.FAILED);
-            context.channel().write(ack);
+            return false;
         }
-
     }
 
-    private void handleTxtMonitor(ChannelHandlerContext context, Packet packet){
+    private void handleTxtMonitor(Packet packet){
         String code = packet.getCode();
-        String json = REDIS.msingle(String.class, Constants.RedisNamespace.MONITOR, code);
-        if (json == null || json.isEmpty()){
+        Map<String, Object> meta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.MONITOR, code);
+        if (meta == null || meta.isEmpty()){
             LOG.info("this packet do not monitor, code is '{}'", code);
         }else {
             // 处理监控
-            Map<String, Object> meta = JSON.parseObject(json);
             Map<String, Object> data = packet.asJson();
             meta.put("data", data);
             MysqlRepository.saveValueDatas(meta);
@@ -68,14 +72,13 @@ public class HandleDataService implements Service {
 
     }
 
-    private void handleTxtRecord(ChannelHandlerContext context, Packet packet){
+    private void handleTxtRecord(Packet packet){
         String code = packet.getCode();
-        String json = REDIS.msingle(String.class, Constants.RedisNamespace.RECORD, code);
-        if (json == null || json.isEmpty()){
+        Map<String, Object> meta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.RECORD, code);
+        if (meta == null || meta.isEmpty()){
             LOG.info("this packet do not record, code is '{}'", code);
         }else {
             // 处理记录
-            Map<String, Object> meta = JSON.parseObject(json);
             Map<String, Object> data = packet.asJson();
             meta.put("data", data);
             MysqlRepository.saveValueDatas(meta);

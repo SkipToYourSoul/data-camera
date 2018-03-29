@@ -20,17 +20,23 @@ public class RedisClient {
     public static final RedisClient I = new RedisClient();
     private PropKit propKit = PropKit._default();
     private String host = propKit.getString("redis.host");
+    private String password = propKit.getString("redis.pwd");
     private Integer port = propKit.getInt("redis.port");
+    private Integer index = propKit.getInt("redis.index");
 
     private JedisPool pool;
 
     private RedisClient(){
-        pool = new JedisPool(new JedisPoolConfig(), host, port);
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMaxTotal(64);
+        config.setMaxIdle(64);
+        pool = new JedisPool(config, host, port, Protocol.DEFAULT_TIMEOUT * 3, password);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> pool.close()));
     }
 
     private <R> R call(Function<Jedis, R> fun, R def){
         try(Jedis jedis = pool.getResource()){
+            jedis.select(index);
             return fun.apply(jedis);
         }catch (Exception e){
             LOG.error("redis call error", e);
