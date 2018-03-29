@@ -214,6 +214,11 @@ public class ActionService {
                 videoData.setSensorId(sensorId);
                 videoData.setTrackId(trackId);
                 videoData.setRecorderInfo(recorderInfo);
+
+                // -- 保存上传的视频，由于上传具有延时性、后面会以异步的方式进行该表的更新
+                videoData.setVideoPost("/camera/img/oceans.png");
+                videoData.setVideoPath("/camera/img/oceans.mp4");
+
                 videoDataRepository.save(videoData);
                 logger.info("Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
             }

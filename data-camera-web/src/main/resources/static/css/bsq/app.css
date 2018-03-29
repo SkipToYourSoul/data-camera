@@ -119,7 +119,7 @@ body {
 }
 
 .sidebar-menu ul li a {
-	color: #93a3b5;
+	color: #35b5eb;
 	font-size: 14px;
 	font-weight: 400;
 }
@@ -130,8 +130,8 @@ body {
 }
 
 .sidebar-menu ul li a:hover {
-	background-color: #fafcfd;
-	color: #5b9bd1;
+	color: #35b5eb;
+	background-color: #FFFFFF;
 }
 
 .sidebar-menu ul li.active {
@@ -154,34 +154,17 @@ body {
 	color: #68c8f0;
 }
 
-.sidebar-menu2 {
-	padding: 15px 10px 10px 10px;
-}
-
-.sidebar-menu2 .my-alter {
-	margin-bottom: 0;
-	font-weight: 600;
-}
-
-.sidebar-menu2 .menu-title {
-	text-align: center;
-	font-weight: 600;
-	padding-bottom: 5px;
-}
-
-.sidebar-menu2 .menu-content {
-	padding-top: 5px;
-	padding-left: 10px;
-	padding-bottom: 5px;
-}
-
 .no-de:hover {
 	text-decoration: none;
 	color: #68c8f0;
 }
 
+.no-de .active {
+	color: #35b5eb;
+}
+
 .no-de {
-	color: #68c8f0;
+	color: #000000;
 }
 
 .sidebar-menu2 .menu-btn {
