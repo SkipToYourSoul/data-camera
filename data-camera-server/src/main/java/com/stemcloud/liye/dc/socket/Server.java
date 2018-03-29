@@ -1,5 +1,6 @@
 package com.stemcloud.liye.dc.socket;
 
+import com.stemcloud.liye.dc.simulator.SimulatorServer;
 import io.netty.channel.ChannelFutureListener;
 
 /**
@@ -14,7 +15,8 @@ public interface Server {
     boolean isStarted();
 
 
-    static Server _default() {
-        return NettyServer.I;
+    static Server def() {
+//        return NettyServer.I;
+        return SimulatorServer.I;
     }
 }

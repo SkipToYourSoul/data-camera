@@ -8,7 +8,9 @@ import com.stemcloud.liye.dc.domain.SensorStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -25,15 +27,31 @@ public class MysqlRepository {
     private static String SENSOR_CONFIG_TBL = "dc_base_sensor_config";
     private static String SENSOR_INFO_TBL = "dc_base_sensor_info";
     private static String EXP_INFO_TBL = "dc_base_experiment_info";
+    private static DecimalFormat DF = new DecimalFormat("#.00");
 
     public static Integer[] saveValueDatas(Map<String, Object> datas){
-        Long sensorId = (Long) datas.get("id");
-        Long trackId = (Long) datas.get("trackId");
+
+        Integer sensorId = (Integer) datas.get("id");
+        Integer trackId = (Integer) datas.get("trackId");
         Map<String, Object> data = (Map<String, Object>)datas.get("data");
         if (sensorId != null && trackId != null){
             // save
             List<Integer> results = new ArrayList<>(data.size());
-            data.forEach((k, v) -> results.add(saveValueData(sensorId, trackId, k, (Double)v)));
+            data.forEach((k, v) -> {
+                double d;
+                if (v instanceof Double){
+                    d = (Double) v;
+                }else if (v instanceof BigDecimal){
+                    d = ((BigDecimal)v).doubleValue();
+                }else if (v instanceof Integer){
+                    d = (Integer)v;
+                }else if (v instanceof Float){
+                    d = (Float)v;
+                }else {
+                    return;
+                }
+                results.add(saveValueData(sensorId, trackId, k, Double.parseDouble(DF.format(d))));
+            });
             return results.toArray(new Integer[results.size()]);
         }
         return new Integer[0];
