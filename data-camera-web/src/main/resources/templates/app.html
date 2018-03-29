@@ -125,7 +125,7 @@
 							<!-- 遍历片段记录数据 -->
 							<ul class="nav" th:if="${not #maps.isEmpty(recorders)}">
 								<th:block th:each="recorder,index:${recorders}">
-									<li style="font-size: 9px; padding: 5px 0px 5px 50px;"
+									<li style="font-size: 10px; padding: 5px 0px 5px 50px;"
 										th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}"
 										th:data="${recorder.key}">
 										<div th:data="${recorder.key}" th:href="|#${recorder.key}|">
@@ -147,8 +147,8 @@
 			<!-- 管理页面的内容展示 -->
 			<div th:if="!${param.id}" id="app-management">
 				<!-- <img th:src="@{/img/quickstart.jpg}" alt="xxx1" />-->
-				<div
-					style="background: url(img/quickstart.jpg) no-repeat; width: 100%; height: 600px"></div>
+				<div class="img-responsive"
+					style="background: url(img/quickstart.jpg) 0 0 no-repeat scroll transparent ;background-size:100% 100%;min-height:700px"></div>
 				<div
 					style="min-height: 170px; width: 100%; background: url(img/app-bottom.png) no-repeat;">
 					<div>
