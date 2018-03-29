@@ -119,8 +119,10 @@ public class DataController {
             long recorderId = Long.parseLong(queryParams.get("recorder-id"));
             String start = queryParams.get("start");
             String end = queryParams.get("end");
-            logger.info("[/data/user-new-recorder], id={}, start={}, end={}", recorderId, start, end);
-            return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end));
+            String name = queryParams.get("name");
+            String desc = queryParams.get("desc");
+            logger.info("[/data/user-new-recorder], id={}, start={}, end={}, name={}, desc={}", recorderId, start, end, name, desc);
+            return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end, name, desc));
         } catch (ParseException e) {
             return ServerReturnTool.serverFailure(e.getMessage());
         }
@@ -149,6 +151,15 @@ public class DataController {
             return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, queryParams.get("from")));
         } catch (Exception e){
             return ServerReturnTool.serverFailure(e.getCause().getMessage());
+        }
+    }
+
+    @GetMapping("/search-hot-content")
+    Map searchHotContent(@RequestParam String search) {
+        try{
+            return ServerReturnTool.serverSuccess(dataService.getSearchContent(search));
+        } catch (Exception e){
+            return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 }

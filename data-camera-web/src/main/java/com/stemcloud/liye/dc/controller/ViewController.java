@@ -152,8 +152,8 @@ public class ViewController {
             model.addAttribute("sensors", baseInfoService.getOnlineSensor(user));
 
             // --- RECORDER:
-            Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
-            model.addAttribute("recorders", recorders);
+            // Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
+            model.addAttribute("recorders", baseInfoService.getRecordersOfApp(id));
         }
 
         return "app";
@@ -205,10 +205,30 @@ public class ViewController {
                 return "index";
             }
             ContentInfo currentContent = crudService.findContent(id);
+            List<ContentInfo> userHotContent = crudService.selectUserHotContent(currentContent.getOwner());
+            userHotContent.remove(currentContent);
+
             model.addAttribute("currentContent", currentContent);
+            model.addAttribute("userHotContent", userHotContent);
+
+            Map<Long, RecorderInfo> map = new HashMap<Long, RecorderInfo>(1);
+            map.put(currentContent.getRecorderInfo().getId(), currentContent.getRecorderInfo());
+            model.addAttribute("recorders", map);
         }
 
         return "content";
+    }
+
+    @GetMapping("/hot-content")
+    public String hotContent(Model model, HttpServletRequest request) {
+        model.addAttribute("inContent", true);
+        String currentUser = commonService.getCurrentLoginUser(request);
+        List<ContentInfo> userContent = crudService.selectUserContent(currentUser);
+        List<ContentInfo> hotContent = crudService.selectHotContent();
+
+        model.addAttribute("userContent", userContent);
+        model.addAttribute("hotContent", hotContent);
+        return "hot-content";
     }
 
     @GetMapping("/share")
@@ -227,7 +247,6 @@ public class ViewController {
         }
         RecorderInfo recorderInfo = crudService.findRecorder(rid);
         model.addAttribute("recorder", recorderInfo);
-        model.addAttribute("inContent", true);
 
         return "share";
     }
@@ -245,8 +264,13 @@ public class ViewController {
     }
 
     @GetMapping("/login")
-    public String login(){
-        logger.info("In login.html");
+    public String login(HttpServletRequest request){
+        logger.info("In login.html, from {}", request.getRequestURI());
         return "login";
+    }
+
+    @GetMapping("/test")
+    public String test(){
+        return "test";
     }
 }

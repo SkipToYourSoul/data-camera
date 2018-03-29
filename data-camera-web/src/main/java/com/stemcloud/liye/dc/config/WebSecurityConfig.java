@@ -74,8 +74,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         int cookieValidSeconds = 60*60*24;
         httpSecurity.authorizeRequests()
                 /*  主页以及主页相关数据无需登录权限认证  */
-                .antMatchers("/", "/index/**", "/app/**", "/device/**", "/content/**").permitAll()
-                .antMatchers("/crud/**", "/action/**", "/data/**").permitAll()
+                .antMatchers("/", "/index/**", "/app/**", "/device/**", "/content/**","/share/**","/hot-content/**").permitAll()
+                .antMatchers("/crud/**", "/action/**", "/data/**", "/test/**", "/websocket/**").permitAll()
                 .anyRequest().authenticated()   /* 其他所有资源都需要认证，登陆后访问 */
                 .and()
                 /* 登陆相关设置 */

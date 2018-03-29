@@ -24,12 +24,29 @@ public interface ContentRepository extends CrudRepository<ContentInfo, Long> {
     List<ContentInfo> findByOwnerAndIsDeleted(String owner, int isDeleted);
 
     /**
-     * 查询分享的热门内容
-     * @param isShared
+     * 查询用户热门内容
+     * @param owner
      * @param isDeleted
      * @return
      */
-    List<ContentInfo> findTop50ByIsSharedAndIsDeletedOrderByLikeDesc(int isShared, int isDeleted);
+    List<ContentInfo> findByOwnerAndIsDeletedOrderByLikeDesc(String owner, int isDeleted);
+
+    /**
+     * 查询分享的热门内容，后续需改造成分页查询
+     * @return
+     */
+    @Transactional(timeout = 10)
+    @Query(value = "SELECT c FROM ContentInfo c WHERE c.isShared = 1 AND c.isDeleted = 0 ORDER BY c.like DESC, c.createTime DESC")
+    List<ContentInfo> findTop50ByIsSharedAndIsDeletedOrderByLikeAndCreateTimeDesc();
+
+    /**
+     * 查询关键词相关内容
+     * @param isShared
+     * @param isDeleted
+     * @param search
+     * @return
+     */
+    List<ContentInfo> findByIsSharedAndIsDeletedAndTitleLikeOrderByLikeDesc(int isShared, int isDeleted, String search);
 
     /**
      * delete content
