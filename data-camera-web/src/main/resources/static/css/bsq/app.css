@@ -233,8 +233,7 @@ body {
 /** 场景实验页面样式 app-tab.html **/
 .app-exp-action-bar {
 	margin-bottom: 5px;
-	padding: 5px 15px;
-	/*background-color: #f5f5f5;*/
+	padding: 5px 15px 0;
 }
 
 .analysis-sub-content {
@@ -302,6 +301,7 @@ body {
 	font-weight: 600;
 	height: 40px;
 	line-height: 40px;
+	text-align: right;
 }
 
 .app-exp-status button {
@@ -405,12 +405,6 @@ body {
 	{
 	color: #35b5eb;
 	background-color: #fff;
-}
-
-.btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus,
-	.btn-group>.btn:hover {
-	color: #35b5eb;
-	box-shadow: none;
 }
 
 .sidebar-menu ul li>a {

@@ -152,13 +152,18 @@ body {
 
 .btn-square{
 	background-color: #35b5eb;
-	width: 40px; height: 40px;
+	width: 34px; height: 34px;
 	color: #fff; 
 	border: 0 solid #fff;
 }
 
 .btn-white{
 	color:#36b5eb;
+    background-color: #FFFFFF;
+}
+
+.btn-grey {
+    background-color: #f4f4f4;
 }
 
 .icon{

@@ -7,20 +7,20 @@
 			<div class="analysis-sub-content" id="content-handle-bar">
 				<div class="action-bar wi8">
 					<!-- 播放、暂停 -->
-					<div class="btn-group mbtn-group">
-						<button class="btn btn-default" style="border-radius: 0" onclick="recorderPlay()" id="play-btn">
+					<div class="btn-group btn-action-bar">
+						<button class="btn btn-grey" style="border-radius: 0" onclick="recorderPlay()" id="play-btn">
 							<i class="fa fa-play"></i>
 						</button>
-						<button class="btn btn-default" style="border-radius: 0" onclick="recorderPause()" id="pause-btn" disabled="disabled">
+						<button class="btn btn-grey" style="border-radius: 0" onclick="recorderPause()" id="pause-btn" disabled="disabled">
 							<i class="fa fa-pause"></i>
 						</button>
 					</div>
 					<!-- 重置 -->
-					<button class="btn btn-default" style="border-radius: 0" onclick="recorderReset()" id="reset-btn">
+					<button class="btn btn-grey btn-action-bar" style="border-radius: 0" onclick="recorderReset()" id="reset-btn">
 						<i class="fa fa-repeat"></i>
 					</button>
 					<!-- 播放速度 -->
-					<div class="btn-group" data-toggle="buttons" id="recorder-speed">
+					<div class="btn-group mbtn-group" data-toggle="buttons" id="recorder-speed">
 						<label class="btn active"><input type="radio" name="options" id="option1" autocomplete="off" checked="checked" value="1" /> X1
 						</label>
 						<label class="btn"> <input type="radio" name="options" id="option2" autocomplete="off" value="2" /> X2
@@ -38,10 +38,10 @@
 							<button class="btn btn-blue" data-toggle="modal" data-target="#new-data-recorder-modal">
 								<i class="fa fa-save"></i>&nbsp;保存
 							</button>
-							<button class="btn btn-default" onclick="deleteContent()" id="delete-btn">
+							<button class="btn btn-grey" onclick="deleteContent()" id="delete-btn">
 								<i class="fa fa-trash"></i>&nbsp;删除
 							</button>
-							<button class="btn btn-default" onclick="shareContent()">
+							<button class="btn btn-grey" onclick="shareContent()">
 								<i class="fa fa-share"></i>&nbsp;分享
 							</button>
 						</div>
@@ -69,7 +69,7 @@
 					<div style="padding: 0 20px">
 						<label class="desc-title">试验描述</label>
 						<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
-						<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 5px">
+						<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 10px">
 							<i class="fa fa-save"></i>&nbsp;保存
 						</button>
 					</div>

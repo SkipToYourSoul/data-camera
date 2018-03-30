@@ -157,7 +157,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                 $dom2.append(generate(videoDomId + '-panel', "视频", videoDomId));
 
                 if (videoOption['sources'] != null){
-                    $('#' + videoDomId).append('<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video>');
+                    $('#' + videoDomId).append('<div style="padding-left: 15px"><video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
                     videojs(videoId, videoOption, function () {
                         videojs.log('The video player ' + videoId + ' is ready');
                         analysisObject.setVideo(videoId, this);

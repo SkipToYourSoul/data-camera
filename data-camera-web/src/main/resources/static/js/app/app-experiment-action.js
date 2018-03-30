@@ -422,8 +422,6 @@ function allMonitor() {
                             pageStartMonitor(expId);
                         });
                     } else if (action == 0){
-                        $('#all-monitor-btn').removeClass('btn-success').addClass('btn-default');
-                        $('#all-record-btn').removeClass('btn-success').addClass('btn-default');
                         targetExp.forEach(function (expId) {
                             pageStopMonitor(expId);
                         });
@@ -492,12 +490,10 @@ function allRecord(){
                 } else if (response.code == "0000"){
                     var targetExp = response.data;
                     if (action == 1){
-                        $('#all-record-btn').removeClass('btn-default').addClass('btn-success');
                         targetExp.forEach(function (expId) {
                             pageStartRecord(expId);
                         });
                     } else if (action == 0){
-                        $('#all-record-btn').removeClass('btn-success').addClass('btn-default');
                         targetExp.forEach(function (expId) {
                             pageStopRecorder(expId);
                         });

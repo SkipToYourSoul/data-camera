@@ -123,11 +123,11 @@
 										<li style="padding: 5px 0 5px 60px;"
 											th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}"
 											th:data="${recorder.key}">
-											<div th:data="${recorder.key}" th:href="|#${recorder.key}|">
+											<a th:data="${recorder.key}" th:href="|#${recorder.key}|" style="padding: 0">
 												<div th:text="|${recorder.value.name}|"></div>
 												<div th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}" style="font-size: 12px"
 													 th:text="|${#dates.format(recorder.value.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.value.endTime, 'HH:mm:ss')}|"></div>
-											</div>
+											</a>
 										</li>
 									</th:block>
 								</ul>
@@ -142,8 +142,6 @@
 			<!-- 管理页面的内容展示 -->
 			<div th:if="!${param.id}" id="app-management">
 				<img th:src="@{/img/quickstart.jpg}" class="img-responsive" />
-				<!--<div class="img-responsive"
-					style="background: url(img/quickstart.jpg) 0 0 no-repeat scroll transparent; background-size:100% 100%;min-height:700px"></div>-->
 				<div style="min-height: 170px; width: 100%; background: url(img/app-bottom.png) no-repeat;">
 					<div>
 						<div class="app-title">优秀案例</div>

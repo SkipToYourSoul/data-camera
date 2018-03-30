@@ -47,7 +47,7 @@ function initExperiment(iFi){
                         '<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
                     var video = videojs(videoId, {
                         controls: false,
-                        poster: "/camera/img/video-load2.jpg",
+                        /*poster: "/camera/img/video-load2.jpg",*/
                         preload: "auto",
                         loop: true,
                         sources: [{src: "/camera/img/oceans.mp4", type: "video/mp4"}],

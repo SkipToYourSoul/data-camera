@@ -3,22 +3,19 @@
 <body>
 	<div th:fragment="app-experiment">
 		<!-- 实验操作按钮 -->
-		<div class="app-exp-action-bar row wi8">
+		<div class="app-exp-action-bar row wi8" style="padding-right: 0">
 			<div class="col-sm-10 col-md-10 col-xs-10" style="line-height: 50px">
-				<button class="btn btn-pink"
-					onclick="allMonitor()" id="all-monitor-btn">
-				 <img th:src="@{/img/icons/eye1.png}" class="icon" style="height:10px"/>&nbsp;全局监控
+				<button class="btn btn-pink" onclick="allMonitor()" id="all-monitor-btn">
+				 	<img th:src="@{/img/icons/eye1.png}" class="icon" style="height:10px"/>&nbsp;全局监控
 				</button>
-				<button class="btn btn-blue1"
-					style="margin-left: 20px"
-					onclick="allRecord()" id="all-record-btn">
+				<button class="btn btn-blue1" style="margin-left: 20px" onclick="allRecord()" id="all-record-btn">
 					<i class="fa fa-video-camera"></i>&nbsp;全局录制
 				</button>
 			</div>
-			<button class="col-sm-2 col-md-2 col-xs-2 pull-right btn-square" data-toggle="modal"
-				data-target="#exp-modal" todo="new">
-				 <img th:src="@{/img/icons/add.png}" class="icon"/>
-			</button>
+			<div class="col-sm-2 col-md-2 col-xs-2" style="line-height: 50px; padding-right: 0; text-align: right">
+				<button class="btn btn-square" data-toggle="modal" data-target="#exp-modal" todo="new"> <i class="fa fa-plus"></i>
+				</button>
+			</div>
 		</div>
 
 		<div class="app-exp-container wi8">
@@ -30,25 +27,19 @@
 			<th:block th:each="experiment,expIndex:${experiments}">
 				<div class="panel-heading" style="border-bottom: solid 1px #eee; border-top: solid 1px #eee">
 					<div class="panel-title row">
-						<div class="col-sm-8 col-md-8 col-xs-8" style="line-height:40px;">
+						<div class="col-sm-5 col-md-5 col-xs-5" style="line-height: 40px">
 							<!-- 标题 -->
 							<!-- 根据设计而改 -->
-							<a th:text="|传感器组|"
-								th:data="${experiment.key}" class="app-group-title"></a>
-							 <a class="app-group-title"
-							role="button" data-toggle="collapse"
-								th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">
-								&nbsp;<i class="fa fa-sort"></i>
-							</a> 
+							<a th:data="${experiment.key}" class="app-group-title">传感器组</a>
+							<a class="app-group-title" role="button" data-toggle="collapse" th:href="@{|#exp-${experiment.key}|}" aria-expanded="true">&nbsp;<i class="fa fa-sort"></i></a>
 							<!-- 实验状态和操作栏 -->
-							<span> <span class="label label-default"
-								th:id="|experiment-es-${experiment.key}|">非监控</span> <span
-								class="label label-default"
-								th:id="|experiment-rs-${experiment.key}|">非录制</span>
+							<span style="margin-left: 5px">
+								<span class="label label-default" th:id="|experiment-es-${experiment.key}|">非监控</span>
+								<span class="label label-default" th:id="|experiment-rs-${experiment.key}|">非录制</span>
 							</span>
 						</div>
-						<div class="col-sm-4 col-md-4 col-xs-4">
-							<div class="app-exp-status pull-right">
+						<div class="col-sm-7 col-md-7 col-xs-7">
+							<div class="app-exp-status">
 								<div class="btn-group" style="padding-right: 15px">
 									<button style="color: #fc4a6c; background-color: transparent"
 										th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}"
@@ -142,8 +133,8 @@
 																		<div class="text-center">
 																			<span th:class="|current-content-value-${experiment.key}|" th:id="|experiment-now-${experiment.key}-${track.id}-${dim}|">-</span>
 																			<span th:text="${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)}"></span>
-																			<span th:case="1" class="content-sub-text">当前值</span>
-																			<span th:case="2" class="content-sub-text">持续时间</span>
+																			<!--<span th:case="1" class="content-sub-text">当前值</span>
+																			<span th:case="2" class="content-sub-text">持续时间</span>-->
 																		</div>
 																	</div>
 																	<div class="content-sub-text" th:switch="${track.type}">
@@ -190,8 +181,8 @@
 							class="app-analysis-tree-dom wi8" th:data="${entry.key}"
 							style="background-color: #fff;">
 						<div class="tree-info">
-							<span th:text="${entry.value.name}"></span> <span
-								th:text="|数据时间： ${#dates.format(entry.value.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(entry.value.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></span>
+							<span th:text="|【${entry.value.name}】|" style="font-weight: 600"></span> <span
+								th:text="|${#dates.format(entry.value.startTime, 'yyyy-MM-dd HH:mm:ss')} - ${#dates.format(entry.value.endTime, 'yyyy-MM-dd HH:mm:ss')}|"></span>
 						</div>
 						<div class="tree-chart" th:id="|tree-chart-${entry.value.id}|"
 							 style="background-color: #fff; margin: 10px 0"></div>

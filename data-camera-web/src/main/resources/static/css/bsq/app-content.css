@@ -110,8 +110,13 @@
 }
 
 /*  播放速度按钮  */
-.btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus,
-.btn-group>.btn:hover {
+.mbtn-group>.btn.active, .mbtn-group>.btn:active, .mbtn-group>.btn:focus, .mbtn-group>.btn:hover {
     color: #35b5eb;
     box-shadow: none;
+}
+
+/*  播放控制按钮  */
+.btn-action-bar>.btn.active, .btn-action-bar>.btn:active, .btn-action-bar>.btn:focus, .btn-action-bar>.btn:hover {
+    background-color: #35b5eb;
+    color: #FFFFFF;
 }
