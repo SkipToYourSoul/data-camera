@@ -57,14 +57,14 @@ public class DataService {
         List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         Set<Long> boundSensorIds = new HashSet<Long>();
         for (SensorInfo bs: boundSensors){
-            boundSensorIds.add(bs.getId());
+            if (bs.getSensorConfig().getType() == 1) {
+                boundSensorIds.add(bs.getId());
+            }
         }
-
         Date time = new Date(timestamp);
         List<ValueData> data = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(time, boundSensorIds);
-
-        // logger.info("Request data size={}, time={}", data.size(), time.toString());
-        return transferChartData(data);
+        Map<Long, Map<String, List<ChartTimeSeries>>> map = transferChartData(data);
+        return map;
     }
 
     /**

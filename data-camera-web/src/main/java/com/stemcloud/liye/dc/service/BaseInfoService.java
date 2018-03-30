@@ -70,7 +70,7 @@ public class BaseInfoService {
      */
     public Boolean isAppBelongUser(long id, String user) {
         AppInfo app = appRepository.findOne(id);
-        logger.info("Check user {} has app {}", user, id);
+        logger.debug("Check user {} has app {}", user, id);
         return app != null && app.getIsDeleted() == 0 && user.equals(app.getCreator());
     }
 

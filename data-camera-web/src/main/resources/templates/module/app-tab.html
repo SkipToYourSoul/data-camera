@@ -49,7 +49,7 @@
 						</div>
 						<div class="col-sm-4 col-md-4 col-xs-4">
 							<div class="app-exp-status pull-right">
-								<div class="btn-group">
+								<div class="btn-group" style="padding-right: 15px">
 									<button style="color: #fc4a6c; background-color: transparent"
 										th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}"
 										class="btn btn-sm" th:data="${experiment.key}"
@@ -66,28 +66,26 @@
 									</button>
 								</div>
 								<div class="btn-group">
-									<button class="btn btn-default btn-sm"
+									<button class="btn btn-default btn-sm" style="background-color: #f4f4f4"
 										th:data="${experiment.key}" data-toggle="modal"
 										data-target="#exp-modal" todo="edit" from="modify-sensor">
 										<i class="fa fa-plus"></i>
 									</button>							
-									<button class="btn btn-default btn-sm"
+									<button class="btn btn-default btn-sm" style="background-color: #f4f4f4"
 											th:data="${experiment.key}" data-toggle="modal"
 											data-target="#exp-del-modal">
 										<i class="fa fa-minus"></i>
 									</button>
-								</div>
-								<div class="btn-group">
 									<button class="btn btn-default btn-sm"
-											th:data="${experiment.key}" data-toggle="modal"
+											th:data="${experiment.key}" data-toggle="modal" style="background-color: #f4f4f4"
 											data-target="#exp-modal" todo="edit" from="modify-desc">
-										<i class="fa fa-refresh"></i>
+										<i class="fa fa-file-text-o"></i>
+									</button>
+									<button class="btn btn-default btn-sm" style="background-color: #f4f4f4"
+											th:data="${experiment.key}" onclick="deleteExp(this)">
+										<i class="fa fa-trash"></i>
 									</button>
 								</div>
-									<button class="btn btn-default btn-sm"
-										th:data="${experiment.key}" onclick="deleteExp(this)">
-									 <img th:src="@{/img/icons/delete.png}" class="icon" style="width:10px;"/>
-									</button>
 							</div>
 						</div>
 					</div>
@@ -119,8 +117,7 @@
 											<div class="panel panel-default my-panel">
 												<div class="my-panel-head">
 													<div class="panel-title my-panel-title">
-														<span class="app-group-title"
-															  th:text="|${dim}(${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)})|"></span>
+														<span class="app-group-title" th:text="|${dim}(${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)})|"></span>
 														<span class="pull-right">
 															<a data-toggle="collapse" th:href="@{|#exp-${experiment.key}-${track.id}-${dim}|}" aria-expanded="true">
 																<i class="fa fa-sort-down" style="color: #9d9d9d;"></i>
@@ -143,10 +140,8 @@
 																	<div style="font-size: 24px; font-weight: 600; padding-bottom: 5px" class="text-center" th:text="${dim}"></div>
 																	<div class="content-now-text" th:switch="${track.type}">
 																		<div class="text-center">
-																			<span th:class="|current-content-value-${experiment.key}|"
-																				th:id="|experiment-now-${experiment.key}-${track.id}-${dim}|">-</span>
-																			<span
-																				th:text="${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)}"></span>
+																			<span th:class="|current-content-value-${experiment.key}|" th:id="|experiment-now-${experiment.key}-${track.id}-${dim}|">-</span>
+																			<span th:text="${#strings.listSplit(track.sensor.sensorConfig.unit,';').get(dimIndex.count - 1)}"></span>
 																			<span th:case="1" class="content-sub-text">当前值</span>
 																			<span th:case="2" class="content-sub-text">持续时间</span>
 																		</div>
@@ -154,20 +149,13 @@
 																	<div class="content-sub-text" th:switch="${track.type}">
 																		<div th:case="1">
 																			<div class="text-center">
-																				最大值：<span
-																					th:class="|content-value-${experiment.key}|"
-																					style="margin-right: 10px"
-																					th:id="|experiment-info-${experiment.key}-${track.id}-${dim}-1|">-</span>
-																				最小值：<span
-																					th:class="|content-value-${experiment.key}|"
-																					th:id="|experiment-info-${experiment.key}-${track.id}-${dim}-2|">-</span>
+																				最大值：<span th:class="|content-value-${experiment.key}|" style="margin-right: 10px" th:id="|experiment-info-${experiment.key}-${track.id}-${dim}-1|">-</span>
+																				最小值：<span th:class="|content-value-${experiment.key}|" th:id="|experiment-info-${experiment.key}-${track.id}-${dim}-2|">-</span>
 																			</div>
 																		</div>
 																		<div th:case="2">
 																			<div class="text-center">
-																				开始录制时间: <span
-																					th:class="|content-value-${experiment.key}|"
-																					th:id="|experiment-info-${experiment.key}-${track.id}-${dim}|">-</span>
+																				开始录制时间: <span th:class="|content-value-${experiment.key}|" th:id="|experiment-info-${experiment.key}-${track.id}-${dim}|">-</span>
 																			</div>
 																		</div>
 																	</div>

@@ -26,85 +26,91 @@ function doInterval(exp_id){
      */
     function askForData(exp_id) {
         var exp_bound_sensors = boundSensors[exp_id];
-        $.get(data_address + "/monitoring", {
-            "exp-id": exp_id,
-            "timestamp": expObject.newestTimestamp[exp_id]
-        }, function (response) {
-            if (response.code == "1111"){
-                message_info('请求数据失败: ' + response.data, "error");
-                return;
-            }
+        $.ajax({
+            type: 'get',
+            url: data_address + "/monitoring",
+            timeout: 2000,
+            data: {
+                "exp-id": exp_id,
+                "timestamp": expObject.newestTimestamp[exp_id]
+            },
+            async: true,
+            success: function (response) {
+                if (response.code == "1111"){
+                    commonObject.printExceptionMsg(response.data);
+                } else if (response.code == "0000"){
+                    // --- traverse the sensors of this experiment
+                    exp_bound_sensors.forEach(function (sensor, index) {
+                        var sensor_type = sensor['sensorConfig']['type'];
+                        var sensor_dimension = sensor['sensorConfig']['dimension'];
+                        var sensor_id = sensor['id'];
+                        var track_id = sensor['trackId'];
 
-            // --- traverse the sensors of this experiment
-            exp_bound_sensors.forEach(function (sensor, index) {
-                var sensor_type = sensor['sensorConfig']['type'];
-                var sensor_dimension = sensor['sensorConfig']['dimension'];
-                var sensor_id = sensor['id'];
-                var track_id = sensor['trackId'];
+                        if (sensor_type == 1){
+                            for (var dimIndex in sensor_dimension.split(';')){
+                                var dim = sensor_dimension.split(';')[dimIndex];
+                                var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + dim;
+                                if (!response.data.hasOwnProperty(sensor_id) || !response.data[sensor_id].hasOwnProperty(dim)
+                                    || echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
+                                    continue;
+                                }
+                                // --- init
+                                var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
+                                var series = chart.getOption()['series'];
+                                // --- update series data
+                                var unit = sensor['sensorConfig']['unit'].split(';');
+                                var statistics_info = {
+                                    "max": "-",
+                                    "min": "-",
+                                    "now": "-"
+                                };
+                                // --- add new data
+                                var new_data = response.data[sensor_id][dim];
+                                series[0]['data'].push.apply( series[0]['data'], new_data );
+                                // -- keep the arr length 10
+                                if (series[0]['data'].length > 10){
+                                    series[0]['data'].splice(0, series[0]['data'].length - 10);
+                                }
+                                // -- get statistics info
+                                statistics_info = updateInfo(statistics_info, series[0]['data']);
+                                $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-1").html(statistics_info['max']);
+                                $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-2").html(statistics_info['min']);
+                                $('#experiment-now-' + exp_id + "-" + track_id + "-" + dim).html(statistics_info['now']);
+                                // -- update newest data timestamp
+                                var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
+                                if (new_time > expObject.newestTimestamp[exp_id]){
+                                    expObject.newestTimestamp[exp_id] = new_time;
+                                }
 
-                if (sensor_type == 1){
-                    for (var dimIndex in sensor_dimension.split(';')){
-                        var dim = sensor_dimension.split(';')[dimIndex];
-                        var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + dim;
-                        if (!response.data.hasOwnProperty(sensor_id) || echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
-                            continue;
-                        }
-                        if (!response.data[sensor_id].hasOwnProperty(dim)){
-                            continue;
-                        }
-                        // --- init
-                        var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
-                        var series = chart.getOption()['series'];
-                        // --- update series data
-                        var unit = sensor['sensorConfig']['unit'].split(';');
-                        var statistics_info = {
-                            "max": "-",
-                            "min": "-",
-                            "now": "-"
-                        };
-                        // --- add new data
-                        var new_data = response.data[sensor_id][dim];
-                        series[0]['data'].push.apply( series[0]['data'], new_data );
-                        // -- keep the arr length 50
-                        if (series[0]['data'].length > 10){
-                            series[0]['data'].splice(0, series[0]['data'].length - 10);
-                        }
-                        // -- get statistics info
-                        statistics_info = updateInfo(statistics_info, series[0]['data']);
-                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-1").html(statistics_info['max']);
-                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-2").html(statistics_info['min']);
-                        $('#experiment-now-' + exp_id + "-" + track_id + "-" + dim).html(statistics_info['now']);
-                        // -- update newest data timestamp
-                        var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
-                        if (new_time > expObject.newestTimestamp[exp_id]){
-                            expObject.newestTimestamp[exp_id] = new_time;
-                        }
+                                // --- update series markArea (if recorder)
+                                if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
+                                    var mark_list = series[0]['markArea']['data'];
+                                    mark_list[0] = [{
+                                        xAxis: parseTime(expObject.recorderTimestamp[exp_id][0])
+                                    }, {
+                                        xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
+                                    }];
+                                    series[0]['markArea']['data'] = mark_list;
+                                }
 
-                        // --- update series markArea (if recorder)
-                        if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
-                            var mark_list = series[0]['markArea']['data'];
-                            mark_list[0] = [{
-                                xAxis: parseTime(expObject.recorderTimestamp[exp_id][0])
-                            }, {
-                                xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
-                            }];
-                            series[0]['markArea']['data'] = mark_list;
+                                // -- set new option
+                                chart.setOption({
+                                    series: series
+                                });
+                            }
+                        } else if (sensor_type == 2){
+                            if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
+                                // --- if in recorder state, update info
+                                var start_time = expObject.recorderTimestamp[exp_id][0];
+                                $('#experiment-info-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(parseTime(start_time));
+                                $('#experiment-now-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(Math.round((Date.now() - Date.parse(start_time))/1000));
+                            }
                         }
-
-                        // -- set new option
-                        chart.setOption({
-                            series: series
-                        });
-                    }
-                } else if (sensor_type == 2){
-                    if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
-                        // --- if in recorder state, update info
-                        var start_time = expObject.recorderTimestamp[exp_id][0];
-                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(parseTime(start_time));
-                        $('#experiment-now-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(Math.round((Date.now() - Date.parse(start_time))/1000));
-                    }
+                    });
                 }
-            });
+            }, error: function (response) {
+                commonObject.printRejectMsg();
+            }
         });
     }
 
@@ -553,7 +559,9 @@ function pageStopMonitor(exp_id){
         if (exp_id == expId) {
             var chart = echarts.getInstanceByDom(document.getElementById(dom));
             var series = chart.getOption()['series'];
-            series[0]['data'] = [];
+            series[0]['data'] = [{
+                value : [new Date().Format("yyyy-MM-dd HH:mm:ss"), 0]
+            }];
             series[0]['markArea']['data'] = [];
             chart.setOption({
                 series: series

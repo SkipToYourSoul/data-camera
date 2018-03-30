@@ -113,12 +113,12 @@ $(function(){
             template += '<span class="label label-default content-tag-style">无标签</span>';
         } else {
             content['tag'].split(',').forEach(function (tag) {
-                template += '<span class="label label-default content-tag-style">' + tag + '</span>';
+                template += '<span class="label label-default content-tag-style">标签：' + tag + '</span>';
             });
         }
         template += '</div>';
         // -- 分类
-        template += '<div class="content-category">' + content['category'] + '</div>';
+        template += '<div class="content-category"> <span class="label label-default content-tag-style">' + content['category'] + '</span> </div>';
         template += '</div>';
         // -- 细节信息
         template += '<div class="share-view-info">';

@@ -8,6 +8,7 @@ import com.stemcloud.liye.dc.common.ServerReturnTool;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.DataService;
 import com.stemcloud.liye.dc.service.OssService;
+import com.stemcloud.liye.dc.util.IpAddressUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,8 +76,8 @@ public class DataController {
         try {
             Long beginTime = System.currentTimeMillis();
             map = ServerReturnTool.serverSuccess(dataService.getRecentDataOfBoundSensors(Long.parseLong(queryParams.get("exp-id")), Long.parseLong(queryParams.get("timestamp"))));
-            Long endTime = System.currentTimeMillis();
-            logger.debug("[/data/monitoring] request data in {} ms.", (endTime - beginTime));
+            logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
             logger.error("[/data/monitoring]", e);

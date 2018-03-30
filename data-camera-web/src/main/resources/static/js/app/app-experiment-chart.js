@@ -43,11 +43,11 @@ function initExperiment(iFi){
                 legends.forEach(function (legend) {
                     var dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
                     var videoId = "experiment-video-" + exp_id + "-" + track_id;
-                    $('#' + dom).html('<div style="padding: 10px">' +
+                    $('#' + dom).html('<div style="padding: 10px 25px 0">' +
                         '<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
                     var video = videojs(videoId, {
                         controls: false,
-                        /*poster: "/camera/img/oceans.png",*/
+                        poster: "/camera/img/video-load2.jpg",
                         preload: "auto",
                         loop: true,
                         sources: [{src: "/camera/img/oceans.mp4", type: "video/mp4"}],

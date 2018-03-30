@@ -67,8 +67,8 @@ function buildExperimentChartOption(legend) {
         grid: [{
             borderWidth: 0,
             top: 10,
-            bottom: 30,
-            left: 40,
+            bottom: 35,
+            left: 25,
             right: 25,
             textStyle: {
                 color: "#fff"
@@ -144,7 +144,9 @@ function buildExperimentChartOption(legend) {
                 silent: true,
                 data: []
             },
-            data: []
+            data: [{
+                value : [new Date().Format("yyyy-MM-dd HH:mm:ss"), 0]
+            }]
         }
     };
 }

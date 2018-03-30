@@ -141,11 +141,10 @@
 		<div class="col-sm-9 col-md-9 col-xs-9" style="padding: 0">
 			<!-- 管理页面的内容展示 -->
 			<div th:if="!${param.id}" id="app-management">
-				<!-- <img th:src="@{/img/quickstart.jpg}" alt="xxx1" />-->
-				<div class="img-responsive"
-					style="background: url(img/quickstart.jpg) 0 0 no-repeat scroll transparent ;background-size:100% 100%;min-height:700px"></div>
-				<div
-					style="min-height: 170px; width: 100%; background: url(img/app-bottom.png) no-repeat;">
+				<img th:src="@{/img/quickstart.jpg}" class="img-responsive" />
+				<!--<div class="img-responsive"
+					style="background: url(img/quickstart.jpg) 0 0 no-repeat scroll transparent; background-size:100% 100%;min-height:700px"></div>-->
+				<div style="min-height: 170px; width: 100%; background: url(img/app-bottom.png) no-repeat;">
 					<div>
 						<div class="app-title">优秀案例</div>
 						<div class="app-summary">小字描述优秀案例的内容做简要概括</div>
