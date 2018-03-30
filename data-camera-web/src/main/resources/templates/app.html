@@ -75,7 +75,7 @@
 				<!-- 场景列表 -->
 				<div class="sidebar-menu" id="app-menu">
 					<ul class="nav main-menu">
-						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
+						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}" style="font-size: 16px; font-weight: 600"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
 					</ul>
 					<div class="btn app-list">
 						<i class="fa fa-bars"></i>&nbsp;场景列表<i
@@ -94,10 +94,9 @@
 				</div>
 
 				<!-- 片段列表 -->
-				<div class="sidebar-menu" id="content-menu" th:if="${param.id}"
-					hidden="hidden">
+				<div class="sidebar-menu" id="content-menu" th:if="${param.id}" hidden="hidden">
 					<ul class="nav main-menu">
-						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
+						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}" style="font-size: 16px; font-weight: 600"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
 					</ul>
 					<div class="btn app-list">
 						<i class="fa fa-bars"></i>&nbsp;场景列表<i class="fa fa-angle-down pull-right" style="font-weight: 600; line-height: 16px; padding-left: 60px;"></i>
