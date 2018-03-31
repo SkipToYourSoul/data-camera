@@ -34,7 +34,7 @@
 	<div class="navbar-wrapper" th:include="module/common::nav"></div>
 	<div style="margin-top: 3px;">
 		<!-- 左侧sidebar -->
-		<div class="col-sm-3 col-md-3 col-xs-3" style="padding: 0;">
+		<div class="col-sm-3 col-md-3 col-xs-12" style="padding: 0;">
 			<div class="sidebar-content">
 				<div class="sidebar-top">
 					<!-- 内容介绍 -->
@@ -129,7 +129,7 @@
 			</div>
 		</div>
 
-		<div class="col-sm-9 col-md-9 col-xs-9" style="padding: 0">
+		<div class="col-sm-9 col-md-9 col-xs-12" style="padding: 0">
 			<!-- 管理页面的内容展示 -->
 			<div th:if="!${param.id}" id="app-management">
 				<img th:src="@{/img/quickstart.jpg}" class="img-responsive" />
