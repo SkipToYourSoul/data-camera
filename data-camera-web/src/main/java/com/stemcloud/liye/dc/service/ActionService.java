@@ -110,6 +110,7 @@ public class ActionService {
             if (recorderInfo != null) {
                 if (isSave == 1){
                     recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name, desc);
+                    saveVideo(recorderInfo);
                     response = recorderInfo.getId();
                 } else if (isSave == 0){
                     recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
