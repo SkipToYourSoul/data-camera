@@ -226,6 +226,13 @@ public class ViewController {
         return "share";
     }
 
+    @GetMapping("/admin")
+    public String admin(Model model, HttpServletRequest request){
+        String currentUser = commonService.getCurrentLoginUser(request);
+        logger.info("Admin user {} request the admin page.", currentUser);
+        return "admin";
+    }
+
     @GetMapping("/denied")
     public String denied() {
         return "denied";
@@ -238,10 +245,7 @@ public class ViewController {
 
     @GetMapping("/login")
     public String login(HttpServletRequest request){
-
-        logger.info(request.getHeader("Referer"));
-
-        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
+        logger.info("Ip {} request login page from url {}", IpAddressUtil.getClientIpAddress(request), request.getHeader("Referer"));
         return "login";
     }
 }

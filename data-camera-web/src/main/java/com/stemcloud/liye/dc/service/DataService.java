@@ -64,6 +64,7 @@ public class DataService {
         Date time = new Date(timestamp);
         List<ValueData> data = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(time, boundSensorIds);
         Map<Long, Map<String, List<ChartTimeSeries>>> map = transferChartData(data);
+        logger.info("--> Get data of exp {}, sensor size is {}, data size is {}", expId, boundSensorIds.size(), data.size());
         return map;
     }
 
@@ -229,7 +230,6 @@ public class DataService {
      * @param mark
      */
     public int updateDataMarker(long id, String mark){
-        logger.info("Update mark {} of id {}", mark, id);
         return valueDataRepository.updateMarker(id, mark);
     }
 

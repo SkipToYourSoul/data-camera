@@ -63,12 +63,8 @@ public class DataController {
 
     /**
      * 获取更新的监控数据
-     *
      * Map<Long, Map<String, List<ChartTimeSeries>>>
      *     sensor_id, (data_key, List<data_value>)
-     * @param queryParams
-     * @param request
-     * @return
      */
     @GetMapping("/monitoring")
     Map monitor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
@@ -94,14 +90,14 @@ public class DataController {
      * @return Map
      */
     @GetMapping("/get-recorder-data")
-    Map getRecorderData(@RequestParam Map<String, String> queryParams){
+    Map getRecorderData(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         Map<String, Object> map;
         try{
             Long beginTime = System.currentTimeMillis();
             long recorderId = Long.parseLong(queryParams.get("recorder-id"));
             map = ServerReturnTool.serverSuccess(dataService.getRecorderData(recorderId));
-            Long endTime = System.currentTimeMillis();
-            logger.info("[/data/get-recorder-data] request recorder data, cost={} ms.", (endTime - beginTime));
+            logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
         } catch (Exception e){
             map = ServerReturnTool.serverFailure(e.getMessage());
             logger.error("[/data/get-recorder-data]", e);
@@ -111,36 +107,39 @@ public class DataController {
 
     /**
      * 生成用户自定义的实验片段
-     * @param queryParams
-     * @return
      */
     @GetMapping("/user-new-recorder")
-    Map newContent(@RequestParam Map<String, String> queryParams){
+    Map newContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
             long recorderId = Long.parseLong(queryParams.get("recorder-id"));
             String start = queryParams.get("start");
             String end = queryParams.get("end");
             String name = queryParams.get("name");
             String desc = queryParams.get("desc");
-            logger.info("[/data/user-new-recorder], id={}, start={}, end={}, name={}, desc={}", recorderId, start, end, name, desc);
-            return ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end, name, desc));
+            Map result = ServerReturnTool.serverSuccess(dataService.generateUserContent(recorderId, start, end, name, desc));
+            logger.info("Ip {} request ajax url {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString());
+            return result;
         } catch (ParseException e) {
+            logger.error("[/data/user-new-recorder]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 更新数据标注
-     * @param queryParams
-     * @return
      */
     @GetMapping("/user-data-mark")
-    Map addDataMark(@RequestParam Map<String, String> queryParams){
+    Map addDataMark(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try{
             long id = Long.parseLong(queryParams.get("data-id"));
             String mark = queryParams.get("data-mark");
-            return ServerReturnTool.serverSuccess(dataService.updateDataMarker(id, mark));
+            Map result =  ServerReturnTool.serverSuccess(dataService.updateDataMarker(id, mark));
+            logger.info("Ip {} request ajax url {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString());
+            return result;
         } catch (Exception e){
+            logger.error("[/data/user-new-recorder]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
@@ -149,17 +148,27 @@ public class DataController {
     @ResponseBody
     Map uploadFile(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try{
-            return ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, queryParams.get("from")));
+            long beginTime = System.currentTimeMillis();
+            Map result = ServerReturnTool.serverSuccess(ossService.uploadFileToOss(request, queryParams.get("from")));
+            logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
+            return result;
         } catch (Exception e){
+            logger.error("[/data/user-new-recorder]", e);
             return ServerReturnTool.serverFailure(e.getCause().getMessage());
         }
     }
 
     @GetMapping("/search-hot-content")
-    Map searchHotContent(@RequestParam String search) {
+    Map searchHotContent(@RequestParam String search, HttpServletRequest request) {
         try{
-            return ServerReturnTool.serverSuccess(dataService.getSearchContent(search));
+            long beginTime = System.currentTimeMillis();
+            Map result = ServerReturnTool.serverSuccess(dataService.getSearchContent(search));
+            logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
+            return result;
         } catch (Exception e){
+            logger.error("[/data/user-new-recorder]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }

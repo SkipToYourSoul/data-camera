@@ -36,10 +36,8 @@
 		<!-- 左侧sidebar -->
 		<div class="col-sm-3 col-md-3 col-xs-3" style="padding: 0;">
 			<div class="sidebar-content">
-				<!-- 管理页面图片 -->
-				<!-- <img th:if="!${param.id}" th:src="@{/img/index/nav11.png}" class="img-responsive" alt=""/> -->
-				<!-- 内容介绍 -->
 				<div class="sidebar-top">
+					<!-- 内容介绍 -->
 					<div class="sidebar-info" style="padding: 0">
 						<div th:if="!${param.id}" class="info-title">WELCOME</div>
 						<div th:if="${param.id}" class="info-title">
@@ -58,81 +56,74 @@
 						</div>
 					</div>
 					<!-- 操作按钮 -->
-					<div>
-						<div class="sidebar-buttons">
-							<button th:if="!${param.id}" type="button"
+					<div class="sidebar-buttons">
+						<button th:if="!${param.id}" type="button"
 								class="btn sidebar-buttons"
 								style="background-color: #fff; color: #36b5eb; font-weight: 1px"
 								data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
-							<button th:if="${param.id}" type="button"
-									class="btn btn-sm btn-white" data-toggle="modal"
-									data-target="#app-modal" todo="edit">编辑场景</button>
-							<button th:if="${param.id}" type="button"
-									class="btn btn-sm btn-pink1" onclick="deleteApp(this)">删除场景</button>
-						</div>
+						<button th:if="${param.id}" type="button"
+								class="btn btn-sm btn-white" data-toggle="modal"
+								data-target="#app-modal" todo="edit">编辑场景</button>
+						<button th:if="${param.id}" type="button"
+								class="btn btn-sm btn-pink1" onclick="deleteApp(this)">删除场景</button>
 					</div>
 				</div>
-				<!-- 场景列表 -->
-				<div class="sidebar-menu" id="app-menu">
+				<div class="sidebar-menu">
 					<ul class="nav main-menu">
-						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}" style="font-size: 16px; font-weight: 600"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
+						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}" style="font-size: 14px; font-weight: 600"><i class="fa fa-home"></i>&nbsp;场景管理页面</a></li>
 					</ul>
 					<div class="btn app-list">
-						<i class="fa fa-bars"></i>&nbsp;场景列表<i
-							class="fa fa-angle-down pull-right"
-							style="font-weight: 600; line-height: 16px; padding-left: 30px;"></i>
+						<i class="fa fa-bars"></i>&nbsp;场景列表<i class="fa fa-angle-down pull-right" style="font-weight: 600; line-height: 16px; padding-left: 30px;"></i>
 					</div>
-					<ul class="nav" style="padding-left: 20px">
-						<th:block th:each="entry,index:${apps}">
-							<li th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
-								<a th:href="@{/app(id=${entry.key})}"
-								th:class="|app-${index.count}|">
-									<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-circle':'fa fa-circle-o'"></span>
-									&nbsp;<span th:text="${entry.value.name}"></span> </a></li>
-						</th:block>
-					</ul>
-				</div>
 
-				<!-- 片段列表 -->
-				<div class="sidebar-menu" id="content-menu" th:if="${param.id}" hidden="hidden">
-					<ul class="nav main-menu">
-						<li th:class="${param.id}?'':'active'"><a th:href="@{/app}" style="font-size: 16px; font-weight: 600"><img th:src="@{/img/icons/home.png}" class="icon"/>&nbsp; 场景管理页面</a></li>
-					</ul>
-					<div class="btn app-list">
-						<i class="fa fa-bars"></i>&nbsp;场景列表<i class="fa fa-angle-down pull-right" style="font-weight: 600; line-height: 16px; padding-left: 60px;"></i>
+					<!-- 场景列表 -->
+					<div id="app-menu">
+						<ul class="nav" style="padding-left: 20px">
+							<th:block th:each="entry,index:${apps}">
+								<li th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
+									<a th:href="@{/app(id=${entry.key})}"
+									   th:class="|app-${index.count}|">
+										<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-circle':'fa fa-circle-o'"></span>
+										&nbsp;<span th:text="${entry.value.name}"></span> </a></li>
+							</th:block>
+						</ul>
 					</div>
-					<div style="padding-top: 5px">
-						<th:block th:each="entry,index:${apps}">
-							<div class="nav" style="padding: 5px 0 15px 35px;">
-								<a class="no-de" type="button" th:href="@{/app(id=${entry.key},tab=2)}">
+
+					<!-- 片段列表 -->
+					<div id="content-menu" hidden="hidden">
+						<div style="padding-top: 5px">
+							<th:block th:each="entry,index:${apps}">
+								<div class="nav" style="padding: 5px 0 15px 35px;">
+									<a class="no-de" type="button" th:href="@{/app(id=${entry.key},tab=2)}">
 									<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'active':''">
 										<span th:class="${#httpServletRequest.getParameter('id') eq ''+entry.key}?'fa fa-circle':'fa fa-circle-o'"></span>
 										&nbsp;<span th:text="${entry.value.name}"></span>
 									</span>
-								</a>
-							</div>
-							<div th:if="${#httpServletRequest.getParameter('id') eq ''+entry.key}"
-									class="menu-content collapse in" style="margin-top: -10px"
-									th:id="|recorder-${index.count}|">
-								<!-- 该场景没有片段记录数据 -->
-								<div th:if="${#maps.isEmpty(recorders)}"
-									 class="alert alert-warning" role="alert">没有可选的数据片段</div>
-								<!-- 遍历片段记录数据 -->
-								<ul class="nav" th:if="${not #maps.isEmpty(recorders)}">
-									<th:block th:each="recorder,index:${recorders}">
-										<li style="padding: 5px 0 5px 60px;"
-											th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}"
-											th:data="${recorder.key}">
-											<a th:data="${recorder.key}" th:href="|#${recorder.key}|" style="padding: 0">
-												<div th:text="|${recorder.value.name}|"></div>
-												<div th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}" style="font-size: 12px"
-													 th:text="|${#dates.format(recorder.value.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.value.endTime, 'HH:mm:ss')}|"></div>
-											</a>
-										</li>
-									</th:block>
-								</ul>
-							</div>
-						</th:block>
+									</a>
+								</div>
+								<div th:if="${#httpServletRequest.getParameter('id') eq ''+entry.key}"
+									 class="menu-content collapse in" style="margin-top: -10px"
+									 th:id="|recorder-${index.count}|">
+									<!-- 该场景没有片段记录数据 -->
+									<div th:if="${#maps.isEmpty(recorders)}"
+										 class="alert alert-warning" role="alert">没有可选的数据片段</div>
+									<!-- 遍历片段记录数据 -->
+									<ul class="nav" th:if="${not #maps.isEmpty(recorders)}">
+										<th:block th:each="recorder,index:${recorders}">
+											<li style="padding: 5px 0 5px 60px;"
+												th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}"
+												th:data="${recorder.key}">
+												<a th:data="${recorder.key}" th:href="|#${recorder.key}|" style="padding: 0">
+													<div th:text="|${recorder.value.name}|"></div>
+													<div th:if="${recorder.value.isUserGen eq 0 and recorder.value.isRecorder eq 0}" style="font-size: 12px"
+														 th:text="|${#dates.format(recorder.value.startTime, 'HH:mm:ss')} - ${#dates.format(recorder.value.endTime, 'HH:mm:ss')}|"></div>
+												</a>
+											</li>
+										</th:block>
+									</ul>
+								</div>
+							</th:block>
+						</div>
 					</div>
 				</div>
 			</div>

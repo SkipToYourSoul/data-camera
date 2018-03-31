@@ -6,8 +6,7 @@
 		th:class="${inIndex}?'navbar navbar-default':'navbar navbar-default'"
 		style="padding: 10px 0px 10px 0px;">
 		<!-- navbar header -->
-		<div
-			class="col-sm-6 col-md-6 col-xs-6 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+		<div class="col-sm-6 col-md-6 col-xs-6 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed"
 					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
@@ -26,10 +25,9 @@
 					<ul class="nav navbar-nav" style="margin-left: 20px">
 						<li><a th:href="@{/index}">首页</a></li>
 						<li th:class="${inApp}?'active':''"><a th:href="@{/app}">场景</a></li>
-						<li th:class="${inDevice}?'active':''"><a
-							th:href="@{/device}">设备</a></li>
-						<li th:class="${inContent}?'active':''"><a
-							th:href="@{/content}">内容</a></li>
+						<li th:class="${inDevice}?'active':''"><a th:href="@{/device}">设备</a></li>
+						<li th:class="${inContent}?'active':''"><a th:href="@{/content}">内容</a></li>
+						<li th:class="${inAdmin}?'active':''" sec:authorize="hasAuthority('admin')"><a th:href="@{/admin}">管理</a></li>
 					</ul>
 				</th:block>
 			</div>
@@ -37,24 +35,18 @@
 		<div class="col-sm-5 col-md-5 col-xs-5">
 			<!-- login user control -->
 			<div sec:authorize="isAuthenticated()">
-				<ul class="nav navbar-nav pull-right navbar-login-ul">
-					<li th:if="${inIndex}"><a th:href="@{/index}">联系我们</a></li>
-					<li><a><i class="fa fa-user-circle fa-fw"></i>&nbsp;
-							登陆用户:&nbsp; <span sec:authentication="name">ANONYMOUS_USER</span></a></li>
-					<li><a><i class="fa fa-id-card-o fa-fw"></i>&nbsp;
-							用户身份:&nbsp; <span sec:authentication="principal.authorities">[ROLE_USER]</span></a></li>
-					<li><a th:href="@{/logout}"><i
-							class="fa fa-sign-out fa-fw"></i>&nbsp; 注销</a></li>
+				<ul class="nav navbar-nav navbar-login-ul">
+					<li><a><i class="fa fa-user-circle fa-fw"></i>&nbsp;<span sec:authentication="name">ANONYMOUS_USER</span>
+						<span sec:authentication="principal.authorities">[ROLE_USER]</span></a></li>
+					<li><a th:href="@{/logout}"><i class="fa fa-sign-out fa-fw"></i>&nbsp;注销</a></li>
+					<li><label class="search-label"><input class="search-input" placeholder="搜索热门场景" /><i class="fa fa-search search-icon"></i></label></li>
 				</ul>
 			</div>
 			<div sec:authorize="!isAuthenticated()">
 				<ul class="nav navbar-nav navbar-login-ul">
-					<li th:if="${inIndex}"><a th:href="@{/index}">联系我们</a></li>
 					<li><a th:href="@{/login}">登录</a></li>
-					<li th:if="${inIndex}"><a href="#">&nbsp; 注册</a></li>
-					<li><label class="search-label"><input
-							class="search-input" placeholder="搜索热门场景" /><i
-							class="fa fa-search search-icon"></i></label></li>
+					<li><a href="#">注册</a></li>
+					<li><label class="search-label"><input class="search-input" placeholder="搜索热门场景" /><i class="fa fa-search search-icon"></i></label></li>
 				</ul>
 			</div>
 		</div>

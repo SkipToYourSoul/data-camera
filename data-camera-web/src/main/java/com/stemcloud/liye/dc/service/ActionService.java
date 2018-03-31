@@ -114,13 +114,14 @@ public class ActionService {
                 } else if (isSave == 0){
                     recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
                 }
+                ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, 0));
             }
         }
         // -- send message
         // sendMessageToRedis(expId, MONITOR, action);
         ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, MONITOR, action));
 
-        logger.info("Change experiment monitor state, action={}, isSave={}, response={}", action, isSave, response);
+        logger.info("--> Change experiment monitor state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
     }
 
@@ -175,17 +176,17 @@ public class ActionService {
             if (isSave == 1){
                 recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name, desc);
                 saveVideo(recorderInfo);
-                response = recorderInfo.getId();
             } else if (isSave == 0){
                 recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
             }
+            response = recorderInfo.getId();
         }
 
         // -- send message
         // sendMessageToRedis(expId, RECORD, action);
         ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, action));
 
-        logger.info("Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
+        logger.info("--> Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
     }
 
@@ -210,7 +211,7 @@ public class ActionService {
                 videoData.setVideoPath("/camera/img/oceans.mp4");
 
                 videoDataRepository.save(videoData);
-                logger.info("Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
+                logger.info("--> Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
             }
         }
     }
@@ -283,7 +284,7 @@ public class ActionService {
                 if (!noChange){
                     changeMonitorState(exp.getId(), action, isSave, dataTime, name, desc);
                     expIds.add(exp.getId());
-                    logger.info("Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                    logger.info("--> Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
             }
         }
@@ -313,7 +314,7 @@ public class ActionService {
                         changeRecorderState(exp.getId(), action, isSave, dataTime, name, desc);
                     }
                     expIds.add(exp.getId());
-                    logger.info("Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                    logger.info("--> Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
             }
         }
@@ -364,7 +365,7 @@ public class ActionService {
 
         @Override
         public void run() {
-            logger.info("Send message to redis, expId={}, actionType={}, action={}", expId, actionType, action);
+            logger.info("--> Send message to redis, expId={}, actionType={}, action={}", expId, actionType, action);
             List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
             for (SensorInfo sensor : sensors) {
                 String redisKey = MONITOR.equals(actionType)? RedisKeyUtils.mkSensorMonitorKey():RedisKeyUtils.mkSensorRecordKey();

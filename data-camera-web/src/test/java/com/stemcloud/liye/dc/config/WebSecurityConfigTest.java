@@ -14,8 +14,8 @@ import static org.junit.Assert.*;
 public class WebSecurityConfigTest {
     @Test
     public void passwordGenerator(){
-        String name = "root";
-        String password = "root";
+        String name = "user";
+        String password = "user";
 
         BCryptPasswordEncoder bc=new BCryptPasswordEncoder(4);
         System.out.println(bc.encode(password));
