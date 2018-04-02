@@ -38,6 +38,12 @@ public class SimulatorServer implements Server {
                     0L,3L,
                     TimeUnit.SECONDS
             );
+            SCHEDULE.scheduleWithFixedDelay(
+                    sensorSimulator::refresh,
+                    0,
+                    60L,
+                    TimeUnit.SECONDS
+            );
         }
     }
 

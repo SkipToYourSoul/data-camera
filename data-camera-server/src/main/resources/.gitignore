@@ -1,0 +1,14 @@
+.idea/
+*.iml
+*.iws
+
+# mac temp file
+*/.DS_Store
+.DS_Store
+
+target/
+
+logs/
+/resources/**
+
+/.project
