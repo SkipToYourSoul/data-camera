@@ -15,6 +15,7 @@ import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -69,7 +70,7 @@ public class BaseInfoService {
      */
     public Boolean isAppBelongUser(long id, String user) {
         AppInfo app = appRepository.findOne(id);
-        logger.info("Check user {} has app {}", user, id);
+        logger.debug("Check user {} has app {}", user, id);
         return app != null && app.getIsDeleted() == 0 && user.equals(app.getCreator());
     }
 
@@ -141,7 +142,7 @@ public class BaseInfoService {
     }
 
     /**
-     * 获取当前应用下的所有实验记录，按创建时间排序
+     * 获取当前用户所有应用下的所有实验记录，按创建时间排序
      * @return Map<appId-Recorder>
      */
     public Map<Long, List<RecorderInfo>> getAllRecorders(Map<Long, AppInfo> apps){
@@ -163,6 +164,15 @@ public class BaseInfoService {
             }
         }
 
+        return map;
+    }
+
+    public Map<Long, RecorderInfo> getRecordersOfApp(Long appId){
+        Map<Long, RecorderInfo> map = new LinkedHashMap<Long, RecorderInfo>();
+        List<RecorderInfo> recorders = recorderRepository.findByAppIdAndIsRecorderAndIsDeletedOrderByIdDesc(appId, 0, 0);
+        for (RecorderInfo r : recorders) {
+            map.put(r.getId(), r);
+        }
         return map;
     }
 

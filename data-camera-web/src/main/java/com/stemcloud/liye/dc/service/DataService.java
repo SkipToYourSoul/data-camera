@@ -3,14 +3,12 @@ package com.stemcloud.liye.dc.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
+import com.stemcloud.liye.dc.dao.data.ContentRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
-import com.stemcloud.liye.dc.domain.data.RecorderDevices;
-import com.stemcloud.liye.dc.domain.data.RecorderInfo;
-import com.stemcloud.liye.dc.domain.data.ValueData;
-import com.stemcloud.liye.dc.domain.data.VideoData;
+import com.stemcloud.liye.dc.domain.data.*;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
 import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.domain.view.Video;
@@ -37,13 +35,15 @@ public class DataService {
     private final ValueDataRepository valueDataRepository;
     private final RecorderRepository recorderRepository;
     private final VideoDataRepository videoDataRepository;
+    private final ContentRepository contentRepository;
 
     @Autowired
-    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository) {
+    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository, ContentRepository contentRepository) {
         this.sensorRepository = sensorRepository;
         this.valueDataRepository = valueDataRepository;
         this.recorderRepository = recorderRepository;
         this.videoDataRepository = videoDataRepository;
+        this.contentRepository = contentRepository;
     }
 
     /**
@@ -57,18 +57,19 @@ public class DataService {
         List<SensorInfo> boundSensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
         Set<Long> boundSensorIds = new HashSet<Long>();
         for (SensorInfo bs: boundSensors){
-            boundSensorIds.add(bs.getId());
+            if (bs.getSensorConfig().getType() == 1) {
+                boundSensorIds.add(bs.getId());
+            }
         }
-
         Date time = new Date(timestamp);
         List<ValueData> data = valueDataRepository.findByCreateTimeGreaterThanAndSensorIdInOrderByCreateTime(time, boundSensorIds);
-
-        // logger.info("Request data size={}, time={}", data.size(), time.toString());
-        return transferChartData(data);
+        Map<Long, Map<String, List<ChartTimeSeries>>> map = transferChartData(data);
+        logger.info("--> Get data of exp {}, sensor size is {}, data size is {}", expId, boundSensorIds.size(), data.size());
+        return map;
     }
 
     /**
-     *
+     * 获取数据片段的数据
      * @param recorderId
      * @return MAP
      *  key: SensorType
@@ -86,18 +87,15 @@ public class DataService {
 
         // -- value data for chart
         List<ValueData> chartValues = new ArrayList<ValueData>();
+        List<Long> sensorIds = new ArrayList<Long>();
         for (RecorderDevices device: devices){
-            long sensorId = device.getSensor();
-            List<ValueData> dataList = valueDataRepository.findBySensorIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
-                    sensorId, startTime, endTime
-            );
-            if (dataList.size() == 0){
-                continue;
-            }
-            chartValues.addAll(dataList);
+            sensorIds.add(device.getSensor());
         }
-        Map<Long, Map<String, List<ChartTimeSeries>>> chartMap
-                = transferChartData(chartValues);
+        List<ValueData> dataList = valueDataRepository.findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(
+                sensorIds, startTime, endTime
+        );
+        chartValues.addAll(dataList);
+        Map<Long, Map<String, List<ChartTimeSeries>>> chartMap = transferChartData(chartValues);
 
         // -- 将不同数据段的数据对齐
         long maxDataTime = endTime.getTime();
@@ -136,7 +134,7 @@ public class DataService {
      * @param start 数据截取起点
      * @param end 数据截取终点
      */
-    public Long generateUserContent(long recorderId, String start, String end) throws ParseException {
+    public Long generateUserContent(long recorderId, String start, String end, String name, String desc) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         RecorderInfo recorder = recorderRepository.findOne(recorderId);
@@ -144,8 +142,8 @@ public class DataService {
 
         // 保存新的实验记录
         RecorderInfo newRecorder = new RecorderInfo();
-        newRecorder.setName("来自片段{" + recorder.getName() + "}");
-        newRecorder.setDescription("子片段描述");
+        newRecorder.setName(name);
+        newRecorder.setDescription(desc);
         newRecorder.setStartTime(sdf.parse(start));
         newRecorder.setEndTime(sdf.parse(end));
         newRecorder.setExpId(recorder.getExpId());
@@ -154,7 +152,25 @@ public class DataService {
         newRecorder.setIsUserGen(1);
         newRecorder.setParentId(recorderId);
         newRecorder.setDevices(new Gson().toJson(devices));
-        return recorderRepository.save(newRecorder).getId();
+        newRecorder.setStartSeconds( (sdf.parse(start).getTime() - recorder.getStartTime().getTime())/1000 + recorder.getStartSeconds() );
+        long newR = recorderRepository.save(newRecorder).getId();
+
+        // 若有视频，则在video表中生成记录
+        for (RecorderDevices device : devices) {
+            if (device.getLegends().size() == 1 && "视频".equals(device.getLegends().get(0))) {
+                List<VideoData> videos = videoDataRepository.findByRecorderInfo(recorder);
+                List<VideoData> newVideos = new ArrayList<VideoData>();
+                for (VideoData video : videos) {
+                    VideoData newVideo = new VideoData(video.getTrackId(), video.getSensorId(),
+                            newRecorder, video.getVideoPath(),video.getVideoPost());
+                    newVideos.add(newVideo);
+                }
+                videoDataRepository.save(newVideos);
+                break;
+            }
+        }
+
+        return newR;
     }
 
     /**
@@ -214,7 +230,14 @@ public class DataService {
      * @param mark
      */
     public int updateDataMarker(long id, String mark){
-        logger.info("Update mark {} of id {}", mark, id);
         return valueDataRepository.updateMarker(id, mark);
+    }
+
+    public List<ContentInfo> getSearchContent(String search) {
+        List<ContentInfo> content = new ArrayList<ContentInfo>();
+        if (search.trim().isEmpty()) {
+            return content;
+        }
+        return contentRepository.findByIsSharedAndIsDeletedAndTitleLikeOrderByLikeDesc(1,0,'%' + search + '%');
     }
 }

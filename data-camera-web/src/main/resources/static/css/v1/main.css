@@ -63,9 +63,10 @@ body {
 .footer{
     background-color: #35b5eb;
     /* bybsq */
-    position:absolute;
+    position:fixed;
     bottom:0; 
     width:100%;
+    z-index:101;
 }
 
 .content-about-us {

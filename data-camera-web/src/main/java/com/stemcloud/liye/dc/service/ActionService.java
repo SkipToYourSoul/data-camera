@@ -16,6 +16,7 @@ import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.message.SensorStatus;
+import com.stemcloud.liye.dc.util.ExecutorUtil;
 import com.stemcloud.liye.dc.util.RedisKeyUtils;
 import com.stemcloud.liye.dc.util.RedisUtils;
 import org.slf4j.Logger;
@@ -25,6 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Belongs to data-camera-web
@@ -44,9 +49,10 @@ public class ActionService {
 
     @Autowired
     RedisUtils redisUtils;
+
     private Gson gson = new Gson();
-    private String MONITOR = "monitor";
-    private String RECORD = "record";
+    private final String MONITOR = "monitor";
+    private final String RECORD = "record";
 
     public ActionService(ExperimentRepository experimentRepository, RecorderRepository recorderRepository, SensorRepository sensorRepository, VideoDataRepository videoDataRepository, AppRepository appRepository) {
         this.experimentRepository = experimentRepository;
@@ -62,7 +68,7 @@ public class ActionService {
      * @return
      * NOT_BOUND_SENSOR, MONITORING_NOT_RECORDING, MONITORING_AND_RECORDING, NOT_MONITOR, UNKNOWN
      */
-    public synchronized ExpStatus expCurrentStatus(long expId){
+    public ExpStatus expCurrentStatus(long expId){
         ExperimentInfo exp = experimentRepository.findOne(expId);
         Boolean hasSensor = false;
         for (TrackInfo track: exp.getTrackInfoList()){
@@ -87,66 +93,53 @@ public class ActionService {
 
     /**
      * 改变当前实验的监控状态
-     * @param expId
-     * @param action
-     * @param isSave
-     * @param dataTime
-     * @param name
-     * @param desc
      * @return 若有数据片段保存，则返回片段ID，否则返回-1
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized long changeMonitorState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public long changeMonitorState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long response = -1;
 
         if (action == 1){
             experimentRepository.monitorExp(expId, 1);
         } else if (action == 0){
-            experimentRepository.monitorExp(expId, 0);
-            experimentRepository.recorderExp(expId, 0);
+            experimentRepository.monitorAndRecorderExp(expId, 0, 0);
             // --- end recorder
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo != null) {
                 if (isSave == 1){
-                    String recorderName = name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name;
-                    String recorderDesc = desc.isEmpty()?"实验{" + experiment.getName() + "}的描述":desc;
-                    recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, recorderName, recorderDesc);
+                    recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name, desc);
+                    saveVideo(recorderInfo);
                     response = recorderInfo.getId();
                 } else if (isSave == 0){
                     recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
                 }
+                ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, 0));
             }
         }
-
         // -- send message
-        sendMessageToRedis(expId, MONITOR, action);
+        // sendMessageToRedis(expId, MONITOR, action);
+        ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, MONITOR, action));
 
-        logger.info("Change experiment monitor state, action={}, isSave={}, response={}", action, isSave, response);
+        logger.info("--> Change experiment monitor state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
     }
 
     /**
      * 改变当前实验的录制状态
-     * @param expId
-     * @param action
-     * @param isSave
-     * @param dataTime
-     * @param name
-     * @param desc
      * @return 若有数据片段保存，则返回片段ID，否则返回-1
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long response = -1;
 
         if (action == 1){
             RecorderInfo testRecorder = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (testRecorder != null){
-                logger.warn("Start record, but the record has already start");
+                logger.warn("The record has already start");
                 return -1L;
             }
 
@@ -170,8 +163,8 @@ public class ActionService {
             recorderInfo.setIsRecorder(1);
             recorderInfo.setStartTime(new Date());
             recorderInfo.setDevices(new Gson().toJson(devices));
-            recorderInfo.setName("实验{" + experiment.getName() + "}的片段");
-            recorderInfo.setDescription("实验{" + experiment.getName() + "}的描述");
+            recorderInfo.setName(experiment.getName());
+            recorderInfo.setDescription(experiment.getName());
             recorderRepository.save(recorderInfo);
         } else if (action == 0){
             // --- end recorder
@@ -182,20 +175,19 @@ public class ActionService {
             }
             experimentRepository.recorderExp(expId, 0);
             if (isSave == 1){
-                String recorderName = name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name;
-                String recorderDesc = desc.isEmpty()?"实验{" + experiment.getName() + "}的描述":desc;
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, recorderName, recorderDesc);
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name, desc);
                 saveVideo(recorderInfo);
-                response = recorderInfo.getId();
             } else if (isSave == 0){
                 recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
             }
+            response = recorderInfo.getId();
         }
 
         // -- send message
-        sendMessageToRedis(expId, RECORD, action);
+        // sendMessageToRedis(expId, RECORD, action);
+        ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, action));
 
-        logger.info("Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
+        logger.info("--> Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
     }
 
@@ -214,8 +206,13 @@ public class ActionService {
                 videoData.setSensorId(sensorId);
                 videoData.setTrackId(trackId);
                 videoData.setRecorderInfo(recorderInfo);
+
+                // -- 保存上传的视频，由于上传具有延时性、后面会以异步的方式进行该表的更新
+                videoData.setVideoPost("/camera/img/oceans.png");
+                videoData.setVideoPath("/camera/img/oceans.mp4");
+
                 videoDataRepository.save(videoData);
-                logger.info("Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
+                logger.info("--> Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
             }
         }
     }
@@ -226,7 +223,7 @@ public class ActionService {
      * @return 6种状态
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized ExpStatus expAllStatus(long appId){
+    public ExpStatus expAllStatus(long appId){
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         List<Long> notInMonitorIds = new ArrayList<Long>();
         List<Long> notInRecordIds = new ArrayList<Long>();
@@ -272,7 +269,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public synchronized List<Long> allMonitor(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public List<Long> allMonitor(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){
@@ -286,9 +283,9 @@ public class ActionService {
             if (hasSensor){
                 boolean noChange = (action == 1 && exp.getIsMonitor() == 1) || (action == 0 && exp.getIsMonitor() == 0);
                 if (!noChange){
-                    changeMonitorState(exp.getId(), action, isSave, dataTime, name + "来自传感器组{" + exp.getName() + "}", desc);
+                    changeMonitorState(exp.getId(), action, isSave, dataTime, name, desc);
                     expIds.add(exp.getId());
-                    logger.info("Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                    logger.info("--> Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
             }
         }
@@ -297,7 +294,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public synchronized List<Long> allRecorder(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public List<Long> allRecorder(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){
@@ -315,10 +312,10 @@ public class ActionService {
                         changeRecorderState(exp.getId(), 0, isSave, dataTime, "", "");
                         changeRecorderState(exp.getId(), action, 0, 0, "", "");
                     } else {
-                        changeRecorderState(exp.getId(), action, isSave, dataTime, name + "来自传感器组{" + exp.getName() + "}", desc);
+                        changeRecorderState(exp.getId(), action, isSave, dataTime, name, desc);
                     }
                     expIds.add(exp.getId());
-                    logger.info("Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                    logger.info("--> Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
             }
         }
@@ -347,6 +344,43 @@ public class ActionService {
                 boolean result = redisUtils.hashSet(redisKey, sensor.getCode(), redisValue);
                 if (!result) {
                     throw new Exception("Redis action failure, alert!!!");
+                }
+            }
+        }
+    }
+
+    /**
+     * 将传感器组的监控/录制状态通知redis
+     * 异步通知
+     */
+    private class SyncSendRedisMessage implements Runnable {
+        private long expId;
+        private String actionType;
+        private int action;
+
+        SyncSendRedisMessage(long expId, String actionType, int action) {
+            this.expId = expId;
+            this.actionType = actionType;
+            this.action = action;
+        }
+
+        @Override
+        public void run() {
+            logger.info("--> Send message to redis, expId={}, actionType={}, action={}", expId, actionType, action);
+            List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
+            for (SensorInfo sensor : sensors) {
+                String redisKey = MONITOR.equals(actionType)? RedisKeyUtils.mkSensorMonitorKey():RedisKeyUtils.mkSensorRecordKey();
+                if (action == 0){
+                    boolean result = redisUtils.hashRemove(redisKey, sensor.getCode());
+                    if (!result) {
+                        logger.error("Redis action failure, alert!!!");
+                    }
+                } else if (action == 1){
+                    String redisValue = gson.toJson(new SensorStatus(sensor.getCode(), action, sensor.getId(), sensor.getTrackId(), sensor.getSensorConfig().getId()));
+                    boolean result = redisUtils.hashSet(redisKey, sensor.getCode(), redisValue);
+                    if (!result) {
+                        logger.error("Redis action failure, alert!!!");
+                    }
                 }
             }
         }

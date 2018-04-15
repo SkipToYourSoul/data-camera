@@ -1,65 +1,66 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 
-    <div th:fragment="nav">
-        <nav th:class="${inIndex}?'navbar navbar-default':'navbar navbar-default navbar-fixed-top'">
-            <!-- navbar header -->
-            <div class="navbar-header" style="margin-left:10%">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="pull-left"><img class="navbar-logo-img" th:src="@{img/logo.png}"/></a>
-            </div>
+<div th:fragment="nav">
+	<nav th:class="${inIndex}?'navbar navbar-default':'navbar navbar-default'" style="padding: 10px 0;">
+		<!-- navbar header -->
+		<div class="col-sm-10 col-md-10 col-xs-10 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a th:href="@{/index}" class="pull-left"><img class="navbar-logo-img" th:src="@{img/logo.png}" /></a>
+			</div>
 
-            <div id="navbar" class="navbar-collapse collapse">
-                <th:block th:if="!${inIndex}">
-                    <!-- nav bar -->
-                    <ul class="nav navbar-nav">
-                        <li><a th:href="@{/index}">首页</a></li>
-                        <li th:class="${inApp}?'active':''"><a th:href="@{/app}">场景</a></li>
-                        <li th:class="${inDevice}?'active':''"><a th:href="@{/device}">设备</a></li>
-                        <li th:class="${inContent}?'active':''"><a th:href="@{/content}">内容</a></li>
-                    </ul>
-                </th:block>
+			<div id="navbar" class="navbar-collapse collapse">
+				<th:block th:if="!${inIndex}">
+					<!-- nav bar -->
+					<ul class="nav navbar-nav" style="margin-left: 20px">
+						<li><a th:href="@{/index}">首页</a></li>
+						<li th:class="${inApp}?'active':''"><a th:href="@{/app}">场景</a></li>
+						<li th:class="${inDevice}?'active':''"><a th:href="@{/device}">设备</a></li>
+						<li th:class="${inContent}?'active':''"><a th:href="@{/content}">内容</a></li>
+						<li th:class="${inAdmin}?'active':''" sec:authorize="hasAuthority('admin')"><a th:href="@{/admin}">管理</a></li>
+					</ul>
+				</th:block>
 
-                <!-- login user control -->
-                <div sec:authorize="isAuthenticated()">
-                    <ul class="nav navbar-nav pull-right navbar-login-ul">
-                        <li><a><i class="fa fa-user-circle fa-fw"></i>&nbsp; 登陆用户:&nbsp; <span sec:authentication="name">ANONYMOUS_USER</span></a></li>
-                        <li><a><i class="fa fa-id-card-o fa-fw"></i>&nbsp; 用户身份:&nbsp;  <span sec:authentication="principal.authorities">[ROLE_USER]</span></a></li>
-                        <li><a th:href="@{/logout}"><i class="fa fa-sign-out fa-fw"></i>&nbsp; 注销</a></li>
-                    </ul>
-                </div>
-                <div sec:authorize="!isAuthenticated()">
-                    <ul class="nav navbar-nav pull-right navbar-login-ul">
-                        <li><a th:href="@{/login}"><i class="fa fa-sign-in fa-fw"></i>&nbsp; 登陆</a></li>
-                        <li th:if="${inIndex}"><a href="#"><i class="fa fa-registered fa-fw"></i>&nbsp; 注册</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-        </nav>
-    </div>
+				<div sec:authorize="isAuthenticated()">
+					<ul class="nav navbar-nav navbar-login-ul pull-right">
+						<li><a><i class="fa fa-user-circle fa-fw"></i>&nbsp;<span sec:authentication="name">ANONYMOUS_USER</span>
+							<span sec:authentication="principal.authorities">[ROLE_USER]</span></a></li>
+						<li><a th:href="@{/logout}"><i class="fa fa-sign-out fa-fw"></i>&nbsp;注销</a></li>
+						<li><label class="search-label"><input class="search-input" placeholder="搜索热门场景" /><i class="fa fa-search search-icon"></i></label></li>
+					</ul>
+				</div>
+				<div sec:authorize="!isAuthenticated()">
+					<ul class="nav navbar-nav navbar-login-ul pull-right">
+						<li><a th:href="@{/login}">登录</a></li>
+						<li><a href="#">注册</a></li>
+						<li><label class="search-label"><input class="search-input" placeholder="搜索热门场景" /><i class="fa fa-search search-icon"></i></label></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+</div>
 
-    <div th:fragment="main-footer">
-        <div class="footer">
-            <div class="content-about-us">
-                <div class="title">关于我们</div>
-                <div class="desc">上海STEM云中心是借助上海市科协专业协会、学会、研究会的支持，依托华东师范大学及国内外高校、科技企业的资源，通过社会化合作和运行模式共同打造而成的全国首家STEM教育平台。上海STEM云中心自成立之初，一直致力于精心打造优质的STEM教育。云中心提供的STEM教育服务，旨在培养学生综合运用科学（Science）、技术(Technology)、工程(Engineering)、数学(Mathematics)知识进行创新实践能力，锻炼学生运用科学的方法解决实际问题的能力。STEM云中心提供STEM云平台stemcloud.cn、STEM课程研发、STEM课程授课、STEM素质综合测评系统、课题研究检索查新系统、实验室预约管理系统、STEM出国培训等一系列STEM教育资源与服务，旨在为中国提供最全面、最专业的STEM教育服务。</div>
-            </div>
-            <div class="copyright">
-                Copyright ® 上海STEM云中心 沪ICP备14033392号-1
-            </div>
-        </div>
-    </div>
+<div th:fragment="main-footer">
+	<div class="footer">
+		<div class="content-about-us">
+			<div class="title">关于我们</div>
+			<div class="desc">上海STEM云中心是借助上海市科协专业协会、学会、研究会的支持，依托华东师范大学及国内外高校、科技企业的资源，通过社会化合作和运行模式共同打造而成的全国首家STEM教育平台。上海STEM云中心自成立之初，一直致力于精心打造优质的STEM教育。云中心提供的STEM教育服务，旨在培养学生综合运用科学（Science）、技术(Technology)、工程(Engineering)、数学(Mathematics)知识进行创新实践能力，锻炼学生运用科学的方法解决实际问题的能力。STEM云中心提供STEM云平台stemcloud.cn、STEM课程研发、STEM课程授课、STEM素质综合测评系统、课题研究检索查新系统、实验室预约管理系统、STEM出国培训等一系列STEM教育资源与服务，旨在为中国提供最全面、最专业的STEM教育服务。</div>
+		</div>
+		<div class="copyright">Copyright ® 上海STEM云中心 沪ICP备14033392号-1</div>
+	</div>
+</div>
 
-    <div th:fragment="sub-footer">
-        <div class="copyright" style="padding-left:10%">
-            Copyright ® 上海STEM云中心 沪ICP备14033392号-1
-        </div>
-    </div>
+<div th:fragment="sub-footer">
+	<div class="copyright" style="padding-left: 10%">Copyright ®
+		上海STEM云中心 沪ICP备14033392号-1</div>
+</div>
 
 </html>

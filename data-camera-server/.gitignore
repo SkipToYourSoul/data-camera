@@ -10,4 +10,6 @@ target/
 
 logs/
 
+src/main/resources/**
+
 /.project

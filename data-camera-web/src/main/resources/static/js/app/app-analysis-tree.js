@@ -7,17 +7,16 @@
  */
 
 // -- 入口函数，初始化树形图
-function initTreeDom(){
-    // 判断加载状态
-    if (appObject.iFa == false){
-        console.log("Not the first time in analysis");
+function initTreeDom(iFi){
+    if (iFi == false) {
+        // 不是第一次加载
         return;
     } else {
-        appObject.iFa = false;
+        analysisObject.iFi = false;
     }
-    
-    if (!recorders.hasOwnProperty(app['id'])){
-        console.log("Empty data recorders in this app.");
+
+    console.log("场景数据片段: ", recorders);
+    if (isEmptyObject(recorders) || null == recorders){
         return;
     }
 
@@ -26,11 +25,8 @@ function initTreeDom(){
     var nodeTemplate = $go(go.Node, "Horizontal",
         { selectionChanged: nodeSelectionChanged },  // this event handler is defined below
         $go(go.Panel, "Auto",
-            $go(go.Shape, "RoundedRectangle", { fill: "#1F4963", stroke: null }),
-            $go(go.TextBlock,
-                { font: "bold 14px Helvetica, bold Arial, sans-serif",
-                    stroke: "white", margin: 10 },
-                new go.Binding("text", "name"))
+            $go(go.Shape, "RoundedRectangle", { fill: "#35b5eb", stroke: null }),
+            $go(go.TextBlock, { font: "bold 14px Microsoft YaHei, 微软雅黑, Microsoft YaHei, Hiragino Sans GB, sans-serif", stroke: "white", margin: 10 }, new go.Binding("text", "name"))
         ),
         $go("TreeExpanderButton")
     );
@@ -41,14 +37,14 @@ function initTreeDom(){
 
     // Construct node data
     var rData = {};
-    var appRecorders = recorders[app['id']];
-    // 构造节点关系
-    appRecorders.forEach(function (recorder, index) {
-        analysisObject.rDataMap[recorder['id']] = recorder['parentId'];
+    // 构造数据片段间的节点关系
+    Object.keys(recorders).forEach(function (rid) {
+        var recorder = recorders[rid];
+        analysisObject.rDataMap[rid] = recorder['parentId'];
     });
     // 数据构造
-    appRecorders.forEach(function (recorder, index) {
-        var rid = recorder['id'];
+    Object.keys(recorders).forEach(function (rid) {
+        var recorder = recorders[rid];
         var name = recorder['name'];
         var parentId = recorder['parentId'];
         var ancestor = findParent(rid);
@@ -66,19 +62,19 @@ function initTreeDom(){
     });
 
     // 画图
-    appRecorders.forEach(function (recorder, index) {
-        var id = recorder['id'];
+    Object.keys(recorders).forEach(function (rid) {
+        var recorder = recorders[rid];
         if (recorder['isUserGen'] == 0 && recorder['isRecorder'] == 0){
             var myDiagram =
-                $go(go.Diagram, "tree-chart-" + id,
+                $go(go.Diagram, "tree-chart-" + rid,
                     {
                         initialAutoScale: go.Diagram.UniformToFill,
                         initialContentAlignment: go.Spot.LeftCenter,
                         isReadOnly: false,  // do not allow users to modify or select in this view
                         allowSelect: true,
                         allowMove: false,
-                        allowVerticalScroll: rData[id].length >= 5,
-                        allowHorizontalScroll: rData[id].length >= 5,
+                        allowVerticalScroll: rData[rid].length >= 5,
+                        allowHorizontalScroll: rData[rid].length >= 5,
                         allowZoom: true,
                         // define the layout for the diagram
                         layout: $go(go.TreeLayout, { nodeSpacing: 5, layerSpacing: 30 })
@@ -88,25 +84,16 @@ function initTreeDom(){
             myDiagram.model = $go(go.TreeModel, {
                 isReadOnly: true,  // don't allow the user to delete or copy nodes
                 // build up the tree in an Array of node data
-                nodeDataArray: rData[id]
+                nodeDataArray: rData[rid]
             });
         }
     });
-}
-
-function findParent(id) {
-    if (analysisObject.rDataMap[id] == -1){
-        return id;
-    } else {
-        return findParent(analysisObject.rDataMap[id]);
-    }
 }
 
 // -- node选中事件
 function nodeSelectionChanged(node) {
     if (node.isSelected && node.data.key != analysisObject.currentRecorderId) {
         var target = findParent(node.data.key) + '';
-        console.log("Select tree-dom: " + node.data.key + ", target tree-dom: " + target);
         showRecorderContent(target, node.data.key);
     }
 }
@@ -114,7 +101,6 @@ function nodeSelectionChanged(node) {
 // -- 边栏菜单点击事件
 $('.menu-content ul li').click(function (e) {
     var target = $(e.target).parent().attr('data');
-    console.log("Click the menu: " + target);
     showRecorderContent(target, target);
 });
 
@@ -127,32 +113,25 @@ function showRecorderContent(target, node){
     // 更新当前recorder id
     analysisObject.currentRecorderId = node;
 
-    // 只展示当前选中的树形图
-    var dom = $('.app-analysis-tree-group').find('.app-analysis-tree-dom');
-    for (var index=0; index<dom.length; index++){
-        var $dom = $(dom[index]);
-        if ($dom.attr('data') == target){
-            console.log("Show tree-dom:" + $dom.attr('data'));
-            $dom.attr("hidden", false);
-        } else {
-            // console.log("Hide tree-dom:" + $dom.attr('data'));
-            $dom.attr("hidden", true);
-        }
-    }
     // 展示数据图表
     $('.app-analysis-chart-dom').attr("hidden", false);
     initRecorderContentDom(node);
 
-    // 激活菜单
-    var menu = $('.menu-content ul li');
-    for (var index=0; index<menu.length; index++){
-        var $menu = $(menu[index]);
-        if ($menu.attr('data') == target){
-            console.log("Active li:" + $menu.attr('data'));
-            $menu.addClass('active');
+    // 只展示当前选中的树形图
+    $('.app-analysis-tree-group').find('.app-analysis-tree-dom').each(function () {
+        if ($(this).attr('data') == target){
+            $(this).attr("hidden", false);
         } else {
-            // console.log("InActive li:" + $menu.attr('data'));
-            $menu.removeClass('active');
+            $(this).attr("hidden", true);
         }
-    }
+    });
+
+    // 激活菜单
+    $('.menu-content ul li').each(function () {
+        if ($(this).attr('data') == target){
+            $(this).addClass('active');
+        } else {
+            $(this).removeClass('active');
+        }
+    });
 }

@@ -1,0 +1,176 @@
+body {
+    font-family: "微软雅黑","Microsoft YaHei","STHeiti",SimHei,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/** 通用：导航栏样式 **/
+.navbar {
+    margin-bottom:0;
+}
+
+.navbar-default {
+    background-color: #ffffff;
+}
+
+.navbar .navbar-nav>li>a {
+    color: #000;
+    height: 60px;
+    line-height: 60px;
+    font-size:16px;
+    font-weight:300;
+    padding-top:0;
+    padding-bottom:0;
+}
+
+.navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>.open>a:focus {
+    color: #36b5eb;
+ 	background-color:#fff
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+    color: #36b5eb;
+    background-color:#fff
+}
+
+.navbar a, .dropdown-menu>li>a, .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover, .navbar-toggle{
+    color: rgba(154, 154, 154, 1);
+}
+
+.navbar-logo-img {
+    height: 60px;
+}
+
+/* .navbar-login-ul {
+    border-left:solid 1px #d9d9de;
+} */
+
+/* 通用：滚动条样式 */
+.scroll::-webkit-scrollbar {
+    width: 10px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 20px;
+}
+
+.scroll::-webkit-scrollbar-track {
+    background: #ddd;
+    border-radius: 20px;
+}
+
+/** 通用：脚注样式 **/
+.footer{
+    background-color: #35b5eb;
+    /* bybsq */
+    position:fixed;
+    z-index:101;
+    bottom:0; 
+    width:100%;
+}
+
+.content-about-us {
+    height: auto;
+    text-align: center;
+    overflow: hidden;
+    margin-top: 0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #eeeeee;
+    color: #666;
+    /*border-top: solid 1px #ccc;*/
+}
+
+.content-about-us .title{
+    font-size: 24px;
+    line-height: 40px;
+    color: #2e87c5;
+}
+
+.content-about-us .desc{
+    width: 88%;
+    max-width: 1005px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 30px;
+    margin: 30px auto auto;
+    color: #666;
+}
+
+.copyright {
+    width: 100%;
+    height: 55px;
+    color: #fff;
+    font-size: 12px;
+    line-height: 53px;
+    clear: both;
+}
+
+.search-label{
+	margin-left:30px;
+	height:50px;
+	line-height:60px
+}
+
+.search-input{
+	line-height:35px;
+	height:35px;
+	background-color:#e1e2e9;
+	border:none;
+ 	padding:10px;
+ 	font-size:12px;
+ 	font-weight:1;
+}
+
+.search-icon{
+	line-height:35px;
+	height:35px;
+	background-color:#e1e2e9;
+	padding-right:10px;
+	color:#35b5eb;
+}
+
+/* 按钮系列 */
+.btn-blue{
+	color:#fff;
+	background-color:#35b5eb
+}
+
+.btn-pink{
+	background-color: #fc4a6c; 
+	color: #fff
+}
+
+.btn-pink1{
+	color: #fff;
+	background-color: #fc4b6c;
+}
+
+.btn-blue1{
+	background-color: #26c6db;
+	color: #fff;
+}
+
+.btn-square{
+	background-color: #35b5eb;
+	width: 34px; height: 34px;
+	color: #fff; 
+	border: 0 solid #fff;
+}
+
+.btn-white{
+	color:#36b5eb;
+    background-color: #FFFFFF;
+}
+
+.btn-grey {
+    background-color: #f4f4f4;
+}
+
+.icon{
+	width:15px;
+	height:15px;
+}
+
+.no-radius {
+	border-radius: 0px;
+}

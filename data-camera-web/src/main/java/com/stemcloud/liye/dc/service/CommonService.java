@@ -1,5 +1,6 @@
 package com.stemcloud.liye.dc.service;
 
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,13 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class CommonService {
     public String getCurrentLoginUser(HttpServletRequest request){
-        /*SecurityContextImpl securityContextImpl = (SecurityContextImpl) request
+        SecurityContextImpl securityContextImpl = (SecurityContextImpl) request
                 .getSession().getAttribute("SPRING_SECURITY_CONTEXT");
         if (securityContextImpl == null) {
-            return null;
+            return "root";
         }
-
-        return securityContextImpl.getAuthentication().getName();*/
-        return "root";
+        System.out.println("--> " + securityContextImpl.getAuthentication().getName());
+        return securityContextImpl.getAuthentication().getName();
     }
 }

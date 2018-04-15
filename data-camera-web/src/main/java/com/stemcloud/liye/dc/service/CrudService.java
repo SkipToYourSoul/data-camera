@@ -12,12 +12,14 @@ import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
+import com.stemcloud.liye.dc.domain.config.SensorConfig;
 import com.stemcloud.liye.dc.domain.config.SensorRegister;
 import com.stemcloud.liye.dc.domain.data.ContentInfo;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -52,35 +54,76 @@ public class CrudService {
 
     // -------------------------------------------------
     /** 场景应用 **/
-    public AppInfo saveApp(AppInfo app){
+    @Transactional(rollbackFor = Exception.class)
+    public AppInfo saveApp(String user, String name, String desc){
+        AppInfo app = new AppInfo();
+        app.setCreator(user);
+        app.setName(name);
+        app.setDescription(desc);
         return appRepository.save(app);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public AppInfo updateApp(long id, String name, String desc) {
+        AppInfo app = appRepository.findOne(id);
+        app.setName(name);
+        app.setDescription(desc);
+        return appRepository.save(app);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void deleteApp(Long id){
-        // delete app
-        int a = appRepository.deleteApp(id);
-        logger.info("DELETE APP " + id);
         AppInfo app = appRepository.findOne(id);
         List<ExperimentInfo> experiments = expRepository.findByAppAndIsDeletedOrderByCreateTime(app, 0);
         for (ExperimentInfo exp : experiments){
             deleteExp(exp.getId());
         }
+        appRepository.deleteApp(id);
     }
 
     public AppInfo findApp(Long id){
         return appRepository.findOne(id);
     }
-    // -------------------------------------------------
 
     // -------------------------------------------------
     /** 传感器组 **/
-    public ExperimentInfo saveExp(ExperimentInfo exp){
-        return expRepository.save(exp);
+    @Transactional(rollbackFor = Exception.class)
+    public ExperimentInfo saveExp(long appId, String name, String desc, List<String> sensors){
+        ExperimentInfo exp = new ExperimentInfo();
+        exp.setName(name);
+        exp.setDescription(desc);
+        exp.setApp(appRepository.findOne(appId));
+        expRepository.save(exp);
+
+        if (null != sensors && sensors.size() > 0){
+            for (String s: sensors){
+                long sensorId = Long.parseLong(s);
+                newTrackAndBoundSensor(exp, sensorRepository.findOne(sensorId));
+            }
+        }
+
+        return exp;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public ExperimentInfo updateExp(long expId, String name, String desc, List<String> sensors) {
+        ExperimentInfo exp = expRepository.findOne(expId);
+        exp.setName(name);
+        exp.setDescription(desc);
+        expRepository.save(exp);
+
+        if (null != sensors && sensors.size() > 0){
+            for (String s: sensors){
+                long sensorId = Long.parseLong(s);
+                newTrackAndBoundSensor(exp, sensorRepository.findOne(sensorId));
+            }
+        }
+
+        return exp;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void deleteExp(Long id){
-        int e = expRepository.deleteExp(id);
-        logger.info("DELETE EXPERIMENT " + id);
         ExperimentInfo exp = expRepository.findOne(id);
         Set<TrackInfo> tracks = exp.getTrackInfoList();
         for (TrackInfo track: tracks){
@@ -88,38 +131,38 @@ public class CrudService {
                 deleteTrack(track.getId());
             }
         }
+        expRepository.deleteExp(id);
     }
 
     public ExperimentInfo findExp(Long id){
         return expRepository.findOne(id);
     }
-    // -------------------------------------------------
 
     // -------------------------------------------------
     /** 轨迹 **/
-    public void newTrackAndBoundSensor(ExperimentInfo exp, SensorInfo sensor){
+    @Transactional(rollbackFor = Exception.class)
+    private void newTrackAndBoundSensor(ExperimentInfo exp, SensorInfo sensor){
         TrackInfo track = new TrackInfo();
         track.setExperiment(exp);
         track.setSensor(sensor);
         track.setType(sensor.getSensorConfig().getType());
         TrackInfo trackInfo = trackRepository.save(track);
+        logger.info("--> New Track {}", trackInfo.getId());
         long sensorId = trackInfo.getSensor().getId();
         long trackId = trackInfo.getId();
         long expId = trackInfo.getExperiment().getId();
         long appId = trackInfo.getExperiment().getApp().getId();
         sensorRepository.boundSensor(sensorId, appId, expId, trackId);
-        logger.info("BOUND SENSOR {} ON TRACK {}.", sensorId, trackId);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteTrack(Long id){
-        logger.info("DELETE TRACK {}", id);
+        logger.info("--> Delete Track {}", id);
         TrackInfo track = trackRepository.findOne(id);
-        // unbound sensor
         if (null != track.getSensor()){
             long sensorId = track.getSensor().getId();
             if (track.getSensor().getIsDeleted() == 0) {
-                int s = sensorRepository.unboundSensorById(sensorId);
-                logger.info("UNBOUND SENSOR {}", sensorId);
+                sensorRepository.unboundSensorById(sensorId);
             }
         }
         trackRepository.deleteTrack(id);
@@ -128,14 +171,36 @@ public class CrudService {
     public TrackInfo findTrack(Long id){
         return trackRepository.findOne(id);
     }
-    // -------------------------------------------------
 
     // -------------------------------------------------
     /** 传感器 **/
-    public SensorInfo saveSensor(SensorInfo sensor){
+    @Transactional(rollbackFor = Exception.class)
+    public SensorInfo saveSensor(String user, String code, SensorConfig config, String img, String name, String desc){
+        SensorInfo sensor = new SensorInfo();
+        sensor.setCode(code);
+        sensor.setSensorConfig(config);
+        if (!img.trim().isEmpty()){
+            sensor.setImg(img);
+        }
+        sensor.setCreator(user);
+        sensor.setName(name);
+        sensor.setDescription(desc);
+        registerSensor(1, code);
         return sensorRepository.save(sensor);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public SensorInfo updateSensor(Long id, String img, String name, String desc) {
+        SensorInfo sensor = findSensor(id);
+        if (!img.trim().isEmpty()){
+            sensor.setImg(img);
+        }
+        sensor.setName(name);
+        sensor.setDescription(desc);
+        return sensorRepository.save(sensor);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void deleteSensor(Long id, String code){
         sensorRepository.deleteSensor(id);
         sensorRegisterRepository.register(0, code);
@@ -145,12 +210,14 @@ public class CrudService {
         return sensorRepository.findOne(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void unboundSensor(long sensorId, long trackId){
         trackRepository.unboundSensor(trackId);
         sensorRepository.unboundSensorById(sensorId);
-        logger.info("UNBOUND SENSOR {} ON TRACK {}.", sensorId, trackId);
+        logger.info("--> Unbound Sensor {} On Track {}.", sensorId, trackId);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void boundSensor(long sensorId, long trackId){
         TrackInfo trackInfo = trackRepository.findOne(trackId);
         SensorInfo sensorInfo = sensorRepository.findOne(sensorId);
@@ -159,7 +226,7 @@ public class CrudService {
         long expId = trackInfo.getExperiment().getId();
         long appId = trackInfo.getExperiment().getApp().getId();
         sensorRepository.boundSensor(sensorId, appId, expId, trackId);
-        logger.info("BOUND SENSOR {} ON TRACK {}.", sensorId, trackId);
+        logger.info("--> Bound Sensor {} On Track {}.", sensorId, trackId);
     }
 
     public SensorRegister findRegister(String code){
@@ -169,7 +236,6 @@ public class CrudService {
     public void registerSensor(int action, String code){
         sensorRegisterRepository.register(action, code);
     }
-    // -------------------------------------------------
 
     // -------------------------------------------------
     /** 数据片段 **/
@@ -181,14 +247,13 @@ public class CrudService {
         recorderRepository.updateName(id, name);
     }
 
-    public void updateRecorderDescription(long id, String description){
-        recorderRepository.updateDescription(id, description);
+    public void updateRecorderDescription(long id, String title, String description){
+        recorderRepository.updateDescription(id, title, description);
     }
 
     public void deleteAllRecorder(long id){
         deleteRecorder(id);
         List<RecorderInfo> rs = recorderRepository.findByParentIdAndIsDeleted(id, 0);
-        logger.info("delete {}, has child {}", id, rs.size());
         if (rs.size() == 0){
             return;
         }
@@ -198,9 +263,9 @@ public class CrudService {
     }
 
     private void deleteRecorder(long id){
+        logger.info("--> Delete recorder {}", id);
         recorderRepository.deleteRecorder(id);
     }
-    // -------------------------------------------------
 
     // -------------------------------------------------
     /** 内容 **/
@@ -227,13 +292,15 @@ public class CrudService {
         return contentRepository.findByOwnerAndIsDeleted(user, 0);
     }
 
+    public List<ContentInfo> selectUserHotContent(String user){
+        return contentRepository.findByOwnerAndIsDeletedOrderByLikeDesc(user, 0);
+    }
+
     public List<ContentInfo> selectHotContent(){
-        return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeDesc(1, 0);
+        return contentRepository.findTop50ByIsSharedAndIsDeletedOrderByLikeAndCreateTimeDesc();
     }
 
     public void deleteContent(long id){
         contentRepository.deleteContent(id);
     }
-
-    // -------------------------------------------------
 }

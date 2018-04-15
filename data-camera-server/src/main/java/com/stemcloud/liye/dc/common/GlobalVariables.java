@@ -1,5 +1,6 @@
 package com.stemcloud.liye.dc.common;
 
+import com.stemcloud.liye.dc.dao.MysqlRepository;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 
 import java.util.HashMap;
@@ -30,5 +31,5 @@ public class GlobalVariables {
     public static ConcurrentMap<String, String> sensorInfo = new ConcurrentHashMap<String, String>();
 
     /** sensor config, load when server start **/
-    public static Map<Long, SensorConfig> sensorConfigMap = new HashMap<Long, SensorConfig>();
+    public static Map<Long, SensorConfig> sensorConfigMap = MysqlRepository.loadSensorConfigMap();
 }

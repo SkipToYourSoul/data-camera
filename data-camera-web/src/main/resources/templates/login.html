@@ -17,8 +17,8 @@
 <body>
     <div class="container">
         <div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
-            <img alt="" th:src="@{/img/logo.png}" />
-            <img th:class="!${param.error}?'':'shake-opacity shake-constant shake-constant--hover'" alt="" th:src="@{/img/rocketsignin.png}" />
+            <img th:class="!${param.error}?'img-responsive':'img-responsive shake-opacity shake-constant shake-constant--hover'"
+                 alt="" th:src="@{/img/logo.png}" style="margin-top: 20px;" />
 
             <div class="login-container">
                 <h1 class="login-title">欢迎登陆DC系统</h1>

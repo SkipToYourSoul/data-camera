@@ -1,14 +1,17 @@
 package com.stemcloud.liye.dc.controller;
 
+import com.google.gson.Gson;
 import com.stemcloud.liye.dc.domain.base.AppInfo;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.common.ServerReturnTool;
 import com.stemcloud.liye.dc.domain.config.SensorRegister;
+import com.stemcloud.liye.dc.domain.data.ContentInfo;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.CommonService;
 import com.stemcloud.liye.dc.service.CrudService;
+import com.stemcloud.liye.dc.util.IpAddressUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,193 +36,149 @@ public class CrudController {
 
     private final CommonService commonService;
     private final CrudService crudService;
-    private final BaseInfoService baseInfoService;
 
     @Autowired
-    public CrudController(CommonService commonService, CrudService crudService, BaseInfoService baseInfoService) {
+    public CrudController(CommonService commonService, CrudService crudService) {
         this.commonService = commonService;
         this.crudService = crudService;
-        this.baseInfoService = baseInfoService;
     }
 
     /**
      * 新建场景
-     * @param queryParams
-     * @param request
-     * @return
      */
     @PostMapping("/app/new")
     public Map newApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
-            AppInfo appInfo = new AppInfo();
             String user = commonService.getCurrentLoginUser(request);
-            appInfo.setCreator(user);
-            appInfo.setName(queryParams.get("app-name"));
-            appInfo.setDescription(queryParams.get("app-desc"));
-            AppInfo newApp = crudService.saveApp(appInfo);
-            logger.info("User {} new app {}", user, newApp.getId());
-            return ServerReturnTool.serverSuccess(newApp);
+            AppInfo newApp = crudService.saveApp(user, queryParams.get("app-name"), queryParams.get("app-desc"));
+            Map result = ServerReturnTool.serverSuccess(newApp);
+            logger.info("Ip {} request ajax url {}, user {} new app {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, newApp.getId());
+            return result;
         } catch (Exception e){
-            logger.error("[/app/new]", e);
+            logger.error("[/crud/app/new]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 编辑场景
-     * @param queryParams
-     * @param request
-     * @return
      */
     @PostMapping("/app/update")
     public Map updateApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
-            AppInfo appInfo = crudService.findApp(Long.valueOf(queryParams.get("app-id")));
             String user = commonService.getCurrentLoginUser(request);
-            if (!baseInfoService.isAppBelongUser(appInfo.getId(), user)){
-                throw new Exception("App not belong user Exception");
-            }
-            appInfo.setCreator(user);
-            appInfo.setName(queryParams.get("app-name"));
-            appInfo.setDescription(queryParams.get("app-desc"));
-            AppInfo newApp = crudService.saveApp(appInfo);
-            logger.info("User {} update app {}", user, newApp.getId());
-            return ServerReturnTool.serverSuccess(newApp);
+            AppInfo newApp = crudService.updateApp(Long.valueOf(queryParams.get("app-id")), queryParams.get("app-name"), queryParams.get("app-desc"));
+            Map result = ServerReturnTool.serverSuccess(newApp);
+            logger.info("Ip {} request ajax url {}, user {} update app {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, newApp.getId());
+            return result;
         } catch (Exception e){
-            logger.error("[/app/update]", e);
+            logger.error("[/crud/app/update]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 删除场景
-     * @param queryParams
-     * @param request
-     * @return
      */
     @GetMapping("/app/delete")
     public Map deleteApp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
             Long id = Long.parseLong(queryParams.get("app-id"));
             String user = commonService.getCurrentLoginUser(request);
-            logger.info("User {} delete app {}", user, id);
             crudService.deleteApp(id);
+            logger.info("Ip {} request ajax url {}, user {} delete app {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, id);
             return ServerReturnTool.serverSuccess(id);
         } catch (Exception e){
-            logger.error("[/app/delete]", e);
+            logger.error("[/crud/app/delete]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 新建传感器组
-     * @param queryParams
-     * @param sensors
-     * @param request
-     * @return
      */
     @PostMapping("/exp/new")
-    public Map newExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select", required = false) List<String> sensors, HttpServletRequest request){
+    public Map newExp(@RequestParam Map<String, String> queryParams,
+                      @RequestParam(value = "exp-select", required = false) List<String> sensors, HttpServletRequest request){
         try {
-            ExperimentInfo expInfo = new ExperimentInfo();
+
             String user = commonService.getCurrentLoginUser(request);
-            expInfo.setName(queryParams.get("exp-name"));
-            expInfo.setDescription(queryParams.get("exp-desc"));
-            expInfo.setApp(crudService.findApp(Long.valueOf(queryParams.get("app-id"))));
-            ExperimentInfo newExpInfo = crudService.saveExp(expInfo);
-            if (null != sensors && sensors.size() > 0){
-                for (String s: sensors){
-                    long sensorId = Long.parseLong(s);
-                    crudService.newTrackAndBoundSensor(newExpInfo, crudService.findSensor(sensorId));
-                }
-            }
-            logger.info("User {} new experiment {}", user, newExpInfo.getId());
+            ExperimentInfo newExpInfo = crudService.saveExp(Long.valueOf(queryParams.get("app-id")),
+                    queryParams.get("exp-name"), queryParams.get("exp-desc"), sensors);
+            logger.info("Ip {} request ajax url {}, user {} new exp {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, newExpInfo.getId());
             return ServerReturnTool.serverSuccess(newExpInfo);
         } catch (Exception e){
-            logger.error("[/exp/new]", e);
+            logger.error("[/crud/exp/new]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 编辑传感器组
-     * @param queryParams
-     * @param sensors
-     * @param request
-     * @return
      */
     @PostMapping("/exp/update")
     public Map updateExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select", required = false) List<String> sensors, HttpServletRequest request){
         try {
             String user = commonService.getCurrentLoginUser(request);
-            ExperimentInfo expInfo = crudService.findExp(Long.valueOf(queryParams.get("exp-id")));
-            expInfo.setName(queryParams.get("exp-name"));
-            expInfo.setDescription(queryParams.get("exp-desc"));
-            ExperimentInfo newExpInfo = crudService.saveExp(expInfo);
-            // add sensor on experiment
-            if (null != sensors && sensors.size() > 0){
-                for (String s: sensors){
-                    long sensorId = Long.parseLong(s);
-                    crudService.newTrackAndBoundSensor(newExpInfo, crudService.findSensor(sensorId));
-                }
-            }
-            logger.info("User {} update experiment {}", user, newExpInfo.getId());
+            ExperimentInfo newExpInfo = crudService.saveExp(Long.valueOf(queryParams.get("exp-id")),
+                    queryParams.get("exp-name"), queryParams.get("exp-desc"), sensors);
+            logger.info("Ip {} request ajax url {}, user {} update exp {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, newExpInfo.getId());
             return ServerReturnTool.serverSuccess(newExpInfo);
         }catch (Exception e){
-            logger.error("[/exp/update]", e);
+            logger.error("[/crud/exp/update]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 删除传感器组
-     * @param queryParams
-     * @param request
-     * @return
      */
     @GetMapping("/exp/delete")
     public Map deleteExp(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
             Long id = Long.parseLong(queryParams.get("exp-id"));
             String user = commonService.getCurrentLoginUser(request);
-            logger.info("User {} delete experiment {}", user, id);
             crudService.deleteExp(id);
+            logger.info("Ip {} request ajax url {}, user {} delete exp {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, id);
             return ServerReturnTool.serverSuccess(id);
         } catch (Exception e){
-            logger.error("[/exp/delete]", e);
+            logger.error("[/crud/exp/delete]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 删除轨迹
-     * @param queryParams
-     * @param request
-     * @return
      */
     @GetMapping("/track/delete")
-    public Map deleteTrack(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
+    public Map deleteTrack(@RequestParam List<String> ids, HttpServletRequest request){
         try {
             String user = commonService.getCurrentLoginUser(request);
-            Long trackId = Long.parseLong(queryParams.get("track-id"));
-            logger.info("User {} delete track {}", user, trackId);
-            crudService.deleteTrack(trackId);
-            return ServerReturnTool.serverSuccess(trackId);
+            for (String id : ids){
+                crudService.deleteTrack(Long.parseLong(id));
+            }
+            logger.info("Ip {} request ajax url {}, user {} delete track {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, new Gson().toJson(ids));
+            return ServerReturnTool.serverSuccess(ids.size());
         } catch (Exception e){
-            logger.error("[/track/delete]", e);
+            logger.error("[/crud/track/delete]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 绑定和解绑传感器
-     * @param queryParams
-     * @return
      */
     @PostMapping("/bound/toggle")
-    public Map boundToggle(@RequestParam Map<String, String> queryParams){
+    public Map boundToggle(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
-            Map<String, String> result = new HashMap<String, String>();
+            Map<String, String> result = new HashMap<String, String>(16);
             long trackId = Long.parseLong(queryParams.get("pk"));
             String dom = queryParams.get("name");
             if (queryParams.get("value").isEmpty()){
@@ -239,23 +198,20 @@ public class CrudController {
                 result.put("sensor", String.valueOf(sensorId));
             }
             result.put("dom", dom);
+            logger.info("Ip {} request ajax url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
             return ServerReturnTool.serverSuccess(result);
         } catch (Exception e){
-            logger.error("[/bound/toggle]", e);
+            logger.error("[/crud/bound/toggle]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 新增设备
-     * @param queryParams
-     * @param request
-     * @return
      */
     @PostMapping("/sensor/new")
     public Map newSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
-            SensorInfo sensor = new SensorInfo();
             String user = commonService.getCurrentLoginUser(request);
 
             // 查看注册表是否已注册该设备
@@ -265,62 +221,37 @@ public class CrudController {
             } else if (sensorRegister.getIsRegistered() == 1){
                 return ServerReturnTool.serverFailure("该编号已被其他用户绑定，无法新增");
             }
-            sensor.setCode(queryParams.get("sensor-code"));
-            sensor.setSensorConfig(sensorRegister.getSensorConfig());
-            String img = queryParams.get("device-img");
-            if (!img.trim().isEmpty()){
-                sensor.setImg(img);
-            }
-            crudService.registerSensor(1, queryParams.get("sensor-code"));
-
-            sensor.setCreator(user);
-            sensor.setName(queryParams.get("sensor-name"));
-            sensor.setDescription(queryParams.get("sensor-desc"));
-            SensorInfo newSensor = crudService.saveSensor(sensor);
-            logger.info("User {} new sensor {}", user, newSensor.getId());
+            SensorInfo newSensor = crudService.saveSensor(user, queryParams.get("sensor-code"), sensorRegister.getSensorConfig(),
+                    queryParams.get("device-img"), queryParams.get("sensor-name"), queryParams.get("sensor-desc"));
+            logger.info("Ip {} request ajax url {}, user {} new sensor {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, newSensor.getId());
             return ServerReturnTool.serverSuccess(newSensor);
         } catch (Exception e){
-            logger.error("[/sensor/new]", e);
+            logger.error("[/crud/sensor/new]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 更新设备信息
-     * @param queryParams
-     * @param request
-     * @return
      */
     @PostMapping("/sensor/update")
     public Map updateSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
             String user = commonService.getCurrentLoginUser(request);
-            Long id = Long.parseLong(queryParams.get("sensor-id"));
-            SensorInfo sensor = crudService.findSensor(id);
-            if (sensor == null || !sensor.getCreator().equals(user)){
-                return ServerReturnTool.serverFailure("参数错误");
-            }
-            String img = queryParams.get("device-img");
-            if (!img.trim().isEmpty()){
-                sensor.setImg(img);
-            }
-            sensor.setCreator(user);
-            sensor.setName(queryParams.get("sensor-name"));
-            sensor.setDescription(queryParams.get("sensor-desc"));
-            SensorInfo newSensor = crudService.saveSensor(sensor);
-            logger.info("User {} update sensor {}", user, newSensor.getId());
+            SensorInfo newSensor = crudService.updateSensor(Long.valueOf(queryParams.get("sensor-id")), queryParams.get("device-img"),
+                    queryParams.get("sensor-name"), queryParams.get("sensor-desc"));
+            logger.info("Ip {} request ajax url {}, user {} update sensor {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, newSensor.getId());
             return ServerReturnTool.serverSuccess(newSensor);
         } catch (Exception e){
-            logger.error("[/sensor/update]", e);
+            logger.error("[/crud/sensor/update]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 删除设备
-     * @param queryParams
-     * @param request
-     * @return
      */
     @GetMapping("/sensor/delete")
     public Map deleteSensor(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
@@ -328,7 +259,8 @@ public class CrudController {
             String user = commonService.getCurrentLoginUser(request);
             Long sensorId = Long.parseLong(queryParams.get("sensor-id"));
             crudService.deleteSensor(sensorId, queryParams.get("sensor-code"));
-            logger.info("User {} delete sensor {}", user, sensorId);
+            logger.info("Ip {} request ajax url {}, user {} delete sensor {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, sensorId);
             return ServerReturnTool.serverSuccess(sensorId);
         } catch (Exception e){
             return ServerReturnTool.serverFailure(e.getMessage());
@@ -337,8 +269,6 @@ public class CrudController {
 
     /**
      * 修改数据片段名称
-     * @param queryParams
-     * @return
      */
     @PostMapping("/recorder/name")
     public Map modifySegmentName(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
@@ -347,39 +277,37 @@ public class CrudController {
             long recorderId = Long.parseLong(queryParams.get("pk"));
             String name = queryParams.get("value");
             crudService.updateRecorderName(recorderId, name);
-            logger.info("User {} update recorder {}'s name to {}", user, recorderId, name);
+            logger.info("Ip {} request ajax url {}, user {} update recorder name", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user);
             return ServerReturnTool.serverSuccess(name);
         } catch (Exception e){
-            logger.error("[/recorder/name]", e);
+            logger.error("[/crud/recorder/name]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 修改数据片段描述
-     * @param queryParams
-     * @return
      */
     @GetMapping("/recorder/desc")
     public Map modifySegmentDesc(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
             String user = commonService.getCurrentLoginUser(request);
             long recorderId = Long.parseLong(queryParams.get("id"));
+            String title = queryParams.get("title");
             String desc = queryParams.get("desc");
-            crudService.updateRecorderDescription(recorderId, desc);
-            logger.info("User {} update recorder {}'s name to {}", user, recorderId, desc);
+            crudService.updateRecorderDescription(recorderId, title, desc);
+            logger.info("Ip {} request ajax url {}, user {} update recorder description", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user);
             return ServerReturnTool.serverSuccess(desc);
         } catch (Exception e){
-            logger.error("[/recorder/desc]", e);
+            logger.error("[/crud/recorder/desc]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 删除数据片段
-     * @param queryParams 参数
-     * @param request http请求
-     * @return
      */
     @GetMapping("/recorder/delete")
     public Map deleteRecorder(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
@@ -387,19 +315,17 @@ public class CrudController {
             String user = commonService.getCurrentLoginUser(request);
             Long recorderId = Long.parseLong(queryParams.get("recorder-id"));
             crudService.deleteAllRecorder(recorderId);
-            logger.info("User {} delete recorder {}", user, recorderId);
+            logger.info("Ip {} request ajax url {}, user {} delete recorder", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user);
             return ServerReturnTool.serverSuccess(Long.parseLong(queryParams.get("recorder-id")));
         } catch (Exception e){
-            logger.error("[/recorder/delete]", e);
+            logger.error("[/crud/recorder/delete]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
 
     /**
      * 发布内容
-     * @param queryParams
-     * @param request
-     * @return
      */
     @PostMapping("/content/new")
     public Map publishContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
@@ -412,7 +338,10 @@ public class CrudController {
             String tag = queryParams.get("tags");
             String img = queryParams.get("share-img");
             int isShared = Integer.parseInt(queryParams.get("content-private-select"));
-            return ServerReturnTool.serverSuccess(crudService.saveContent(user, name, desc, category, tag, isShared, recorderId, img));
+            ContentInfo content = crudService.saveContent(user, name, desc, category, tag, isShared, recorderId, img);
+            logger.info("Ip {} request ajax url {}, user {} new content {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, content.getId());
+            return ServerReturnTool.serverSuccess(content);
         } catch (Exception e){
             logger.error("[/content/new]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
@@ -421,20 +350,18 @@ public class CrudController {
 
     /**
      * 删除内容
-     * @param queryParams
-     * @param request
-     * @return
      */
     @GetMapping("/content/delete")
     public Map deleteContent(@RequestParam Map<String, String> queryParams, HttpServletRequest request){
         try {
             Long id = Long.parseLong(queryParams.get("content-id"));
             String user = commonService.getCurrentLoginUser(request);
-            logger.info("User {} delete content {}", user, id);
             crudService.deleteContent(id);
+            logger.info("Ip {} request ajax url {}, user {} delete content {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString(), user, id);
             return ServerReturnTool.serverSuccess(id);
         } catch (Exception e){
-            logger.error("[/content/delete]", e);
+            logger.error("[/crud/content/delete]", e);
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }

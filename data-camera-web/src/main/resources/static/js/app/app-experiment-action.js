@@ -26,85 +26,91 @@ function doInterval(exp_id){
      */
     function askForData(exp_id) {
         var exp_bound_sensors = boundSensors[exp_id];
-        $.get(data_address + "/monitoring", {
-            "exp-id": exp_id,
-            "timestamp": expObject.newestTimestamp[exp_id]
-        }, function (response) {
-            if (response.code == "1111"){
-                message_info('请求数据失败: ' + response.data, "error");
-                return;
-            }
+        $.ajax({
+            type: 'get',
+            url: data_address + "/monitoring",
+            timeout: 2000,
+            data: {
+                "exp-id": exp_id,
+                "timestamp": expObject.newestTimestamp[exp_id]
+            },
+            async: true,
+            success: function (response) {
+                if (response.code == "1111"){
+                    commonObject.printExceptionMsg(response.data);
+                } else if (response.code == "0000"){
+                    // --- traverse the sensors of this experiment
+                    exp_bound_sensors.forEach(function (sensor, index) {
+                        var sensor_type = sensor['sensorConfig']['type'];
+                        var sensor_dimension = sensor['sensorConfig']['dimension'];
+                        var sensor_id = sensor['id'];
+                        var track_id = sensor['trackId'];
 
-            // --- traverse the sensors of this experiment
-            exp_bound_sensors.forEach(function (sensor, index) {
-                var sensor_type = sensor['sensorConfig']['type'];
-                var sensor_dimension = sensor['sensorConfig']['dimension'];
-                var sensor_id = sensor['id'];
-                var track_id = sensor['trackId'];
+                        if (sensor_type == 1){
+                            for (var dimIndex in sensor_dimension.split(';')){
+                                var dim = sensor_dimension.split(';')[dimIndex];
+                                var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + dim;
+                                if (!response.data.hasOwnProperty(sensor_id) || !response.data[sensor_id].hasOwnProperty(dim)
+                                    || echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
+                                    continue;
+                                }
+                                // --- init
+                                var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
+                                var series = chart.getOption()['series'];
+                                // --- update series data
+                                var unit = sensor['sensorConfig']['unit'].split(';');
+                                var statistics_info = {
+                                    "max": "-",
+                                    "min": "-",
+                                    "now": "-"
+                                };
+                                // --- add new data
+                                var new_data = response.data[sensor_id][dim];
+                                series[0]['data'].push.apply( series[0]['data'], new_data );
+                                // -- keep the arr length 10
+                                if (series[0]['data'].length > 10){
+                                    series[0]['data'].splice(0, series[0]['data'].length - 10);
+                                }
+                                // -- get statistics info
+                                statistics_info = updateInfo(statistics_info, series[0]['data']);
+                                $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-1").html(statistics_info['max']);
+                                $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-2").html(statistics_info['min']);
+                                $('#experiment-now-' + exp_id + "-" + track_id + "-" + dim).html(statistics_info['now']);
+                                // -- update newest data timestamp
+                                var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
+                                if (new_time > expObject.newestTimestamp[exp_id]){
+                                    expObject.newestTimestamp[exp_id] = new_time;
+                                }
 
-                if (sensor_type == 1){
-                    for (var dimIndex in sensor_dimension.split(';')){
-                        var dim = sensor_dimension.split(';')[dimIndex];
-                        var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + dim;
-                        if (!response.data.hasOwnProperty(sensor_id) || echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
-                            continue;
-                        }
-                        if (!response.data[sensor_id].hasOwnProperty(dim)){
-                            continue;
-                        }
-                        // --- init
-                        var chart = echarts.getInstanceByDom(document.getElementById(chart_dom));
-                        var series = chart.getOption()['series'];
-                        // --- update series data
-                        var unit = sensor['sensorConfig']['unit'].split(';');
-                        var statistics_info = {
-                            "max": "-",
-                            "min": "-",
-                            "now": "-"
-                        };
-                        // --- add new data
-                        var new_data = response.data[sensor_id][dim];
-                        series[0]['data'].push.apply( series[0]['data'], new_data );
-                        // -- keep the arr length 50
-                        if (series[0]['data'].length > 10){
-                            series[0]['data'].splice(0, series[0]['data'].length - 10);
-                        }
-                        // -- get statistics info
-                        statistics_info = updateInfo(statistics_info, series[0]['data']);
-                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-1").html(statistics_info['max']);
-                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-2").html(statistics_info['min']);
-                        $('#experiment-now-' + exp_id + "-" + track_id + "-" + dim).html(statistics_info['now']);
-                        // -- update newest data timestamp
-                        var new_time = Date.parse(new_data[new_data.length - 1]['value'][0]);
-                        if (new_time > expObject.newestTimestamp[exp_id]){
-                            expObject.newestTimestamp[exp_id] = new_time;
-                        }
+                                // --- update series markArea (if recorder)
+                                if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
+                                    var mark_list = series[0]['markArea']['data'];
+                                    mark_list[0] = [{
+                                        xAxis: parseTime(expObject.recorderTimestamp[exp_id][0])
+                                    }, {
+                                        xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
+                                    }];
+                                    series[0]['markArea']['data'] = mark_list;
+                                }
 
-                        // --- update series markArea (if recorder)
-                        if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
-                            var mark_list = series[0]['markArea']['data'];
-                            mark_list[0] = [{
-                                xAxis: parseTime(expObject.recorderTimestamp[exp_id][0])
-                            }, {
-                                xAxis: new Date().Format("yyyy-MM-dd HH:mm:ss")
-                            }];
-                            series[0]['markArea']['data'] = mark_list;
+                                // -- set new option
+                                chart.setOption({
+                                    series: series
+                                });
+                            }
+                        } else if (sensor_type == 2){
+                            if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
+                                // --- if in recorder state, update info
+                                var start_time = expObject.recorderTimestamp[exp_id][0];
+                                $('#experiment-info-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(parseTime(start_time));
+                                $('#experiment-now-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(Math.round((Date.now() - Date.parse(start_time))/1000));
+                            }
                         }
-
-                        // -- set new option
-                        chart.setOption({
-                            series: series
-                        });
-                    }
-                } else if (sensor_type == 2){
-                    if (expObject.recorderTimestamp.hasOwnProperty(exp_id) && expObject.recorderTimestamp[exp_id].length == 1){
-                        // --- if in recorder state, update info
-                        var start_time = expObject.recorderTimestamp[exp_id][0];
-                        $('#experiment-info-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(parseTime(start_time));
-                        $('#experiment-now-' + exp_id + "-" + track_id + "-" + sensor_dimension).html(Math.round((Date.now() - Date.parse(start_time))/1000));
-                    }
+                    });
                 }
-            });
+            }, error: function (response) {
+                commonObject.printRejectMsg();
+            }
         });
     }
 
@@ -416,8 +422,6 @@ function allMonitor() {
                             pageStartMonitor(expId);
                         });
                     } else if (action == 0){
-                        $('#all-monitor-btn').removeClass('btn-success').addClass('btn-default');
-                        $('#all-record-btn').removeClass('btn-success').addClass('btn-default');
                         targetExp.forEach(function (expId) {
                             pageStopMonitor(expId);
                         });
@@ -486,12 +490,10 @@ function allRecord(){
                 } else if (response.code == "0000"){
                     var targetExp = response.data;
                     if (action == 1){
-                        $('#all-record-btn').removeClass('btn-default').addClass('btn-success');
                         targetExp.forEach(function (expId) {
                             pageStartRecord(expId);
                         });
                     } else if (action == 0){
-                        $('#all-record-btn').removeClass('btn-success').addClass('btn-default');
                         targetExp.forEach(function (expId) {
                             pageStopRecorder(expId);
                         });
@@ -513,14 +515,20 @@ function allRecord(){
  * @param exp_id
  */
 function pageStartMonitor(exp_id){
-    var exp_state_dom = $('#experiment-es-' + exp_id);
-    var exp_monitor_btn = $('#experiment-monitor-' + exp_id);
+    console.info("Page start monitor: " + exp_id);
 
+    var exp_state_dom = $('#experiment-es-' + exp_id);
     isExperimentMonitor[exp_id] = 1;
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-    exp_monitor_btn.removeClass('btn-default').addClass('btn-success');
 
     doInterval(exp_id);
+
+    // 模拟视频播放
+    Object.keys(expObject.video).forEach(function (id) {
+        if (id.split('-')[2] == exp_id) {
+            videojs(id).play();
+        }
+    });
 }
 
 /**
@@ -532,12 +540,37 @@ function pageStopMonitor(exp_id){
 
     isExperimentMonitor[exp_id] = 0;
     $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-default').text('非监控');
-    $('#experiment-monitor-' + exp_id).removeClass('btn-success').addClass('btn-default');
+    /*$('#experiment-monitor-' + exp_id).removeClass('btn-success').addClass('btn-default');*/
 
     clearInterval(exp_monitor_interval[exp_id]);
     delete exp_monitor_interval[exp_id];
 
+    // 清空状态数据
+    $('.current-content-value-' + exp_id).html('-');
     $('.content-value-' + exp_id).html('-');
+
+    // 清空echart数据
+    Object.keys(expObject.chart).forEach(function (dom) {
+        var expId = dom.split('-')[2];
+        if (exp_id == expId) {
+            var chart = echarts.getInstanceByDom(document.getElementById(dom));
+            var series = chart.getOption()['series'];
+            series[0]['data'] = [{
+                value : [new Date().Format("yyyy-MM-dd HH:mm:ss"), 0]
+            }];
+            series[0]['markArea']['data'] = [];
+            chart.setOption({
+                series: series
+            });
+        }
+    });
+
+    // 模拟视频播放
+    Object.keys(expObject.video).forEach(function (id) {
+        if (id.split('-')[2] == exp_id) {
+            videojs(id).pause();
+        }
+    });
 }
 
 /**
@@ -547,10 +580,8 @@ function pageStopMonitor(exp_id){
 function pageStartRecord(exp_id) {
     console.info("Page start recorder: " + exp_id);
     var exp_state_dom = $('#experiment-rs-' + exp_id);
-    var exp_recorder_btn = $('#experiment-recorder-' + exp_id);
 
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-    exp_recorder_btn.removeClass('btn-default').addClass('btn-success');
 
     expObject.setRecorderTime(exp_id, [new Date().Format("yyyy-MM-dd HH:mm:ss")]);
     isExperimentRecorder[exp_id] = 1;
@@ -563,7 +594,6 @@ function pageStartRecord(exp_id) {
 function pageStopRecorder(exp_id){
     console.info("Page stop recorder: " + exp_id);
     $('#experiment-rs-' + exp_id).removeClass('label-success').addClass('label-default').text('非录制');
-    $('#experiment-recorder-' + exp_id).removeClass('btn-success').addClass('btn-default');
     isExperimentRecorder[exp_id] = 0;
     expObject.setRecorderTime(exp_id, []);
 }

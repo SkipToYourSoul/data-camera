@@ -54,6 +54,18 @@ public interface ExperimentRepository extends CrudRepository<ExperimentInfo, Lon
     Integer recorderExp(long id, int isRecorder);
 
     /**
+     * monitor&recorder
+     * @param id
+     * @param isMonitor
+     * @param isRecorder
+     * @return
+     */
+    @Query(value = "UPDATE ExperimentInfo e SET e.isMonitor=?2, e.isRecorder = ?3 WHERE e.id = ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer monitorAndRecorderExp(long id, int isMonitor, int isRecorder);
+
+    /**
      * delete experiment
      * @param id
      * @return recorder count

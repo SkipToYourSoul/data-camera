@@ -67,8 +67,8 @@ function buildExperimentChartOption(legend) {
         grid: [{
             borderWidth: 0,
             top: 10,
-            bottom: 30,
-            left: 40,
+            bottom: 35,
+            left: 25,
             right: 25,
             textStyle: {
                 color: "#fff"
@@ -84,6 +84,12 @@ function buildExperimentChartOption(legend) {
                     type: 'line',
                     snap: true,
                     z: 100
+                },
+                splitLine: {
+                    show: true,
+                    lineStyle: {
+                        type: 'dashed'
+                    }
                 }
             }
         ],
@@ -92,7 +98,10 @@ function buildExperimentChartOption(legend) {
                 type: 'value',
                 scale: true,
                 splitLine: {
-                    show: false
+                    show: true,
+                    lineStyle: {
+                        type: 'dashed'
+                    }
                 },
                 boundaryGap: true,
                 minInterval: 1,
@@ -102,29 +111,45 @@ function buildExperimentChartOption(legend) {
         series: {
             name: legend,
             type: 'line',
-            symbolSize: 4,
-            symbol:'circle',
-            hoverAnimation: false,
             smooth: true,
+
+            /* 点，线，面的样式 */
+            symbolSize: 1,
+            symbol:'circle',
+            itemStyle: {
+                normal: {
+                    color: '#4CCBFF'
+                }
+            },
+            lineStyle: {
+                normal: {
+                    color: '#4CCBFF',
+                    width: 1
+                }
+            },
             areaStyle: {
                 normal: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                         offset: 0,
-                        color: 'rgb(255, 158, 68)'
+                        color: '#4CCBFF'
                     }, {
                         offset: 1,
-                        color: 'rgb(255, 70, 131)'
+                        color: '#4CADFF'
                     }])
                 }
             },
+
+            /* 标记的样式 */
             markArea: {
                 silent: true,
                 data: []
             },
-            data: []
+            data: [{
+                value : [new Date().Format("yyyy-MM-dd HH:mm:ss"), 0]
+            }]
         }
     };
-};
+}
 
 /**
  * 分析页面的图表
@@ -158,15 +183,18 @@ function buildAnalysisChartOption(data, legend) {
         grid: [{
             top: 5,
             bottom: 5,
-            left: 40,
-            right: 20
+            left: 30,
+            right: 15
         }],
         calculable: true,
         xAxis: [
             {
                 type: 'time',
                 splitLine: {
-                    show: true
+                    show: true,
+                    lineStyle: {
+                        type: 'dashed'
+                    }
                 },
                 axisLabel: {
                     show: false
@@ -182,7 +210,10 @@ function buildAnalysisChartOption(data, legend) {
                 scale: true,
                 boundaryGap: false,
                 splitLine: {
-                    show: false
+                    show: true,
+                    lineStyle: {
+                        type: 'dashed'
+                    }
                 },
                 minInterval: 1,
                 splitNumber: 3
@@ -192,32 +223,42 @@ function buildAnalysisChartOption(data, legend) {
             {
                 name: legend,
                 type: 'line',
-                symbolSize: 5,
-                symbol:'circle',
-                hoverAnimation: false,
-                itemStyle: {
-                    normal: {
-                        color: 'rgb(30, 144, 255)'
-                    }
-                },
                 smooth: true,
                 sampling: true,
+
+                /* 点，线，面的样式 */
+                symbol:'circle',
+                symbolSize: 1,
+                itemStyle: {
+                    normal: {
+                        color: '#4CCBFF'
+                    }
+                },
+                lineStyle: {
+                    normal: {
+                        color: '#4CCBFF',
+                        width: 1
+                    }
+                },
                 areaStyle: {
                     normal: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                            offset: 0,
-                            color: 'rgb(30, 144, 255)'
+                            offset: 0.3,
+                            color: '#4CCBFF'
                         }, {
                             offset: 1,
-                            color: 'rgb(0, 191, 255)'
+                            color: '#4CADFF'
                         }])
                     }
                 },
+
+                /* 标记的样式 */
                 markArea: {
                     silent: true,
                     itemStyle: {
                         normal: {
-                            color: '#DCDCDC'
+                            color: '#35b5eb',
+                            opacity: 0.5
                         }
                     },
                     data: [[{

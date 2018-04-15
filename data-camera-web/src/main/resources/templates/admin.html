@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<title>管理页面</title>
+
+	<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}" />
+
+	<!-- Bootstrap core CSS -->
+	<link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}" />
+	<link rel="stylesheet" th:href="@{source/bootstrap/bootstrap-select.min.css}" />
+	<link rel="stylesheet" th:href="@{source/bootstrap/font-awesome.min.css}" />
+
+	<link rel="stylesheet" th:href="@{css/bsq/main.css}" />
+</head>
+<body>
+	<div class="navbar-wrapper" th:include="module/common::nav"></div>
+	<div class="container">
+		<h3>设备管理表：设备注册情况、发行新设备</h3>
+		<h3>用户管理表：用户及权限</h3>
+		<h3>权限管理表：页面权限配置</h3>
+		<h3>数据统计表：场景数据、传感器数据、内容数据</h3>
+		<h3><a th:href="@{/druid/index.html}">跳转至数据库管理页面</a></h3>
+	</div>
+
+	<script th:src="@{source/jquery.min.js}"></script>
+	<script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+
+	<script th:src="@{source/messenger/messenger.min.js}"></script>
+	<script th:src="@{source/bootstrap/bootstrap-select.min.js}"></script>
+
+	<script th:src="@{js/common.js}"></script>
+</body>
+</html>

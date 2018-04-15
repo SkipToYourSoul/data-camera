@@ -9,6 +9,7 @@ import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.service.BaseInfoService;
 import com.stemcloud.liye.dc.service.CommonService;
 import com.stemcloud.liye.dc.service.CrudService;
+import com.stemcloud.liye.dc.util.IpAddressUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,46 +46,29 @@ public class ViewController {
 
     /**
      * 主页
-     * @param model
-     * @return
      */
     @GetMapping("/index")
-    public String index(Model model) {
-        logger.info("[/index], in index page");
+    public String index(Model model, HttpServletRequest request) {
+        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
         model.addAttribute("inIndex", true);
         return "index";
     }
 
     /**
-     * 应用页
-     * @param id
-     * @param model
-     * @param request http request
-     * @param response http response
-     * @return
-     * @throws IOException
+     * 场景页
      */
     @GetMapping("/app")
     public String app(@RequestParam(value = "id", required = false) Long id, Model model,
                       HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // --- login before visit
-        String user = commonService.getCurrentLoginUser(request);
-        if (user == null) {
-            logger.warn("[/app], no login user, redirect to /login");
-            response.sendRedirect(request.getContextPath() + "/login");
-            return "login";
-        }
+        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
 
         // --- add base information
+        String user = commonService.getCurrentLoginUser(request);
         Map<Long, AppInfo> apps = baseInfoService.getOnlineApps(user);
         model.addAttribute("apps", apps);
         model.addAttribute("inApp", true);
 
-        if (id == null){
-            // --- id is null, in app management page
-            logger.info("[/app], in app manage page");
-        } else {
-            logger.info("[/app], in app detail page");
+        if (id != null) {
             // --- can't visit app if app not belong current user
             if (!baseInfoService.isAppBelongUser(id, user)){
                 logger.warn("[/app], the user {} has not the app {}, redirect to /index", user, id);
@@ -152,24 +136,21 @@ public class ViewController {
             model.addAttribute("sensors", baseInfoService.getOnlineSensor(user));
 
             // --- RECORDER:
-            Map<Long, List<RecorderInfo>> recorders = baseInfoService.getAllRecorders(apps);
-            model.addAttribute("recorders", recorders);
+            model.addAttribute("recorders", baseInfoService.getRecordersOfApp(id));
         }
 
         return "app";
     }
 
+    /**
+     * 设备页
+     */
     @GetMapping("/device")
     public String device(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // --- get login user name
-        String currentUser = commonService.getCurrentLoginUser(request);
-        if (currentUser == null) {
-            logger.warn("[/device], no login user, redirect to /login");
-            response.sendRedirect(request.getContextPath() + "/login");
-            return "login";
-        }
+        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
 
         // --- get the devices of user
+        String currentUser = commonService.getCurrentLoginUser(request);
         List<SensorInfo> sensors = baseInfoService.getOnlineSensor(currentUser);
         model.addAttribute("sensors", sensors);
         model.addAttribute("inDevice", true);
@@ -177,17 +158,15 @@ public class ViewController {
         return "device";
     }
 
+    /**
+     * 内容页
+     */
     @GetMapping("/content")
     public String content(@RequestParam(value = "id", required = false) Long id,
                           Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
         // --- get login user name
         String currentUser = commonService.getCurrentLoginUser(request);
-        if (currentUser == null) {
-            logger.warn("[/content], no login user, redirect to /login");
-            response.sendRedirect(request.getContextPath() + "/login");
-            return "login";
-        }
-
         model.addAttribute("inContent", true);
 
         if (id == null){
@@ -205,48 +184,68 @@ public class ViewController {
                 return "index";
             }
             ContentInfo currentContent = crudService.findContent(id);
+            List<ContentInfo> userHotContent = crudService.selectUserHotContent(currentContent.getOwner());
+            userHotContent.remove(currentContent);
+
             model.addAttribute("currentContent", currentContent);
+            model.addAttribute("userHotContent", userHotContent);
+
+            Map<Long, RecorderInfo> map = new HashMap<Long, RecorderInfo>(1);
+            map.put(currentContent.getRecorderInfo().getId(), currentContent.getRecorderInfo());
+            model.addAttribute("recorders", map);
         }
 
         return "content";
     }
 
-    @GetMapping("/share")
-    public String shareContent(@RequestParam(value = "rid", required = false) Long rid,
-                               Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    /**
+     * 热门内容页
+     */
+    @GetMapping("/hot-content")
+    public String hotContent(Model model, HttpServletRequest request) {
+        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
+        model.addAttribute("inContent", true);
         String currentUser = commonService.getCurrentLoginUser(request);
-        if (currentUser == null){
-            logger.warn("[/share], no login user, redirect to /login");
-            response.sendRedirect(request.getContextPath() + "/login");
-            return "login";
-        }
-        if (rid == null){
-            logger.warn("[/share], unsupport url");
-            response.sendRedirect(request.getContextPath() + "/index");
-            return "index";
-        }
+        List<ContentInfo> userContent = crudService.selectUserContent(currentUser);
+        List<ContentInfo> hotContent = crudService.selectHotContent();
+
+        model.addAttribute("userContent", userContent);
+        model.addAttribute("hotContent", hotContent);
+        return "hot-content";
+    }
+
+    /**
+     * 分享页
+     */
+    @GetMapping("/share")
+    public String shareContent(@RequestParam(value = "rid") Long rid, Model model, HttpServletRequest request) throws IOException {
+        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
         RecorderInfo recorderInfo = crudService.findRecorder(rid);
         model.addAttribute("recorder", recorderInfo);
-        model.addAttribute("inContent", true);
 
         return "share";
     }
 
+    @GetMapping("/admin")
+    public String admin(Model model, HttpServletRequest request){
+        String currentUser = commonService.getCurrentLoginUser(request);
+        logger.info("Admin user {} request the admin page.", currentUser);
+        return "admin";
+    }
+
     @GetMapping("/denied")
-    public String denied(HttpServletRequest request) {
-        logger.warn("denied: {}", request.getRequestURL().toString());
+    public String denied() {
         return "denied";
     }
 
     @GetMapping("/exception")
     public String exception(){
-        logger.warn("exception");
         return "exception";
     }
 
     @GetMapping("/login")
-    public String login(){
-        logger.info("In login.html");
+    public String login(HttpServletRequest request){
+        logger.info("Ip {} request login page from url {}", IpAddressUtil.getClientIpAddress(request), request.getHeader("Referer"));
         return "login";
     }
 }
