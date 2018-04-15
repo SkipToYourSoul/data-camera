@@ -12,7 +12,7 @@ import javax.swing.*;
  *
  * @author liye on 2018/4/15
  */
-public class Camera1 {
+public class BaseCamera {
     public static void main(String[] args) throws FrameGrabber.Exception, InterruptedException {
         OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
         grabber.start();
