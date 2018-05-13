@@ -43,18 +43,46 @@ function initExperiment(iFi){
                 legends.forEach(function (legend) {
                     var dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
                     var videoId = "experiment-video-" + exp_id + "-" + track_id;
-                    $('#' + dom).html('<div style="padding: 10px 25px 0">' +
+
+                    /*$('#' + dom).html('<div style="padding: 10px 25px 0">' +
                         '<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
                     var video = videojs(videoId, {
-                        controls: false,
-                        /*poster: "/camera/img/video-load2.jpg",*/
+                        controls: true,
+                        /!*poster: "/camera/img/video-load2.jpg",*!/
                         preload: "auto",
                         loop: true,
-                        sources: [{src: "/camera/img/oceans.mp4", type: "video/mp4"}],
-                        techOrder: ["html5", "flash"]
+                        sources: [
+                            {src: "rtmp://10.5.138.8/live/test", type: "rtmp/flv"}
+                            /!*{src: "/camera/img/oceans.mp4", type: "video/mp4"}*!/
+                            ],
+                        techOrder: ["flash", "html5"]
                     }, function () {
                     });
-                    expObject.setVideo(videoId, video);
+                    // test for rtmp
+                    video.play();*/
+
+                    // baidu player
+                    $('#' + dom).css("padding", "10px 25px 0").html('<div id=' + videoId + '></div>');
+                    var player = cyberplayer(videoId).setup({
+                        width: $('#' + dom).width,
+                        height: 300,
+                        file: "rtmp://localhost/live/test", // <—rtmp直播地址
+                        /*minBufferLength: 200,*/
+                        autostart: false,
+                        stretching: "uniform",
+                        volume: 100,
+                        controls: true,
+                        rtmp: {
+                            reconnecttime: 5, // rtmp直播的重连次数
+                            bufferlength: 1 // 缓冲多少秒之后开始播放 默认1秒
+                        },
+                        ak: "3c482e9f90a641cfab6a236960fbb707" // 公有云平台注册即可获得accessKey
+                    });
+
+
+
+                    // expObject.setVideo(videoId, video);
+
                 });
             } else if (track_type == 0){
                 

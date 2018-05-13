@@ -233,6 +233,12 @@ public class ViewController {
         return "admin";
     }
 
+    @GetMapping("/test")
+    public String test(HttpServletRequest request) {
+        logger.info("Ip {} request view url {}", IpAddressUtil.getClientIpAddress(request), request.getRequestURL().toString());
+        return "test";
+    }
+
     @GetMapping("/denied")
     public String denied() {
         return "denied";

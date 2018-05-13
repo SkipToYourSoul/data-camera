@@ -4,14 +4,48 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <title>Title</title>
+
+    <link rel="stylesheet" th:href="@{source/video/video-js.min.css}" />
+    <link rel="stylesheet" th:href="@{source/ksplayer/ksplayer.min.css}" />
 </head>
 <body>
-    <input id="text" type="text" />
+    <!--<input id="text" type="text" />
     <button onclick="send()">Send</button>
     <button onclick="closeWebSocket()">Close</button>
-    <h1 id="message"></h1>
+    <h1 id="message"></h1>-->
+
+    <div id="video"></div>
+
+
+    <!--<div id="flow-video" style="margin-top: 50px;width:600px;height:300px;text-align:center">
+    </div>
+
+    <div style="margin-top: 50px;">
+        <video id="my-js-video" class="video-js" data-setup="{}"></video>
+    </div>-->
+
+    <!--<div style="margin-top: 50px">
+        <video id="ks-video" class="video-js" width="640" height="400" poster=""></video>
+    </div>-->
+
+
+
+    <script th:src="@{source/jquery.min.js}"></script>
+
+    <script th:src="@{source/video-baidu/cyberplayer.js}"></script>
+
+    <script th:src="@{source/video-baidu/flowplayer-3.2.13.js}"></script>
+
+    <script th:src="@{source/video/video.min.js}"></script>
+    <script th:src="@{source/video/videojs-flash.min.js}"></script>
+
+    <script th:src="@{source/ksplayer/ksplayer.min.js}"></script>
+
+    <script th:src="@{js/test.js}"></script>
 </body>
-<script type="text/javascript">
+
+
+<!--<script type="text/javascript">
     var websocket = null;
     // 判断当前浏览器是否支持WebSocket
     if('WebSocket' in window){
@@ -61,5 +95,5 @@
         var message = document.getElementById('text').value;
         websocket.send(message);
     }
-</script>
+</script>-->
 </html>
