@@ -21,6 +21,7 @@ public class RecordCamera {
         Loader.load(opencv_objdetect.class);
 
         FrameGrabber grabber = FrameGrabber.createDefault(0);
+        // FrameGrabber grabber = new OpenCVFrameGrabber(0);
         grabber.start();
 
         OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
@@ -60,7 +61,13 @@ public class RecordCamera {
 
     public static void main(String[] args) {
         try {
-            record("./test.mp4", 25);
+            // record("./test.mp4", 25);
+
+            String stem = "rtmp://video-center.alivecdn.com/AppName/StreamName?vhost=push.stemcloud.cn&auth_key=1524479131-0-0-5cf5378a644063bb45d663baabed01f5";
+            String ali = "rtmp://47.100.173.108:1935/live/stem";
+            String qiyi = "rtmp://10.5.138.8/live/test";
+
+            record(ali, 25);
         } catch (FrameGrabber.Exception e) {
             e.printStackTrace();
         } catch (FrameRecorder.Exception e) {
