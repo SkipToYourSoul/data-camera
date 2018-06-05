@@ -50,6 +50,9 @@ public class SensorInfo {
     @OneToOne
     private SensorConfig sensorConfig;
 
+    @Column(name = "sensor_mark")
+    private String mark;
+
     @Column(name = "is_deleted",
             columnDefinition = "INT DEFAULT 0")
     private int isDeleted = 0;
@@ -144,6 +147,14 @@ public class SensorInfo {
 
     public void setSensorConfig(SensorConfig sensorConfig) {
         this.sensorConfig = sensorConfig;
+    }
+
+    public String getMark() {
+        return mark;
+    }
+
+    public void setMark(String mark) {
+        this.mark = mark;
     }
 
     public int getIsDeleted() {

@@ -1,5 +1,6 @@
 package com.stemcloud.liye.dc.service;
 
+import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
@@ -141,7 +142,7 @@ public class CrudService {
     // -------------------------------------------------
     /** 轨迹 **/
     @Transactional(rollbackFor = Exception.class)
-    private void newTrackAndBoundSensor(ExperimentInfo exp, SensorInfo sensor){
+    public void newTrackAndBoundSensor(ExperimentInfo exp, SensorInfo sensor){
         TrackInfo track = new TrackInfo();
         track.setExperiment(exp);
         track.setSensor(sensor);
@@ -185,7 +186,16 @@ public class CrudService {
         sensor.setCreator(user);
         sensor.setName(name);
         sensor.setDescription(desc);
+
+        // -- 更改传感器的注册状态
         registerSensor(1, code);
+
+        // -- 如果是摄像头，则获取直播推流地址
+        if (config.getType() == SensorType.VIDEO.getValue()) {
+            SensorRegister register = sensorRegisterRepository.findByCode(code);
+            sensor.setMark(register.getLive());
+        }
+
         return sensorRepository.save(sensor);
     }
 

@@ -124,7 +124,7 @@ public class CrudController {
     public Map updateExp(@RequestParam Map<String, String> queryParams, @RequestParam(value = "exp-select", required = false) List<String> sensors, HttpServletRequest request){
         try {
             String user = commonService.getCurrentLoginUser(request);
-            ExperimentInfo newExpInfo = crudService.saveExp(Long.valueOf(queryParams.get("exp-id")),
+            ExperimentInfo newExpInfo = crudService.updateExp(Long.valueOf(queryParams.get("exp-id")),
                     queryParams.get("exp-name"), queryParams.get("exp-desc"), sensors);
             logger.info("Ip {} request ajax url {}, user {} update exp {}", IpAddressUtil.getClientIpAddress(request),
                     request.getRequestURL().toString(), user, newExpInfo.getId());

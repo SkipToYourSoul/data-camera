@@ -6,7 +6,7 @@
  */
 
 function initExperiment(iFi){
-    if (iFi == false) {
+    if (iFi === false) {
         // 不是第一次加载
         return;
     } else {
@@ -26,49 +26,34 @@ function initExperiment(iFi){
 
             // init track chart
             var legends = (null == track['sensor']) ? [] : track['sensor']['sensorConfig']['dimension'].split(';');
-            if (track_type == 1) {
-                // --- value sensor
+            if (track_type === 1) {
+                // --- 数值型传感器，可能存在多个维度
                 legends.forEach(function (legend) {
                     var dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
                     var chart = echarts.init(document.getElementById(dom), "", opts = {height: 150});
                     chart.setOption(buildExperimentChartOption(legend));
                     expObject.setChart(dom, chart);
                 });
-            } else if (track_type == 2){
+            } else if (track_type === 2){
                 // --- 视频直播
                 Object.keys(expObject.video).forEach(function (id) {
-                    videojs(id).dispose();
+                    // 移除之前创建的视频对象
+                    expObject.video[id].remove();
                     delete expObject.video[id];
                 });
                 legends.forEach(function (legend) {
-                    var dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
+                    var dom = "#experiment-track-" + exp_id + "-" + track_id + "-" + legend;
                     var videoId = "experiment-video-" + exp_id + "-" + track_id;
+                    var liveAddress = track['sensor']['mark'];
 
-                    /*$('#' + dom).html('<div style="padding: 10px 25px 0">' +
-                        '<video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
-                    var video = videojs(videoId, {
-                        controls: true,
-                        /!*poster: "/camera/img/video-load2.jpg",*!/
-                        preload: "auto",
-                        loop: true,
-                        sources: [
-                            {src: "rtmp://10.5.138.8/live/test", type: "rtmp/flv"}
-                            /!*{src: "/camera/img/oceans.mp4", type: "video/mp4"}*!/
-                            ],
-                        techOrder: ["flash", "html5"]
-                    }, function () {
-                    });
-                    // test for rtmp
-                    video.play();*/
-
-                    // baidu player
-                    $('#' + dom).css("padding", "10px 25px 0").html('<div id=' + videoId + '></div>');
-                    var player = cyberplayer(videoId).setup({
-                        width: $('#' + dom).width,
+                    // rtmp://47.100.173.108:1935/live/stem
+                    // rtmp://live.hkstv.hk.lxdns.com/live/hks
+                    $(dom).css("padding", "10px 25px 0").html('<div id=' + videoId + '></div>');
+                    var videoPlayer = cyberplayer(videoId).setup({
+                        width: $(dom).width,
                         height: 300,
-                        file: "rtmp://localhost/live/test", // <—rtmp直播地址
-                        /*minBufferLength: 200,*/
-                        autostart: false,
+                        file: "rtmp://47.100.173.108:1935/live/" + liveAddress, // <—rtmp直播地址
+                        autostart: true,
                         stretching: "uniform",
                         volume: 100,
                         controls: true,
@@ -79,16 +64,13 @@ function initExperiment(iFi){
                         ak: "3c482e9f90a641cfab6a236960fbb707" // 公有云平台注册即可获得accessKey
                     });
 
-
-
-                    // expObject.setVideo(videoId, video);
-
+                    expObject.setVideo(videoId, videoPlayer);
                 });
-            } else if (track_type == 0){
+            } else if (track_type === 0){
                 
             }
 
-            // init track bound sensor
+            // 初始化轨迹绑定传感器的设置
             var $track_bound_dom = $('#track-bound-' + track_id);
             var sensor = (null == track['sensor'])?null:track['sensor'];
             var source = [];
@@ -161,22 +143,15 @@ function initActionStatus(){
         var exp_monitor_dom = $('#experiment-es-' + id);
         var exp_recorder_dom = $('#experiment-rs-' + id);
 
-        if (isExperimentMonitor[id] == 1){
+        if (isExperimentMonitor[id] === 1){
             exp_monitor_dom.removeClass('label-default').addClass('label-success').text('正在监控');
 
-            if (isExperimentRecorder[id] == 1){
+            if (isExperimentRecorder[id] === 1){
                 exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
                 expObject.setRecorderTime(id, [expRecorderTime[id]]);
                 expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
             }
             doInterval(id);
-
-            // 模拟视频播放
-            Object.keys(expObject.video).forEach(function (vid) {
-                if (vid.split('-')[2] == id) {
-                    videojs(vid).play();
-                }
-            });
         }
     });
 }

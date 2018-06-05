@@ -20,7 +20,7 @@ public class TrackInfo {
     @GeneratedValue
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     private ExperimentInfo experiment;
 

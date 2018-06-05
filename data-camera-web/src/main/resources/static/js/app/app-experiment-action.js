@@ -138,7 +138,7 @@ function doInterval(exp_id){
 }
 
 /**
- * 获取当前实验状态
+ * 获取当前实验状态，用于判断监控和录制的动作进行
  *  NOT_BOUND_SENSOR, MONITORING_NOT_RECORDING, MONITORING_AND_RECORDING, NOT_MONITOR, UNKNOWN
  * @param expId
  * @returns {string}
@@ -153,13 +153,13 @@ function getExpStatusFromServer(expId){
             "exp-id": expId
         },
         success: function (response) {
-            if (response.code == "1111"){
+            if (response.code === "1111"){
                 commonObject.printExceptionMsg(response.data);
-            } else if (response.code == "0000"){
+            } else if (response.code === "0000"){
                 status = response.data;
             }
         },
-        error: function (response) {
+        error: function () {
             commonObject.printRejectMsg();
         }
     });
@@ -167,7 +167,7 @@ function getExpStatusFromServer(expId){
 }
 
 /**
- * 获取当前应用下实验的整体状态
+ * 获取当前应用下实验的整体状态，用于判断全局监控和录制的动作进行
  *  ALL_MONITORING_AND_ALL_RECORDING, ALL_MONITORING_AND_PART_RECORDING, ALL_MONITORING_AND_NO_RECORDING,
  *  ALL_NOT_MONITOR, PART_MONITORING, NO_AVAILABLE_SENSOR
  * @returns {string}
@@ -182,13 +182,13 @@ function getAppStatusFromServer(){
             "app-id": app['id']
         },
         success: function (response) {
-            if (response.code == "1111"){
+            if (response.code === "1111"){
                 commonObject.printExceptionMsg(response.data);
-            } else if (response.code == "0000"){
+            } else if (response.code === "0000"){
                 status = response.data;
             }
         },
-        error: function (response) {
+        error: function () {
             commonObject.printRejectMsg();
         }
     });
@@ -200,7 +200,7 @@ function getAppStatusFromServer(){
  * @returns {number}
  */
 function askForSaveRecorder(doFunction, action, endTime, title){
-    var msgHtml = '<div class="row"> <div class="form-group" style="margin-bottom: 45px"><label class="col-sm-2 control-label">片段名</label>' +
+    var msgHtml = '<div class="row"><div class="form-group" style="margin-bottom: 45px"><label class="col-sm-2 control-label">片段名</label>' +
         '<div class="col-sm-10"><input type="text" class="form-control" id="dialog-data-name" placeholder="请输入片段标题"/></div></div>' +
         '<div class="form-group"><label class="col-sm-2 control-label">片段描述</label>' +
         '<div class="col-sm-10"><textarea rows="3" class="form-control" id="dialog-data-desc" placeholder="请输入片段描述"></textarea></div></div>' +
@@ -240,19 +240,19 @@ function askForSaveRecorder(doFunction, action, endTime, title){
 function expMonitor(button){
     var expId = button.getAttribute('data');
     var status = getExpStatusFromServer(expId);
-    if (status == "unknown"){
+    if (status === "unknown"){
         message_info("状态unknown", "info");
-    } else if (status == "not_bound_sensor"){
+    } else if (status === "not_bound_sensor"){
         message_info("实验未绑定任何设备，不能进行监控", "info");
-    } else if (status == "not_monitor"){
+    } else if (status === "not_monitor"){
         // 当前状态是非监控，开始监控
         message_info("开始监控实验" + expId, "success");
         doMonitor(1, 0, 0);
-    } else if (status == "monitoring_not_recording") {
+    } else if (status === "monitoring_not_recording") {
         // 当前状态是监控非录制，停止监控
         message_info("停止监控实验" + expId, "success");
         doMonitor(0, 0, 0);
-    } else if (status == "monitoring_and_recording"){
+    } else if (status === "monitoring_and_recording"){
         askForSaveRecorder(doMonitor, 0, new Date().getTime(), "即将结束监控，是否保存录制数据片段?");
     }
 
@@ -271,24 +271,24 @@ function expMonitor(button){
                 "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
-                if (response.code == "1111"){
+                if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
-                } else if (response.code == "0000"){
-                    if (action == "1"){
+                } else if (response.code === "0000"){
+                    if (action === "1"){
                         // start monitor
                         pageStartMonitor(expId);
-                    } else if (action == "0"){
+                    } else if (action === "0"){
                         // stop monitor
                         pageStopMonitor(expId);
-                        if (isSave == 1 && response.data != -1){
+                        if (isSave === 1 && response.data !== -1){
                             window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
-                        } else if (isSave == 1 && response.data == -1) {
+                        } else if (isSave === 1 && response.data === -1) {
                             commonObject.printExceptionMsg("监控状态结束异常");
                         }
                     }
                 }
             },
-            error: function (response) {
+            error: function () {
                 commonObject.printRejectMsg();
             }
         });
