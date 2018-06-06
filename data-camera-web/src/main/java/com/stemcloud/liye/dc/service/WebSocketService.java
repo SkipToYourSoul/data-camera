@@ -16,8 +16,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * @author liye on 2018/2/11
  */
-@ServerEndpoint(value = "/websocket")
-@Component
+// @ServerEndpoint(value = "/websocket")
+// @Component
 public class WebSocketService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private static int onlineCount = 0;

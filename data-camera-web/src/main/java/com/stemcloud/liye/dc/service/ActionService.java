@@ -16,12 +16,12 @@ import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.message.SensorStatus;
-import com.stemcloud.liye.dc.util.ExecutorUtil;
-import com.stemcloud.liye.dc.util.RedisKeyUtils;
-import com.stemcloud.liye.dc.util.RedisUtils;
+import com.stemcloud.liye.dc.util.*;
+import org.bytedeco.javacv.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +49,12 @@ public class ActionService {
 
     @Autowired
     RedisUtils redisUtils;
+
+    @Autowired
+    OssService ossService;
+
+    @Value("${oss.server.path}")
+    private String baseServerUploadPath;
 
     private Gson gson = new Gson();
     private final String MONITOR = "monitor";
@@ -93,11 +99,12 @@ public class ActionService {
 
     /**
      * 改变当前实验的监控状态
+     * @param action 1 -> 开始监控；2 -> 结束监控
+     * @param isSave 结束监控时判断是否保存正在录制的片段，1 -> 保存，2 -> 不保存
      * @return 若有数据片段保存，则返回片段ID，否则返回-1
-     * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public long changeMonitorState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public long changeMonitorState(long expId, int action, int isSave, long dataTime, String name, String desc) {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long response = -1;
 
@@ -109,10 +116,19 @@ public class ActionService {
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo != null) {
                 if (isSave == 1){
-                    recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name, desc);
-                    saveVideo(recorderInfo);
-                    response = recorderInfo.getId();
+                    // -- 保存当前的录制记录，更新结束时间
+                    String dataName = name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name;
+                    recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, dataName, desc);
+
+                    // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
+                    for (TrackInfo track : experiment.getTrackInfoList()) {
+                        if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
+                            saveVideo(recorderInfo);
+                            response = recorderInfo.getId();
+                        }
+                    }
                 } else if (isSave == 0){
+                    // -- 删除当前的录制记录
                     recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
                 }
                 ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, 0));
@@ -129,10 +145,9 @@ public class ActionService {
     /**
      * 改变当前实验的录制状态
      * @return 若有数据片段保存，则返回片段ID，否则返回-1
-     * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long response = -1;
 
@@ -189,32 +204,6 @@ public class ActionService {
 
         logger.info("--> Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
-    }
-
-    /**
-     * 在录制结束时，保存视频记录
-     * @param recorderInfo 录制的片段信息
-     */
-    private void saveVideo(RecorderInfo recorderInfo){
-        String devicesStr = recorderInfo.getDevices();
-        List<RecorderDevices> devices = new Gson().fromJson(devicesStr, new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
-        for (RecorderDevices d : devices){
-            long trackId = d.getTrack();
-            long sensorId = d.getSensor();
-            if (sensorRepository.findOne(sensorId).getSensorConfig().getType() == SensorType.VIDEO.getValue()){
-                VideoData videoData = new VideoData();
-                videoData.setSensorId(sensorId);
-                videoData.setTrackId(trackId);
-                videoData.setRecorderInfo(recorderInfo);
-
-                // -- 保存上传的视频，由于上传具有延时性、后面会以异步的方式进行该表的更新
-                videoData.setVideoPost("/camera/img/oceans.png");
-                videoData.setVideoPath("/camera/img/oceans.mp4");
-
-                videoDataRepository.save(videoData);
-                logger.info("--> Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
-            }
-        }
     }
 
     /**
@@ -325,32 +314,6 @@ public class ActionService {
 
     /**
      * 将传感器组的监控/录制状态通知redis
-     * @param expId 传感器组ID
-     * @param actionType monitor or recorder
-     * @param action 0 or 1
-     */
-    private void sendMessageToRedis(long expId, String actionType, int action) throws Exception {
-        logger.info("Send message to redis, expId={}, actionType={}, action={}", expId, actionType, action);
-        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
-        for (SensorInfo sensor : sensors) {
-            String redisKey = MONITOR.equals(actionType)? RedisKeyUtils.mkSensorMonitorKey():RedisKeyUtils.mkSensorRecordKey();
-            if (action == 0){
-                boolean result = redisUtils.hashRemove(redisKey, sensor.getCode());
-                if (!result) {
-                    throw new Exception("Redis action failure, alert!!!");
-                }
-            } else if (action == 1){
-                String redisValue = gson.toJson(new SensorStatus(sensor.getCode(), action, sensor.getId(), sensor.getTrackId(), sensor.getSensorConfig().getId()));
-                boolean result = redisUtils.hashSet(redisKey, sensor.getCode(), redisValue);
-                if (!result) {
-                    throw new Exception("Redis action failure, alert!!!");
-                }
-            }
-        }
-    }
-
-    /**
-     * 将传感器组的监控/录制状态通知redis
      * 异步通知
      */
     private class SyncSendRedisMessage implements Runnable {
@@ -383,6 +346,152 @@ public class ActionService {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 按帧录制视频
+     * @param inputFile 该地址可以是网络直播/录播地址，也可以是远程/本地文件路径
+     * @param audioChannel 是否录制音频（0:不录制/1:录制）
+     * @param sensorId 用以标记文件名
+     */
+    boolean startRecordByFrame(String inputFile, int audioChannel, RecorderInfo recorderInfo, long sensorId) {
+        // 该地址只能是文件地址，如果使用该方法推送流媒体服务器会报错，原因是没有设置编码格式
+        String key = LiveRecorderUtil.mkLiveVideoKey(recorderInfo.getId(), sensorId);
+        String outputFile = String.format("%s/%s.mp4", baseServerUploadPath, key);
+        // 获取视频源
+        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
+        // 流媒体输出地址，分辨率（长，高），是否录制音频（0:不录制/1:录制）
+        FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputFile, LiveRecorderUtil.VIDEO_WIDTH, LiveRecorderUtil.VIDEO_HEIGHT, audioChannel);
+
+        LiveRecorderUtil.recorderStatusMap.put(key, "start");
+        ExecutorUtil.RECORDER_EXECUTOR.submit(new SyncRecorder(grabber, recorder, key));
+
+        int waitCount = 100; // 10s, 若超过10s仍然未开始录制，则返回false
+        while (!LiveRecorderUtil.recorderStatusMap.get(key).equals("doing") && waitCount > 0) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            waitCount --;
+        }
+
+        return waitCount > 0;
+    }
+
+    void endRecorderByFrame(RecorderInfo recorderInfo, long sensorId) {
+        String key = LiveRecorderUtil.mkLiveVideoKey(recorderInfo.getId(), sensorId);
+        final String filename = String.format("%s.mp4", key);
+
+        // -- 移除全局变量中的key，停止直播流的录制并中断录制线程
+        LiveRecorderUtil.recorderStatusMap.remove(key);
+
+        List<RecorderDevices> devices = new Gson().fromJson(recorderInfo.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+        for (RecorderDevices device : devices){
+            if (device.getLegends().get(0).equals("视频")) {
+                VideoData videoData = new VideoData();
+                videoData.setSensorId(device.getSensor());
+                videoData.setTrackId(device.getTrack());
+                videoData.setRecorderInfo(recorderInfo);
+                final long vid = videoDataRepository.save(videoData).getId();
+                logger.info("--> Save video data, sensor id is {}, track id is {}, recorder is {}", device.getSensor(), device.getTrack(), recorderInfo.getId());
+
+                // TODO: 异步上传阿里云
+                ExecutorUtil.UPLOAD_EXECUTOR.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String aliAddress = ossService.uploadVideoToOss(filename);
+                            VideoData video = videoDataRepository.findOne(vid);
+                            video.setVideoPath(aliAddress);
+                            videoDataRepository.save(video);
+                            logger.info("--> Get video path from oss, the path={}", aliAddress);
+                        } catch (Exception e) {
+                            logger.error("Upload oss failure", e);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * 在录制结束时，保存视频记录
+     * @param recorderInfo 录制的片段信息
+     */
+    private void saveVideo(RecorderInfo recorderInfo){
+        String devicesStr = recorderInfo.getDevices();
+        List<RecorderDevices> devices = new Gson().fromJson(devicesStr, new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+        for (RecorderDevices d : devices){
+            long trackId = d.getTrack();
+            long sensorId = d.getSensor();
+            if (sensorRepository.findOne(sensorId).getSensorConfig().getType() == SensorType.VIDEO.getValue()){
+                VideoData videoData = new VideoData();
+                videoData.setSensorId(sensorId);
+                videoData.setTrackId(trackId);
+                videoData.setRecorderInfo(recorderInfo);
+
+                // -- 保存上传的视频，由于上传具有延时性、后面会以异步的方式进行该表的更新
+                videoData.setVideoPost("/camera/img/oceans.png");
+                videoData.setVideoPath("/camera/img/oceans.mp4");
+
+                videoDataRepository.save(videoData);
+                logger.info("--> Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
+            }
+        }
+    }
+
+    class SyncRecorder implements Runnable {
+        private FFmpegFrameGrabber grabber;
+        private FFmpegFrameRecorder recorder;
+        private String recorderKey;
+
+        public SyncRecorder(FFmpegFrameGrabber grabber, FFmpegFrameRecorder recorder, String recorderKey) {
+            this.grabber = grabber;
+            this.recorder = recorder;
+            this.recorderKey = recorderKey;
+        }
+
+        @Override
+        public void run() {
+            logger.info("Build recorder threads: " + recorderKey);
+
+            try {
+                grabber.start();
+                recorder.start();
+                Frame frame;
+                // LiveRecorderUtil.showStatusMap();
+                LiveRecorderUtil.recorderStatusMap.put(recorderKey, "doing");
+                // LiveRecorderUtil.showStatusMap();
+
+                while (LiveRecorderUtil.recorderStatusMap.containsKey(recorderKey) && (frame = grabber.grabFrame()) != null) {
+                    recorder.record(frame);
+                }
+                recorder.stop();
+                grabber.stop();
+            } catch (FrameRecorder.Exception e) {
+                logger.error("FrameRecorder.Exception", e);
+            } catch (FrameGrabber.Exception e) {
+                logger.error("FrameGrabber.Exception", e);
+            } finally {
+                if (grabber != null) {
+                    try {
+                        grabber.stop();
+                    } catch (FrameGrabber.Exception e) {
+                        logger.error("FrameRecorder.Exception", e);
+                    }
+                }
+                if (recorder != null) {
+                    try {
+                        recorder.stop();
+                    } catch (FrameRecorder.Exception e) {
+                        logger.error("FrameGrabber.Exception", e);
+                    }
+                }
+            }
+
+            logger.info("Exit recorder threads: " + recorderKey);
         }
     }
 }

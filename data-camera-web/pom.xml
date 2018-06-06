@@ -79,19 +79,23 @@
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>3.0.0</version>
         </dependency>
+        <!-- javacv to handle video stream -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+            <version>1.4.1</version>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>
             tag-checker-front
         </finalName>
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-
         <plugins>
             <!-- use to package and refresh resource, hot refreshing of resources -->
             <plugin>

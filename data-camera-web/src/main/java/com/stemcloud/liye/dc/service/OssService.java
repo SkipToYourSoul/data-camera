@@ -29,8 +29,11 @@ public class OssService {
     @Value("${oss.server.path}")
     private String baseServerUploadPath;
 
-    @Value("${oss.cloud.path}")
-    private String baseCloudUploadPath;
+    @Value("${oss.cloud.img.path}")
+    private String baseCloudImgUploadPath;
+
+    @Value("${oss.cloud.video.path}")
+    private String baseCloudVideoUploadPath;
 
     @Value("${stem.server.path}")
     private String stemServerPath;
@@ -65,18 +68,37 @@ public class OssService {
         }
 
         // 将文件上传至OSS
-        String cloudFilePath = baseCloudUploadPath + newFileName;
-        // OSS key cannot start with "/"
-        String key = cloudFilePath.replaceFirst("/", "");
+        String cloudFilePath = baseCloudImgUploadPath + newFileName;
+        return uploadToOss(serverFilePath, cloudFilePath);
+    }
+
+    /**
+     * 将保存在服务器的视频文件传送到阿里云
+     * @param filename 服务器视频文件名
+     * @return 阿里云的访问路径
+     */
+    public String uploadVideoToOss(String filename) {
+        String localFilePath= baseServerUploadPath + "/" + filename;
+        String ossKey = baseCloudVideoUploadPath + "/" + filename;
+        return uploadToOss(localFilePath, ossKey);
+    }
+
+    /**
+     * oss上传方法
+     * @param localFilePath eg. ./uploads/video.mp4
+     * @param ossKey eg. uploads/dc/videos/video.mp4
+     * @return http://www.stemcloud.cn/uploads/dc/videos/video.mp4
+     */
+    private String uploadToOss(String localFilePath, String ossKey) {
         try {
-            FileInputStream fileInputStream = new FileInputStream(serverFilePath);
-            PutObjectResult result = ObjectService.putObject(client, OSSClientProperties.bucketName, key, fileInputStream);
+            FileInputStream fileInputStream = new FileInputStream(localFilePath);
+            PutObjectResult result = ObjectService.putObject(client, OSSClientProperties.bucketName, ossKey, fileInputStream);
             fileInputStream.close();
-            logger.info("upload file to aliyun OSS object server success. ETag: {}, key={}", result.getETag(), key);
+            logger.info("upload file to aliyun OSS object server success. ETag: {}, key={}", result.getETag(), ossKey);
         } catch (IOException e) {
-            logger.error("An exception occured when copying file, original file={}", serverFilePath, e);
+            logger.error("An exception occured when copying file, original file={}", localFilePath, e);
         }
 
-        return stemServerPath + key;
+        return stemServerPath + ossKey;
     }
 }

@@ -10,6 +10,8 @@
  * @type {{}}
  */
 var exp_monitor_interval = {};
+var $dataDialogName = $('#dialog-data-name');
+var $dataDialogDesc = $('#dialog-data-desc');
 
 /**
  * 监控时定期更新图表数据，后期需改成web socket
@@ -140,6 +142,7 @@ function doInterval(exp_id){
 /**
  * 获取当前实验状态，用于判断监控和录制的动作进行
  *  NOT_BOUND_SENSOR, MONITORING_NOT_RECORDING, MONITORING_AND_RECORDING, NOT_MONITOR, UNKNOWN
+ * Ajax同步请求
  * @param expId
  * @returns {string}
  */
@@ -170,6 +173,7 @@ function getExpStatusFromServer(expId){
  * 获取当前应用下实验的整体状态，用于判断全局监控和录制的动作进行
  *  ALL_MONITORING_AND_ALL_RECORDING, ALL_MONITORING_AND_PART_RECORDING, ALL_MONITORING_AND_NO_RECORDING,
  *  ALL_NOT_MONITOR, PART_MONITORING, NO_AVAILABLE_SENSOR
+ * Ajax同步请求
  * @returns {string}
  */
 function getAppStatusFromServer(){
@@ -229,8 +233,8 @@ function askForSaveRecorder(doFunction, action, endTime, title){
     });
 
     // 完成后清空片段数据框
-    $('#dialog-data-name').val("");
-    $('#dialog-data-desc').val("");
+    $dataDialogName.val("");
+    $dataDialogDesc.val("");
 }
 
 /**
@@ -267,8 +271,8 @@ function expMonitor(button){
                 "action": action,
                 "isSave": isSave,
                 "data-time": endTime,
-                "data-name": $('#dialog-data-name').val(),
-                "data-desc": $('#dialog-data-desc').val()
+                "data-name": $dataDialogName.val(),
+                "data-desc": $dataDialogDesc.val()
             },
             success: function (response) {
                 if (response.code === "1111"){
@@ -302,18 +306,18 @@ function expMonitor(button){
 function expRecorder(button) {
     var expId = button.getAttribute('data');
     var status = getExpStatusFromServer(expId);
-    if (status == "unknown"){
+    if (status === "unknown"){
         message_info("状态unknown", "info");
-    } else if (status == "not_bound_sensor"){
+    } else if (status === "not_bound_sensor"){
         message_info("实验未绑定任何设备，不能进行录制", "info");
-    } else if (status == "not_monitor"){
+    } else if (status === "not_monitor"){
         // 当前状态是非监控，不能录制
         message_info("实验未开始监控，不能进行录制", "info");
-    } else if (status == "monitoring_not_recording") {
+    } else if (status === "monitoring_not_recording") {
         // 当前状态是监控非录制，开始录制
         message_info("开始录制实验" + expId, "success");
         doRecorder(1, 0, 0);
-    } else if (status == "monitoring_and_recording"){
+    } else if (status === "monitoring_and_recording"){
         // 停止录制
         askForSaveRecorder(doRecorder, 0, new Date().getTime(), "即将结束录制，是否保存录制数据片段?");
     }
@@ -327,26 +331,26 @@ function expRecorder(button) {
                 "action": action,
                 "isSave": isSave,
                 "data-time": endTime,
-                "data-name": $('#dialog-data-name').val(),
-                "data-desc": $('#dialog-data-desc').val()
+                "data-name": $dataDialogName.val(),
+                "data-desc": $dataDialogDesc.val()
             },
             success: function (response) {
-                if (response.code == "1111"){
+                if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
-                } else if (response.code == "0000"){
-                    if (action == 1){
+                } else if (response.code === "0000"){
+                    if (action === 1){
                         pageStartRecord(expId);
-                    } else if (action == 0){
+                    } else if (action === 0){
                         pageStopRecorder(expId);
-                        if (isSave == 1 && response.data != -1){
+                        if (isSave === 1 && response.data !== -1){
                             window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
-                        } else if (response.data == -1){
+                        } else if (response.data === -1){
                             commonObject.printExceptionMsg("录制状态结束异常");
                         }
                     }
                 }
             },
-            error: function (response) {
+            error: function () {
                 commonObject.printRejectMsg();
             }
         });
