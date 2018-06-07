@@ -10,8 +10,6 @@
  * @type {{}}
  */
 var exp_monitor_interval = {};
-var $dataDialogName = $('#dialog-data-name');
-var $dataDialogDesc = $('#dialog-data-desc');
 
 /**
  * 监控时定期更新图表数据，后期需改成web socket
@@ -233,8 +231,8 @@ function askForSaveRecorder(doFunction, action, endTime, title){
     });
 
     // 完成后清空片段数据框
-    $dataDialogName.val("");
-    $dataDialogDesc.val("");
+    $('#dialog-data-name').val("");
+    $('#dialog-data-desc').val("");
 }
 
 /**
@@ -243,21 +241,23 @@ function askForSaveRecorder(doFunction, action, endTime, title){
  */
 function expMonitor(button){
     var expId = button.getAttribute('data');
+
+    lockTheBtn(expId, "monitor");
     var status = getExpStatusFromServer(expId);
     if (status === "unknown"){
         message_info("状态unknown", "info");
+        unlockBtn(expId);
     } else if (status === "not_bound_sensor"){
         message_info("实验未绑定任何设备，不能进行监控", "info");
+        unlockBtn(expId);
     } else if (status === "not_monitor"){
         // 当前状态是非监控，开始监控
-        message_info("开始监控实验" + expId, "success");
         doMonitor(1, 0, 0);
     } else if (status === "monitoring_not_recording") {
         // 当前状态是监控非录制，停止监控
-        message_info("停止监控实验" + expId, "success");
         doMonitor(0, 0, 0);
     } else if (status === "monitoring_and_recording"){
-        askForSaveRecorder(doMonitor, 0, new Date().getTime(), "即将结束监控，是否保存录制数据片段?");
+        askForSaveRecorder(doMonitor, 0, new Date().getTime(), "是否保存录制数据片段?");
     }
 
     // action -> 0: stop, 1: start
@@ -267,27 +267,21 @@ function expMonitor(button){
             type: 'get',
             url: action_address + "/monitor",
             data: {
-                "exp-id": expId,
-                "action": action,
-                "isSave": isSave,
-                "data-time": endTime,
-                "data-name": $dataDialogName.val(),
-                "data-desc": $dataDialogDesc.val()
+                "exp-id": expId, "action": action, "isSave": isSave, "data-time": endTime,
+                "data-name": $('#dialog-data-name').val(), "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
+                unlockBtn(expId);
+                var returnStatus = response.data;
                 if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
                 } else if (response.code === "0000"){
-                    if (action === "1"){
-                        // start monitor
+                    if (action === 1){
                         pageStartMonitor(expId);
-                    } else if (action === "0"){
-                        // stop monitor
+                    } else if (action === 0){
                         pageStopMonitor(expId);
-                        if (isSave === 1 && response.data !== -1){
-                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
-                        } else if (isSave === 1 && response.data === -1) {
-                            commonObject.printExceptionMsg("监控状态结束异常");
+                        if (isSave === 1) {
+                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + returnStatus;
                         }
                     }
                 }
@@ -305,21 +299,25 @@ function expMonitor(button){
  */
 function expRecorder(button) {
     var expId = button.getAttribute('data');
+
+    lockTheBtn(expId, "record");
     var status = getExpStatusFromServer(expId);
     if (status === "unknown"){
         message_info("状态unknown", "info");
+        unlockBtn(expId);
     } else if (status === "not_bound_sensor"){
         message_info("实验未绑定任何设备，不能进行录制", "info");
+        unlockBtn(expId);
     } else if (status === "not_monitor"){
         // 当前状态是非监控，不能录制
         message_info("实验未开始监控，不能进行录制", "info");
+        unlockBtn(expId);
     } else if (status === "monitoring_not_recording") {
         // 当前状态是监控非录制，开始录制
-        message_info("开始录制实验" + expId, "success");
         doRecorder(1, 0, 0);
     } else if (status === "monitoring_and_recording"){
         // 停止录制
-        askForSaveRecorder(doRecorder, 0, new Date().getTime(), "即将结束录制，是否保存录制数据片段?");
+        askForSaveRecorder(doRecorder, 0, new Date().getTime(), "是否保存录制数据片段?");
     }
 
     function doRecorder(action, isSave, endTime){
@@ -327,17 +325,14 @@ function expRecorder(button) {
             type: 'get',
             url: action_address + "/record",
             data: {
-                "exp-id": expId,
-                "action": action,
-                "isSave": isSave,
-                "data-time": endTime,
-                "data-name": $dataDialogName.val(),
-                "data-desc": $dataDialogDesc.val()
+                "exp-id": expId, "action": action, "isSave": isSave, "data-time": endTime,
+                "data-name": $('#dialog-data-name').val(), "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
                 if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
                 } else if (response.code === "0000"){
+                    unlockBtn(expId);
                     if (action === 1){
                         pageStartRecord(expId);
                     } else if (action === 0){
@@ -514,6 +509,36 @@ function allRecord(){
     }
 }
 
+function lockTheBtn(expId, action) {
+    var $monitorBtn = $('#experiment-monitor-' + expId);
+    var $allMonitorBtn = $('#all-monitor-btn');
+    var $recorderBtn = $('#experiment-recorder-' + expId);
+    var $allRecorderBtn = $('#all-record-btn');
+
+    $monitorBtn.addClass('disabled');
+    $allMonitorBtn.addClass('disabled');
+    $recorderBtn.addClass('disabled');
+    $allRecorderBtn.addClass('disabled');
+
+    if (action === "monitor") {
+        $('#experiment-es-' + expId).text("加载中");
+    } else if (action === "record") {
+        $('#experiment-rs-' + expId).text("加载中");
+    }
+}
+
+function unlockBtn(expId) {
+    var $monitorBtn = $('#experiment-monitor-' + expId);
+    var $allMonitorBtn = $('#all-monitor-btn');
+    var $recorderBtn = $('#experiment-recorder-' + expId);
+    var $allRecorderBtn = $('#all-record-btn');
+
+    $monitorBtn.removeClass('disabled');
+    $allMonitorBtn.removeClass('disabled');
+    $recorderBtn.removeClass('disabled');
+    $allRecorderBtn.removeClass('disabled');
+}
+
 /**
  * 开始监控时页面的更改
  * @param exp_id
@@ -526,13 +551,6 @@ function pageStartMonitor(exp_id){
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
 
     doInterval(exp_id);
-
-    // 模拟视频播放
-    Object.keys(expObject.video).forEach(function (id) {
-        if (id.split('-')[2] == exp_id) {
-            videojs(id).play();
-        }
-    });
 }
 
 /**
@@ -544,7 +562,6 @@ function pageStopMonitor(exp_id){
 
     isExperimentMonitor[exp_id] = 0;
     $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-default').text('非监控');
-    /*$('#experiment-monitor-' + exp_id).removeClass('btn-success').addClass('btn-default');*/
 
     clearInterval(exp_monitor_interval[exp_id]);
     delete exp_monitor_interval[exp_id];
@@ -556,7 +573,7 @@ function pageStopMonitor(exp_id){
     // 清空echart数据
     Object.keys(expObject.chart).forEach(function (dom) {
         var expId = dom.split('-')[2];
-        if (exp_id == expId) {
+        if (exp_id === expId) {
             var chart = echarts.getInstanceByDom(document.getElementById(dom));
             var series = chart.getOption()['series'];
             series[0]['data'] = [{
@@ -566,13 +583,6 @@ function pageStopMonitor(exp_id){
             chart.setOption({
                 series: series
             });
-        }
-    });
-
-    // 模拟视频播放
-    Object.keys(expObject.video).forEach(function (id) {
-        if (id.split('-')[2] == exp_id) {
-            videojs(id).pause();
         }
     });
 }

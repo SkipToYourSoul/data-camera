@@ -56,6 +56,9 @@ public class ActionService {
     @Value("${oss.server.path}")
     private String baseServerUploadPath;
 
+    @Value("${rtmp.live.server}")
+    private String liveServer;
+
     private Gson gson = new Gson();
     private final String MONITOR = "monitor";
     private final String RECORD = "record";
@@ -70,7 +73,7 @@ public class ActionService {
 
     /**
      * 返回从服务器获取的当前实验状态
-     * @param expId
+     * @param expId 实验ID
      * @return
      * NOT_BOUND_SENSOR, MONITORING_NOT_RECORDING, MONITORING_AND_RECORDING, NOT_MONITOR, UNKNOWN
      */
@@ -101,6 +104,7 @@ public class ActionService {
      * 改变当前实验的监控状态
      * @param action 1 -> 开始监控；2 -> 结束监控
      * @param isSave 结束监控时判断是否保存正在录制的片段，1 -> 保存，2 -> 不保存
+     * @param dataTime 结束监控的时间（记录点击结束BUTTON的时间）
      * @return 若有数据片段保存，则返回片段ID，否则返回-1
      */
     @Transactional(rollbackFor = Exception.class)
@@ -112,30 +116,23 @@ public class ActionService {
             experimentRepository.monitorExp(expId, 1);
         } else if (action == 0){
             experimentRepository.monitorAndRecorderExp(expId, 0, 0);
-            // --- end recorder
+            // -- end recorder
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo != null) {
-                if (isSave == 1){
-                    // -- 保存当前的录制记录，更新结束时间
-                    String dataName = name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name;
-                    recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, dataName, desc);
-
-                    // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
-                    for (TrackInfo track : experiment.getTrackInfoList()) {
-                        if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
-                            saveVideo(recorderInfo);
-                            response = recorderInfo.getId();
-                        }
+                String dataName = (name == null || name.isEmpty())?"实验{" + experiment.getName() + "}的片段":name;
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), Math.abs(isSave - 1), dataName, desc);
+                // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
+                for (TrackInfo track : experiment.getTrackInfoList()) {
+                    if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
+                        // 结束视频录制
+                        endRecorderByFrame(recorderInfo, track.getSensor().getId(), isSave);
                     }
-                } else if (isSave == 0){
-                    // -- 删除当前的录制记录
-                    recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
                 }
+                response = recorderInfo.getId();
                 ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, 0));
             }
         }
         // -- send message
-        // sendMessageToRedis(expId, MONITOR, action);
         ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, MONITOR, action));
 
         logger.info("--> Change experiment monitor state, action={}, isSave={}, response={}", action, isSave, response);
@@ -149,51 +146,53 @@ public class ActionService {
     @Transactional(rollbackFor = Exception.class)
     public long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
+        long appId = experiment.getApp().getId();
         long response = -1;
 
         if (action == 1){
-            RecorderInfo testRecorder = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
-            if (testRecorder != null){
-                logger.warn("The record has already start");
-                return -1L;
+            List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
+            // -- 新建一条片段记录
+            List<RecorderDevices> devices = new ArrayList<RecorderDevices>();
+            for (SensorInfo sensor: sensors){
+                List<String> legend = Arrays.asList(sensor.getSensorConfig().getDimension().split(";"));
+                devices.add(new RecorderDevices(sensor.getId(), sensor.getTrackId(), legend));
+                // -- 若有摄像头，则开始视频录制
+                if (sensor.getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
+                    if (!startRecordByFrame(sensor.getMark(), 0, appId, experiment.getId(), sensor.getId())){
+                        return response;
+                    }
+                }
             }
 
             experimentRepository.recorderExp(expId, 1);
-            List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
-
-            // --- 新建一条片段记录
-            List<RecorderDevices> devices = new ArrayList<RecorderDevices>();
-            for (SensorInfo sensor: sensors){
-                RecorderDevices device = new RecorderDevices();
-                List<String> legend = Arrays.asList(sensor.getSensorConfig().getDimension().split(";"));
-                device.setSensor(sensor.getId());
-                device.setTrack(sensor.getTrackId());
-                device.setLegends(legend);
-                devices.add(device);
-            }
-
             RecorderInfo recorderInfo = new RecorderInfo();
             recorderInfo.setExpId(expId);
             recorderInfo.setAppId(experiment.getApp().getId());
             recorderInfo.setIsRecorder(1);
             recorderInfo.setStartTime(new Date());
-            recorderInfo.setDevices(new Gson().toJson(devices));
+            recorderInfo.setDevices(gson.toJson(devices));
             recorderInfo.setName(experiment.getName());
             recorderInfo.setDescription(experiment.getName());
             recorderRepository.save(recorderInfo);
         } else if (action == 0){
-            // --- end recorder
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo == null){
                 logger.warn("End record, but no record info in table");
                 return -1L;
             }
+            // -- end recorder, 更改experiment表的状态
             experimentRepository.recorderExp(expId, 0);
-            if (isSave == 1){
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), 0, name.isEmpty()?"实验{" + experiment.getName() + "}的片段":name, desc);
-                saveVideo(recorderInfo);
-            } else if (isSave == 0){
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), 1, recorderInfo.getName(), recorderInfo.getDescription());
+
+            String dataName = (name == null || name.isEmpty())?"实验{" + experiment.getName() + "}的片段":name;
+            System.out.println(dataName);
+
+            recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), Math.abs(isSave - 1), dataName, desc);
+            // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
+            for (TrackInfo track : experiment.getTrackInfoList()) {
+                if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
+                    // 结束视频录制
+                    endRecorderByFrame(recorderInfo, track.getSensor().getId(), isSave);
+                }
             }
             response = recorderInfo.getId();
         }
@@ -351,13 +350,16 @@ public class ActionService {
 
     /**
      * 按帧录制视频
-     * @param inputFile 该地址可以是网络直播/录播地址，也可以是远程/本地文件路径
+     * @param liveAddress 直播流地址
      * @param audioChannel 是否录制音频（0:不录制/1:录制）
      * @param sensorId 用以标记文件名
      */
-    boolean startRecordByFrame(String inputFile, int audioChannel, RecorderInfo recorderInfo, long sensorId) {
+    boolean startRecordByFrame(String liveAddress, int audioChannel, long appId, long expId, long sensorId) {
+        // 构造直播流地址
+        String inputFile = liveServer + liveAddress;
+
         // 该地址只能是文件地址，如果使用该方法推送流媒体服务器会报错，原因是没有设置编码格式
-        String key = LiveRecorderUtil.mkLiveVideoKey(recorderInfo.getId(), sensorId);
+        String key = LiveRecorderUtil.mkLiveVideoKey(appId, expId, sensorId);
         String outputFile = String.format("%s/%s.mp4", baseServerUploadPath, key);
         // 获取视频源
         FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
@@ -380,14 +382,17 @@ public class ActionService {
         return waitCount > 0;
     }
 
-    void endRecorderByFrame(RecorderInfo recorderInfo, long sensorId) {
-        String key = LiveRecorderUtil.mkLiveVideoKey(recorderInfo.getId(), sensorId);
+    void endRecorderByFrame(RecorderInfo recorderInfo, long sensorId, int isSave) {
+        String key = LiveRecorderUtil.mkLiveVideoKey(recorderInfo.getAppId(), recorderInfo.getExpId(), sensorId);
         final String filename = String.format("%s.mp4", key);
 
         // -- 移除全局变量中的key，停止直播流的录制并中断录制线程
         LiveRecorderUtil.recorderStatusMap.remove(key);
+        if (isSave == 0) {
+            return;
+        }
 
-        List<RecorderDevices> devices = new Gson().fromJson(recorderInfo.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
+        List<RecorderDevices> devices = gson.fromJson(recorderInfo.getDevices(), new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
         for (RecorderDevices device : devices){
             if (device.getLegends().get(0).equals("视频")) {
                 VideoData videoData = new VideoData();
@@ -412,32 +417,6 @@ public class ActionService {
                         }
                     }
                 });
-            }
-        }
-    }
-
-    /**
-     * 在录制结束时，保存视频记录
-     * @param recorderInfo 录制的片段信息
-     */
-    private void saveVideo(RecorderInfo recorderInfo){
-        String devicesStr = recorderInfo.getDevices();
-        List<RecorderDevices> devices = new Gson().fromJson(devicesStr, new TypeToken<ArrayList<RecorderDevices>>(){}.getType());
-        for (RecorderDevices d : devices){
-            long trackId = d.getTrack();
-            long sensorId = d.getSensor();
-            if (sensorRepository.findOne(sensorId).getSensorConfig().getType() == SensorType.VIDEO.getValue()){
-                VideoData videoData = new VideoData();
-                videoData.setSensorId(sensorId);
-                videoData.setTrackId(trackId);
-                videoData.setRecorderInfo(recorderInfo);
-
-                // -- 保存上传的视频，由于上传具有延时性、后面会以异步的方式进行该表的更新
-                videoData.setVideoPost("/camera/img/oceans.png");
-                videoData.setVideoPath("/camera/img/oceans.mp4");
-
-                videoDataRepository.save(videoData);
-                logger.info("--> Save video data, sensor id is {}, track id is {}, recorder is {}", sensorId, trackId, recorderInfo.getId());
             }
         }
     }

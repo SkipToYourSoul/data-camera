@@ -40,6 +40,12 @@ public class OssService {
 
     private OSSClient client = OSSClientFactory.createOSSClient();
 
+    /**
+     * 处理文件上传请求，并上传至阿里云
+     * @param request
+     * @param from
+     * @return
+     */
     public String uploadFileToOss(HttpServletRequest request, String from){
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = null;
@@ -79,12 +85,12 @@ public class OssService {
      */
     public String uploadVideoToOss(String filename) {
         String localFilePath= baseServerUploadPath + "/" + filename;
-        String ossKey = baseCloudVideoUploadPath + "/" + filename;
+        String ossKey = baseCloudVideoUploadPath + "/" + System.currentTimeMillis() + "-" + filename;
         return uploadToOss(localFilePath, ossKey);
     }
 
     /**
-     * oss上传方法
+     * oss上传接口
      * @param localFilePath eg. ./uploads/video.mp4
      * @param ossKey eg. uploads/dc/videos/video.mp4
      * @return http://www.stemcloud.cn/uploads/dc/videos/video.mp4
@@ -97,6 +103,7 @@ public class OssService {
             logger.info("upload file to aliyun OSS object server success. ETag: {}, key={}", result.getETag(), ossKey);
         } catch (IOException e) {
             logger.error("An exception occured when copying file, original file={}", localFilePath, e);
+            return null;
         }
 
         return stemServerPath + ossKey;

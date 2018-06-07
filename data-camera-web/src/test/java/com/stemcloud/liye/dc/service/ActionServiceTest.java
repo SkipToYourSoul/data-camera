@@ -27,9 +27,9 @@ public class ActionServiceTest {
         recorderInfo.setExpId(0);
         recorderInfo.setId(0);
 
-        actionService.startRecordByFrame(inputFile, 0, recorderInfo,0);
+        actionService.startRecordByFrame(inputFile, 0, 0,0,0);
         Thread.sleep(10000);
-        actionService.endRecorderByFrame(recorderInfo,0);
+        actionService.endRecorderByFrame(recorderInfo,0, 0);
         Thread.sleep(10000);
     }
 }

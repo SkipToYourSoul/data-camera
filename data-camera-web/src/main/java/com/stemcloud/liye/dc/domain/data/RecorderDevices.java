@@ -13,6 +13,12 @@ public class RecorderDevices {
     private Long track;
     private List<String> legends;
 
+    public RecorderDevices(Long sensor, Long track, List<String> legends) {
+        this.sensor = sensor;
+        this.track = track;
+        this.legends = legends;
+    }
+
     public Long getSensor() {
         return sensor;
     }
