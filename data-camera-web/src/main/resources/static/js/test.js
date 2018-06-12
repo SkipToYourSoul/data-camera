@@ -5,7 +5,7 @@ $(function () {
     // rtmp://push.stemcloud.cn/AppName/StreamName?auth_key=1524478514-0-0-bef0746a6b3630faa9a13c8d1b8e1711
     // rtmp://47.100.173.108:1935/live/stem
 
-    var player = cyberplayer("video").setup({
+    /*var player = cyberplayer("video").setup({
         width: 600,
         height: 300,
         isLive: true,
@@ -19,7 +19,7 @@ $(function () {
             bufferlength: 1 // 缓冲多少秒之后开始播放 默认1秒
         },
         ak: "3c482e9f90a641cfab6a236960fbb707" // 公有云平台注册即可获得accessKey
-    });
+    });*/
     // player.seek(0);
     /*console.log(player.getBuffer());
     player.stop();
@@ -73,3 +73,25 @@ $(function () {
     });*/
 
 });
+
+var player = cyberplayer("video").setup({
+    flashplayer: "cyberplayer.flash.swf",
+    stretching: "uniform",
+    isLive: true,
+    file: "http://www.stemcloud.cn/uploads/dc/videos/1528433701884-[4]-[6]-[7].mp4",
+    image: "/camera/img/eye.png",
+    width: 400,
+    height: 300,
+    autostart: true,
+    repeat: false,
+    volume: 100,
+    controls: true,
+    controlbar: {
+        barLogo: false
+    },
+    ak:"3c482e9f90a641cfab6a236960fbb707"
+});
+
+function seekVideo() {
+    player.seek(5);
+}

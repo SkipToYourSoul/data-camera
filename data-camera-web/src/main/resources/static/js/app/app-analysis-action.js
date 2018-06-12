@@ -9,7 +9,13 @@
  * @type {null}
  */
 var recorderInterval = null;
+var lastSlideValue = 0;
+
+/**
+ * 点击播放按钮时触发
+ */
 function recorderPlay() {
+    console.info("Recorder play");
     var interval = 1000/parseInt($('#recorder-speed').find('.active input').val());
     recorderInterval = setInterval(recorderAction, interval);
     analysisObject.playStatus = "play";
@@ -23,6 +29,9 @@ function recorderPlay() {
     });
 }
 
+/**
+ * 播放时图标变化的轮询函数
+ */
 function recorderAction(){
     setTimeLine(++analysisObject.timelineStart, analysisObject.timelineEnd);
     if (analysisObject.timelineStart >= analysisObject.timelineEnd){
@@ -70,6 +79,7 @@ function recorderAction(){
 }
 
 function recorderPause() {
+    console.info("Recorder pause");
     clearInterval(recorderInterval);
     analysisObject.playStatus = "pause";
     $('#play-btn').removeAttr('disabled');
@@ -83,6 +93,7 @@ function recorderPause() {
 }
 
 function recorderReset() {
+    console.info("Recorder reset");
     clearInterval(recorderInterval);
     analysisObject.playStatus = "normal";
     $('#play-btn').removeAttr('disabled');
@@ -91,6 +102,8 @@ function recorderReset() {
         .slider({values: [0, analysisObject.timeline.length - 1]})
         .slider("pips", "refresh")
         .slider("float", "refresh");
+    lastSlideValue = 0;
+
     // 重置chart数据
     Object.keys(analysisObject.chart).forEach(function (i) {
         var series = analysisObject.chart[i].getOption()['series'];
@@ -124,16 +137,18 @@ function slideChange(e, ui) {
     analysisObject.timelineEnd = ui.values[1];
 
     // 图表状态
-    if (analysisObject.playStatus == "play") {
+    if (analysisObject.playStatus === "play" || analysisObject.playStatus === "pause") {
         updateMarkLine();
-        updateVideoTime();
-    } else if (analysisObject.playStatus == "pause") {
-        updateMarkLine();
-        updateVideoTime();
-    } else if (analysisObject.playStatus == "normal") {
+
+        // 手动改变时间轴，更改视频时间
+        if (Math.abs(ui.values[0] - lastSlideValue) > 1) {
+            updateVideoTime();
+        }
+    } else if (analysisObject.playStatus === "normal") {
         updateMarkArea();
         updateVideoTime();
     }
+    lastSlideValue = ui.values[0];
 
     // 进行标记线更新
     function updateMarkLine() {
@@ -169,7 +184,9 @@ function slideChange(e, ui) {
     function updateVideoTime() {
         Object.keys(analysisObject.video).forEach(function (i) {
             var video = analysisObject.video[i];
-            video.currentTime(ui.values[0] + analysisObject.videoStartTime);
+            var vTime = parseInt(ui.values[0]) + parseInt(analysisObject.videoStartTime);
+            console.log("Set video time: " + vTime);
+            video.currentTime(vTime);
         });
     }
 }

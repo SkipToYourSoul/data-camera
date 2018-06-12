@@ -43,6 +43,13 @@ public interface RecorderRepository extends CrudRepository<RecorderInfo, Long> {
     List<RecorderInfo> findByIsDeletedOrderByIdDesc(int isDeleted);
 
     /**
+     *
+     * @return
+     */
+    @Query(value = "SELECT r FROM RecorderInfo r WHERE r.endTime IS NULL AND r.isDeleted = 0")
+    List<RecorderInfo> findRecordingRecorder();
+
+    /**
      * find recorders of current app
      * @param ids
      * @return

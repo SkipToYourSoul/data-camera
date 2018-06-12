@@ -3,6 +3,7 @@ package com.stemcloud.liye.dc.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.common.ExpStatus;
+import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
@@ -11,12 +12,15 @@ import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
-import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.message.SensorStatus;
-import com.stemcloud.liye.dc.util.*;
+import com.stemcloud.liye.dc.util.ExecutorUtil;
+import com.stemcloud.liye.dc.util.LiveRecorderUtil;
+import com.stemcloud.liye.dc.util.RedisKeyUtils;
+import com.stemcloud.liye.dc.util.RedisUtils;
+import org.bytedeco.javacpp.avutil;
 import org.bytedeco.javacv.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +29,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Belongs to data-camera-web
@@ -104,11 +108,10 @@ public class ActionService {
      * 改变当前实验的监控状态
      * @param action 1 -> 开始监控；2 -> 结束监控
      * @param isSave 结束监控时判断是否保存正在录制的片段，1 -> 保存，2 -> 不保存
-     * @param dataTime 结束监控的时间（记录点击结束BUTTON的时间）
      * @return 若有数据片段保存，则返回片段ID，否则返回-1
      */
     @Transactional(rollbackFor = Exception.class)
-    public long changeMonitorState(long expId, int action, int isSave, long dataTime, String name, String desc) {
+    public long changeMonitorState(long expId, int action, int isSave, String name, String desc) {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long response = -1;
 
@@ -120,7 +123,7 @@ public class ActionService {
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo != null) {
                 String dataName = (name == null || name.isEmpty())?"实验{" + experiment.getName() + "}的片段":name;
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), Math.abs(isSave - 1), dataName, desc);
+                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), Math.abs(isSave - 1), dataName, desc);
                 // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
                 for (TrackInfo track : experiment.getTrackInfoList()) {
                     if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
@@ -144,12 +147,18 @@ public class ActionService {
      * @return 若有数据片段保存，则返回片段ID，否则返回-1
      */
     @Transactional(rollbackFor = Exception.class)
-    public long changeRecorderState(long expId, int action, int isSave, long dataTime, String name, String desc) {
+    public long changeRecorderState(long expId, int action, int isSave, String name, String desc) {
         ExperimentInfo experiment = experimentRepository.findOne(expId);
         long appId = experiment.getApp().getId();
         long response = -1;
 
         if (action == 1){
+            RecorderInfo checkR = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
+            if (checkR != null) {
+                logger.warn("Start record, but has already started");
+                return -1L;
+            }
+
             List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
             // -- 新建一条片段记录
             List<RecorderDevices> devices = new ArrayList<RecorderDevices>();
@@ -186,7 +195,7 @@ public class ActionService {
             String dataName = (name == null || name.isEmpty())?"实验{" + experiment.getName() + "}的片段":name;
             System.out.println(dataName);
 
-            recorderRepository.endRecorder(recorderInfo.getId(), new Date(dataTime), Math.abs(isSave - 1), dataName, desc);
+            recorderRepository.endRecorder(recorderInfo.getId(), new Date(), Math.abs(isSave - 1), dataName, desc);
             // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
             for (TrackInfo track : experiment.getTrackInfoList()) {
                 if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
@@ -257,7 +266,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Long> allMonitor(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public List<Long> allMonitor(long appId, int action, int isSave, String name, String desc) throws Exception {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){
@@ -271,7 +280,7 @@ public class ActionService {
             if (hasSensor){
                 boolean noChange = (action == 1 && exp.getIsMonitor() == 1) || (action == 0 && exp.getIsMonitor() == 0);
                 if (!noChange){
-                    changeMonitorState(exp.getId(), action, isSave, dataTime, name, desc);
+                    changeMonitorState(exp.getId(), action, isSave, name, desc);
                     expIds.add(exp.getId());
                     logger.info("--> Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
                 }
@@ -282,7 +291,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Long> allRecorder(long appId, int action, int isSave, long dataTime, String name, String desc) throws Exception {
+    public List<Long> allRecorder(long appId, int action, int isSave, String name, String desc) throws Exception {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){
@@ -297,10 +306,10 @@ public class ActionService {
                 if (!(action == 0 && exp.getIsRecorder() == 0)){
                     // -- 开始录制时，还有之前的记录在，需判定是否保存之前的记录
                     if (action == 1 && exp.getIsRecorder() == 1){
-                        changeRecorderState(exp.getId(), 0, isSave, dataTime, "", "");
-                        changeRecorderState(exp.getId(), action, 0, 0, "", "");
+                        changeRecorderState(exp.getId(), 0, isSave, "", "");
+                        changeRecorderState(exp.getId(), action, 0, "", "");
                     } else {
-                        changeRecorderState(exp.getId(), action, isSave, dataTime, name, desc);
+                        changeRecorderState(exp.getId(), action, isSave, name, desc);
                     }
                     expIds.add(exp.getId());
                     logger.info("--> Global change experiment record state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
@@ -365,6 +374,12 @@ public class ActionService {
         FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
         // 流媒体输出地址，分辨率（长，高），是否录制音频（0:不录制/1:录制）
         FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputFile, LiveRecorderUtil.VIDEO_WIDTH, LiveRecorderUtil.VIDEO_HEIGHT, audioChannel);
+        recorder.setFrameRate(25.0);
+        recorder.setVideoBitrate((int)((LiveRecorderUtil.VIDEO_WIDTH * LiveRecorderUtil.VIDEO_HEIGHT * LiveRecorderUtil.FRAME_RATE) * LiveRecorderUtil.MOTION_FACTOR * 0.07));
+        recorder.setPixelFormat(avutil.AV_PIX_FMT_YUV420P);
+        //设置视频编码  28 指代h.264
+        recorder.setVideoCodec(28);
+        recorder.setFormat("mp4");
 
         LiveRecorderUtil.recorderStatusMap.put(key, "start");
         ExecutorUtil.RECORDER_EXECUTOR.submit(new SyncRecorder(grabber, recorder, key));
@@ -407,6 +422,8 @@ public class ActionService {
                     @Override
                     public void run() {
                         try {
+                            // -- 5s后上传，等待录制线程结束
+                            Thread.sleep(5000);
                             String aliAddress = ossService.uploadVideoToOss(filename);
                             VideoData video = videoDataRepository.findOne(vid);
                             video.setVideoPath(aliAddress);

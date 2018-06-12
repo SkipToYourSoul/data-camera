@@ -59,10 +59,9 @@ public class ActionController {
             long expId = Long.parseLong(queryParams.get("exp-id"));
             int action = Integer.parseInt(queryParams.get("action"));
             int isSave = Integer.parseInt(queryParams.get("isSave"));
-            long dataTime = Long.parseLong(queryParams.get("data-time"));
             String name = queryParams.get("data-name");
             String desc = queryParams.get("data-desc");
-            Map result = ServerReturnTool.serverSuccess(actionService.changeMonitorState(expId, action, isSave, dataTime, name, desc));
+            Map result = ServerReturnTool.serverSuccess(actionService.changeMonitorState(expId, action, isSave, name, desc));
             logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
                     request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
             return result;
@@ -82,10 +81,9 @@ public class ActionController {
             long expId = Long.parseLong(queryParams.get("exp-id"));
             int action = Integer.parseInt(queryParams.get("action"));
             int isSave = Integer.parseInt(queryParams.get("isSave"));
-            long dataTime = Long.parseLong(queryParams.get("data-time"));
             String name = queryParams.get("data-name");
             String desc = queryParams.get("data-desc");
-            Map result =  ServerReturnTool.serverSuccess(actionService.changeRecorderState(expId, action, isSave, dataTime, name, desc));
+            Map result =  ServerReturnTool.serverSuccess(actionService.changeRecorderState(expId, action, isSave, name, desc));
             logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
                     request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
             return result;
@@ -123,10 +121,9 @@ public class ActionController {
             Long appId = Long.valueOf(queryParams.get("app-id"));
             int action = Integer.parseInt(queryParams.get("action"));
             int isSave = Integer.parseInt(queryParams.get("isSave"));
-            long dataTime = Long.parseLong(queryParams.get("data-time"));
             String name = queryParams.get("data-name");
             String desc = queryParams.get("data-desc");
-            Map result = ServerReturnTool.serverSuccess(actionService.allMonitor(appId, action, isSave, dataTime, name, desc));
+            Map result = ServerReturnTool.serverSuccess(actionService.allMonitor(appId, action, isSave, name, desc));
             logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
                     request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
             return result;
@@ -146,10 +143,9 @@ public class ActionController {
             Long appId = Long.valueOf(queryParams.get("app-id"));
             int action = Integer.parseInt(queryParams.get("action"));
             int isSave = Integer.parseInt(queryParams.get("isSave"));
-            long dataTime = Long.parseLong(queryParams.get("data-time"));
             String name = queryParams.get("data-name");
             String desc = queryParams.get("data-desc");
-            Map result = ServerReturnTool.serverSuccess(actionService.allRecorder(appId, action, isSave, dataTime, name, desc));
+            Map result = ServerReturnTool.serverSuccess(actionService.allRecorder(appId, action, isSave, name, desc));
             logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
                     request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
             return result;
