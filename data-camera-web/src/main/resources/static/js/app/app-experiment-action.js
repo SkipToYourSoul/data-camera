@@ -335,14 +335,16 @@ function expRecorder(button) {
                     commonObject.printExceptionMsg(response.data);
                 } else if (response.code === "0000"){
                     unlockBtn(expId);
+                    if (response.data === -1) {
+                        commonObject.printExceptionMsg("操作失败");
+                        return ;
+                    }
                     if (action === 1){
                         pageStartRecord(expId);
                     } else if (action === 0){
                         pageStopRecorder(expId);
-                        if (isSave === 1 && response.data !== -1){
+                        if (isSave === 1){
                             window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
-                        } else if (response.data === -1){
-                            commonObject.printExceptionMsg("录制状态结束异常");
                         }
                     }
                 }
@@ -361,12 +363,16 @@ function expRecorder(button) {
  *  若所有实验都在监控状态，则停止监控
  */
 function allMonitor() {
+    lockAllBtn();
     var status = getAppStatusFromServer();
     console.log("status: " + status);
+
     if (status === "unknown"){
         message_info("状态unknown", "info");
+        unlockAllBtn();
     } else if (status === "no_available_sensor") {
         message_info("没有可用的传感器组", "info");
+        unlockAllBtn();
     } else if (status === "part_monitoring" || status === "all_not_monitor"){
         bootbox.confirm({
             title: "开始全局监控",
@@ -378,6 +384,8 @@ function allMonitor() {
             callback: function (result) {
                 if (result){
                     doAllMonitor(1, 0);
+                } else {
+                    unlockAllBtn();
                 }
             }
         });
@@ -392,6 +400,8 @@ function allMonitor() {
             callback: function (result) {
                 if (result){
                     doAllMonitor(0, 0);
+                } else {
+                    unlockAllBtn();
                 }
             }
         });
@@ -416,7 +426,6 @@ function allMonitor() {
                 } else if (response.code === "0000"){
                     var targetExp = response.data;
                     if (action === 1){
-                        $('#all-monitor-btn').removeClass('btn-default').addClass('btn-success');
                         targetExp.forEach(function (expId) {
                             pageStartMonitor(expId);
                         });
@@ -429,9 +438,11 @@ function allMonitor() {
                         }
                     }
                 }
+                unlockAllBtn();
             },
             error: function () {
                 commonObject.printRejectMsg();
+                unlockAllBtn();
             }
         });
     }
@@ -443,14 +454,19 @@ function allMonitor() {
  *  若所有实验都在录制状态，则停止录制
  */
 function allRecord(){
+    lockAllBtn();
     var status = getAppStatusFromServer();
     console.log("status: " + status);
+
     if (status === "unknown"){
         message_info("状态unknown", "info");
+        unlockAllBtn();
     } else if (status === "no_available_sensor") {
         message_info("没有可用的传感器组", "info");
+        unlockAllBtn();
     } else if (status === "part_monitoring" || status === "all_not_monitor"){
         message_info("当前不是全局监控状态，不能进行全局录制", "info");
+        unlockAllBtn();
     } else if (status === "all_monitoring_and_no_recording"){
         bootbox.confirm({
             title: "开始全局录制",
@@ -462,6 +478,8 @@ function allRecord(){
             callback: function (result) {
                 if (result){
                     doAllRecord(1, 0);
+                } else {
+                    unlockAllBtn();
                 }
             }
         });
@@ -500,14 +518,17 @@ function allRecord(){
                         }
                     }
                 }
+                unlockAllBtn();
             },
             error: function () {
                 commonObject.printRejectMsg();
+                unlockAllBtn();
             }
         });
     }
 }
 
+// 根据实验ID锁住按钮
 function lockTheBtn(expId, action) {
     var $monitorBtn = $('#experiment-monitor-' + expId);
     var $allMonitorBtn = $('#all-monitor-btn');
@@ -526,6 +547,7 @@ function lockTheBtn(expId, action) {
     }
 }
 
+// 根据实验ID解锁按钮
 function unlockBtn(expId) {
     var $monitorBtn = $('#experiment-monitor-' + expId);
     var $allMonitorBtn = $('#all-monitor-btn');
@@ -539,6 +561,18 @@ function unlockBtn(expId) {
 
     $('#experiment-es-' + expId).text("非监控");
     $('#experiment-rs-' + expId).text("非录制");
+}
+
+// 全局监控录制加载过程中，锁住所有按钮
+function lockAllBtn() {
+    $(".monitor-btn").addClass('disabled');
+    $(".record-btn").addClass('disabled');
+}
+
+// 全局监控录制加载过程中，解锁所有按钮
+function unlockAllBtn() {
+    $(".monitor-btn").removeClass('disabled');
+    $(".record-btn").removeClass('disabled');
 }
 
 /**

@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Belongs to data-camera-web
@@ -144,7 +145,7 @@ public class ActionService {
 
     /**
      * 改变当前实验的录制状态
-     * @return 若有数据片段保存，则返回片段ID，否则返回-1
+     * @return 若有数据片段保存，则返回片段ID，否则返回-1（-1为非正常返回）
      */
     @Transactional(rollbackFor = Exception.class)
     public long changeRecorderState(long expId, int action, int isSave, String name, String desc) {
@@ -167,6 +168,10 @@ public class ActionService {
                 devices.add(new RecorderDevices(sensor.getId(), sensor.getTrackId(), legend));
                 // -- 若有摄像头，则开始视频录制
                 if (sensor.getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
+                    // 若当前录制线程满了，则直接返回
+                    if (((ThreadPoolExecutor)ExecutorUtil.RECORDER_EXECUTOR).getActiveCount() == 5) {
+                        return response;
+                    }
                     if (!startRecordByFrame(sensor.getMark(), 0, appId, experiment.getId(), sensor.getId())){
                         return response;
                     }
@@ -183,6 +188,7 @@ public class ActionService {
             recorderInfo.setName(experiment.getName());
             recorderInfo.setDescription(experiment.getName());
             recorderRepository.save(recorderInfo);
+            response = 0;
         } else if (action == 0){
             RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
             if (recorderInfo == null){
@@ -207,7 +213,6 @@ public class ActionService {
         }
 
         // -- send message
-        // sendMessageToRedis(expId, RECORD, action);
         ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, action));
 
         logger.info("--> Change experiment record state, action={}, isSave={}, response={}", action, isSave, response);
@@ -266,7 +271,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Long> allMonitor(long appId, int action, int isSave, String name, String desc) throws Exception {
+    public List<Long> allMonitor(long appId, int action, int isSave, String name, String desc) {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){
@@ -291,7 +296,7 @@ public class ActionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Long> allRecorder(long appId, int action, int isSave, String name, String desc) throws Exception {
+    public List<Long> allRecorder(long appId, int action, int isSave, String name, String desc) {
         List<Long> expIds =  new ArrayList<Long>();
         List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
         for (ExperimentInfo exp: experiments){

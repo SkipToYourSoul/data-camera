@@ -1,7 +1,9 @@
 package com.stemcloud.liye.dc.service;
 
+import com.google.gson.Gson;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
+import com.stemcloud.liye.dc.util.LiveRecorderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,12 +40,13 @@ public class ScheduleService {
             long startTime = r.getStartTime().getTime();
             if (currentTime - startTime > 5 * 60 * 1000) {
                 actionService.changeRecorderState(expId, 0, 0, "", "");
-                LOGGER.info("End recorder, appId = {}, expId = {}, recorderId = {}", r.getAppId(), expId, r.getId());
+                LOGGER.info("[Schedule] End recorder, appId = {}, expId = {}, recorderId = {}", r.getAppId(), expId, r.getId());
             }
         }
     }
 
-    @Scheduled(cron = "05 * * * * *")
-    public void test() {
+    @Scheduled(cron = "05 */5 * * * *")
+    public void checkRecorderMap() {
+        LOGGER.info("[Schedule] Current Recorder Map: {}", new Gson().toJson(LiveRecorderUtil.recorderStatusMap));
     }
 }

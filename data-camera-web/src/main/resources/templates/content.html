@@ -159,23 +159,17 @@
                     <div class="content-other">其他作品</div>
 					<div class="other-works">
 						<th:block th:each="otherContent,index:${userHotContent}">
-							<div class="row"
-								th:if="${index.count%2 eq 1 and index.count lt 5}">
-								<div class="share-view-photo col-md-6">
-									<img
-										th:src="${userHotContent.get(index.count).img}?${userHotContent.get(index.count).img}:'img/logo.png'"
-										class="center-block content-img" />
-									<div class="info-content-title"
-										th:text="${userHotContent.get(index.count).title}"></div>
-								</div>
-								<div class="share-view-photo col-md-6"
-									th:if="${#lists.size(userHotContent) gt index.count}">
-									<img
-										th:src="${userHotContent.get(index.count+1).img}?${userHotContent.get(index.count+1).img}:'img/logo.png'"
-										class="center-block content-img" />
-									<div class="info-content-title"
-										th:text="${userHotContent.get(index.count+1).title}"></div>
-								</div>
+							<div class="row" th:if="${index.count%2 eq 1 and index.count lt 7}">
+                                <div class="share-view-photo col-md-6">
+                                    <img th:src="${userHotContent.get(index.count - 1).img}?${userHotContent.get(index.count - 1).img}:'img/logo.png'"
+                                         class="center-block content-img" />
+                                    <a th:href="@{/content(id=${otherContent.id})}" class="info-content-title" th:text="${userHotContent.get(index.count - 1).title}"></a>
+                                </div>
+                                <div class="share-view-photo col-md-6" th:if="${#lists.size(userHotContent) gt index.count}">
+                                    <img th:src="${userHotContent.get(index.count).img}?${userHotContent.get(index.count).img}:'img/logo.png'"
+                                         class="center-block content-img" />
+                                    <a th:href="@{/content(id=${otherContent.id})}" class="info-content-title" th:text="${userHotContent.get(index.count).title}"></a>
+                                </div>
 							</div>
 						</th:block>
                     </div>

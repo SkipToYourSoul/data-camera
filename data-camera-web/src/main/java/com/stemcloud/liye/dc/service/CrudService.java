@@ -303,7 +303,7 @@ public class CrudService {
     }
 
     public List<ContentInfo> selectUserHotContent(String user){
-        return contentRepository.findByOwnerAndIsDeletedOrderByLikeDesc(user, 0);
+        return contentRepository.findByOwnerAndIsDeletedAndIsSharedOrderByLikeDesc(user, 0, 1);
     }
 
     public List<ContentInfo> selectHotContent(){

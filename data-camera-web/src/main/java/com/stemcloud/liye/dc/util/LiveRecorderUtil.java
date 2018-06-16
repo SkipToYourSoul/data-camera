@@ -21,8 +21,4 @@ public class LiveRecorderUtil {
     public static String mkLiveVideoKey(long appId, long expId, long sensorId) {
         return String.format("[%s]-[%s]-[%s]", appId, expId, sensorId);
     }
-
-    public static void showStatusMap() {
-        System.out.println(new Gson().toJson(recorderStatusMap));
-    }
 }

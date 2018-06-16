@@ -29,7 +29,7 @@ public interface ContentRepository extends CrudRepository<ContentInfo, Long> {
      * @param isDeleted
      * @return
      */
-    List<ContentInfo> findByOwnerAndIsDeletedOrderByLikeDesc(String owner, int isDeleted);
+    List<ContentInfo> findByOwnerAndIsDeletedAndIsSharedOrderByLikeDesc(String owner, int isDeleted, int isShared);
 
     /**
      * 查询分享的热门内容，后续需改造成分页查询

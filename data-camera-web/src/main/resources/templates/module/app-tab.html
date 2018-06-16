@@ -5,10 +5,10 @@
 		<!-- 实验操作按钮 -->
 		<div class="app-exp-action-bar row wi8" style="padding-right: 0">
 			<div class="col-sm-10 col-md-10 col-xs-10" style="line-height: 50px">
-				<button class="btn btn-pink" onclick="allMonitor()" id="all-monitor-btn">
+				<button class="btn btn-pink monitor-btn" onclick="allMonitor()" id="all-monitor-btn">
 				 	<img th:src="@{/img/icons/eye1.png}" class="icon" style="height:10px"/>&nbsp;全局监控
 				</button>
-				<button class="btn btn-blue1" style="margin-left: 20px" onclick="allRecord()" id="all-record-btn">
+				<button class="btn btn-blue1 record-btn" style="margin-left: 15px" onclick="allRecord()" id="all-record-btn">
 					<i class="fa fa-video-camera"></i>&nbsp;全局录制
 				</button>
 			</div>
@@ -41,16 +41,18 @@
 						<div class="col-sm-7 col-md-7 col-xs-7">
 							<div class="app-exp-status">
 								<div class="btn-group" style="padding-right: 15px">
+									<!-- 监控按钮 -->
 									<button style="color: #fc4a6c; background-color: transparent"
 										th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}"
-										class="btn btn-sm" th:data="${experiment.key}"
+										class="btn btn-sm monitor-btn" th:data="${experiment.key}"
 										onclick="expMonitor(this)"
 										th:id="|experiment-monitor-${experiment.key}|">
 										<img th:src="@{/img/eye.png}" style="width:26px;height:16px;"/>
 									</button>
+									<!-- 录制按钮 -->
 									<button style="color: #26c6db; background-color: transparent"
 										th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}"
-										class="btn btn-sm" th:data="${experiment.key}"
+										class="btn btn-sm record-btn" th:data="${experiment.key}"
 										onclick="expRecorder(this)"
 										th:id="|experiment-recorder-${experiment.key}|">
 										<i class="fa fa-video-camera"></i>
