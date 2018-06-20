@@ -173,11 +173,11 @@ $(function () {
         var $app_main_tab = $('#app-main-tab');
         $app_main_tab.find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             var page = e.target.getAttribute('href');
-            if (page == "#app-experiment"){
+            if (page === "#app-experiment"){
                 $('#content-menu').attr("hidden", true);
                 $('#app-menu').attr("hidden", false);
                 initExperiment(expObject.iFi);
-            } else if (page == "#app-analysis") {
+            } else if (page === "#app-analysis") {
                 $('#content-menu').attr("hidden", false);
                 $('#app-menu').attr("hidden", true);
                 initTreeDom(analysisObject.iFi);

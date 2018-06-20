@@ -18,7 +18,7 @@
 	<link rel="stylesheet" th:href="@{source/timeline/timeline.css}" />
 	<link rel="stylesheet" th:href="@{source/datepicker/bootstrap-datetimepicker.min.css}" />
 	<link rel="stylesheet" th:href="@{source/table/bootstrap-editable.css}" />
-	<link rel="stylesheet" th:href="@{source/shake/csshake.min.css}" />
+	<link rel="stylesheet" th:href="@{source/loading/jquery.mloading.css}" />
 	<link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui.css}" />
 	<link rel="stylesheet" th:href="@{source/jqueryui/jquery-ui-slider-pips.css}" />
 	<link rel="stylesheet" th:href="@{source/jqueryui/multi-select.css}" />
@@ -144,7 +144,7 @@
 				</div>
 			</div>
 			<!-- 具体应用页面的内容展示 -->
-			<div th:if="${param.id}" style="background-color: #fff; min-height: 500px; padding: 20px 0">
+			<div th:if="${param.id}" style="background-color: #fff; min-height: 500px; padding: 20px 0" id="app-main-content">
 				<ul class="nav nav-pills" role="tablist" id="app-main-tab">
 					<li role="presentation" th:class="${#httpServletRequest.getParameter('tab') eq '2'}?'':'active'"
 						style="border-right: 2px solid #000; padding-right: 15px">
@@ -223,6 +223,7 @@
 	<script th:src="@{source/echarts/echarts.common.min.js}"></script>
 	<script th:src="@{source/echarts/infographic.js}"></script>
 	<script th:src="@{source/godebug/go-debug.js}"></script>
+	<script th:src="@{source/loading/jquery.mloading.js}"></script>
 
 	<script th:src="@{source/video/video.min.js}"></script>
 	<script th:src="@{source/video/videojs-flash.min.js}"></script>

@@ -10,6 +10,7 @@
  * @type {{}}
  */
 var exp_monitor_interval = {};
+var $loading = $("#app-main-content");
 
 /**
  * 监控时定期更新图表数据，后期需改成web socket
@@ -217,6 +218,7 @@ function askForSaveRecorder(doFunction, action, title){
                 label: '<i class="fa fa-times"></i> 不保存',
                 className: 'btn-danger',
                 callback: function(){
+                    $loading.mLoading("show");
                     doFunction(action, 0);
                 }
             },
@@ -224,6 +226,7 @@ function askForSaveRecorder(doFunction, action, title){
                 label: '<i class="fa fa-check"></i> 保存',
                 className: 'btn-success',
                 callback: function(){
+                    $loading.mLoading("show");
                     doFunction(action, 1);
                 }
             }
@@ -240,16 +243,16 @@ function askForSaveRecorder(doFunction, action, title){
  * @param button
  */
 function expMonitor(button){
-    var expId = button.getAttribute('data');
+    $loading.mLoading("show");
 
-    lockTheBtn(expId, "monitor");
+    var expId = button.getAttribute('data');
     var status = getExpStatusFromServer(expId);
     if (status === "unknown"){
-        message_info("状态unknown", "info");
-        unlockBtn(expId);
+        message_info("服务状态异常，不能进行监控", "info");
+        $loading.mLoading("hide");
     } else if (status === "not_bound_sensor"){
         message_info("实验未绑定任何设备，不能进行监控", "info");
-        unlockBtn(expId);
+        $loading.mLoading("hide");
     } else if (status === "not_monitor"){
         // 当前状态是非监控，开始监控
         doMonitor(1, 0, 0);
@@ -257,9 +260,11 @@ function expMonitor(button){
         // 当前状态是监控非录制，停止监控
         doMonitor(0, 0, 0);
     } else if (status === "monitoring_and_recording"){
+        $loading.mLoading("hide");
         askForSaveRecorder(doMonitor, 0, "是否保存录制数据片段?");
     }
 
+    // 触发监控请求，该请求为同步请求，超时时间为2s
     // action -> 0: stop, 1: start
     // isSave -> 0: not save, 1: save
     function doMonitor(action, isSave) {
@@ -267,12 +272,13 @@ function expMonitor(button){
         $.ajax({
             type: 'get',
             url: action_address + "/monitor",
+            timeout: 2000,
             data: {
                 "exp-id": expId, "action": action, "isSave": isSave,
                 "data-name": $('#dialog-data-name').val(), "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
-                unlockBtn(expId);
+                $loading.mLoading("hide");
                 var returnStatus = response.data;
                 if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
@@ -289,6 +295,7 @@ function expMonitor(button){
             },
             error: function () {
                 commonObject.printRejectMsg();
+                $loading.mLoading("hide");
             }
         });
     }
@@ -299,24 +306,25 @@ function expMonitor(button){
  * @param button
  */
 function expRecorder(button) {
-    var expId = button.getAttribute('data');
+    $loading.mLoading("show");
 
-    lockTheBtn(expId, "record");
+    var expId = button.getAttribute('data');
     var status = getExpStatusFromServer(expId);
     if (status === "unknown"){
-        message_info("状态unknown", "info");
-        unlockBtn(expId);
+        message_info("服务状态异常，不能进行录制", "info");
+        $loading.mLoading("hide");
     } else if (status === "not_bound_sensor"){
         message_info("实验未绑定任何设备，不能进行录制", "info");
-        unlockBtn(expId);
+        $loading.mLoading("hide");
     } else if (status === "not_monitor"){
         // 当前状态是非监控，不能录制
         message_info("实验未开始监控，不能进行录制", "info");
-        unlockBtn(expId);
+        $loading.mLoading("hide");
     } else if (status === "monitoring_not_recording") {
         // 当前状态是监控非录制，开始录制
         doRecorder(1, 0, 0);
     } else if (status === "monitoring_and_recording"){
+        $loading.mLoading("hide");
         // 停止录制
         askForSaveRecorder(doRecorder, 0, "是否保存录制数据片段?");
     }
@@ -331,10 +339,10 @@ function expRecorder(button) {
                 "data-name": $('#dialog-data-name').val(), "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
+                $loading.mLoading("hide");
                 if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
                 } else if (response.code === "0000"){
-                    unlockBtn(expId);
                     if (response.data === -1) {
                         commonObject.printExceptionMsg("操作失败");
                         return ;
@@ -351,6 +359,7 @@ function expRecorder(button) {
             },
             error: function () {
                 commonObject.printRejectMsg();
+                $loading.mLoading("hide");
             }
         });
     }
@@ -363,17 +372,18 @@ function expRecorder(button) {
  *  若所有实验都在监控状态，则停止监控
  */
 function allMonitor() {
-    lockAllBtn();
-    var status = getAppStatusFromServer();
-    console.log("status: " + status);
+    $loading.mLoading("show");
 
+    var status = getAppStatusFromServer();
+    console.log("All monitor status: " + status);
     if (status === "unknown"){
         message_info("状态unknown", "info");
-        unlockAllBtn();
+        $loading.mLoading("hide");
     } else if (status === "no_available_sensor") {
         message_info("没有可用的传感器组", "info");
-        unlockAllBtn();
+        $loading.mLoading("hide");
     } else if (status === "part_monitoring" || status === "all_not_monitor"){
+        $loading.mLoading("hide");
         bootbox.confirm({
             title: "开始全局监控",
             message: "是否要开始全局监控",
@@ -383,13 +393,13 @@ function allMonitor() {
             },
             callback: function (result) {
                 if (result){
+                    $loading.mLoading("show");
                     doAllMonitor(1, 0);
-                } else {
-                    unlockAllBtn();
                 }
             }
         });
     } else if (status === "all_monitoring_and_no_recording"){
+        $loading.mLoading("hide");
         bootbox.confirm({
             title: "结束全局监控",
             message: "是否要结束全局监控",
@@ -399,13 +409,13 @@ function allMonitor() {
             },
             callback: function (result) {
                 if (result){
+                    $loading.mLoading("show");
                     doAllMonitor(0, 0);
-                } else {
-                    unlockAllBtn();
                 }
             }
         });
     } else if (status === "all_monitoring_and_all_recording" || status === "all_monitoring_and_part_recording"){
+        $loading.mLoading("hide");
         askForSaveRecorder(doAllMonitor, 0, "即将结束全局监控，是否保存录制数据片段?");
     }
 
@@ -421,6 +431,7 @@ function allMonitor() {
                 "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
+                $loading.mLoading("hide");
                 if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
                 } else if (response.code === "0000"){
@@ -438,11 +449,10 @@ function allMonitor() {
                         }
                     }
                 }
-                unlockAllBtn();
             },
             error: function () {
                 commonObject.printRejectMsg();
-                unlockAllBtn();
+                $loading.mLoading("hide");
             }
         });
     }
@@ -454,20 +464,21 @@ function allMonitor() {
  *  若所有实验都在录制状态，则停止录制
  */
 function allRecord(){
-    lockAllBtn();
+    $loading.mLoading("show");
+
     var status = getAppStatusFromServer();
     console.log("status: " + status);
-
     if (status === "unknown"){
         message_info("状态unknown", "info");
-        unlockAllBtn();
+        $loading.mLoading("hide");
     } else if (status === "no_available_sensor") {
         message_info("没有可用的传感器组", "info");
-        unlockAllBtn();
+        $loading.mLoading("hide");
     } else if (status === "part_monitoring" || status === "all_not_monitor"){
         message_info("当前不是全局监控状态，不能进行全局录制", "info");
-        unlockAllBtn();
+        $loading.mLoading("hide");
     } else if (status === "all_monitoring_and_no_recording"){
+        $loading.mLoading("hide");
         bootbox.confirm({
             title: "开始全局录制",
             message: "是否要开始全局录制",
@@ -477,15 +488,16 @@ function allRecord(){
             },
             callback: function (result) {
                 if (result){
+                    $loading.mLoading("show");
                     doAllRecord(1, 0);
-                } else {
-                    unlockAllBtn();
                 }
             }
         });
     } else if (status === "all_monitoring_and_part_recording") {
+        $loading.mLoading("hide");
         askForSaveRecorder(doAllRecord, 1, "即将开始全局录制，是否保存之前已录制的数据片段?");
     } else if (status === "all_monitoring_and_all_recording"){
+        $loading.mLoading("hide");
         askForSaveRecorder(doAllRecord, 0, "即将结束全局录制，是否保存录制的数据片段?");
     }
 
@@ -501,6 +513,7 @@ function allRecord(){
                 "data-desc": $('#dialog-data-desc').val()
             },
             success: function (response) {
+                $loading.mLoading("hide");
                 if (response.code === "1111"){
                     commonObject.printExceptionMsg(response.data);
                 } else if (response.code === "0000"){
@@ -518,61 +531,13 @@ function allRecord(){
                         }
                     }
                 }
-                unlockAllBtn();
             },
             error: function () {
                 commonObject.printRejectMsg();
-                unlockAllBtn();
+                $loading.mLoading("hide");
             }
         });
     }
-}
-
-// 根据实验ID锁住按钮
-function lockTheBtn(expId, action) {
-    var $monitorBtn = $('#experiment-monitor-' + expId);
-    var $allMonitorBtn = $('#all-monitor-btn');
-    var $recorderBtn = $('#experiment-recorder-' + expId);
-    var $allRecorderBtn = $('#all-record-btn');
-
-    $monitorBtn.addClass('disabled');
-    $allMonitorBtn.addClass('disabled');
-    $recorderBtn.addClass('disabled');
-    $allRecorderBtn.addClass('disabled');
-
-    if (action === "monitor") {
-        $('#experiment-es-' + expId).text("加载中");
-    } else if (action === "record") {
-        $('#experiment-rs-' + expId).text("加载中");
-    }
-}
-
-// 根据实验ID解锁按钮
-function unlockBtn(expId) {
-    var $monitorBtn = $('#experiment-monitor-' + expId);
-    var $allMonitorBtn = $('#all-monitor-btn');
-    var $recorderBtn = $('#experiment-recorder-' + expId);
-    var $allRecorderBtn = $('#all-record-btn');
-
-    $monitorBtn.removeClass('disabled');
-    $allMonitorBtn.removeClass('disabled');
-    $recorderBtn.removeClass('disabled');
-    $allRecorderBtn.removeClass('disabled');
-
-    $('#experiment-es-' + expId).text("非监控");
-    $('#experiment-rs-' + expId).text("非录制");
-}
-
-// 全局监控录制加载过程中，锁住所有按钮
-function lockAllBtn() {
-    $(".monitor-btn").addClass('disabled');
-    $(".record-btn").addClass('disabled');
-}
-
-// 全局监控录制加载过程中，解锁所有按钮
-function unlockAllBtn() {
-    $(".monitor-btn").removeClass('disabled');
-    $(".record-btn").removeClass('disabled');
 }
 
 /**
