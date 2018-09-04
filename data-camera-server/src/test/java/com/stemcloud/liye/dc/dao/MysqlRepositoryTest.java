@@ -21,7 +21,7 @@ public class MysqlRepositoryTest {
         String key = "key";
         Double value = 0.0;
 
-        MysqlRepository.saveValueData(sensorId, trackId, key, value);
+        MysqlRepository.saveValueData(sensorId, trackId, key, value, System.currentTimeMillis());
     }
 
 }

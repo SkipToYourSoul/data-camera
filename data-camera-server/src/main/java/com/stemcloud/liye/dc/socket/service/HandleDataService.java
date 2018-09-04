@@ -42,7 +42,7 @@ public class HandleDataService implements Service {
             // 如果是文本
             try {
                 handleTxtMonitor(packet);
-                handleTxtRecord(packet);
+                // handleTxtRecord(packet);
                 return true;
             }catch (Exception e){
                 LOG.error("handleTxtMonitor error, packet is '{}'", packet, e);
@@ -61,15 +61,15 @@ public class HandleDataService implements Service {
     private void handleTxtMonitor(Packet packet){
         String code = packet.getCode();
         Map<String, Object> meta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.MONITOR, code);
+        LOG.info("handle packet {}, meta size = {}", code, (meta == null)?0:meta.size());
         if (meta == null || meta.isEmpty()){
-            LOG.info("this packet do not monitor, code is '{}'", code);
+            // LOG.info("this packet do not monitor, code is '{}'", code);
         }else {
             // 处理监控
             Map<String, Object> data = packet.asJson();
             meta.put("data", data);
             MysqlRepository.saveValueDatas(meta);
         }
-
     }
 
     private void handleTxtRecord(Packet packet){

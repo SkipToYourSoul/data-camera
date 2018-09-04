@@ -37,6 +37,7 @@ public class MysqlRepository {
         if (sensorId != null && trackId != null){
             // save
             List<Integer> results = new ArrayList<>(data.size());
+            long timestamp = System.currentTimeMillis();
             data.forEach((k, v) -> {
                 double d;
                 if (v instanceof Double){
@@ -50,14 +51,14 @@ public class MysqlRepository {
                 }else {
                     return;
                 }
-                results.add(saveValueData(sensorId, trackId, k, Double.parseDouble(DF.format(d))));
+                results.add(saveValueData(sensorId, trackId, k, Double.parseDouble(DF.format(d)), timestamp));
             });
             return results.toArray(new Integer[results.size()]);
         }
         return new Integer[0];
     }
 
-    public static int saveValueData(long sensorId, long trackId, String key, Double value){
+    public static int saveValueData(long sensorId, long trackId, String key, Double value, long timestamp){
         String sql = String.format("INSERT INTO %s (data_key, data_value, sensor_id, track_id, create_time) VALUES (?,?,?,?,?)", VALUE_DATA_TBL);
         DruidPooledConnection conn = null;
         PreparedStatement ps = null;
@@ -69,7 +70,7 @@ public class MysqlRepository {
             ps.setDouble(2, value);
             ps.setLong(3, sensorId);
             ps.setLong(4, trackId);
-            ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+            ps.setTimestamp(5, new Timestamp(timestamp));
 
             result = ps.executeUpdate();
 

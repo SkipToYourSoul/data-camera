@@ -32,16 +32,19 @@ public class SimulatorServer implements Server {
     @Override
     public void start(ChannelFutureListener listener) {
         if (started.compareAndSet(false, true)){
+            // hard code
+            DataGenerator.init();
+
             sensorSimulator.refresh();
             SCHEDULE.scheduleAtFixedRate(
                     sensorSimulator,
-                    0L,3L,
+                    0L,1L,
                     TimeUnit.SECONDS
             );
             SCHEDULE.scheduleWithFixedDelay(
                     sensorSimulator::refresh,
                     0,
-                    60L,
+                    30L,
                     TimeUnit.SECONDS
             );
         }
