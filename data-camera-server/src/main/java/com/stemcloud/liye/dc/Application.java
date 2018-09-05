@@ -21,6 +21,8 @@ public class Application {
 //
 //        System.out.println("Init random generator");
 //        new RandomGenerator().allSensor();
-        Server.def().start();
+        // Server.def().start();
+
+        Server.webSocket().start();
     }
 }

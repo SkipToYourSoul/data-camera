@@ -1,6 +1,7 @@
 package com.stemcloud.liye.dc.socket;
 
 import com.stemcloud.liye.dc.simulator.SimulatorServer;
+import com.stemcloud.liye.dc.websocket.WebSocketServer;
 import io.netty.channel.ChannelFutureListener;
 
 /**
@@ -18,5 +19,9 @@ public interface Server {
     static Server def() {
 //        return NettyServer.I;
         return SimulatorServer.I;
+    }
+
+    static Server webSocket() {
+        return WebSocketServer.I;
     }
 }
