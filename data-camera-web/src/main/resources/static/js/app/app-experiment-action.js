@@ -4,12 +4,6 @@
  *  Description:
  *      实验的监控和录制操作
  */
-/**
- * key: exp_id
- * value: exp_interval
- * @type {{}}
- */
-var exp_monitor_interval = {};
 var $loading = $("#app-main-content");
 
 /**
@@ -50,7 +44,7 @@ function doInterval(exp_id){
                         if (sensor_type === 1){
                             for (var dimIndex in sensor_dimension.split(';')){
                                 var dim = sensor_dimension.split(';')[dimIndex];
-                                var chart_dom = "experiment-track-" + exp_id + "-" + track_id + "-" + dim;
+                                var chart_dom = "experiment-track-" + track_id + "-" + dim;
                                 if (!response.data.hasOwnProperty(sensor_id) || !response.data[sensor_id].hasOwnProperty(dim)
                                     || echarts.getInstanceByDom(document.getElementById(chart_dom)) == null){
                                     continue;
@@ -65,13 +59,19 @@ function doInterval(exp_id){
                                     "min": "-",
                                     "now": "-"
                                 };
+
                                 // --- add new data
                                 var new_data = response.data[sensor_id][dim];
+                                // -- 移除初始化时的节点
+                                if (series[0]['data'][0]['value'][0].length === 19) {
+                                    series[0]['data'].splice(0, 1);
+                                }
                                 series[0]['data'].push.apply( series[0]['data'], new_data );
                                 // -- keep the arr length 10
                                 if (series[0]['data'].length > 10){
                                     series[0]['data'].splice(0, series[0]['data'].length - 10);
                                 }
+
                                 // -- get statistics info
                                 statistics_info = updateInfo(statistics_info, series[0]['data']);
                                 $('#experiment-info-' + exp_id + "-" + track_id + "-" + dim + "-1").html(statistics_info['max']);
@@ -550,8 +550,6 @@ function pageStartMonitor(exp_id){
     var exp_state_dom = $('#experiment-es-' + exp_id);
     isExperimentMonitor[exp_id] = 1;
     exp_state_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-
-    doInterval(exp_id);
 }
 
 /**
@@ -563,9 +561,6 @@ function pageStopMonitor(exp_id){
 
     isExperimentMonitor[exp_id] = 0;
     $('#experiment-es-' + exp_id).removeClass('label-success').addClass('label-default').text('非监控');
-
-    clearInterval(exp_monitor_interval[exp_id]);
-    delete exp_monitor_interval[exp_id];
 
     // 清空状态数据
     $('.current-content-value-' + exp_id).html('-');

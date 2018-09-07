@@ -9,92 +9,76 @@
  * @type {null}
  */
 var recorderInterval = null;
+var timeLineInterval = null;
 var lastSlideValue = 0;
 
 /**
  * 点击播放按钮时触发
  */
 function recorderPlay() {
-    console.info("Recorder play");
-    var interval = 1000/parseInt($('#recorder-speed').find('.active input').val());
-    recorderInterval = setInterval(recorderAction, interval);
+    if (analysisObject.playStatus === "play") {
+        message_info("正在回放", "info", 3);
+        return;
+    }
+
+    // 开始播放
+    console.info("Recorder play at ", new Date());
     analysisObject.playStatus = "play";
-    $('#play-btn').attr('disabled', 'disabled');
-    $('#pause-btn').removeAttr('disabled');
+
+    var speed = parseInt($('#recorder-speed').find('.active input').val());
+    var startTime = analysisObject.timeline[analysisObject.timelineStart];
+    recorderInterval = chartDataPlay(startTime, 300, speed);
+    timeLineInterval = timeLinePlay(1000, speed);
 
     // 播放视频
-    Object.keys(analysisObject.video).forEach(function (i) {
-        var video = analysisObject.video[i];
-        video.play();
-    });
-}
-
-/**
- * 播放时图标变化的轮询函数
- */
-function recorderAction(){
-    setTimeLine(++analysisObject.timelineStart, analysisObject.timelineEnd);
-    if (analysisObject.timelineStart >= analysisObject.timelineEnd){
-        recorderReset();
-    }
-
-    // 每次轮询更新时间轴以及图表
-    function setTimeLine(start, end){
-        // 更新时间轴
-        $(".slider")
-            .slider({values: [start, end]})
-            .slider("pips", "refresh")
-            .slider("float", "refresh");
-
-        // 显示时间标记
-        /*$("#timeline-slider").find(".ui-slider-tip").css("visibility", "visible");*/
-
-        // 重置chart数据
-        Object.keys(analysisObject.chart).forEach(function (i) {
-            var series = analysisObject.chart[i].getOption()['series'];
-            var chartData = analysisObject.getChartData()[i];
-            // var currentChartData = series[0]['data'];
-            series[0]['data'] = updateChartData(chartData);
-            series[0]['markArea']['data'] = [];
-            analysisObject.chart[i].setOption({
-                series: series
-            });
+    if (analysisObject.timelineStart !== analysisObject.timelineEnd) {
+        Object.keys(analysisObject.video).forEach(function (i) {
+            var video = analysisObject.video[i];
+            video.play();
         });
-
-        function updateChartData(d) {
-            var n = [];
-            for (var index = 0; index < d.length; index ++) {
-                if (d[index]['value'][0] > analysisObject.timeline[start] + '.000'){
-                    n = d.slice(0, index);
-                    var lastPoint = d[d.length - 1];
-                    n.push({
-                        value: [lastPoint['value'][0]]
-                    });
-                    break;
-                }
-            }
-            return n;
-        }
     }
+
+    // 更改界面样式
+    $('#play-btn').attr('disabled', 'disabled');
+    $('#pause-btn').removeAttr('disabled');
 }
 
 function recorderPause() {
-    console.info("Recorder pause");
-    clearInterval(recorderInterval);
+    if (analysisObject.playStatus !== "play") {
+        message_info("不在回放", "info", 3);
+        return;
+    }
+
+    console.info("Recorder pause at ", new Date());
     analysisObject.playStatus = "pause";
-    $('#play-btn').removeAttr('disabled');
-    $('#pause-btn').attr('disabled', 'disabled');
+
+    clearInterval(recorderInterval);
+    clearInterval(timeLineInterval);
 
     // 暂停视频
     Object.keys(analysisObject.video).forEach(function (i) {
         var video = analysisObject.video[i];
         video.pause();
     });
+
+    // 更改界面样式
+    $('#play-btn').removeAttr('disabled');
+    $('#pause-btn').attr('disabled', 'disabled');
+}
+
+function recorderComplete() {
+    if (recorderInterval == null && timeLineInterval == null) {
+        analysisObject.playStatus = "normal";
+        $('#play-btn').removeAttr('disabled');
+        $('#pause-btn').attr('disabled', 'disabled');
+    }
 }
 
 function recorderReset() {
     console.info("Recorder reset");
     clearInterval(recorderInterval);
+    clearInterval(timeLineInterval);
+
     analysisObject.playStatus = "normal";
     $('#play-btn').removeAttr('disabled');
     $('#pause-btn').attr('disabled', 'disabled');
@@ -138,13 +122,12 @@ function slideChange(e, ui) {
 
     // 图表状态
     if (analysisObject.playStatus === "play" || analysisObject.playStatus === "pause") {
-        updateMarkLine();
-
         // 手动改变时间轴，更改视频时间
         if (Math.abs(ui.values[0] - lastSlideValue) > 1) {
             updateVideoTime();
         }
     } else if (analysisObject.playStatus === "normal") {
+        updateMarkLine();
         updateMarkArea();
         updateVideoTime();
     }
@@ -192,6 +175,11 @@ function slideChange(e, ui) {
 }
 
 $('#recorder-speed').find('input:radio').change(function(radio){
+    if (analysisObject.playStatus === "play") {
+        message_info("建议不要在播放状态下调节速度，会引起视频卡顿", "info", 3);
+        return;
+    }
+
     var speed = radio.target.getAttribute('value');
     var interval = 1000/parseInt(speed);
     if (recorderInterval != null){

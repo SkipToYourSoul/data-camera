@@ -14,16 +14,19 @@ if (current_address.indexOf('?') >= 0){
     current_address = current_address.substring(0, window.location.href.indexOf('?'));
 }
 
+var SUCCESS = "0000";
+var FAILURE = "1111";
+
 var commonObject = (function () {
     // ajax msg
     var ajaxRejectMsg = function () {
         message_info("请求服务器数据被拒绝", 'error');
-        console.warn("请求服务器数据被拒绝");
+        console.info("请求服务器数据被拒绝");
     };
 
     var ajaxExceptionMsg = function (e) {
         message_info("后台服务异常，原因为: " + e, 'error');
-        console.warn("后台服务异常，原因为: " + e);
+        console.info("后台服务异常，原因为: " + e);
     };
 
     var newObjectText = "确认创建";
@@ -59,6 +62,16 @@ function parseTime(time) {
         return new Date(time).Format("yyyy-MM-dd HH:mm:ss");
     } else if (typeof (time) == "string"){
         return time.split('.')[0].replace('T', ' ');
+    }
+}
+
+// 2017-08-17 18:16:31.100 -->> number
+// number -->> 2017-08-17 18:16:31.100
+function transferTime(time) {
+    if (typeof (time) === "string") {
+        return new Date(time).getTime();
+    } else if (typeof (time) === "number") {
+        return new Date(time).Format("yyyy-MM-dd HH:mm:ss.S");
     }
 }
 

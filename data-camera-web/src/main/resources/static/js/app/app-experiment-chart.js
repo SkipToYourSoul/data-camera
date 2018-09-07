@@ -29,10 +29,14 @@ function initExperiment(iFi){
             if (track_type === 1) {
                 // --- 数值型传感器，可能存在多个维度
                 legends.forEach(function (legend) {
-                    var dom = "experiment-track-" + exp_id + "-" + track_id + "-" + legend;
-                    var chart = echarts.init(document.getElementById(dom), "", opts = {height: 150});
-                    chart.setOption(buildExperimentChartOption(legend));
-                    expObject.setChart(dom, chart);
+                    var dom = "experiment-track-" + track_id + "-" + legend;
+                    if (document.getElementById(dom) != null) {
+                        var chart = echarts.init(document.getElementById(dom), "", opts = {height: 150});
+                        chart.setOption(buildExperimentChartOption(legend));
+                        expObject.setChart(dom, chart);
+                    } else {
+                        console.log(legend);
+                    }
                 });
             } else if (track_type === 2){
                 // --- 视频直播
@@ -42,14 +46,14 @@ function initExperiment(iFi){
                     delete expObject.video[id];
                 });
                 legends.forEach(function (legend) {
-                    var dom = "#experiment-track-" + exp_id + "-" + track_id + "-" + legend;
+                    var dom = "#experiment-track-" + track_id + "-" + legend;
                     var videoId = "experiment-video-" + exp_id + "-" + track_id;
                     var liveAddress = track['sensor']['mark'];
 
                     // rtmp://47.100.173.108:1935/live/stem
                     // rtmp://live.hkstv.hk.lxdns.com/live/hks
                     $(dom).css("padding", "10px 25px 0").html('<div id=' + videoId + '></div>');
-                    var videoPlayer = cyberplayer(videoId).setup({
+                    /*var videoPlayer = cyberplayer(videoId).setup({
                         width: $(dom).width,
                         height: 300,
                         file: "rtmp://47.100.173.108:1935/live/" + liveAddress, // <—rtmp直播地址
@@ -61,6 +65,19 @@ function initExperiment(iFi){
                             reconnecttime: 5, // rtmp直播的重连次数
                             bufferlength: 1 // 缓冲多少秒之后开始播放 默认1秒
                         },
+                        ak: "3c482e9f90a641cfab6a236960fbb707" // 公有云平台注册即可获得accessKey
+                    });*/
+
+                    // 临时替换方案
+                    var videoPlayer = cyberplayer(videoId).setup({
+                        width: $(dom).width,
+                        height: 300,
+                        file: "/camera/img/rocket.mp4",
+                        autostart: false,
+                        stretching: "uniform",
+                        volume: 100,
+                        controls: "over",
+                        repeat: true,
                         ak: "3c482e9f90a641cfab6a236960fbb707" // 公有云平台注册即可获得accessKey
                     });
 
@@ -151,7 +168,7 @@ function initActionStatus(){
                 expObject.setRecorderTime(id, [expRecorderTime[id]]);
                 expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
             }
-            doInterval(id);
+            // doInterval(id);
         }
     });
 }

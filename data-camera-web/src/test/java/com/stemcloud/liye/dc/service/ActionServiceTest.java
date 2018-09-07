@@ -22,7 +22,7 @@ public class ActionServiceTest {
     @Test
     public void testRecordByFrame() throws InterruptedException {
         String inputFile = "rtmp://47.100.173.108:1935/live/stem";
-        RecorderInfo recorderInfo = new RecorderInfo();
+        /*RecorderInfo recorderInfo = new RecorderInfo();
         recorderInfo.setAppId(0);
         recorderInfo.setExpId(0);
         recorderInfo.setId(0);
@@ -30,6 +30,6 @@ public class ActionServiceTest {
         actionService.startRecordByFrame(inputFile, 0, 0,0,0);
         Thread.sleep(10000);
         actionService.endRecorderByFrame(recorderInfo,0, 0);
-        Thread.sleep(10000);
+        Thread.sleep(10000);*/
     }
 }

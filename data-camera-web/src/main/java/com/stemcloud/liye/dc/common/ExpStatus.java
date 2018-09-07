@@ -19,7 +19,7 @@ public enum ExpStatus {
     ALL_MONITORING_AND_ALL_RECORDING("all_monitoring_and_all_recording"),
     ALL_MONITORING_AND_PART_RECORDING("all_monitoring_and_part_recording"),
     ALL_MONITORING_AND_NO_RECORDING("all_monitoring_and_no_recording"),
-    PART_MONITORING("part_monitoring"), ALL_NOT_MONITOR("all_not_monitor"),
+    HAS_NOT_MONITOR("has_not_monitor"),
 
     UNKNOWN("unknown");
 

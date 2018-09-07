@@ -30,26 +30,6 @@ var app_chart_data_zoom = [{
     end: 100
 }];
 
-var app_chart_tooltip = {
-    trigger: 'axis',
-    /*axisPointer: {
-     type: 'cross'
-     },*/
-    backgroundColor: 'rgba(245, 245, 245, 0.8)',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    textStyle: {
-        color: '#000'
-    },
-    position: function (pos, params, el, elRect, size) {
-        var obj = {top: 10};
-        obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
-        return obj;
-    },
-    extraCssText: 'width: 170px'
-};
-
 /**
  * 实验页面的图表
  * @param legend
@@ -58,7 +38,24 @@ var app_chart_tooltip = {
 function buildExperimentChartOption(legend) {
     return {
         backgroundColor: '#ffffff',
-        tooltip: app_chart_tooltip,
+        tooltip: {
+            trigger: 'axis',
+            backgroundColor: 'rgba(245, 245, 245, 0.8)',
+            borderWidth: 1,
+            borderColor: '#ccc',
+            padding: 10,
+            formatter: function (params) {
+                params = params[0];
+                var html = "<b>TIME: </b>" + params.value[0] + "<br/>";
+                if (params.value.length > 1){
+                    html += "<b>VALUE: </b>" + params.value[1] + "<br/>";
+                }
+                return html;
+            },
+            textStyle: {
+                color: '#000'
+            }
+        },
         legend: {
             top: '0%',
             left: 'center',
@@ -75,16 +72,19 @@ function buildExperimentChartOption(legend) {
             }
         }],
         calculable: true,
+        animation: false,
         xAxis: [
             {
                 type: 'time',
                 boundaryGap : ['20%', '20%'],
+                // X轴的直线指示器
                 axisPointer: {
                     show: true,
                     type: 'line',
                     snap: true,
                     z: 100
                 },
+                // 分割线
                 splitLine: {
                     show: true,
                     lineStyle: {
@@ -145,7 +145,8 @@ function buildExperimentChartOption(legend) {
                 data: []
             },
             data: [{
-                value : [new Date().Format("yyyy-MM-dd HH:mm:ss"), 0]
+                value : [new Date().Format("yyyy-MM-dd HH:mm:ss"), 0],
+                mark: "init"
             }]
         }
     };
@@ -187,6 +188,7 @@ function buildAnalysisChartOption(data, legend) {
             right: 15
         }],
         calculable: true,
+        animation: false,
         xAxis: [
             {
                 type: 'time',

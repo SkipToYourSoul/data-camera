@@ -49,6 +49,13 @@ public interface ContentRepository extends CrudRepository<ContentInfo, Long> {
     List<ContentInfo> findByIsSharedAndIsDeletedAndTitleLikeOrderByLikeDesc(int isShared, int isDeleted, String search);
 
     /**
+     * 查询在线的内容
+     * @param isDeleted
+     * @return
+     */
+    List<ContentInfo> findByIsDeleted(int isDeleted);
+
+    /**
      * delete content
      * @param id
      * @return 1

@@ -29,10 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -106,42 +103,108 @@ public class ActionService {
     }
 
     /**
-     * 改变当前实验的监控状态
-     * @param action 1 -> 开始监控；2 -> 结束监控
-     * @param isSave 结束监控时判断是否保存正在录制的片段，1 -> 保存，2 -> 不保存
-     * @return 若有数据片段保存，则返回片段ID，否则返回-1
+     * 开始监控
+     * @param expId 实验ID
+     * @return response
      */
     @Transactional(rollbackFor = Exception.class)
-    public long changeMonitorState(long expId, int action, int isSave, String name, String desc) {
-        ExperimentInfo experiment = experimentRepository.findOne(expId);
-        long response = -1;
+    public Map<String, Object> startMonitor(long expId) {
+        Map<String, Object> response = new HashMap<String, Object>();
+        experimentRepository.monitorExp(expId, 1);
+        response.put("sensor", getSensorIdsOfExp(expId));
 
-        if (action == 1){
-            experimentRepository.monitorExp(expId, 1);
-        } else if (action == 0){
-            experimentRepository.monitorAndRecorderExp(expId, 0, 0);
-            // -- end recorder
-            RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
-            if (recorderInfo != null) {
-                String dataName = (name == null || name.isEmpty())?"实验{" + experiment.getName() + "}的片段":name;
-                recorderRepository.endRecorder(recorderInfo.getId(), new Date(), Math.abs(isSave - 1), dataName, desc);
-                // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
-                for (TrackInfo track : experiment.getTrackInfoList()) {
-                    if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
-                        // 结束视频录制
-                        endRecorderByFrame(recorderInfo, track.getSensor().getId(), isSave);
-                    }
-                }
-                response = recorderInfo.getId();
-                ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, 0));
-            }
-        }
-        // -- send message
-        ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, MONITOR, action));
+        ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, MONITOR, 1));
+        logger.info("Start monitor experiment {}", expId);
 
-        logger.info("--> Change experiment monitor state, action={}, isSave={}, response={}", action, isSave, response);
         return response;
     }
+
+    /**
+     * 结束监控
+     * @param expId 实验ID
+     * @param isSave 结束监控时判断是否保存正在录制的片段，1 -> 保存，2 -> 不保存
+     * @param name 片段名
+     * @param desc 片段描述
+     * @return response
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> endMonitor(long expId, int isSave, String name, String desc) {
+        Map<String, Object> response = new HashMap<String, Object>();
+
+        experimentRepository.monitorAndRecorderExp(expId, 0, 0);
+        response.put("sensor", getSensorIdsOfExp(expId));
+
+        RecorderInfo recorderInfo = recorderRepository.findByExpIdAndIsRecorderAndIsDeleted(expId, 1, 0);
+        if (recorderInfo != null) {
+            ExperimentInfo experiment = experimentRepository.findOne(expId);
+            String dataName = (name == null || name.isEmpty())?"实验{" + experiment.getName() + "}的片段":name;
+            recorderRepository.endRecorder(recorderInfo.getId(), new Date(), Math.abs(isSave - 1), dataName, desc);
+
+            // -- 遍历实验轨迹，若有摄像头，则保存录制的视频片段
+            for (TrackInfo track : experiment.getTrackInfoList()) {
+                if (track.getSensor() != null && track.getSensor().getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
+                    // 结束视频录制
+                    endRecorderByFrame(recorderInfo, track.getSensor().getId(), isSave);
+                }
+            }
+            response.put("recorder", recorderInfo.getId());
+            ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, RECORD, 0));
+        }
+
+        ExecutorUtil.REDIS_EXECUTOR.submit(new SyncSendRedisMessage(expId, MONITOR, 0));
+        logger.info("End monitor experiment {}, isSave = {}", expId, isSave);
+
+        return response;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<Long, Map> allMonitor(long appId, int action, int isSave, String name, String desc) {
+        Map<Long, Map> result = new HashMap<Long, Map>();
+
+        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
+        for (ExperimentInfo exp: experiments){
+            Boolean hasSensor = false;
+            for (TrackInfo track : exp.getTrackInfoList()){
+                if (track.getSensor() != null){
+                    hasSensor = true;
+                    break;
+                }
+            }
+            if (hasSensor){
+                boolean noChange = (action == 1 && exp.getIsMonitor() == 1) || (action == 0 && exp.getIsMonitor() == 0);
+                if (!noChange){
+                    if (action == 1) {
+                        result.put(exp.getId(), startMonitor(exp.getId()));
+                    } else if (action == 0) {
+                        result.put(exp.getId(), endMonitor(exp.getId(), isSave, name, desc));
+                    }
+                    logger.info("--> Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /** 获取当前实验的设备ID **/
+    private List<Long> getSensorIdsOfExp(long expId) {
+        List<SensorInfo> sensors = sensorRepository.findByExpIdAndIsDeleted(expId, 0);
+        List<Long> ids = new ArrayList<Long>();
+        for (SensorInfo sensor : sensors) {
+            ids.add(sensor.getId());
+        }
+        return ids;
+    }
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 改变当前实验的录制状态
@@ -168,12 +231,17 @@ public class ActionService {
                 devices.add(new RecorderDevices(sensor.getId(), sensor.getTrackId(), legend));
                 // -- 若有摄像头，则开始视频录制
                 if (sensor.getSensorConfig().getType() == SensorType.VIDEO.getValue()) {
-                    // 若当前录制线程满了，则直接返回
-                    if (((ThreadPoolExecutor)ExecutorUtil.RECORDER_EXECUTOR).getActiveCount() == 5) {
-                        return response;
-                    }
-                    if (!startRecordByFrame(sensor.getMark(), 0, appId, experiment.getId(), sensor.getId())){
-                        return response;
+                    // --------------- HARD CODE ------------
+                    if (sensor.getId() == 10) {
+
+                    } else {
+                        // 若当前录制线程满了，则直接返回
+                        if (((ThreadPoolExecutor)ExecutorUtil.RECORDER_EXECUTOR).getActiveCount() == 5) {
+                            return response;
+                        }
+                        if (!startRecordByFrame(sensor.getMark(), 0, appId, experiment.getId(), sensor.getId())){
+                            return response;
+                        }
                     }
                 }
             }
@@ -261,38 +329,11 @@ public class ActionService {
             return ExpStatus.ALL_MONITORING_AND_NO_RECORDING;
         } else if (!notInMonitorIds.isEmpty() && notInRecordIds.isEmpty()) {
             return ExpStatus.UNKNOWN;
-        } else if (!notInMonitorIds.isEmpty() && notInMonitorIds.size() == sensorExp){
-            return ExpStatus.ALL_NOT_MONITOR;
         } else if (!notInMonitorIds.isEmpty()){
-            return ExpStatus.PART_MONITORING;
+            return ExpStatus.HAS_NOT_MONITOR;
         }
 
         return ExpStatus.UNKNOWN;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public List<Long> allMonitor(long appId, int action, int isSave, String name, String desc) {
-        List<Long> expIds =  new ArrayList<Long>();
-        List<ExperimentInfo> experiments = experimentRepository.findByAppAndIsDeletedOrderByCreateTime(appRepository.findOne(appId), 0);
-        for (ExperimentInfo exp: experiments){
-            Boolean hasSensor = false;
-            for (TrackInfo track : exp.getTrackInfoList()){
-                if (track.getSensor() != null){
-                    hasSensor = true;
-                    break;
-                }
-            }
-            if (hasSensor){
-                boolean noChange = (action == 1 && exp.getIsMonitor() == 1) || (action == 0 && exp.getIsMonitor() == 0);
-                if (!noChange){
-                    changeMonitorState(exp.getId(), action, isSave, name, desc);
-                    expIds.add(exp.getId());
-                    logger.info("--> Global change experiment monitor state, action={}, isSave={}, expId={}", action, isSave, exp.getId());
-                }
-            }
-        }
-
-        return expIds;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -419,11 +460,17 @@ public class ActionService {
                 videoData.setSensorId(device.getSensor());
                 videoData.setTrackId(device.getTrack());
                 videoData.setRecorderInfo(recorderInfo);
+
+                // ------------HARD CODE----------------
+                if (device.getSensor() == 10) {
+                    videoData.setVideoPath("/camera/img/rocket.mp4");
+                }
+
                 final long vid = videoDataRepository.save(videoData).getId();
                 logger.info("--> Save video data, sensor id is {}, track id is {}, recorder is {}", device.getSensor(), device.getTrack(), recorderInfo.getId());
 
                 // TODO: 异步上传阿里云
-                ExecutorUtil.UPLOAD_EXECUTOR.submit(new Runnable() {
+                /*ExecutorUtil.UPLOAD_EXECUTOR.submit(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -438,7 +485,7 @@ public class ActionService {
                             logger.error("Upload oss failure", e);
                         }
                     }
-                });
+                });*/
             }
         }
     }

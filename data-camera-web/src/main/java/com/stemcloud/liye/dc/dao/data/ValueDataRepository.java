@@ -48,15 +48,15 @@ public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
     List<ValueData> findBySensorIdInAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(List<Long> sensorId, Date startTime, Date endTime);
 
     /**
-     * 找到当前设备和维度下，在给定时间戳范围内的数据
+     * 找到当前设备和轨迹下，在给定时间戳范围内的数据
      *
      * @param sensorId 设备编号
-     * @param key 数据维度
+     * @param trackId 轨迹
      * @param startTime 时间戳下限
      * @param endTime 时间戳上线
      * @return
      */
-    List<ValueData> findBySensorIdAndKeyAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, String key, Date startTime, Date endTime);
+    List<ValueData> findBySensorIdAndTrackIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(Long sensorId, Long trackId, Date startTime, Date endTime);
 
     /**
      * 修改数据标注
@@ -68,4 +68,14 @@ public interface ValueDataRepository extends CrudRepository<ValueData, Long> {
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     Integer updateMarker(long id, String marker);
+
+    /**
+     * 删除无用id
+     * @param ids
+     * @return
+     */
+    @Query(value = "DELETE FROM ValueData v WHERE v.id not in ?1")
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    Integer deleteOfflineData(List<Long> ids);
 }

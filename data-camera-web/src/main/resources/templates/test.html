@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" th:href="@{source/video/video-js.min.css}" />
     <link rel="stylesheet" th:href="@{source/ksplayer/ksplayer.min.css}" />
+    <link rel="stylesheet" th:href="@{source/bootstrap/bootstrap.min.css}"/>
 </head>
 <body>
     <!--<input id="text" type="text" />
@@ -14,11 +15,11 @@
     <button onclick="closeWebSocket()">Close</button>
     <h1 id="message"></h1>-->
 
-    <div style="margin-bottom: 20px">
+    <!--<div style="margin-bottom: 20px">
         <button onclick="seekVideo()">CLICK</button>
     </div>
 
-    <div id="video"></div>
+    <div id="video"></div>-->
 
 
     <!--<div id="flow-video" style="margin-top: 50px;width:600px;height:300px;text-align:center">
@@ -32,72 +33,118 @@
         <video id="ks-video" class="video-js" width="640" height="400" poster=""></video>
     </div>-->
 
-
+    <div style="margin-top: 30px;">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div style="border: 1px solid #9d9d9d; height: 500px; overflow: auto" id="message"></div>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 10px">
+            <div class="col-sm-4 col-sm-offset-1">
+                <input type="text" class="form-control" id="input-message"/>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-default btn-block" onclick="send()">send</button>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-default btn-block" onclick="start()">start</button>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-default btn-block" onclick="end()">end</button>
+            </div>
+        </div>
+    </div>
 
     <script th:src="@{source/jquery.min.js}"></script>
 
+    <script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
+
     <script th:src="@{source/video-baidu/cyberplayer.js}"></script>
-
     <script th:src="@{source/video-baidu/flowplayer-3.2.13.js}"></script>
-
     <script th:src="@{source/video/video.min.js}"></script>
     <script th:src="@{source/video/videojs-flash.min.js}"></script>
-
     <script th:src="@{source/ksplayer/ksplayer.min.js}"></script>
 
-    <script th:src="@{js/test.js}"></script>
+    <!--<script th:src="@{js/test.js}"></script>-->
 </body>
 
 
-<!--<script type="text/javascript">
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", connect, false);
+
     var websocket = null;
-    // 判断当前浏览器是否支持WebSocket
-    if('WebSocket' in window){
-        websocket = new WebSocket("ws://localhost/camera/websocket");
+    function connect() {
+        console.log("Try to connect websocket");
+
+        // 判断当前浏览器是否支持WebSocket
+        if(!'WebSocket' in window){
+            setMessageInnerHTML("Not support websocket");
+        } else {
+            if (websocket == null) {
+                websocket = new WebSocket("ws://localhost:8889/dc-websocket");
+                setMessageInnerHTML("链接中...");
+
+                //连接发生错误的回调方法
+                websocket.onerror = function(){
+                    setMessageInnerHTML("链接错误");
+                };
+
+                //连接成功建立的回调方法
+                websocket.onopen = function(event){
+                    setMessageInnerHTML("链接成功");
+                };
+
+                //接收到消息的回调方法
+                websocket.onmessage = function(event){
+                    serverMessageInnerHTML(event.data);
+                };
+
+                //连接关闭的回调方法
+                websocket.onclose = function(){
+                    setMessageInnerHTML("链接关闭");
+                };
+
+                //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+                window.onbeforeunload = function(){
+                    websocket.close();
+                };
+            }
+        }
     }
-    else{
-        alert('Not support websocket')
-    }
-
-    //连接发生错误的回调方法
-    websocket.onerror = function(){
-        setMessageInnerHTML("error");
-    };
-
-    //连接成功建立的回调方法
-    websocket.onopen = function(event){
-        setMessageInnerHTML("open");
-    };
-
-    //接收到消息的回调方法
-    websocket.onmessage = function(event){
-        setMessageInnerHTML(event.data);
-    };
-
-    //连接关闭的回调方法
-    websocket.onclose = function(){
-        setMessageInnerHTML("close");
-    };
-
-    //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
-    window.onbeforeunload = function(){
-        websocket.close();
-    };
 
     //将消息显示在网页上
     function setMessageInnerHTML(innerHTML){
-        document.getElementById('message').innerHTML += innerHTML + '<br/>';
+        document.getElementById('message').innerHTML += '<p style="margin-left: 10px">' + innerHTML + '</p>';
+    }
+
+    function serverMessageInnerHTML(innerHTML) {
+        document.getElementById('message').innerHTML += '<p class="text-right" style="margin-right: 10px">' + innerHTML + '</p>';
     }
 
     //关闭连接
     function closeWebSocket(){
-        websocket.close();
+        if (websocket != null) {
+            websocket.close();
+        }
     }
 
     //发送消息
     function send(){
-        var message = document.getElementById('text').value;
-        websocket.send(message);
+        if (websocket != null) {
+            var message = document.getElementById('input-message').value;
+            setMessageInnerHTML(message);
+            websocket.send(message);
+        }
     }
-</script>-->
+
+    function start() {
+        setMessageInnerHTML("监控开始");
+        websocket.send("{\"action\":1,\"sensorId\":1,\"type\":\"monitor\"}");
+    }
+
+    function end() {
+        setMessageInnerHTML("监控结束");
+        websocket.send("{\"action\":0,\"sensorId\":1,\"type\":\"monitor\"}");
+    }
+</script>
 </html>

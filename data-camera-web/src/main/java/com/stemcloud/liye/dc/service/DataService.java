@@ -118,8 +118,24 @@ public class DataService {
             chartMap.put(entry.getKey(), map);
         }
 
+        // -- 维护一个有序map作为返回，保证数据维度顺序一致
+        Map<Long, LinkedHashMap<String, List<ChartTimeSeries>>> resultChartMap = new HashMap<Long, LinkedHashMap<String, List<ChartTimeSeries>>>();
+        for (RecorderDevices device : devices) {
+            long sensorId = device.getSensor();
+            List<String> legends = device.getLegends();
+            LinkedHashMap<String, List<ChartTimeSeries>> dataMap = new LinkedHashMap<String, List<ChartTimeSeries>>();
+            for (String legend : legends) {
+                if (chartMap.containsKey(sensorId) && chartMap.get(sensorId).containsKey(legend)) {
+                    dataMap.put(legend, chartMap.get(sensorId).get(legend));
+                }
+            }
+            if (!dataMap.isEmpty()) {
+                resultChartMap.put(sensorId, dataMap);
+            }
+        }
+
         Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put(SensorType.CHART.toString(), chartMap);
+        map.put(SensorType.CHART.toString(), resultChartMap);
         map.put(SensorType.VIDEO.toString(), videoMap);
         map.put("MIN", minDataTime);
         map.put("MAX", maxDataTime);
