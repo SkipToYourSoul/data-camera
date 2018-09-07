@@ -1,17 +1,20 @@
 package com.stemcloud.liye.dc.socket.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.stemcloud.liye.dc.Constants;
+import com.stemcloud.liye.dc.common.GV;
 import com.stemcloud.liye.dc.common.RedisClient;
 import com.stemcloud.liye.dc.dao.MysqlRepository;
 import com.stemcloud.liye.dc.socket.AckResult;
 import com.stemcloud.liye.dc.socket.Packet;
+import com.stemcloud.liye.dc.websocket.MessageHandler;
+import com.stemcloud.liye.dc.websocket.message.MessageType;
+import com.stemcloud.liye.dc.websocket.message.ServerMessage;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.group.ChannelGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -42,7 +45,7 @@ public class HandleDataService implements Service {
             // 如果是文本
             try {
                 handleTxtMonitor(packet);
-                // handleTxtRecord(packet);
+                handleTxtRecord(packet);
                 return true;
             }catch (Exception e){
                 LOG.error("handleTxtMonitor error, packet is '{}'", packet, e);
@@ -61,14 +64,16 @@ public class HandleDataService implements Service {
     private void handleTxtMonitor(Packet packet){
         String code = packet.getCode();
         Map<String, Object> meta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.MONITOR, code);
-        LOG.info("handle packet {}, meta size = {}", code, (meta == null)?0:meta.size());
-        if (meta == null || meta.isEmpty()){
-            // LOG.info("this packet do not monitor, code is '{}'", code);
-        }else {
-            // 处理监控
-            Map<String, Object> data = packet.asJson();
-            meta.put("data", data);
-            MysqlRepository.saveValueDatas(meta);
+
+        if (meta != null && !meta.isEmpty()) {
+            Long sensorId = ((Integer) meta.get("id")).longValue();
+            meta.put("data", packet.asJson());
+            meta.put("timestamp", System.currentTimeMillis());
+
+            if (GV.sensorIsMonitor.containsKey(sensorId) && GV.sensorIsMonitor.get(sensorId)) {
+                ChannelGroup ctxGroup = GV.sensorChannelGroup.get(sensorId);
+                MessageHandler.push(ctxGroup, new ServerMessage(MessageType.DATA.getValue(), meta).toString());
+            }
         }
     }
 
@@ -76,7 +81,7 @@ public class HandleDataService implements Service {
         String code = packet.getCode();
         Map<String, Object> meta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.RECORD, code);
         if (meta == null || meta.isEmpty()){
-            LOG.info("this packet do not record, code is '{}'", code);
+            // LOG.info("this packet do not record, code is '{}'", code);
         }else {
             // 处理记录
             Map<String, Object> data = packet.asJson();
@@ -85,6 +90,4 @@ public class HandleDataService implements Service {
         }
 
     }
-
-
 }

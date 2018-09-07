@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class WebSocketServer implements Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketServer.class);
+    private static final String SOCKET_ADDRESS = "/dc-websocket";
     public static final WebSocketServer I = new WebSocketServer();
 
     private AtomicBoolean started = new AtomicBoolean(false);
@@ -56,7 +57,7 @@ public class WebSocketServer implements Server {
                                 // HttpObjectAggregator：将HTTP消息的多个部分合成一条完整的HTTP消息
                                 ch.pipeline().addLast(new HttpObjectAggregator(65536));
                                 ch.pipeline().addLast(new WebSocketServerCompressionHandler());
-                                ch.pipeline().addLast(new WebSocketServerProtocolHandler("websocket", null,true));
+                                ch.pipeline().addLast(new WebSocketServerProtocolHandler(SOCKET_ADDRESS, null,true));
                                 ch.pipeline().addLast("ServerHandle", new WebSocketServerHandler());
                             }
                         });

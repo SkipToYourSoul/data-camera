@@ -2,7 +2,6 @@ package com.stemcloud.liye.dc.dao;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
-import com.stemcloud.liye.dc.common.GlobalVariables;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 import com.stemcloud.liye.dc.domain.SensorStatus;
 import org.slf4j.Logger;
@@ -113,6 +112,10 @@ public class MysqlRepository {
         return sensorConfigMap;
     }
 
+    /**
+     * 获取绑定到实验上的SENSOR的状态信息
+     * @return
+     */
     public static List<SensorStatus> fetchSensorStatus(){
         String sql = String.format("SELECT a.sensor_code, b.is_monitor, a.id, a.track_id, a.sensor_config_id " +
                 "FROM %s a, %s b WHERE a.exp_id = b.id AND a.is_deleted = 0", SENSOR_INFO_TBL, EXP_INFO_TBL);

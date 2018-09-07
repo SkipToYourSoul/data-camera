@@ -32,15 +32,24 @@ public class SimulatorServer implements Server {
     @Override
     public void start(ChannelFutureListener listener) {
         if (started.compareAndSet(false, true)){
-            // hard code
             DataGenerator.init();
 
             sensorSimulator.refresh();
+            // -- 随机数据生成
             SCHEDULE.scheduleAtFixedRate(
                     sensorSimulator,
                     0L,1L,
                     TimeUnit.SECONDS
             );
+
+            // -- 水火箭数据模拟
+            SCHEDULE.scheduleAtFixedRate(
+                    sensorSimulator::rocket,
+                    0L, 100L,
+                    TimeUnit.MILLISECONDS
+            );
+
+            // -- 传感器状态刷新
             SCHEDULE.scheduleWithFixedDelay(
                     sensorSimulator::refresh,
                     0,

@@ -1,20 +1,25 @@
 package com.stemcloud.liye.dc.websocket;
 
+import com.stemcloud.liye.dc.common.GV;
+import com.stemcloud.liye.dc.common.JSON;
 import com.stemcloud.liye.dc.socket.connection.Connection;
 import com.stemcloud.liye.dc.socket.connection.ConnectionManager;
 import com.stemcloud.liye.dc.socket.connection.NettyConnection;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
+import com.stemcloud.liye.dc.websocket.message.ClientMessage;
+import com.stemcloud.liye.dc.websocket.message.MessageType;
+import com.stemcloud.liye.dc.websocket.message.ServerMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.http.websocketx.*;
-import io.netty.util.CharsetUtil;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Belongs to data-camera-server
@@ -24,8 +29,6 @@ import org.slf4j.LoggerFactory;
  */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketServerHandler.class);
-
-    private WebSocketServerHandshaker handshaker;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -44,70 +47,63 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         LOGGER.info("Channel read, id = {}", ctx.channel().id().asLongText());
-        if (msg instanceof HttpRequest) {
-
-        }
-
         handleWebSocketFrame(ctx, msg);
-    }
-
-    /**
-     * 客户端第一次请求是http请求，请求头包括ws的信息
-     * @param ctx
-     * @param request
-     */
-    private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest request) {
-        LOGGER.info("Handle Http Request, id = {}", ctx.channel().id().asLongText());
-
-        if (!request.decoderResult().isSuccess()) {
-            LOGGER.info("Handle Http Request failure, id = {}", ctx.channel().id().asLongText());
-            DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST);
-            // 返回应答给客户端
-            if (response.status().code() != 200) {
-                ByteBuf buf = Unpooled.copiedBuffer(response.status().toString(), CharsetUtil.UTF_8);
-                response.content().writeBytes(buf);
-                buf.release();
-            }
-            // 如果是非Keep-Alive，关闭连接
-            ChannelFuture f = ctx.channel().writeAndFlush(response);
-            if (!HttpHeaders.isKeepAlive(request) || response.getStatus().code() != 200) {
-                f.addListener(ChannelFutureListener.CLOSE);
-            }
-            return;
-        }
-
-        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory("ws://localhost" + "/websocket",null,false);
-        handshaker = wsFactory.newHandshaker(request);
-        if(handshaker == null){
-            // 不支持
-            WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
-        }else{
-            LOGGER.info("Handle Http Request success, id = {}", ctx.channel().id().asLongText());
-            handshaker.handshake(ctx.channel(), request);
-        }
     }
 
     private void handleWebSocketFrame(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
         LOGGER.info("Handle WebSocket Request, id = {}", ctx.channel().id().asLongText());
-        String request = frame.text();
-        LOGGER.info("收到消息: " + request);
 
-        // 判断监控和录制状态，若对应的传感器有收到数据，则通过websocket发送
-        push(ctx, request);
-    }
+        try {
+            // 处理从客户端发过来的消息
+            String jMessage = frame.text();
+            ClientMessage message = JSON.from(jMessage, ClientMessage.class);
+            String type = message.getType();
+            Map<String, Object> data = message.getData();
+            LOGGER.info("Client message: {}", jMessage);
 
-    /**
-     * 消息发送方法
-     * @param ctx
-     * @param message
-     */
-    private void push(ChannelHandlerContext ctx, String message) {
-        TextWebSocketFrame frame = new TextWebSocketFrame(message);
-        ctx.channel().writeAndFlush(frame);
-    }
-
-    private void push(ChannelGroup ctxGroup, String message) {
-        TextWebSocketFrame frame = new TextWebSocketFrame(message);
-        ctxGroup.writeAndFlush(frame);
+            if (type.equals(MessageType.REGISTER.getValue())) {
+                // 打开页面时的注册信息，将channel加入sensor绑定的channelGroup
+                List<Integer> sensorIds = (List<Integer>) data.get("sensors");
+                sensorIds.forEach((sensorId) -> {
+                    long id = (long) sensorId;
+                    if (GV.sensorChannelGroup.containsKey(id)) {
+                        ChannelGroup group = GV.sensorChannelGroup.get(id);
+                        group.add(ctx.channel());
+                    } else {
+                        ChannelGroup group = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+                        group.add(ctx.channel());
+                        GV.sensorChannelGroup.put(id, group);
+                    }
+                });
+            } else if (type.equals(MessageType.START.getValue())) {
+                List<Integer> sensorIds = (List<Integer>) data.get("sensors");
+                boolean isStart = false;
+                for (int i = 0; i < sensorIds.size(); i++) {
+                    long sensorId = sensorIds.get(i);
+                    GV.sensorIsMonitor.put(sensorId, true);
+                    if (GV.sensorChannelGroup.containsKey(sensorId) && !isStart) {
+                        MessageHandler.push(GV.sensorChannelGroup.get(sensorId),
+                                new ServerMessage(MessageType.START.getValue(), data).toString());
+                        isStart = true;
+                    }
+                }
+            } else if (type.equals(MessageType.END.getValue())) {
+                List<Integer> sensorIds = (List<Integer>) data.get("sensors");
+                boolean isEnd = false;
+                for (int i = 0; i < sensorIds.size(); i++) {
+                    long sensorId = sensorIds.get(i);
+                    GV.sensorIsMonitor.put(sensorId, false);
+                    if (GV.sensorChannelGroup.containsKey(sensorId) && !isEnd) {
+                        MessageHandler.push(GV.sensorChannelGroup.get(sensorId),
+                                new ServerMessage(MessageType.END.getValue(), data).toString());
+                        isEnd = true;
+                    }
+                }
+            } else {
+                LOGGER.info("Unknown message type: {}", jMessage);
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 }

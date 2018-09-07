@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.stemcloud.liye.dc.common.GlobalVariables.*;
+import static com.stemcloud.liye.dc.common.GV.*;
 
 /**
  * Project : data-camera
@@ -31,62 +31,41 @@ public class SensorSimulator implements Runnable {
     public void run() {
         // 生成数据
         SENSORS.forEach((code, sensor) -> {
-            Packet p = new Packet();
-            p.setCode(code);
-            p.setFlag(0);
-            SensorConfig config = sensorConfigMap.get(sensor.getSensorConfigId());
-            if (config != null){
-                // 获取dim
-                List<String> dims = config.getDimension();
-                Map<String, Double> vals = new HashMap<>();
-
-                // 【水火箭】实验专用数据, HARD CODE
-                if (sensor.getId() == 8) {
-                    vals.putAll(DataGenerator.getData(dims));
-                } else {
-                    dims.forEach(dim -> {
-                        if ("视频".equals(dim)) {
-                            return;
-                        }
-                        double val;
-                        if("温度".equals(dim)){
-                            val = rand(10, 25);
-                        }else if ("湿度".equals(dim)){
-                            val = rand(30, 60);
-                        }else if("光照".equals(dim)){
-                            val = rand(30, 500);
-                        }else if ("脑电波".equals(dim)){
-                            val = rand(100, 1600);
-                        }else if ("压力".equals(dim)){
-                            val = rand(1, 30);
-                        }else {
-                            val = rand(1, 100);
-                        }
-                        vals.put(dim, val);
-                    });
-                }
-
-                if (!vals.isEmpty()){
-                    p.setBody(JSON.toJson(vals).getBytes(Charset.forName("utf8")));
-                    HANDLER.handle(p);
+            if (sensor.getId() == 8) {
+                // 【水火箭】实验专用数据
+            } else {
+                SensorConfig config = sensorConfigMap.get(sensor.getSensorConfigId());
+                if (config != null){
+                    Map<String, Double> values = DataGenerator.generateRandom(config);
+                    if (!values.isEmpty()){
+                        handleValue(code, values);
+                    }
                 }
             }
         });
     }
 
-    private double rand(int from, int to){
-        if (to <= from){
-            return 0.0;
+    public void rocket() {
+        String rocketCode = "1001";
+        if (SENSORS.containsKey(rocketCode)) {
+            SensorConfig config = sensorConfigMap.get(SENSORS.get(rocketCode).getSensorConfigId());
+            Map<String, Double> values = DataGenerator.getRocket(config.getDimension());
+            if (!values.isEmpty()) {
+                handleValue(rocketCode, values);
+            }
         }
-        Random random = new Random();
-        return random.nextDouble() * from + (to - from);
     }
 
+    /**
+     * 周期方法，更新目前已绑定的SENSOR的状态
+     */
     public void refresh(){
         Set<String> onlineSensors = new HashSet<>();
         List<SensorStatus> sensorStatuses = MysqlRepository.fetchSensorStatus();
         sensorStatuses.forEach(sensor -> {
-            SENSORS.put(sensor.getCode(), sensor);
+            if (!SENSORS.containsKey(sensor.getCode())) {
+                SENSORS.put(sensor.getCode(), sensor);
+            }
             onlineSensors.add(sensor.getCode());
         });
 
@@ -97,5 +76,15 @@ public class SensorSimulator implements Runnable {
             }
         });
         notExist.forEach(SENSORS::remove);
+    }
+
+    private void handleValue(String code, Map<String, Double> values) {
+        Packet p = new Packet();
+        p.setCode(code);
+        p.setFlag(0);
+        p.setBody(JSON.toJson(values).getBytes(Charset.forName("utf8")));
+        // LOGGER.info("Handle code = {}, value = {}", code, JSON.toJson(values));
+
+        HANDLER.handle(p);
     }
 }
