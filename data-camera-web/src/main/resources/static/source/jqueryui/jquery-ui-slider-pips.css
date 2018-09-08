@@ -54,6 +54,9 @@
     height: 3px;
     position: absolute;
     left: 50%;
+
+    /* custom define */
+    top: 1px;
 }
 
 /* the text label postion & size */
@@ -64,6 +67,9 @@
     left: 50%;
     margin-left: -1em;
     width: 2em;
+
+    /* custom define */
+    top: 7px;
 }
 
 /* make it easy to see when we hover a label */

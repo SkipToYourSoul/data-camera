@@ -23,7 +23,6 @@ function initRecorderContentDom(recorderId){
             var recorder = recorders[rid];
             $('#app-analysis-title').val(recorder['name']);
             $('#app-analysis-desc').val(recorder['description']);
-            console.info("加载片段描述成功：", recorder['name'], " - ", recorder['description']);
         }
     });
 }

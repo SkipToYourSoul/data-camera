@@ -75,27 +75,31 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                         GV.sensorChannelGroup.put(id, group);
                     }
                 });
-            } else if (type.equals(MessageType.START.getValue())) {
+            } else if (type.equals(MessageType.START_M.getValue()) || type.equals(MessageType.START_R.getValue())) {
                 List<Integer> sensorIds = (List<Integer>) data.get("sensors");
                 boolean isStart = false;
                 for (int i = 0; i < sensorIds.size(); i++) {
                     long sensorId = sensorIds.get(i);
-                    GV.sensorIsMonitor.put(sensorId, true);
+                    if (type.equals(MessageType.START_M.getValue())) {
+                        GV.sensorIsMonitor.put(sensorId, true);
+                    }
                     if (GV.sensorChannelGroup.containsKey(sensorId) && !isStart) {
                         MessageHandler.push(GV.sensorChannelGroup.get(sensorId),
-                                new ServerMessage(MessageType.START.getValue(), data).toString());
+                                new ServerMessage(type, data).toString());
                         isStart = true;
                     }
                 }
-            } else if (type.equals(MessageType.END.getValue())) {
+            } else if (type.equals(MessageType.END_M.getValue()) || type.equals(MessageType.END_R.getValue())) {
                 List<Integer> sensorIds = (List<Integer>) data.get("sensors");
                 boolean isEnd = false;
                 for (int i = 0; i < sensorIds.size(); i++) {
                     long sensorId = sensorIds.get(i);
-                    GV.sensorIsMonitor.put(sensorId, false);
+                    if (type.equals(MessageType.END_M.getValue())) {
+                        GV.sensorIsMonitor.put(sensorId, false);
+                    }
                     if (GV.sensorChannelGroup.containsKey(sensorId) && !isEnd) {
                         MessageHandler.push(GV.sensorChannelGroup.get(sensorId),
-                                new ServerMessage(MessageType.END.getValue(), data).toString());
+                                new ServerMessage(type, data).toString());
                         isEnd = true;
                     }
                 }

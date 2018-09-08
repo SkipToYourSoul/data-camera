@@ -26,7 +26,7 @@ public class ExecutorUtil {
         }
     });
 
-    private static final int RECORDER_THREAD_COUNT = 5;
+    private static final int RECORDER_THREAD_COUNT = 50;
     public static final ExecutorService RECORDER_EXECUTOR = Executors.newFixedThreadPool(RECORDER_THREAD_COUNT, new ThreadFactory() {
         private AtomicInteger I = new AtomicInteger(0);
         @Override
@@ -37,7 +37,7 @@ public class ExecutorUtil {
         }
     });
 
-    private static final int UPLOAD_THREAD_COUNT = 5;
+    private static final int UPLOAD_THREAD_COUNT = 50;
     public static final ExecutorService UPLOAD_EXECUTOR = Executors.newFixedThreadPool(UPLOAD_THREAD_COUNT, new ThreadFactory() {
         private AtomicInteger I = new AtomicInteger(0);
         @Override

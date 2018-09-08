@@ -44,7 +44,7 @@ public class ScheduleService {
             long expId = r.getExpId();
             long startTime = r.getStartTime().getTime();
             if (currentTime - startTime > 5 * 60 * 1000) {
-                actionService.changeRecorderState(expId, 0, 0, "", "");
+                actionService.endRecord(expId, 0, "", "");
                 LOGGER.info("[Schedule] End recorder, appId = {}, expId = {}, recorderId = {}", r.getAppId(), expId, r.getId());
             }
         }

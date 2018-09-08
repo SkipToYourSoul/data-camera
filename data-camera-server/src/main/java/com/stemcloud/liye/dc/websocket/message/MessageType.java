@@ -7,7 +7,8 @@ package com.stemcloud.liye.dc.websocket.message;
  * @author liye on 2018/9/7
  */
 public enum MessageType {
-    START("START"), END("END"), DATA("DATA"), REGISTER("REGISTER");
+    START_M("START_M"), END_M("END_M"), START_R("START_R"), END_R("END_R"),
+    DATA("DATA"), REGISTER("REGISTER");
 
     private String value;
 

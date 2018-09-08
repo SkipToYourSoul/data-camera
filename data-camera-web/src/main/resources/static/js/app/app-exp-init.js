@@ -16,8 +16,6 @@ function initExperiment(iFi){
     // -- 初始化实验轨迹、传感器绑定信息
     Object.keys(experiments).forEach(function (exp_id) {
         var experiment = experiments[exp_id];
-        // - 设置该实验的最新数据时间
-        expObject.setNewTime(exp_id, new Date().getTime());
 
         // -- 遍历轨迹
         experiment['trackInfoList'].forEach(function (track, index) {
@@ -151,24 +149,91 @@ function initExperiment(iFi){
     });
 
     // -- 初始化实验监控和录制状态
-    initActionStatus();
+    Object.keys(isExperimentMonitor).forEach(function (id) {
+        if (isExperimentMonitor[id] === 1) {
+            pageStartMonitor(id);
+        }
+        if (isExperimentRecorder[id] === 1){
+            pageStartRecord(id, parseTime(expRecorderTime[id]));
+        }
+    });
 }
 
-function initActionStatus(){
-    // -- 更改实验状态（如果在监控或录制状态）
-    Object.keys(isExperimentMonitor).forEach(function (id) {
-        var exp_monitor_dom = $('#experiment-es-' + id);
-        var exp_recorder_dom = $('#experiment-rs-' + id);
-
-        if (isExperimentMonitor[id] === 1){
-            exp_monitor_dom.removeClass('label-default').addClass('label-success').text('正在监控');
-
-            if (isExperimentRecorder[id] === 1){
-                exp_recorder_dom.removeClass('label-default').addClass('label-success').text('正在录制');
-                expObject.setRecorderTime(id, [expRecorderTime[id]]);
-                expObject.setNewTime(id, new Date(parseTime(expRecorderTime[id])).getTime());
+function initExpSelect() {
+    // 初始化内容
+    var $exp_select = $('#exp-add-select');
+    var valueHtml = '<optgroup label="<b>数值型传感器</b>">';
+    var videoHtml = '<optgroup label="<b>摄像头</b>">';
+    sensors.forEach(function (sensor, index) {
+        var id = sensor['id'];
+        var type = sensor['sensorConfig']['type'];
+        var text = sensor['name'];
+        if (type == 1){
+            if (freeSensors.hasOwnProperty(id)){
+                valueHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+            } else {
+                valueHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '(已绑定)</option>';
             }
-            // doInterval(id);
+        } else if (type == 2){
+            if (freeSensors.hasOwnProperty(id)){
+                videoHtml += '<option value="' + sensor.id + '">' + text + '</option>';
+            } else {
+                videoHtml += '<option value="' + sensor.id + '" disabled="disabled">' + text + '(已绑定)</option>';
+            }
+        }
+    });
+    valueHtml += '</optgroup>';
+    videoHtml += '</optgroup>';
+    $exp_select.html(valueHtml + videoHtml);
+
+    // 初始化添加传感器的SELECT
+    $exp_select.multiSelect({
+        selectableHeader: "<input type='text' class='form-control muti-select-search-input' autocomplete='off' placeholder='搜索设备'>",
+        selectionHeader: "<div style='height: 40px; font-size: 16px; font-weight: 600; padding-top: 5px; color: #9d9d9d'>已选设备</div>",
+        afterInit: function(ms){
+            var that = this,
+                $selectableSearch = that.$selectableUl.prev(),
+                selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)';
+
+            that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+                .on('keydown', function(e){
+                    if (e.which === 40){
+                        that.$selectableUl.focus();
+                        return false;
+                    }
+                });
+        },
+        afterSelect: function(){
+            this.qs1.cache();
+        },
+        afterDeselect: function(){
+            this.qs1.cache();
+        }
+    });
+
+    // 初始化删除传感器和轨迹的SELECT
+    var $expDelSelect = $('#exp-del-select');
+    $expDelSelect.multiSelect({
+        selectableHeader: "<input type='text' class='form-control muti-select-search-input' autocomplete='off' placeholder='搜索设备'>",
+        selectionHeader: "<div style='height: 40px; font-size: 16px; font-weight: 600; padding-top: 5px; color: #9d9d9d'>已选设备</div>",
+        afterInit: function(ms){
+            var that = this,
+                $selectableSearch = that.$selectableUl.prev(),
+                selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)';
+
+            that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+                .on('keydown', function(e){
+                    if (e.which === 40){
+                        that.$selectableUl.focus();
+                        return false;
+                    }
+                });
+        },
+        afterSelect: function(){
+            this.qs1.cache();
+        },
+        afterDeselect: function(){
+            this.qs1.cache();
         }
     });
 }

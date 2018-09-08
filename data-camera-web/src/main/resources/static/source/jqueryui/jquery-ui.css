@@ -731,8 +731,10 @@ button.ui-button::-moz-focus-inner {
 	cursor: default;
 	-ms-touch-action: none;
 	touch-action: none;
+
 	/* custom define */
-	border-radius: 10px;
+	width: 0.1em;
+	height: 1.2em;
 }
 .ui-slider .ui-slider-range {
 	position: absolute;
@@ -751,10 +753,17 @@ button.ui-button::-moz-focus-inner {
 
 .ui-slider-horizontal {
 	height: .8em;
+
+	/* custom define */
+	height: 1.2em;
 }
 .ui-slider-horizontal .ui-slider-handle {
 	top: -.3em;
 	margin-left: -.6em;
+
+	/* custom define */
+	top: -.1em;
+	margin-left: 0;
 }
 .ui-slider-horizontal .ui-slider-range {
 	top: 0;
@@ -912,9 +921,10 @@ body .ui-tooltip {
 .ui-widget-header {
 	/*border: 1px solid #dddddd;*/
 	/*background: #dddddd url("images/ui-bg_highlight-soft_50_dddddd_1x100.png") 50% 50% repeat-x;*/
+
 	/* custom define */
-	border: 1px solid #35b5eb;
-	background: #35b5eb;
+	border: 1px solid #dbdbdb;
+	background: #ededed;
 	color: #444444;
 	font-weight: bold;
 }
@@ -937,11 +947,10 @@ html .ui-button.ui-state-disabled:active {
 	background: #f6f6f6 url("images/ui-bg_highlight-soft_100_f6f6f6_1x100.png") 50% 50% repeat-x;*/
 
 	/* custom define */
-	border: 1px solid #35b5eb;
-	background: #35b5eb;
-
+	border: 1px solid #c9c9c9;
+	background: #c9c9c9;
 	font-weight: bold;
-	color: #0073ea;
+	color: #c9c9c9;
 }
 .ui-state-default a,
 .ui-state-default a:link,

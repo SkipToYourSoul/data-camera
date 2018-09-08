@@ -5,10 +5,10 @@
 		<!-- 实验操作按钮 -->
 		<div class="app-exp-action-bar row wi8" style="padding-right: 0">
 			<div class="col-sm-10 col-md-10 col-xs-10" style="line-height: 50px">
-				<button class="btn btn-pink monitor-btn" id="all-monitor-btn">
+				<button class="btn btn-pink monitor-btn" id="all-monitor-btn" disabled="disabled">
 				 	<img th:src="@{/img/icons/eye1.png}" class="icon" style="height:10px"/>&nbsp;全局监控
 				</button>
-				<button class="btn btn-blue1 record-btn" style="margin-left: 15px" onclick="allRecord()" id="all-record-btn">
+				<button class="btn btn-blue1 record-btn" style="margin-left: 15px" id="all-record-btn" disabled="disabled">
 					<i class="fa fa-video-camera"></i>&nbsp;全局录制
 				</button>
 			</div>
@@ -50,8 +50,7 @@
 									<button style="color: #26c6db; background-color: transparent"
 										th:if="${not #lists.isEmpty(experiment.value.trackInfoList)}"
 										class="btn btn-sm record-btn" th:data="${experiment.key}"
-										onclick="expRecorder(this)"
-										th:id="|experiment-recorder-${experiment.key}|">
+										th:id="|experiment-recorder-${experiment.key}|" disabled="disabled">
 										<i class="fa fa-video-camera"></i>
 									</button>
 								</div>

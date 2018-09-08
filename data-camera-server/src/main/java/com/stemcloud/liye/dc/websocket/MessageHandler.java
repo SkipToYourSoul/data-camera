@@ -27,7 +27,7 @@ public class MessageHandler {
     }
 
     public static void push(ChannelGroup ctxGroup, String message) {
-        LOGGER.info("push {} to {} channels", message, ctxGroup.size());
+        // LOGGER.info("push {} to {} channels", message, ctxGroup.size());
         TextWebSocketFrame frame = new TextWebSocketFrame(message);
         ctxGroup.writeAndFlush(frame);
     }

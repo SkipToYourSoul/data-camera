@@ -8,7 +8,7 @@
 
 // -- 入口函数，初始化树形图
 function initTreeDom(iFi){
-    if (iFi == false) {
+    if (iFi === false) {
         // 不是第一次加载
         return;
     } else {
@@ -134,4 +134,12 @@ function showRecorderContent(target, node){
             $(this).removeClass('active');
         }
     });
+}
+
+function findParent(id) {
+    if (analysisObject.rDataMap[id] === -1){
+        return id;
+    } else {
+        return findParent(analysisObject.rDataMap[id]);
+    }
 }

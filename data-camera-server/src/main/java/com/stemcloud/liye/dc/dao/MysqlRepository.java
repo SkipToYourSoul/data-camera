@@ -2,6 +2,7 @@ package com.stemcloud.liye.dc.dao;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
+import com.stemcloud.liye.dc.common.JSON;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 import com.stemcloud.liye.dc.domain.SensorStatus;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public class MysqlRepository {
         Integer sensorId = (Integer) datas.get("id");
         Integer trackId = (Integer) datas.get("trackId");
         Map<String, Object> data = (Map<String, Object>)datas.get("data");
+
         if (sensorId != null && trackId != null){
             // save
             List<Integer> results = new ArrayList<>(data.size());

@@ -87,10 +87,16 @@ public class ActionController {
             long beginTime = System.currentTimeMillis();
             long expId = Long.parseLong(queryParams.get("exp-id"));
             int action = Integer.parseInt(queryParams.get("action"));
-            int isSave = Integer.parseInt(queryParams.get("isSave"));
-            String name = queryParams.get("data-name");
-            String desc = queryParams.get("data-desc");
-            Map result =  ServerReturnTool.serverSuccess(actionService.changeRecorderState(expId, action, isSave, name, desc));
+
+            Map result = null;
+            if (action == GV.START) {
+                result = ServerReturnTool.serverSuccess(actionService.startRecord(expId));
+            } else if (action == GV.END) {
+                int isSave = Integer.parseInt(queryParams.get("isSave"));
+                String name = queryParams.get("data-name");
+                String desc = queryParams.get("data-desc");
+                result = ServerReturnTool.serverSuccess(actionService.endRecord(expId, isSave, name, desc));
+            }
             logger.info("Ip {} request ajax url {}, cost {} ms", IpAddressUtil.getClientIpAddress(request),
                     request.getRequestURL().toString(), System.currentTimeMillis() - beginTime);
             return result;
