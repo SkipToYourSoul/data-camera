@@ -86,10 +86,11 @@ function askForRecorderDataAndInitDom(recorderId) {
         if (!isEmptyObject(chartData)) {
             Object.keys(chartData).forEach(function (sensorId) {
                 var data = chartData[sensorId];
-                var chartWidth = 0;
                 Object.keys(data).forEach(function (legend) {
                     var chartId = "chart-" + recorderId + '-' + sensorId + '-' + legend;
-                    $dom.append(generate(sensorId +'-'+new Date().getTime(), legend, chartId));
+                    // $dom.append(generate(sensorId +'-'+new Date().getTime(), legend, chartId));
+                    $dom.append(generateChartDom(legend, chartId));
+
                     if (echarts.getInstanceByDom(document.getElementById(chartId)) == null){
                         var chart = echarts.init(document.getElementById(chartId), "", opts = {
                             height: 100
@@ -119,9 +120,9 @@ function askForRecorderDataAndInitDom(recorderId) {
                                                     "data-mark": $('#dialog-data-mark').val()
                                                 },
                                                 success: function (response) {
-                                                    if (response.code == "1111"){
+                                                    if (response.code === "1111"){
                                                         commonObject.printExceptionMsg(response.data);
-                                                    } else if (response.code == "0000"){
+                                                    } else if (response.code === "0000"){
                                                         window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + analysisObject.currentRecorderId;
                                                     }
                                                 },
@@ -153,10 +154,11 @@ function askForRecorderDataAndInitDom(recorderId) {
                 var videoOption = videoData[vSensorId]['option'];
                 var videoId = 'video-' + vSensorId;
                 var videoDomId = 'video-dom-' + vSensorId;
-                $dom2.append(generate(videoDomId + '-panel', "视频", videoDomId));
+                // $dom2.append(generate(videoDomId + '-panel', "视频", videoDomId));
+                $dom2.append(generateVideoDom(videoDomId));
 
                 if (videoOption['sources'] != null){
-                    $('#' + videoDomId).append('<div style="padding-left: 15px"><video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
+                    $('#' + videoDomId).append('<div style="padding-left: 50px"><video id="' + videoId + '"class="video-js vjs-fluid vjs-big-play-centered" data-setup="{}"></video></div>');
                     videojs(videoId, videoOption, function () {
                         videojs.log('The video player ' + videoId + ' is ready');
                         analysisObject.setVideo(videoId, this);
@@ -230,6 +232,30 @@ function generate(panelId, title, contentId) {
         '<div id="' + panelId + '" class="panel-collapse collapse in" role="tabpanel">' +
         '<div class="panel-body my-panel-body"><div id="' + contentId + '"></div></div>' +
         '</div></div>';
+}
+
+function generateChartDom(legend, contentId) {
+    return '<div class="row in-row track">' +
+        '<div class="col-sm-10 col-md-10"><div id="' + contentId + '" class="track-chart" style="margin-bottom: 5px"></div></div>' +
+        '<div class="col-sm-2 col-md-2 col-no-padding-left"><div class="track-statistics">' +
+        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+        '<div class="content-now-text"><div class="text-center">-</div></div>' +
+        '</div></div>' +
+        '</div>';
+}
+
+function generateVideoDom(contentId) {
+    var infoDom = '<div class="track-statistics">' +
+        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center">高度</div>' +
+        '<div class="content-now-text"><div class="text-center">-</div></div></div>';
+
+    return '<div class="row in-row track" style="margin-bottom: 10px">' +
+        '<div class="col-sm-9 col-md-9"><div id="' + contentId + '"></div></div>' +
+        '<div class="col-sm-3 col-md-3 col-no-padding-left">' +
+        '<div class="col-sm-6 col-no-padding-both">' + infoDom + '</div><div class="col-sm-6 col-no-padding-both">' + infoDom + '</div>' +
+        '<div class="col-sm-6 col-no-padding-both">' + infoDom + '</div><div class="col-sm-6 col-no-padding-both">' + infoDom + '</div>' +
+        '</div>' +
+        '</div>';
 }
 
 /**

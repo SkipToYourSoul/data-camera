@@ -5,8 +5,8 @@
 		<div class="app-analysis-chart-dom" hidden="hidden">
 			<!-- 操作栏 -->
 			<div class="analysis-sub-content" id="content-handle-bar">
-				<div class="row">
-					<div class="col-sm-10 col-md-10">
+				<div class="row in-row">
+					<div class="col-sm-9 col-md-9">
 						<div class="action-bar">
 							<!-- 播放速度 -->
 							<select class="selectpicker cuspicker" data-width="10%">
@@ -61,14 +61,14 @@
 				</div>
 
 				<!-- 事件轴 -->
-				<div class="row">
-					<div class="col-sm-10 col-md-10">
+				<div class="row in-row">
+					<div class="col-sm-9 col-md-9">
 						<!-- 时间轴栏 -->
 						<div class="timeline-dom" id="timeline-slider">
 							<div class="slider"></div>
 						</div>
 					</div>
-					<div class="col-sm-2 col-md-2">
+					<div class="col-sm-3 col-md-3">
 						<!-- 记录时间 -->
 						<div style="padding-top: 5px">
 							<div class="record-time">
@@ -85,27 +85,50 @@
 
 			<!-- 数据显示栏 -->
 			<div class="analysis-sub-content">
-				<!-- 通知栏 -->
-				<div class="wi8" id="app-analysis-info"></div>
-				<!-- 视频显示栏 -->
-				<div class="video-dom wi8" id="app-analysis-video"></div>
-				<!-- 图表显示栏 -->
-				<div class="chart-dom wi8" id="app-analysis-chart"></div>
-				<!-- 片段描述 -->
-				<div class="description-dom wi8" th:if="${inApp}">
-					<div style="margin-bottom: 10px; padding: 0 20px">
-						<label class="desc-title">试验标题</label>
-						<input class="newi-control" id="app-analysis-title"/>
+				<div class="row in-row">
+					<!-- 视频和图表 -->
+					<div class="col-sm-9 col-md-9 col-no-padding-left">
+						<!-- 通知栏, 无数据时显示提示 -->
+						<div class="wi8" id="app-analysis-info"></div>
+						<!-- 视频显示栏 -->
+						<div class="video-dom" id="app-analysis-video"></div>
+						<!-- 图表显示栏 -->
+						<div class="chart-dom" id="app-analysis-chart"></div>
+						<!-- 片段描述 -->
+						<div class="description-dom" th:if="${inApp}">
+							<div style="margin-bottom: 10px; padding: 0 20px">
+								<label class="desc-title">试验标题</label>
+								<input class="newi-control" id="app-analysis-title"/>
+							</div>
+							<div style="padding: 0 20px">
+								<label class="desc-title">试验描述</label>
+								<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
+								<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 10px">
+									<i class="fa fa-save"></i>&nbsp;保存
+								</button>
+							</div>
+						</div>
 					</div>
-					<div style="padding: 0 20px">
-						<label class="desc-title">试验描述</label>
-						<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
-						<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 10px">
-							<i class="fa fa-save"></i>&nbsp;保存
-						</button>
+
+					<!-- 事件列表 -->
+					<div class="col-sm-3 col-md-3 col-no-padding-left">
+						<div class="panel panel-default">
+							<div class="panel-heading">事件列表</div>
+							<div class="panel-body" style="padding: 5px">
+								<div class="list-group" style="margin-bottom: 0">
+									<a href="#" class="list-group-item active">
+										START
+									</a>
+									<a href="#" class="list-group-item">Morbi leo risus</a>
+									<a href="#" class="list-group-item">Porta ac consectetur ac</a>
+									<a href="#" class="list-group-item">END</a>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
+
 		</div>
 	</div>
 </body>

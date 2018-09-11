@@ -2,6 +2,25 @@ body {
     font-family: "微软雅黑","Microsoft YaHei","STHeiti",SimHei,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
+/** 通用样式 **/
+.in-row {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.col-no-padding-left {
+    padding-left: 0;
+}
+
+.col-no-padding-right {
+    padding-right: 0;
+}
+
+.col-no-padding-both {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 /** 通用：导航栏样式 **/
 .navbar {
     margin-bottom:0;

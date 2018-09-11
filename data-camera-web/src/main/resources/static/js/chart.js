@@ -184,7 +184,7 @@ function buildAnalysisChartOption(data, legend) {
         grid: [{
             top: 5,
             bottom: 5,
-            left: 30,
+            left: 50,
             right: 15
         }],
         calculable: true,
