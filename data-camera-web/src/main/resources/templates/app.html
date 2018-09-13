@@ -153,7 +153,7 @@
 					<li role="presentation" th:class="${#httpServletRequest.getParameter('tab') eq '2'}?'active':''">
 						<a href="#app-analysis" aria-controls="app-analysis" role="tab" data-toggle="tab" style="padding-left: 25px">分析模式</a></li>
 				</ul>
-				<div class="tab-content">
+				<div class="tab-content my-tab-content">
 					<div th:include="module/app-tab::app-experiment" id="app-experiment" role="tabpanel"
 						 th:class="${#httpServletRequest.getParameter('tab') eq '2'}?'tab-pane fade app-tab-pane-content':'tab-pane active in fade app-tab-pane-content'"></div>
 					<div th:include="module/app-tab::app-analysis" id="app-analysis" role="tabpanel"

@@ -82,6 +82,9 @@ function askForRecorderDataAndInitDom(recorderId) {
             $('#content-handle-bar').find('button').attr('disabled', false);
         }
 
+        // 保存chart的数据维度，方便视频侧展示实时数据
+        var chartLegends = [];
+
         // 初始化chart
         if (!isEmptyObject(chartData)) {
             Object.keys(chartData).forEach(function (sensorId) {
@@ -90,6 +93,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                     var chartId = "chart-" + recorderId + '-' + sensorId + '-' + legend;
                     // $dom.append(generate(sensorId +'-'+new Date().getTime(), legend, chartId));
                     $dom.append(generateChartDom(legend, chartId));
+                    chartLegends.push(legend);
 
                     if (echarts.getInstanceByDom(document.getElementById(chartId)) == null){
                         var chart = echarts.init(document.getElementById(chartId), "", opts = {
@@ -150,6 +154,7 @@ function askForRecorderDataAndInitDom(recorderId) {
 
         // 初始化video
         if (!isEmptyObject(videoData)) {
+            var videoHeight = 50;
             Object.keys(videoData).forEach(function (vSensorId) {
                 var videoOption = videoData[vSensorId]['option'];
                 var videoId = 'video-' + vSensorId;
@@ -166,6 +171,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                         analysisObject.videoStartTime = recorders[recorderId]['startSeconds'];
                         this.currentTime(recorders[recorderId]['startSeconds']);
                     });
+                    videoHeight = $('#' + videoDomId).height();
                 } else {
                     var progressBar = '<div class="progress">' +
                         '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">' +
@@ -173,6 +179,9 @@ function askForRecorderDataAndInitDom(recorderId) {
                     $('#' + videoDomId).append('<div id=' + videoId + '> <p class="text-center">视频来自设备(编号：' + vSensorId + ')，上传中</p>' + progressBar + '</div>');
                 }
             });
+
+            // 新增统计数据
+            $dom2.append(generateVideoLegends(chartLegends, videoHeight));
         }
     }
 }
@@ -235,27 +244,32 @@ function generate(panelId, title, contentId) {
 }
 
 function generateChartDom(legend, contentId) {
+    var legendClass = "statistics-" + legend;
     return '<div class="row in-row track">' +
         '<div class="col-sm-10 col-md-10"><div id="' + contentId + '" class="track-chart" style="margin-bottom: 5px"></div></div>' +
         '<div class="col-sm-2 col-md-2 col-no-padding-left"><div class="track-statistics">' +
-        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center ' + legendClass + '">' + legend + '</div>' +
         '<div class="content-now-text"><div class="text-center">-</div></div>' +
         '</div></div>' +
         '</div>';
 }
 
 function generateVideoDom(contentId) {
-    var infoDom = '<div class="track-statistics">' +
-        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center">高度</div>' +
-        '<div class="content-now-text"><div class="text-center">-</div></div></div>';
-
-    return '<div class="row in-row track" style="margin-bottom: 10px">' +
-        '<div class="col-sm-9 col-md-9"><div id="' + contentId + '"></div></div>' +
-        '<div class="col-sm-3 col-md-3 col-no-padding-left">' +
-        '<div class="col-sm-6 col-no-padding-both">' + infoDom + '</div><div class="col-sm-6 col-no-padding-both">' + infoDom + '</div>' +
-        '<div class="col-sm-6 col-no-padding-both">' + infoDom + '</div><div class="col-sm-6 col-no-padding-both">' + infoDom + '</div>' +
-        '</div>' +
+    return '<div class="col-sm-9 col-md-9 col-no-padding-both">' +
+        '<div id="' + contentId + '"></div>' +
         '</div>';
+}
+
+function generateVideoLegends(chartLegends, videoHeight) {
+    var html = '<div class="col-sm-3 col-md-3"><div style="height: ' + videoHeight + 'px; overflow-x: hidden; overflow-y: auto;">';
+    chartLegends.forEach(function(legend) {
+        var legendClass = "statistics-" + legend;
+        var infoDom = '<div class="track-statistics">' +
+            '<div style="font-size: 12px; font-weight: 400; padding-bottom: 5px" class="text-center ' + legendClass + '">' + legend + '</div>' +
+            '<div class="content-now-text"><div class="text-center">-</div></div></div>';
+        html += '<div class="col-sm-6 col-no-padding-both">' + infoDom + '</div>';
+    });
+    return html + '</div></div>';
 }
 
 /**

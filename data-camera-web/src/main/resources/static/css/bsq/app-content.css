@@ -12,10 +12,11 @@
 
 .app-analysis-chart-dom .record-time {
     font-weight: 600;
+    font-size: 12px;
 }
 
 .app-analysis-chart-dom .timeline-dom {
-    padding: 10px 25px 10px 20px;
+    padding: 10px 20px 10px 50px;
     background:#fff;
 }
 
@@ -43,7 +44,7 @@
 }
 
 .app-analysis-chart-dom .chart-dom {
-
+    padding-top: 5px;
 }
 
 .app-analysis-chart-dom .chart-dom .my-panel {
