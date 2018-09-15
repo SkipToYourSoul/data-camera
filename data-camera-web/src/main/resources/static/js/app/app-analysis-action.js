@@ -25,15 +25,16 @@ function recorderPlay() {
     console.info("Recorder play at ", new Date());
     analysisObject.playStatus = "play";
 
-    var speed = parseInt($('#recorder-speed').find('.active input').val());
+    var speed = parseFloat($('#recorder-speed').selectpicker('val'));
     var startTime = analysisObject.timeline[analysisObject.timelineStart];
-    recorderInterval = chartDataPlay(startTime, 300, speed);
+    recorderInterval = chartDataPlay(startTime, 500, speed);
     timeLineInterval = timeLinePlay(1000, speed);
 
     // 播放视频
     if (analysisObject.timelineStart !== analysisObject.timelineEnd) {
         Object.keys(analysisObject.video).forEach(function (i) {
             var video = analysisObject.video[i];
+            video.playbackRate(speed);
             video.play();
         });
     }
@@ -173,27 +174,6 @@ function slideChange(e, ui) {
         });
     }
 }
-
-$('#recorder-speed').find('input:radio').change(function(radio){
-    if (analysisObject.playStatus === "play") {
-        message_info("建议不要在播放状态下调节速度，会引起视频卡顿", "info", 3);
-        return;
-    }
-
-    var speed = radio.target.getAttribute('value');
-    var interval = 1000/parseInt(speed);
-    if (recorderInterval != null){
-        clearInterval(recorderInterval);
-        recorderInterval = setInterval(recorderAction, interval);
-    }
-
-    // 调整视频速度
-    Object.keys(analysisObject.video).forEach(function (i) {
-        var video = analysisObject.video[i];
-        video.playbackRate(parseInt(speed));
-    });
-});
-
 
 /**
  * 删除实验片段内容

@@ -2,6 +2,7 @@ package com.stemcloud.liye.dc.service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.data.ContentRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
@@ -9,8 +10,8 @@ import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.data.*;
+import com.stemcloud.liye.dc.domain.view.ChartEvent;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
-import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.domain.view.Video;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,16 @@ public class DataService {
         chartValues.addAll(dataList);
         Map<Long, Map<String, List<ChartTimeSeries>>> chartMap = transferChartData(chartValues);
 
+        // -- event data
+        List<ChartEvent> events = new ArrayList<ChartEvent>();
+        events.add(new ChartEvent(startTime.getTime(), "START", "硬件"));
+        for (ValueData data : chartValues) {
+            if (data.getMark() != null) {
+                events.add(new ChartEvent(data.getCreateTime().getTime(), data.getMark(), data.getKey() + "-" + data.getSensorId()));
+            }
+        }
+        events.add(new ChartEvent(endTime.getTime(), "END", "硬件"));
+
         // -- 将不同数据段的数据对齐
         long maxDataTime = endTime.getTime();
         long minDataTime = startTime.getTime();
@@ -137,6 +148,7 @@ public class DataService {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put(SensorType.CHART.toString(), resultChartMap);
         map.put(SensorType.VIDEO.toString(), videoMap);
+        map.put("EVENT", events);
         map.put("MIN", minDataTime);
         map.put("MAX", maxDataTime);
 

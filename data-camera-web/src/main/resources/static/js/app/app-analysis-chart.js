@@ -56,17 +56,18 @@ function askForRecorderDataAndInitDom(recorderId) {
             if (response.code == "0000") {
                 var chartData = response.data['CHART'];
                 var videoData = response.data['VIDEO'];
-                initDom(chartData, videoData, response.data['MIN'], response.data['MAX']);
+                var eventData = response.data['EVENT'];
+                initDom(chartData, videoData, eventData, response.data['MIN'], response.data['MAX']);
             } else if (response.code == "1111") {
                 message_info("加载数据失败，失败原因为：" + response.data, 'error');
             }
         },
-        error: function (response) {
+        error: function () {
             message_info("数据请求被拒绝", 'error');
         }
     });
 
-    function initDom(chartData, videoData, minTime, maxTime){
+    function initDom(chartData, videoData, eventData, minTime, maxTime){
         // 初始化时间进度条
         generateTimeLine(minTime, maxTime);
 
@@ -100,7 +101,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                             height: 100
                         });
                         chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
-                        chart.on('dblclick', function (params) {
+                        chart.on('click', function (params) {
                             console.log(params);
                             bootbox.dialog({
                                 title: "为数据点添加描述",
@@ -183,6 +184,37 @@ function askForRecorderDataAndInitDom(recorderId) {
             // 新增统计数据
             $dom2.append(generateVideoLegends(chartLegends, videoHeight));
         }
+
+        // 初始化事件列表
+        $('#event-table').bootstrapTable({
+            data: eventData,
+            columns: [{
+                field: 'time',
+                title: '时间',
+                formatter: function (value) {
+                    var c = value - minTime;
+                    var hour = Math.floor(c/(60 * 60 * 1000));
+                    c = c - hour * (60 * 60 * 1000);
+                    var minutes = Math.floor(c/(60 * 1000));
+                    c = c - minutes * (60 * 1000);
+                    var seconds = Math.floor(c/1000);
+
+                    if (minutes < 10) {
+                        minutes = "0" + minutes;
+                    }
+                    if (seconds < 10) {
+                        seconds = "0" + seconds;
+                    }
+                    return minutes + ":" + seconds;
+                }
+            }, {
+                field: 'mark',
+                title: '事件'
+            }, {
+                field: 'legend',
+                title: '来源'
+            }]
+        });
     }
 }
 
@@ -248,8 +280,8 @@ function generateChartDom(legend, contentId) {
     return '<div class="row in-row track">' +
         '<div class="col-sm-10 col-md-10"><div id="' + contentId + '" class="track-chart" style="margin-bottom: 5px"></div></div>' +
         '<div class="col-sm-2 col-md-2 col-no-padding-left"><div class="track-statistics">' +
-        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center ' + legendClass + '">' + legend + '</div>' +
-        '<div class="content-now-text"><div class="text-center">-</div></div>' +
+        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+        '<div style="font-size: 14px;color: #35b5eb;"><div class="text-center ' + legendClass + '">-</div></div>' +
         '</div></div>' +
         '</div>';
 }
@@ -265,8 +297,8 @@ function generateVideoLegends(chartLegends, videoHeight) {
     chartLegends.forEach(function(legend) {
         var legendClass = "statistics-" + legend;
         var infoDom = '<div class="track-statistics">' +
-            '<div style="font-size: 12px; font-weight: 400; padding-bottom: 5px" class="text-center ' + legendClass + '">' + legend + '</div>' +
-            '<div class="content-now-text"><div class="text-center">-</div></div></div>';
+            '<div style="font-size: 12px; font-weight: 400; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+            '<div style="font-size: 14px;color: #35b5eb;"><div class="text-center ' + legendClass + '">-</div></div></div>';
         html += '<div class="col-sm-6 col-no-padding-both">' + infoDom + '</div>';
     });
     return html + '</div></div>';

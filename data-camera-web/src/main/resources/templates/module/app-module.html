@@ -9,7 +9,7 @@
 					<div class="analysis-sub-content" id="content-handle-bar">
 						<div class="action-bar">
 							<!-- 播放速度 -->
-							<select class="selectpicker cuspicker" data-width="10%">
+							<select class="selectpicker cuspicker" data-width="10%" id="recorder-speed">
 								<option value="1">X 1</option>
 								<option value="0.025">X 0.025</option>
 								<option value="0.05">X 0.05</option>
@@ -35,15 +35,7 @@
 									<i class="fa fa-repeat"></i>
 								</button>
 							</div>
-							<!-- 播放速度 -->
-							<!--<div class="btn-group mbtn-group" data-toggle="buttons" id="recorder-speed">
-                                <label class="btn active"><input type="radio" name="options" id="option1" autocomplete="off" checked="checked" value="1" /> X1
-                                </label>
-                                <label class="btn"> <input type="radio" name="options" id="option2" autocomplete="off" value="2" /> X2
-                                </label>
-                                <label class="btn"> <input type="radio" name="options" id="option3" autocomplete="off" value="4" /> X4
-                                </label>
-                            </div>-->
+
 							<!-- 内容操作 -->
 							<div class="btn-group btn-action-bar pull-right" th:if="${inApp}">
 								<button class="btn btn-grey no-radius" data-toggle="modal" data-target="#new-data-recorder-modal">
@@ -125,13 +117,17 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">事件列表</div>
 						<div class="panel-body" style="padding: 5px">
-							<table class="table table-hover">
-								<tr><th>时间</th><th>事件</th><th>来源</th></tr>
-								<tr><td>00:00</td><td>START</td><td>硬件</td></tr>
-								<tr><td>00:02</td><td>抛物线定点</td><td>高度</td></tr>
-								<tr><td>00:03</td><td>XXX</td><td>高度</td></tr>
-								<tr><td>00:05</td><td>XXX</td><td>高度</td></tr>
-								<tr><td>00:09</td><td>END</td><td>硬件</td></tr>
+							<table id="event-table"
+								   data-classes="table table-no-bordered table-hover"
+								   data-select-item-name="select1"
+								   data-sort-name="time"
+								   data-id-field="legend"
+								   data-page-size="15"
+								   data-page-list="[15, 25, 50, 100, ALL]"
+								   data-pagination-first-text="首页"
+								   data-pagination-pre-text="上一页"
+								   data-pagination-next-text="下一页"
+								   data-pagination-last-text="尾页">
 							</table>
 						</div>
 					</div>
