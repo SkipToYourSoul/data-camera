@@ -7,6 +7,7 @@
 				<div class="col-sm-9 col-md-9 col-no-padding-both">
 					<!-- 操作栏 -->
 					<div class="analysis-sub-content" id="content-handle-bar">
+						<!-- 操作按钮 -->
 						<div class="action-bar">
 							<!-- 播放速度 -->
 							<select class="selectpicker cuspicker" data-width="10%" id="recorder-speed">
@@ -50,6 +51,7 @@
 							</div>
 						</div>
 
+						<!-- 播放时间轴 -->
 						<div class="row in-row">
 							<div class="col-sm-10 col-md-10 col-no-padding-both">
 								<!-- 时间轴栏 -->
@@ -82,6 +84,10 @@
 						</div>
 
 						<!-- 图表显示栏 -->
+						<div class="row in-row">
+							<!-- 若没有视频，图表数据信息将展示在这里 -->
+							<div id="app-analysis-chart-info"></div>
+						</div>
 						<div class="row in-row">
 							<ul class="nav nav-tabs" role="tablist" style="margin: 0 20px">
 								<li role="presentation" class="active"><a href="#o-chart" aria-controls="o-chart" role="tab" data-toggle="tab">原始数据</a></li>
