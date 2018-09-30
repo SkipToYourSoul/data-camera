@@ -12,3 +12,6 @@ img/
 /.classpath
 /.settings/
 /.project
+
+# mp4 file
+*.mp4

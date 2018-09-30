@@ -20,8 +20,11 @@ public class RecordCamera {
     public static void record(String outputFile, double frameRate) throws FrameGrabber.Exception, FrameRecorder.Exception, InterruptedException {
         Loader.load(opencv_objdetect.class);
 
-        FrameGrabber grabber = FrameGrabber.createDefault(0);
+        // FrameGrabber grabber = FrameGrabber.createDefault(0);
         // FrameGrabber grabber = new OpenCVFrameGrabber(0);
+
+        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber("http://10.5.138.248/?user=admin&pwd=");
+
         grabber.start();
 
         OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
