@@ -29,8 +29,11 @@ var analysisObject = (function () {
         delete selectedChart[key];
     };
 
-    // --
-
+    // -- 分析模式下额外生成的图表
+    var analysisChart = {};
+    var setAnalysisChart = function (key, value) {
+        analysisChart[key] = value;
+    };
 
     // -- 视频dom
     var video = {};
@@ -82,6 +85,9 @@ var analysisObject = (function () {
         selectedChart: selectedChart,
         setSelectedChart: setSelectedChart,
         removeSelectedChart: removeSelectedChart,
+
+        analysisChart: analysisChart,
+        setAnalysisChart: setAnalysisChart,
 
         video: video,
         setVideo: setVideo,

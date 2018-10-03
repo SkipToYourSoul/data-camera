@@ -152,39 +152,42 @@ function askForRecorderDataAndInitDom(recorderId) {
                 $('#chart-cube').html(generateChartCube(chartLegends));
             }
 
+            // 初始化用户自定义图表
+            if (!isEmptyObject(defineData)) {
+                defineData.forEach(function (dInfo) {
+                    var sensorId = dInfo['info']['sensorId'];
+                    var originData = chartData[sensorId];
+                    var xLegend = dInfo['info']['x'];
+                    var yLegend = dInfo['info']['y'];
+                    var xChartId = 'define-chart-x-' + dInfo['info']['id'];
+                    var yChartId = 'define-chart-y-' + dInfo['info']['id'];
+                    var chartId = 'define-chart-' + dInfo['info']['id'];
+                    $dom3.append(generateDefineChartDom(xChartId, yChartId, chartId, dInfo['info']['name'], dInfo['info']['desc']));
+
+                    var xChart = echarts.init(document.getElementById(xChartId), "walden", opts = {
+                        height: 100
+                    });
+                    xChart.setOption(buildAnalysisChartOption(originData[xLegend], xLegend));
+                    var yChart = echarts.init(document.getElementById(yChartId), "walden", opts = {
+                        height: 100
+                    });
+                    yChart.setOption(buildAnalysisChartOption(originData[yLegend], yLegend));
+
+                    // define chart
+                    var chart = echarts.init(document.getElementById(chartId), "walden", opts = {
+                        height: 200
+                    });
+                    chart.setOption(buildAnalysisDefineChartOption(dInfo));
+
+                    analysisObject.setChart(xChartId, xChart);
+                    analysisObject.setChart(yChartId, yChart);
+                });
+            }
+
             // 为chart添加resize监听(echarts初始化width若写死，则无法resize)
             onChartResize(analysisObject.chart);
             $(window).resize(function() {
                 onChartResize(analysisObject.chart);
-            });
-        }
-
-        // 初始化用户自定义图表
-        if (!isEmptyObject(defineData)) {
-            defineData.forEach(function (dInfo) {
-                var sensorId = dInfo['info']['sensorId'];
-                var originData = chartData[sensorId];
-                var xLegend = dInfo['info']['x'];
-                var yLegend = dInfo['info']['y'];
-                var xChartId = 'define-chart-x-' + dInfo['info']['id'];
-                var yChartId = 'define-chart-y-' + dInfo['info']['id'];
-                var chartId = 'define-chart-' + dInfo['info']['id'];
-                $dom3.append(generateDefineChartDom(xChartId, yChartId, chartId, dInfo['info']['name'], dInfo['info']['desc']));
-
-                var xChart = echarts.init(document.getElementById(xChartId), "walden", opts = {
-                    height: 100
-                });
-                xChart.setOption(buildAnalysisChartOption(originData[xLegend], xLegend));
-                var yChart = echarts.init(document.getElementById(yChartId), "walden", opts = {
-                    height: 100
-                });
-                yChart.setOption(buildAnalysisChartOption(originData[yLegend], yLegend));
-
-                // define chart
-                var chart = echarts.init(document.getElementById(chartId), "walden", opts = {
-                    height: 200
-                });
-                chart.setOption(buildAnalysisDefineChartOption(dInfo));
             });
         }
 

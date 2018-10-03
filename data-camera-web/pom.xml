@@ -84,32 +84,7 @@
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
             <version>1.4.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bytedeco.javacpp-presets</groupId>
-                    <artifactId>android-arm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bytedeco.javacpp-presets</groupId>
-                    <artifactId>android-arm64</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bytedeco.javacpp-presets</groupId>
-                    <artifactId>android-x86</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bytedeco.javacpp-presets</groupId>
-                    <artifactId>android-x86_64</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bytedeco.javacpp-presets</groupId>
-                    <artifactId>ios-arm64</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bytedeco.javacpp-presets</groupId>
-                    <artifactId>ios-x86_64</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
