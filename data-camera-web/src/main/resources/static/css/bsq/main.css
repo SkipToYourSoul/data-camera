@@ -21,6 +21,12 @@ body {
     padding-right: 0;
 }
 
+.col-little-padding-both {
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+}
+
 /** 通用：导航栏样式 **/
 .navbar {
     margin-bottom:0;

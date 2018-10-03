@@ -170,7 +170,7 @@ function buildAnalysisChartOption(data, legend) {
                 params = params[0];
                 var html = "<b>TIME: </b>" + params.value[0] + "<br/>";
                 if (params.value.length > 1){
-                    html += "<b>VALUE: </b>" + params.value[1] + "<br/>";
+                    html += "<b>" + legend + "</b>: " + params.value[1] + "<br/>";
                 }
                 if (params.name !== null){
                     html += "<b>MARK: </b>"+ params.name;
@@ -227,25 +227,28 @@ function buildAnalysisChartOption(data, legend) {
                 type: 'line',
                 smooth: true,
                 sampling: true,
+                hoverAnimation: false,
 
                 /* 点，线，面的样式 */
                 symbol:'circle',
                 symbolSize: 1,
-                itemStyle: {
+                /*itemStyle: {
                     normal: {
                         color: '#4CCBFF'
                     }
-                },
+                },*/
+
                 lineStyle: {
                     normal: {
-                        color: '#4CCBFF',
+                        /*color: '#4CCBFF',*/
                         width: 1
                     }
                 },
+
                 areaStyle: {
                     normal: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                            offset: 0.3,
+                            offset: 0.1,
                             color: '#4CCBFF'
                         }, {
                             offset: 1,
@@ -255,7 +258,7 @@ function buildAnalysisChartOption(data, legend) {
                 },
 
                 /* 标记的样式 */
-                markArea: {
+                /*markArea: {
                     silent: true,
                     itemStyle: {
                         normal: {
@@ -268,12 +271,13 @@ function buildAnalysisChartOption(data, legend) {
                     },{
                         xAxis: analysisObject.timeline[analysisObject.timeline.length - 1]
                     }]]
-                },
+                },*/
+
                 markLine: {
                     silent: true,
                     itemStyle: {
                         normal: {
-                            color: 'rgb(0, 0, 0)',
+                            color: '#35b5eb',
                             lineStyle: {
                                 type: 'solid',
                                 width: 1
@@ -284,7 +288,66 @@ function buildAnalysisChartOption(data, legend) {
                     symbolSize: 0,
                     data: []
                 },
+
                 data: data
+            }
+        ]
+    }
+}
+
+/**
+ * 分析页面用户自定图表的设置
+ * @param data
+ */
+function buildAnalysisDefineChartOption(dInfo) {
+    return {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            }
+        },
+        grid: [{
+            top: 30,
+            bottom: 30,
+            left: 50,
+            right: 50
+        }],
+        xAxis: [
+            {
+                name: dInfo['info']['x'],
+                type: 'value',
+                min: dInfo['xMin'],
+                max: dInfo['xMax'],
+                splitLine: {
+                    show: true,
+                    lineStyle: {
+                        type: 'dashed'
+                    }
+                }
+            }
+        ],
+        yAxis: [
+            {
+                name: dInfo['info']['y'],
+                type: 'value',
+                min: dInfo['yMin'],
+                max: dInfo['yMax'],
+                splitLine: {
+                    show: true,
+                    lineStyle: {
+                        type: 'dashed'
+                    }
+                }
+            }
+        ],
+        series: [
+            {
+                id: 'a',
+                type: 'scatter',
+                smooth: true,
+                symbolSize: 10,
+                data: dInfo['data']
             }
         ]
     }

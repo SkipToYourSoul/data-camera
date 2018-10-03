@@ -60,7 +60,7 @@
 					<div class="sidebar-buttons">
 						<button th:if="!${param.id}" type="button"
 								class="btn sidebar-buttons"
-								style="background-color: #fff; color: #36b5eb; font-weight: 1px"
+								style="background-color: #fff; color: #36b5eb;"
 								data-toggle="modal" data-target="#app-modal" todo="new">新建场景</button>
 						<button th:if="${param.id}" type="button"
 								class="btn btn-sm btn-white" data-toggle="modal"
@@ -167,6 +167,7 @@
 	<div th:include="module/modal::exp-modal"></div>
 	<div th:include="module/modal::exp-del-modal"></div>
 	<div th:include="module/modal::new-data-recorder"></div>
+	<div th:include="module/modal::new-analysis-chart"></div>
 
 	<script th:src="@{source/jquery.min.js}"></script>
 	<script th:src="@{source/bootstrap/bootstrap.min.js}"></script>
@@ -223,7 +224,7 @@
 	<script th:src="@{source/validation/bootstrap.min.js}"></script>
 
 	<script th:src="@{source/echarts/echarts.common.min.js}"></script>
-	<script th:src="@{source/echarts/infographic.js}"></script>
+	<script th:src="@{source/echarts/walden.js}"></script>
 	<script th:src="@{source/godebug/go-debug.js}"></script>
 	<script th:src="@{source/loading/jquery.mloading.js}"></script>
 

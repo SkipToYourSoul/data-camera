@@ -93,11 +93,11 @@ function recorderReset() {
     Object.keys(analysisObject.chart).forEach(function (i) {
         var series = analysisObject.chart[i].getOption()['series'];
         series[0]['data'] = analysisObject.getChartData()[i];
-        series[0]['markArea']['data'] = [[{
+        /*series[0]['markArea']['data'] = [[{
             xAxis: analysisObject.timeline[0]
         }, {
             xAxis: analysisObject.timeline[analysisObject.timeline.length - 1]
-        }]];
+        }]];*/
         series[0]['markLine']['data'] = [];
         analysisObject.chart[i].setOption({
             series: series
@@ -129,7 +129,7 @@ function slideChange(e, ui) {
         }
     } else if (analysisObject.playStatus === "normal") {
         updateMarkLine();
-        updateMarkArea();
+        // updateMarkArea();
         updateVideoTime();
     }
     lastSlideValue = ui.values[0];
@@ -286,6 +286,72 @@ function saveDataDesc(){
     });
 }
 
+/** 分享内容 **/
 function shareContent() {
     window.location.href = base_address + "/share?rid=" + analysisObject.currentRecorderId;
 }
+
+/** 新增用户自定义图表 **/
+$('#new-analysis-chart-modal').on('show.bs.modal', function (m) {
+    var usableSensor = {};
+    var $select = $('#new-analysis-chart-select');
+    var count = 1;
+    $select.empty();
+    JSON.parse(recorders[analysisObject.currentRecorderId]['devices']).forEach(function (device) {
+        if (device['legends'].length > 1) {
+            var sensorId = device['sensor'];
+            var trackId = device['track'];
+            usableSensor[sensorId] = device['legends'];
+            $select.append('<option value="' + sensorId + '">' + tracks[trackId]['sensor']['name'] + '</option>');
+
+            if (count === 1) {
+                device['legends'].forEach(function (legend) {
+                    $('.new-analysis-chart-legend-select').append('<option value="' + legend + '">' + legend + '</option>');
+                });
+            }
+            count ++;
+        }
+    });
+    if (!isEmptyObject(usableSensor)) {
+        $select.change(function () {
+            $('.new-analysis-chart-legend-select').empty();
+            usableSensor[$select.val()].forEach(function (legend) {
+                $('.new-analysis-chart-legend-select').append('<option value="' + legend + '">' + legend + '</option>');
+            });
+        });
+    } else {
+        $('#new-analysis-chart-modal').modal('hide');
+    }
+});
+
+$('#new-analysis-chart-form').formValidation({
+    framework: 'bootstrap',
+    icon: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove'
+    },
+    fields: {
+        'name-input': {validators: {notEmpty: {message: '名称不能为空'}}},
+        'desc-input': {validators: {notEmpty: {message: '描述不能为空'}}}
+    }
+}).on('success.form.fv', function (evt){
+    evt.preventDefault();
+    $.ajax({
+        type: 'post',
+        url: data_address + "/user-new-chart",
+        data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId,
+        success: function (response) {
+            if (response.code === "0000"){
+                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
+            } else if (response.code === "1111") {
+                commonObject.printExceptionMsg(response.data);
+            }
+        },
+        error: function (response) {
+            commonObject.printRejectMsg();
+        }
+    });
+}).on('err.form.fv', function (evt) {
+    commonObject.printRejectMsg();
+});
+

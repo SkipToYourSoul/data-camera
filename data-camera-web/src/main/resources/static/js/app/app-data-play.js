@@ -36,18 +36,24 @@ function chartDataPlay(dataStartTime, interval, speed) {
 
             chartCurrentSeries[0]['data'] = updateChartData(chartOriginData);
             chartCurrentSeries[0]['markLine']['data'] = line;
-            chartCurrentSeries[0]['markArea']['data'] = [];
-            analysisObject.chart[index].setOption({
-                series: chartCurrentSeries
-            });
+            // chartCurrentSeries[0]['markArea']['data'] = [];
+
+            if (analysisObject.selectedChart.hasOwnProperty(index)) {
+                analysisObject.chart[index].setOption({
+                    series: chartCurrentSeries
+                });
+            }
 
             // 更新实时显示的数据
             var legend = chartCurrentSeries[0]['name'];
             var dLength = chartCurrentSeries[0]['data'].length;
             if (dLength > 2) {
-                $('.statistics-' + legend).html(chartCurrentSeries[0]['data'][dLength - 2]['value'][1].toFixed(2));
+                $('.cube-' + legend).html(chartCurrentSeries[0]['data'][dLength - 2]['value'][1].toFixed(2));
             }
         });
+
+        // 更新数据cube
+
 
         // 数据已轮询完毕，停止轮询
         if (isEnd) {

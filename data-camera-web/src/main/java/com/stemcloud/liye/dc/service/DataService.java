@@ -4,12 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.common.SensorType;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
-import com.stemcloud.liye.dc.dao.data.ContentRepository;
-import com.stemcloud.liye.dc.dao.data.RecorderRepository;
-import com.stemcloud.liye.dc.dao.data.ValueDataRepository;
-import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
+import com.stemcloud.liye.dc.dao.data.*;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.data.*;
+import com.stemcloud.liye.dc.domain.view.ChartDefine;
 import com.stemcloud.liye.dc.domain.view.ChartEvent;
 import com.stemcloud.liye.dc.domain.view.ChartTimeSeries;
 import com.stemcloud.liye.dc.domain.view.Video;
@@ -37,14 +35,16 @@ public class DataService {
     private final RecorderRepository recorderRepository;
     private final VideoDataRepository videoDataRepository;
     private final ContentRepository contentRepository;
+    private final UserDefineChartRepository userDefineChartRepository;
 
     @Autowired
-    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository, ContentRepository contentRepository) {
+    public DataService(SensorRepository sensorRepository, ValueDataRepository valueDataRepository, RecorderRepository recorderRepository, VideoDataRepository videoDataRepository, ContentRepository contentRepository, UserDefineChartRepository userDefineChartRepository) {
         this.sensorRepository = sensorRepository;
         this.valueDataRepository = valueDataRepository;
         this.recorderRepository = recorderRepository;
         this.videoDataRepository = videoDataRepository;
         this.contentRepository = contentRepository;
+        this.userDefineChartRepository = userDefineChartRepository;
     }
 
     /**
@@ -98,6 +98,20 @@ public class DataService {
         chartValues.addAll(dataList);
         Map<Long, Map<String, List<ChartTimeSeries>>> chartMap = transferChartData(chartValues);
 
+        // -- user define chart
+        List<ChartDefine> userDefineChart = new ArrayList<ChartDefine>();
+        List<UserDefineChart> userCharts = userDefineChartRepository.findByRecorderId(recorderId);
+        for (UserDefineChart uc : userCharts) {
+            ChartDefine chartDefine = new ChartDefine();
+
+            Map<String, List<ChartTimeSeries>> cd = chartMap.get(uc.getSensorId());
+            List<ChartTimeSeries> x = cd.get(uc.getX());
+            List<ChartTimeSeries> y = cd.get(uc.getY());
+            chartDefine.setData(x, y);
+            chartDefine.setInfo(uc);
+            userDefineChart.add(chartDefine);
+        }
+
         // -- event data
         List<ChartEvent> events = new ArrayList<ChartEvent>();
         events.add(new ChartEvent(startTime.getTime(), "START", "硬件"));
@@ -149,6 +163,7 @@ public class DataService {
         map.put(SensorType.CHART.toString(), resultChartMap);
         map.put(SensorType.VIDEO.toString(), videoMap);
         map.put("EVENT", events);
+        map.put("DEFINE", userDefineChart);
         map.put("MIN", minDataTime);
         map.put("MAX", maxDataTime);
 
@@ -267,5 +282,16 @@ public class DataService {
             return content;
         }
         return contentRepository.findByIsSharedAndIsDeletedAndTitleLikeOrderByLikeDesc(1,0,'%' + search + '%');
+    }
+
+    public Long userNewChart(long sensorId, long recorderId, String x, String y, String name, String desc) {
+        UserDefineChart chart = new UserDefineChart();
+        chart.setRecorderId(recorderId);
+        chart.setSensorId(sensorId);
+        chart.setX(x);
+        chart.setY(y);
+        chart.setName(name);
+        chart.setDesc(desc);
+        return userDefineChartRepository.save(chart).getRecorderId();
     }
 }

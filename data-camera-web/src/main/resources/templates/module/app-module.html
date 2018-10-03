@@ -10,7 +10,7 @@
 						<!-- 操作按钮 -->
 						<div class="action-bar">
 							<!-- 播放速度 -->
-							<select class="selectpicker cuspicker" data-width="10%" id="recorder-speed">
+							<select class="selectpicker cuspicker" data-width="10%" id="recorder-speed" disabled="disabled">
 								<option value="1">X 1</option>
 								<option value="0.025">X 0.025</option>
 								<option value="0.05">X 0.05</option>
@@ -78,6 +78,10 @@
 						<!-- 通知栏, 无数据时显示提示 -->
 						<div class="wi8" id="app-analysis-info"></div>
 
+						<!-- 纯图表模式下的数据方格显示位置 -->
+						<div class="row in-row" style="margin-bottom: 5px" id="chart-cube">
+						</div>
+
 						<!-- 视频显示栏 -->
 						<div class="row in-row" style="margin-bottom: 5px">
 							<div class="video-dom track" id="app-analysis-video"></div>
@@ -90,14 +94,26 @@
 						</div>
 						<div class="row in-row">
 							<ul class="nav nav-tabs" role="tablist" style="margin: 0 20px">
-								<li role="presentation" class="active"><a href="#o-chart" aria-controls="o-chart" role="tab" data-toggle="tab">原始数据</a></li>
-								<li role="presentation"><a href="#a-chart" aria-controls="a-chart" role="tab" data-toggle="tab">分析数据</a></li>
+								<li role="presentation"><a href="#o-chart" aria-controls="o-chart" role="tab" data-toggle="tab">原始数据</a></li>
+								<li role="presentation" class="active"><a href="#a-chart" aria-controls="a-chart" role="tab" data-toggle="tab">分析数据</a></li>
 							</ul>
-							<div class="tab-content">
-								<div role="tabpanel" class="tab-pane active" id="o-chart">
-									<div class="chart-dom" id="app-analysis-chart"></div>
+							<div class="tab-content" style="padding: 5px 0">
+								<div role="tabpanel" class="tab-pane" id="o-chart">
+									<div style="padding: 5px 20px" id="app-analysis-cube-alert">
+										<div class="alert alert-info">点击上方的数据方块选择你想查看的数据</div>
+									</div>
+									<div class="chart-dom" id="app-analysis-chart">
+									</div>
 								</div>
-								<div role="tabpanel" class="tab-pane" id="a-chart">hi</div>
+								<div role="tabpanel" class="tab-pane active" id="a-chart">
+									<div class="chart-dom" id="app-analysis-define-chart">
+									</div>
+									<div style="padding: 5px 20px" th:if="${inApp}">
+										<div class="btn btn-blue" data-toggle="modal" data-target="#new-analysis-chart-modal">
+											<i class="fa fa-plus"></i>&nbsp;新增对比图表
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 
@@ -111,7 +127,7 @@
 								<label class="desc-title">试验描述</label>
 								<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
 								<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 10px">
-									<i class="fa fa-save"></i>&nbsp;保存
+									<i class="fa fa-save"></i>&nbsp;保存试验描述
 								</button>
 							</div>
 						</div>
@@ -121,7 +137,7 @@
 				<!-- 事件列表 -->
 				<div class="col-sm-3 col-md-3 col-no-padding-left" style="padding-top: 10px">
 					<div class="panel panel-default">
-						<div class="panel-heading">事件列表</div>
+						<div class="panel-heading">事件列表(点击可查看事件位置)</div>
 						<div class="panel-body" style="padding: 5px">
 							<table id="event-table"
 								   data-classes="table table-no-bordered table-hover"

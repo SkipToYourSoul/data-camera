@@ -172,4 +172,23 @@ public class DataController {
             return ServerReturnTool.serverFailure(e.getMessage());
         }
     }
+
+    @PostMapping("/user-new-chart")
+    Map userNewChart(@RequestParam Map<String, String> queryParams, HttpServletRequest request) {
+        try {
+            long sensorId = Long.parseLong(queryParams.get("sensor-select"));
+            long recorderId = Long.parseLong(queryParams.get("recorder-id"));
+            String x = queryParams.get("x-select");
+            String y = queryParams.get("y-select");
+            String name = queryParams.get("name-input");
+            String desc = queryParams.get("desc-input");
+            Map result = ServerReturnTool.serverSuccess(dataService.userNewChart(sensorId, recorderId, x, y, name, desc));
+            logger.info("Ip {} request ajax url {}", IpAddressUtil.getClientIpAddress(request),
+                    request.getRequestURL().toString());
+            return result;
+        } catch (Exception e) {
+            logger.error("[/data/user-new-chart]", e);
+            return ServerReturnTool.serverFailure(e.getMessage());
+        }
+    }
 }

@@ -7,26 +7,30 @@ var analysisObject = (function () {
 
     // -- 当前显示的所有echarts对象, key: domId, value: chartInstance
     var chart = {};
-
-    // -- 当前选中的数据片段data, key: domId, value: data
-    var chartData = {};
-
     var setChart = function (key, value) {
         chart[key] = value;
     };
 
-    // deep copy
-    var getChart = function () {
-        return $.extend(true, {}, chart);
-    };
-
+    // -- 当前选中的数据片段data, key: domId, value: data
+    var chartData = {};
     var setChartData = function (key, value) {
         chartData[key] = value;
     };
-
     var getChartData = function () {
         return $.extend(true, {}, chartData);
     };
+
+    // -- 分析页面中选中查看的图表，key: domId, value: chartInstance
+    var selectedChart = {};
+    var setSelectedChart = function (key, value) {
+        selectedChart[key] = value;
+    };
+    var removeSelectedChart = function (key) {
+        delete selectedChart[key];
+    };
+
+    // --
+
 
     // -- 视频dom
     var video = {};
@@ -67,12 +71,18 @@ var analysisObject = (function () {
 
     return {
         iFi: iFi,
+
         chart: chart,
         setChart: setChart,
-        getChart: getChart,
+
         chartData: chartData,
         setChartData: setChartData,
         getChartData: getChartData,
+
+        selectedChart: selectedChart,
+        setSelectedChart: setSelectedChart,
+        removeSelectedChart: removeSelectedChart,
+
         video: video,
         setVideo: setVideo,
         videoStartTime: videoStartTime,

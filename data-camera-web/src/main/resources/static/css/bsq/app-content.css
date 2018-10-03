@@ -1,4 +1,10 @@
 /*  数据片段展示图，用于场景分析页面以及内容详情页面    */
+.analysis-sub-content {
+    margin: 0;
+    padding: 5px;
+    background-color: #fff;
+}
+
 .app-analysis-chart-dom {
     /*    border: 1px solid #9d9d9d; */
     min-height: 300px;
