@@ -26,7 +26,7 @@ function chartDataPlay(dataStartTime, interval, speed) {
             xAxis: transferTime(timeMS)
         }];
 
-        // 遍历当前所有的chart
+        // 遍历当前所有的chart, index = chartId
         Object.keys(analysisObject.chart).forEach(function (index) {
             // chart的原始数据
             var chartOriginData = analysisObject.getChartData()[index];
@@ -34,26 +34,37 @@ function chartDataPlay(dataStartTime, interval, speed) {
             // chart的当前展示数据
             var chartCurrentSeries = analysisObject.chart[index].getOption()['series'];
 
-            chartCurrentSeries[0]['data'] = updateChartData(chartOriginData);
-            chartCurrentSeries[0]['markLine']['data'] = line;
-            // chartCurrentSeries[0]['markArea']['data'] = [];
+            // legend
+            var legend = chartCurrentSeries[0]['name'];
+
+            // 用户自定义的图表回放
+            if (index.startsWith("define")) {
+                var nd = updateDefineChartData(chartOriginData);
+                chartCurrentSeries[0]['data'] = nd;
+
+                // 更新数据cube
+                var length = nd.length;
+                if (length > 0) {
+                    $('.cube-' + legend).html(nd[length - 1][0].toFixed(2) + "-" + nd[length - 1][1].toFixed(2));
+                }
+            } else {
+                chartCurrentSeries[0]['data'] = updateChartData(chartOriginData);
+                chartCurrentSeries[0]['markLine']['data'] = line;
+                // chartCurrentSeries[0]['markArea']['data'] = [];
+
+                // 更新数据cube
+                var dLength = chartCurrentSeries[0]['data'].length;
+                if (dLength > 2) {
+                    $('.cube-' + legend).html(chartCurrentSeries[0]['data'][dLength - 2]['value'][1].toFixed(2));
+                }
+            }
 
             if (analysisObject.selectedChart.hasOwnProperty(index)) {
                 analysisObject.chart[index].setOption({
                     series: chartCurrentSeries
                 });
             }
-
-            // 更新实时显示的数据
-            var legend = chartCurrentSeries[0]['name'];
-            var dLength = chartCurrentSeries[0]['data'].length;
-            if (dLength > 2) {
-                $('.cube-' + legend).html(chartCurrentSeries[0]['data'][dLength - 2]['value'][1].toFixed(2));
-            }
         });
-
-        // 更新数据cube
-
 
         // 数据已轮询完毕，停止轮询
         if (isEnd) {
@@ -63,22 +74,70 @@ function chartDataPlay(dataStartTime, interval, speed) {
         }
     }
 
+    /** 找出当前回放时间点的图表数据 **/
     function updateChartData(d) {
-        var n = [];
-
-        // 返回时间范围内的数据
-        for (var index = 0; index < d.length; index ++) {
-            var time = transferTime(d[index]['value'][0]);
-            if (time >= timeMS){
-                var lastPoint = d[d.length - 1];
-                n = d.slice(0, index);
-                n.push({
-                    value: [lastPoint['value'][0]]
-                });
-                break;
-            }
+        var position = findPosition(timeMS, d);
+        var n = d.slice(0, position);
+        if (n.length < d.length) {
+            n.push({
+                value: [d[d.length - 1]['value'][0]]
+            });
         }
         return n;
+
+        function findPosition(i, arr) {
+            var left = 0;
+            var right = arr.length - 1;
+
+            if (i < transferTime(arr[left]['value'][0])) {
+                return 0;
+            }
+            if (i >= transferTime(arr[right]['value'][0])) {
+                return arr.length;
+            }
+
+            while (left <= right) {
+                var mid = Math.floor((left + right)/2);
+                if (i >= transferTime(arr[mid]['value'][0]) && i < transferTime(arr[mid+1]['value'][0])) {
+                    return mid + 1;
+                } else if (i < transferTime(arr[mid]['value'][0])) {
+                    right = mid - 1;
+                } else {
+                    left = mid + 1;
+                }
+            }
+        }
+    }
+
+    function updateDefineChartData(d) {
+        var time = d['time'];
+        var data = d['data'];
+
+        var position = findPosition(timeMS, time);
+        return data.slice(0, position);
+
+        function findPosition(i, arr) {
+            var left = 0;
+            var right = arr.length - 1;
+
+            if (i < transferTime(arr[left])) {
+                return 0;
+            }
+            if (i >= transferTime(arr[right])) {
+                return arr.length;
+            }
+
+            while (left <= right) {
+                var mid = Math.floor((left + right)/2);
+                if (i >= transferTime(arr[mid]) && i < transferTime(arr[mid + 1])) {
+                    return mid + 1;
+                } else if (i < transferTime(arr[mid])) {
+                    right = mid - 1;
+                } else {
+                    left = mid + 1;
+                }
+            }
+        }
     }
 }
 

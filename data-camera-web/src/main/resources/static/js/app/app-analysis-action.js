@@ -92,17 +92,26 @@ function recorderReset() {
     // 重置chart数据
     Object.keys(analysisObject.chart).forEach(function (i) {
         var series = analysisObject.chart[i].getOption()['series'];
-        series[0]['data'] = analysisObject.getChartData()[i];
-        /*series[0]['markArea']['data'] = [[{
-            xAxis: analysisObject.timeline[0]
-        }, {
-            xAxis: analysisObject.timeline[analysisObject.timeline.length - 1]
-        }]];*/
-        series[0]['markLine']['data'] = [];
+        if (i.startsWith("define")) {
+            series[0]['data'] = analysisObject.getChartData()[i]['data'];
+        } else {
+            series[0]['data'] = analysisObject.getChartData()[i];
+            /*series[0]['markArea']['data'] = [[{
+                xAxis: analysisObject.timeline[0]
+            }, {
+                xAxis: analysisObject.timeline[analysisObject.timeline.length - 1]
+            }]];*/
+            series[0]['markLine']['data'] = [];
+        }
+
         analysisObject.chart[i].setOption({
             series: series
         });
     });
+
+    // 清空数据方块数值
+    $(".cube-text").html("-");
+
     // 隐藏时间标记
     $("#timeline-slider").find(".ui-slider-tip").css("visibility", "");
 
@@ -140,6 +149,9 @@ function slideChange(e, ui) {
             xAxis: analysisObject.timeline[ui.values[0]]
         }];
         Object.keys(analysisObject.chart).forEach(function (i) {
+            if (i.startsWith("define")) {
+                return;
+            }
             var series = analysisObject.chart[i].getOption()['series'];
             series[0]['markLine']['data'] = line;
             analysisObject.chart[i].setOption({

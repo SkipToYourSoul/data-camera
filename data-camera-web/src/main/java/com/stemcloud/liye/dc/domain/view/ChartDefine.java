@@ -14,6 +14,7 @@ import java.util.List;
 public class ChartDefine {
     private UserDefineChart info;
     private List<List<Double>> data;
+    private List<String> timestamp;
     private Double xMin;
     private Double xMax;
     private Double yMin;
@@ -33,11 +34,14 @@ public class ChartDefine {
 
     public void setData(List<ChartTimeSeries> x, List<ChartTimeSeries> y) {
         List<List<Double>> result = new ArrayList<List<Double>>();
+        List<String> timestamp = new ArrayList<String>();
         for (int index = 0; index < x.size(); index++) {
             if (x.get(index).getValue().size() == 2 && y.get(index).getValue().size() == 2) {
                 List<Double> list = new ArrayList<Double>();
                 double xv = Double.valueOf(String.valueOf(x.get(index).getValue().get(1)));
                 double yv = Double.valueOf(String.valueOf(y.get(index).getValue().get(1)));
+                String time = String.valueOf(x.get(index).getValue().get(0));
+                timestamp.add(time);
                 if (xMin == null || xv < xMin) {
                     xMin = xv;
                 }
@@ -60,6 +64,7 @@ public class ChartDefine {
         this.xMin = Math.floor(xMin);
         this.yMax = Math.ceil(yMax);
         this.yMin = Math.floor(yMin);
+        this.timestamp = timestamp;
         this.data = result;
     }
 
@@ -77,5 +82,9 @@ public class ChartDefine {
 
     public Double getyMax() {
         return yMax;
+    }
+
+    public List<String> getTimestamp() {
+        return timestamp;
     }
 }

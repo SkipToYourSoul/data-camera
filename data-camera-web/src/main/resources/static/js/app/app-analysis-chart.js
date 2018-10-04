@@ -18,13 +18,8 @@ function initRecorderContentDom(recorderId){
     askForRecorderDataAndInitDom(recorderId);
 
     // 填写片段描述
-    Object.keys(recorders).forEach(function (rid) {
-        if (rid === recorderId){
-            var recorder = recorders[rid];
-            $('#app-analysis-title').val(recorder['name']);
-            $('#app-analysis-desc').val(recorder['description']);
-        }
-    });
+    $('#app-analysis-title').val(recorders[analysisObject.currentRecorderId]['name']);
+    $('#app-analysis-desc').val(recorders[analysisObject.currentRecorderId]['description']);
 }
 
 function askForRecorderDataAndInitDom(recorderId) {
@@ -89,6 +84,29 @@ function askForRecorderDataAndInitDom(recorderId) {
 
         // 初始化chart
         if (!isEmptyObject(chartData)) {
+            // 初始化用户自定义图表
+            if (!isEmptyObject(defineData)) {
+                defineData.forEach(function (dInfo) {
+                    var chartId = 'define-chart-' + dInfo['info']['id'];
+                    var legend = dInfo['info']['x'] + "-" + dInfo['info']['y'];;
+                    $dom3.append(generateDefineChartDom(chartId, legend, dInfo['info']['name'], dInfo['info']['desc']));
+                    chartLegends[chartId] = legend;
+
+                    // define chart
+                    var chart = echarts.init(document.getElementById(chartId), "walden", opts = {
+                        height: 200
+                    });
+                    chart.setOption(buildAnalysisDefineChartOption(dInfo, legend));
+
+                    var chartData = {
+                        'time': dInfo['timestamp'],
+                        'data': dInfo['data']
+                    };
+                    analysisObject.setChart(chartId, chart);
+                    analysisObject.setChartData(chartId, chartData);
+                });
+            }
+
             Object.keys(chartData).forEach(function (sensorId) {
                 var data = chartData[sensorId];
                 Object.keys(data).forEach(function (legend) {
@@ -152,38 +170,6 @@ function askForRecorderDataAndInitDom(recorderId) {
                 $('#chart-cube').html(generateChartCube(chartLegends));
             }
 
-            // 初始化用户自定义图表
-            if (!isEmptyObject(defineData)) {
-                defineData.forEach(function (dInfo) {
-                    var sensorId = dInfo['info']['sensorId'];
-                    var originData = chartData[sensorId];
-                    var xLegend = dInfo['info']['x'];
-                    var yLegend = dInfo['info']['y'];
-                    var xChartId = 'define-chart-x-' + dInfo['info']['id'];
-                    var yChartId = 'define-chart-y-' + dInfo['info']['id'];
-                    var chartId = 'define-chart-' + dInfo['info']['id'];
-                    $dom3.append(generateDefineChartDom(xChartId, yChartId, chartId, dInfo['info']['name'], dInfo['info']['desc']));
-
-                    var xChart = echarts.init(document.getElementById(xChartId), "walden", opts = {
-                        height: 100
-                    });
-                    xChart.setOption(buildAnalysisChartOption(originData[xLegend], xLegend));
-                    var yChart = echarts.init(document.getElementById(yChartId), "walden", opts = {
-                        height: 100
-                    });
-                    yChart.setOption(buildAnalysisChartOption(originData[yLegend], yLegend));
-
-                    // define chart
-                    var chart = echarts.init(document.getElementById(chartId), "walden", opts = {
-                        height: 200
-                    });
-                    chart.setOption(buildAnalysisDefineChartOption(dInfo));
-
-                    analysisObject.setChart(xChartId, xChart);
-                    analysisObject.setChart(yChartId, yChart);
-                });
-            }
-
             // 为chart添加resize监听(echarts初始化width若写死，则无法resize)
             onChartResize(analysisObject.chart);
             $(window).resize(function() {
@@ -220,7 +206,7 @@ function askForRecorderDataAndInitDom(recorderId) {
             });
 
             // 新增统计数据
-            $dom2.append(generateVideoCube(chartLegends, videoHeight));
+            $('#video-cube').append(generateVideoCube(chartLegends, videoHeight));
         }
 
         // 初始化事件列表
@@ -261,6 +247,9 @@ function askForRecorderDataAndInitDom(recorderId) {
                 xAxis: transferTime(tableTime)
             }];
             Object.keys(analysisObject.chart).forEach(function (i) {
+                if (i.startsWith("define")) {
+                    return;
+                }
                 var series = analysisObject.chart[i].getOption()['series'];
                 series[0]['markLine']['data'] = line;
                 analysisObject.chart[i].setOption({
@@ -315,11 +304,11 @@ function generateChartDom(legend, chartId) {
     var legendClass = "cube-" + legend;
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
-        '<div class="col-sm-10 col-md-10"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
+        '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
         '<div class="col-sm-2 col-md-2 col-no-padding-left" style="padding-top: 5px">' +
-        '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 70px;" key="' + chartId + '">' +
-        '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-        '<div class="text-center ' + legendClass + '" style="font-size: 14px;color: #35b5eb;">-</div>' +
+        '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 80px; white-space: pre-wrap"" key="' + chartId + '">' +
+        '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+        '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
         '</div>' +
         '</div>';
 }
@@ -332,9 +321,9 @@ function generateChartCube(chartLegends) {
         var legendClass = "cube-" + legend;
         var cube = "cube-" + chartId;
         html += '<div class="col-sm-2 col-md-2" id="' + cube + '">' +
-            '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 70px;" key="' + chartId + '">' +
-            '<div style="font-size: 16px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-            '<div class="text-center ' + legendClass + '" style="font-size: 14px;color: #35b5eb;">-</div>' +
+            '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 70px; white-space: pre-wrap"" key="' + chartId + '">' +
+            '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+            '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
             '</div>' +
             '</div>';
     });
@@ -342,10 +331,17 @@ function generateChartCube(chartLegends) {
 }
 
 /** 初始化用户自定义图表数据 **/
-function generateDefineChartDom(xChartId, yChartId, chartId, title, desc) {
-    return '<div class="row in-row" style="margin-bottom: 5px"><div id="' + xChartId + '"></div></div>' +
-        '<div class="row in-row" style="margin-bottom: 5px"><div id="' + yChartId + '"></div></div>' +
-        '<div class="row in-row"><div id="' + chartId + '"></div></div>' +
+function generateDefineChartDom(chartId, legend, title, desc) {
+    var legendClass = "cube-" + legend;
+    var chartDom = chartId + "-dom";
+    return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
+        '<div class="row in-row">' +
+        '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
+        '<div class="col-sm-2 col-md-2 col-no-padding-left" style="padding-top: 5px">' +
+        '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 80px; white-space: pre-wrap"" key="' + chartId + '">' +
+        '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+        '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
+        '</div></div></div>' +
         '<div class="row in-row"><div class="col-sm-2 text-left" style="font-size: 16px; font-weight: 600">' + title + '</div>' +
         '<div class="col-sm-10 text-left" style="font-size: 14px">' + desc + '</div></div>' +
         '<hr/>';
@@ -392,26 +388,26 @@ function clickHideCube(btn) {
 
 /** 初始化视频内容 **/
 function generateVideoDom(contentId) {
-    return '<div class="col-sm-9 col-md-9 col-no-padding-both">' +
+    return '<div class="row in-row">' +
         '<div id="' + contentId + '"></div>' +
         '</div>';
 }
 
 /** 初始化视频数据方格 **/
 function generateVideoCube(chartLegends, videoHeight) {
-    var html = '<div class="col-sm-3 col-md-3"><div style="height: ' + videoHeight + 'px; overflow-x: hidden; overflow-y: auto;">';
+    var html = '<div style="height: ' + videoHeight + 'px; overflow-x: hidden; overflow-y: auto;">';
     Object.keys(chartLegends).forEach(function(chartId) {
         var legend = chartLegends[chartId];
         var legendClass = "cube-" + legend;
         var cube = "cube-" + chartId;
 
-        var infoDom = '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 70px;" key="' + chartId + '">' +
+        var infoDom = '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 70px; white-space: pre-wrap" key="' + chartId + '">' +
             '<div style="font-size: 12px; font-weight: 400; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-            '<div class="text-center ' + legendClass + '" style="font-size: 14px;color: #35b5eb;">-</div>' +
+            '<div class="text-center cube-text ' + legendClass + '" style="font-size: 14px;color: #35b5eb;">-</div>' +
             '</div>';
         html += '<div class="col-sm-6 col-little-padding-both" id="' + cube + '">' + infoDom + '</div>';
     });
-    return html + '</div></div>';
+    return html + '</div>';
 }
 
 /**

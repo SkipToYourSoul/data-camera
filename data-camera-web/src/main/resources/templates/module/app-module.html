@@ -40,7 +40,7 @@
 							<!-- 内容操作 -->
 							<div class="btn-group btn-action-bar pull-right" th:if="${inApp}">
 								<button class="btn btn-grey no-radius" data-toggle="modal" data-target="#new-data-recorder-modal">
-									<i class="fa fa-save"></i>&nbsp;保存
+									<i class="fa fa-cut"></i>&nbsp;截取
 								</button>
 								<button class="btn btn-grey no-radius" onclick="deleteContent()" id="delete-btn">
 									<i class="fa fa-trash"></i>&nbsp;删除
@@ -84,35 +84,26 @@
 
 						<!-- 视频显示栏 -->
 						<div class="row in-row" style="margin-bottom: 5px">
-							<div class="video-dom track" id="app-analysis-video"></div>
+							<div class="video-dom">
+								<div class="col-sm-9 col-md-9 col-no-padding-both" id="app-analysis-video">
+								</div>
+								<div class="col-sm-3 col-md-3 col-no-padding-right" id="video-cube">
+								</div>
+							</div>
 						</div>
 
 						<!-- 图表显示栏 -->
 						<div class="row in-row">
-							<!-- 若没有视频，图表数据信息将展示在这里 -->
-							<div id="app-analysis-chart-info"></div>
-						</div>
-						<div class="row in-row">
-							<ul class="nav nav-tabs" role="tablist" style="margin: 0 20px">
-								<li role="presentation"><a href="#o-chart" aria-controls="o-chart" role="tab" data-toggle="tab">原始数据</a></li>
-								<li role="presentation" class="active"><a href="#a-chart" aria-controls="a-chart" role="tab" data-toggle="tab">分析数据</a></li>
-							</ul>
-							<div class="tab-content" style="padding: 5px 0">
-								<div role="tabpanel" class="tab-pane" id="o-chart">
-									<div style="padding: 5px 20px" id="app-analysis-cube-alert">
-										<div class="alert alert-info">点击上方的数据方块选择你想查看的数据</div>
-									</div>
-									<div class="chart-dom" id="app-analysis-chart">
-									</div>
-								</div>
-								<div role="tabpanel" class="tab-pane active" id="a-chart">
-									<div class="chart-dom" id="app-analysis-define-chart">
-									</div>
-									<div style="padding: 5px 20px" th:if="${inApp}">
-										<div class="btn btn-blue" data-toggle="modal" data-target="#new-analysis-chart-modal">
-											<i class="fa fa-plus"></i>&nbsp;新增对比图表
-										</div>
-									</div>
+							<div style="padding: 5px 20px" id="app-analysis-cube-alert">
+								<div class="alert alert-info">点击上方的数据方块选择你想查看的数据</div>
+							</div>
+							<div class="chart-dom" id="app-analysis-define-chart">
+							</div>
+							<div class="chart-dom" id="app-analysis-chart">
+							</div>
+							<div style="padding: 5px 20px" th:if="${inApp}">
+								<div class="btn btn-info" data-toggle="modal" data-target="#new-analysis-chart-modal">
+									<i class="fa fa-plus"></i>&nbsp;新增对比图表
 								</div>
 							</div>
 						</div>
@@ -126,7 +117,7 @@
 							<div style="padding: 0 20px">
 								<label class="desc-title">试验描述</label>
 								<textarea class="newt-control" rows="3" id="app-analysis-desc"></textarea>
-								<button class="btn btn-blue" onclick="saveDataDesc()" style="margin-top: 10px">
+								<button class="btn btn-info" onclick="saveDataDesc()" style="margin-top: 10px">
 									<i class="fa fa-save"></i>&nbsp;保存试验描述
 								</button>
 							</div>

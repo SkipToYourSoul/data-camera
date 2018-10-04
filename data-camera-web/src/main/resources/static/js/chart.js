@@ -168,12 +168,12 @@ function buildAnalysisChartOption(data, legend) {
             padding: 10,
             formatter: function (params) {
                 params = params[0];
-                var html = "<b>TIME: </b>" + params.value[0] + "<br/>";
+                var html = "<b>时间: </b>" + params.value[0] + "<br/>";
                 if (params.value.length > 1){
                     html += "<b>" + legend + "</b>: " + params.value[1] + "<br/>";
                 }
                 if (params.name !== null){
-                    html += "<b>MARK: </b>"+ params.name;
+                    html += "<b>标记: </b>"+ params.name;
                 }
                 return html;
             },
@@ -187,6 +187,13 @@ function buildAnalysisChartOption(data, legend) {
             left: 50,
             right: 15
         }],
+        dataZoom: {
+            type: 'inside',
+            realtime: true,
+            start: 0,
+            end: 100,
+            xAxisIndex: [0]
+        },
         calculable: true,
         animation: false,
         xAxis: [
@@ -226,26 +233,20 @@ function buildAnalysisChartOption(data, legend) {
                 name: legend,
                 type: 'line',
                 smooth: true,
-                sampling: true,
+                sampling: "average",
                 hoverAnimation: false,
 
                 /* 点，线，面的样式 */
-                symbol:'circle',
-                symbolSize: 1,
-                /*itemStyle: {
-                    normal: {
-                        color: '#4CCBFF'
-                    }
-                },*/
+                /*symbol:'circle',*/
+                symbolSize: 5,
 
                 lineStyle: {
                     normal: {
-                        /*color: '#4CCBFF',*/
                         width: 1
                     }
                 },
 
-                areaStyle: {
+                /*areaStyle: {
                     normal: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                             offset: 0.1,
@@ -255,7 +256,7 @@ function buildAnalysisChartOption(data, legend) {
                             color: '#4CADFF'
                         }])
                     }
-                },
+                },*/
 
                 /* 标记的样式 */
                 /*markArea: {
@@ -297,9 +298,10 @@ function buildAnalysisChartOption(data, legend) {
 
 /**
  * 分析页面用户自定图表的设置
- * @param data
+ * @param dInfo
+ * @param legend
  */
-function buildAnalysisDefineChartOption(dInfo) {
+function buildAnalysisDefineChartOption(dInfo, legend) {
     return {
         tooltip: {
             trigger: 'axis',
@@ -311,11 +313,12 @@ function buildAnalysisDefineChartOption(dInfo) {
             top: 30,
             bottom: 30,
             left: 50,
-            right: 50
+            right: 15
         }],
         xAxis: [
             {
                 name: dInfo['info']['x'],
+                nameLocation: 'start',
                 type: 'value',
                 min: dInfo['xMin'],
                 max: dInfo['xMax'],
@@ -344,6 +347,7 @@ function buildAnalysisDefineChartOption(dInfo) {
         series: [
             {
                 id: 'a',
+                name: legend,
                 type: 'scatter',
                 smooth: true,
                 symbolSize: 10,
