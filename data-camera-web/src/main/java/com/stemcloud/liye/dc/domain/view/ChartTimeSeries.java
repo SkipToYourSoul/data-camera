@@ -19,7 +19,9 @@ public class ChartTimeSeries {
     private List<Object> value;
 
     /** data style **/
-    private Map<String, Map<String, Object>> itemStyle;
+    private Map<String, Object> itemStyle;
+
+    private Map<String, Map<String, Object>> emphasis;
 
     public ChartTimeSeries(Date date){
         List<Object> list = new ArrayList<Object>();
@@ -35,24 +37,27 @@ public class ChartTimeSeries {
         this.value = list;
 
         // mark and style
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        Map<String, Object> subMap = new HashMap<String, Object>();
+        Map<String, Object> itemStyle = new HashMap<String, Object>();
 
         if (vd.getMark() != null && !vd.getMark().trim().isEmpty()){
             this.name = vd.getMark();
-            subMap.put("color", "#fffff");
-            subMap.put("borderColor", "#00a6db");
-            subMap.put("borderWidth", 5);
-            subMap.put("opacity", 0.8);
-            subMap.put("id", vd.getId());
-            map.put("normal", subMap);
         }else {
             this.name = "无";
-            subMap.put("opacity", 1);
-            subMap.put("id", vd.getId());
-            map.put("normal", subMap);
         }
-        this.itemStyle = map;
+        itemStyle.put("id", vd.getId());
+        this.itemStyle = itemStyle;
+
+        // emphasis map
+        Map<String, Map<String, Object>> emphasis = new HashMap<String, Map<String, Object>>();
+        Map<String, Object> eItemStyle = new HashMap<String, Object>();
+        if (vd.getMark() != null && !vd.getMark().trim().isEmpty()){
+            eItemStyle.put("color", "#fffff");
+            eItemStyle.put("borderColor", "#00a6db");
+            eItemStyle.put("borderWidth", 5);
+            eItemStyle.put("opacity", 0.8);
+        }
+        emphasis.put("itemStyle", eItemStyle);
+        this.emphasis = emphasis;
     }
 
     public String getName() {
@@ -71,11 +76,19 @@ public class ChartTimeSeries {
         this.value = value;
     }
 
-    public Map<String, Map<String, Object>> getItemStyle() {
+    public Map<String, Object> getItemStyle() {
         return itemStyle;
     }
 
-    public void setItemStyle(Map<String, Map<String, Object>> itemStyle) {
+    public void setItemStyle(Map<String, Object> itemStyle) {
         this.itemStyle = itemStyle;
+    }
+
+    public Map<String, Map<String, Object>> getEmphasis() {
+        return emphasis;
+    }
+
+    public void setEmphasis(Map<String, Map<String, Object>> emphasis) {
+        this.emphasis = emphasis;
     }
 }

@@ -94,7 +94,7 @@ function askForRecorderDataAndInitDom(recorderId) {
 
                     // define chart
                     var chart = echarts.init(document.getElementById(chartId), "walden", opts = {
-                        height: 200
+                        height: 180
                     });
                     chart.setOption(buildAnalysisDefineChartOption(dInfo, legend));
 
@@ -120,43 +120,44 @@ function askForRecorderDataAndInitDom(recorderId) {
                         });
                         chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
                         chart.on('click', function (params) {
-                            console.log(params);
-                            bootbox.dialog({
-                                title: "为数据点添加描述",
-                                message: '<div class="form-group">' +
-                                '<textarea rows="3" class="form-control" id="dialog-data-mark" >' + params.name + '</textarea></div>',
-                                async: false,
-                                buttons: {
-                                    cancel: {
-                                        label: '<i class="fa fa-times"></i> 不保存',
-                                        className: 'btn-danger'
-                                    },
-                                    confirm: {
-                                        label: '<i class="fa fa-check"></i> 保存',
-                                        className: 'btn-success',
-                                        callback: function(){
-                                            $.ajax({
-                                                type: 'get',
-                                                url: data_address + "/user-data-mark",
-                                                data: {
-                                                    "data-id": params.data.itemStyle.normal.id,
-                                                    "data-mark": $('#dialog-data-mark').val()
-                                                },
-                                                success: function (response) {
-                                                    if (response.code === "1111"){
-                                                        commonObject.printExceptionMsg(response.data);
-                                                    } else if (response.code === "0000"){
-                                                        window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + analysisObject.currentRecorderId;
+                            if (params['componentType'] === 'series') {
+                                bootbox.dialog({
+                                    title: "为数据点添加描述",
+                                    message: '<div class="form-group">' +
+                                    '<textarea rows="3" class="form-control" id="dialog-data-mark" >' + params.name + '</textarea></div>',
+                                    async: false,
+                                    buttons: {
+                                        cancel: {
+                                            label: '<i class="fa fa-times"></i> 不保存',
+                                            className: 'btn-danger'
+                                        },
+                                        confirm: {
+                                            label: '<i class="fa fa-check"></i> 保存',
+                                            className: 'btn-success',
+                                            callback: function(){
+                                                $.ajax({
+                                                    type: 'get',
+                                                    url: data_address + "/user-data-mark",
+                                                    data: {
+                                                        "data-id": params.data.itemStyle.id,
+                                                        "data-mark": $('#dialog-data-mark').val()
+                                                    },
+                                                    success: function (response) {
+                                                        if (response.code === "1111"){
+                                                            commonObject.printExceptionMsg(response.data);
+                                                        } else if (response.code === "0000"){
+                                                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + analysisObject.currentRecorderId;
+                                                        }
+                                                    },
+                                                    error: function () {
+                                                        commonObject.printRejectMsg();
                                                     }
-                                                },
-                                                error: function () {
-                                                    commonObject.printRejectMsg();
-                                                }
-                                            });
+                                                });
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
+                            }
                         });
 
                         analysisObject.setChart(chartId, chart);
@@ -195,8 +196,14 @@ function askForRecorderDataAndInitDom(recorderId) {
                         // 如果是某个片段的子片段，需要设置起始时间
                         analysisObject.videoStartTime = recorders[recorderId]['startSeconds'];
                         this.currentTime(recorders[recorderId]['startSeconds']);
+
+                        // 等待video高度自适应调整后，再做数据cube的生成
+                        setTimeout(function () {
+                            videoHeight = $videoDom.height();
+                            // 新增统计数据
+                            $('#video-cube').append(generateVideoCube(chartLegends, videoHeight));
+                        }, 500);
                     });
-                    videoHeight = $videoDom.height();
                 } else {
                     var progressBar = '<div class="progress">' +
                         '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">' +
@@ -204,9 +211,6 @@ function askForRecorderDataAndInitDom(recorderId) {
                     $('#' + videoDomId).append('<div id=' + videoId + '> <p class="text-center">视频来自设备(编号：' + vSensorId + ')，上传中</p>' + progressBar + '</div>');
                 }
             });
-
-            // 新增统计数据
-            $('#video-cube').append(generateVideoCube(chartLegends, videoHeight));
         }
 
         // 初始化事件列表
@@ -305,11 +309,11 @@ function generateChartDom(legend, chartId) {
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
         '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
-        '<div class="col-sm-2 col-md-2 col-no-padding-left" style="padding-top: 5px">' +
-        '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 80px; white-space: pre-wrap"" key="' + chartId + '">' +
+        '<div class="col-sm-2 col-md-2" style="padding-top: 5px">' +
+        '<div style="padding-left: 22%;"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
         '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
         '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
-        '</div>' +
+        '</div></div>' +
         '</div>';
 }
 
@@ -320,8 +324,8 @@ function generateChartCube(chartLegends) {
         var legend = chartLegends[chartId];
         var legendClass = "cube-" + legend;
         var cube = "cube-" + chartId;
-        html += '<div class="col-sm-2 col-md-2" id="' + cube + '">' +
-            '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 70px; white-space: pre-wrap"" key="' + chartId + '">' +
+        html += '<div class="col-sm-2 col-md-2 col-little-padding-both" id="' + cube + '">' +
+            '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
             '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
             '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
             '</div>' +
@@ -335,15 +339,14 @@ function generateDefineChartDom(chartId, legend, title, desc) {
     var legendClass = "cube-" + legend;
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
+        '<div class="row in-row"><div class="col-sm-12"><span style="font-size: 18px; font-weight: 600; padding-left: 50px">' + title + '</span><span style="font-size: 16px; padding-left: 20px; padding-top: 3px">' + desc + '</span></div></div>' +
         '<div class="row in-row">' +
         '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
-        '<div class="col-sm-2 col-md-2 col-no-padding-left" style="padding-top: 5px">' +
-        '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 80px; white-space: pre-wrap"" key="' + chartId + '">' +
+        '<div class="col-sm-2 col-md-2" style="padding-top: 20px">' +
+        '<div style="padding-left: 22%;"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
         '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
         '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
-        '</div></div></div>' +
-        '<div class="row in-row"><div class="col-sm-2 text-left" style="font-size: 16px; font-weight: 600">' + title + '</div>' +
-        '<div class="col-sm-10 text-left" style="font-size: 14px">' + desc + '</div></div>' +
+        '</div></div></div></div>' +
         '<hr/>';
 }
 
@@ -401,8 +404,8 @@ function generateVideoCube(chartLegends, videoHeight) {
         var legendClass = "cube-" + legend;
         var cube = "cube-" + chartId;
 
-        var infoDom = '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 70px; white-space: pre-wrap" key="' + chartId + '">' +
-            '<div style="font-size: 12px; font-weight: 400; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+        var infoDom = '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 90px; white-space: pre-wrap" key="' + chartId + '">' +
+            '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
             '<div class="text-center cube-text ' + legendClass + '" style="font-size: 14px;color: #35b5eb;">-</div>' +
             '</div>';
         html += '<div class="col-sm-6 col-little-padding-both" id="' + cube + '">' + infoDom + '</div>';

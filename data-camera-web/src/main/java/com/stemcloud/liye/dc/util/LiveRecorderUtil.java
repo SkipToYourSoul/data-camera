@@ -1,9 +1,6 @@
 package com.stemcloud.liye.dc.util;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
-import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
 import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.service.OssService;
@@ -15,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

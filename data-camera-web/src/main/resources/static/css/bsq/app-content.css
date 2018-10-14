@@ -22,7 +22,7 @@
 }
 
 .app-analysis-chart-dom .timeline-dom {
-    padding: 10px 20px 10px 50px;
+    padding: 10px 15px 10px 50px;
     background:#fff;
 }
 
@@ -54,6 +54,7 @@
 }
 
 .app-analysis-chart-dom .video-dom {
+    margin-bottom: 15px;
 }
 
 .app-analysis-chart-dom .description-dom {

@@ -159,6 +159,19 @@ function buildExperimentChartOption(legend) {
  * @returns
  * */
 function buildAnalysisChartOption(data, legend) {
+    // markPoint
+    var markPoint = {
+        data: []
+    };
+    data.forEach(function (d) {
+        if (d['name'] !== null && d['name'] !== "无") {
+            markPoint['data'].push({
+                coord: d['value'],
+                value: d['name']
+            });
+        }
+    });
+
     return {
         tooltip: {
             trigger: 'axis',
@@ -182,7 +195,7 @@ function buildAnalysisChartOption(data, legend) {
             }
         },
         grid: [{
-            top: 5,
+            top: 15,
             bottom: 5,
             left: 50,
             right: 15
@@ -233,12 +246,13 @@ function buildAnalysisChartOption(data, legend) {
                 name: legend,
                 type: 'line',
                 smooth: true,
+                showSymbol: false,
                 sampling: "average",
                 hoverAnimation: false,
 
                 /* 点，线，面的样式 */
                 /*symbol:'circle',*/
-                symbolSize: 5,
+                symbolSize: 10,
 
                 lineStyle: {
                     normal: {
@@ -274,6 +288,7 @@ function buildAnalysisChartOption(data, legend) {
                     }]]
                 },*/
 
+                markPoint: markPoint,
                 markLine: {
                     silent: true,
                     itemStyle: {
@@ -310,7 +325,7 @@ function buildAnalysisDefineChartOption(dInfo, legend) {
             }
         },
         grid: [{
-            top: 30,
+            top: 20,
             bottom: 30,
             left: 50,
             right: 15
@@ -333,6 +348,7 @@ function buildAnalysisDefineChartOption(dInfo, legend) {
         yAxis: [
             {
                 name: dInfo['info']['y'],
+                nameLocation: 'start',
                 type: 'value',
                 min: dInfo['yMin'],
                 max: dInfo['yMax'],

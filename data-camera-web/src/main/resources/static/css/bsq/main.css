@@ -22,9 +22,9 @@ body {
 }
 
 .col-little-padding-both {
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-bottom: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 9px;
 }
 
 /** 通用：导航栏样式 **/
