@@ -45,7 +45,11 @@ function chartDataPlay(dataStartTime, interval, speed) {
                 // 更新数据cube
                 var length = nd.length;
                 if (length > 0) {
+                    var legend1 = legend.split("-")[0];
+                    var legend2 = legend.split("-")[1];
                     $('.cube-' + legend).html(nd[length - 1][0].toFixed(2) + "-" + nd[length - 1][1].toFixed(2));
+                    $('.cube-' + legend1).html(nd[length - 1][0].toFixed(2));
+                    $('.cube-' + legend2).html(nd[length - 1][1].toFixed(2));
                 }
             } else {
                 chartCurrentSeries[0]['data'] = updateChartData(chartOriginData);

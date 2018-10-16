@@ -302,6 +302,9 @@ function buildAnalysisChartOption(data, legend) {
                     },
                     symbol: 'none',
                     symbolSize: 0,
+                    label: {
+                        show: false
+                    },
                     data: []
                 },
 
@@ -333,7 +336,7 @@ function buildAnalysisDefineChartOption(dInfo, legend) {
         xAxis: [
             {
                 name: dInfo['info']['x'],
-                nameLocation: 'start',
+                nameLocation: 'middle',
                 type: 'value',
                 min: dInfo['xMin'],
                 max: dInfo['xMax'],
@@ -347,8 +350,10 @@ function buildAnalysisDefineChartOption(dInfo, legend) {
         ],
         yAxis: [
             {
-                name: dInfo['info']['y'],
-                nameLocation: 'start',
+                name: dInfo['info']['y'].split('').join("\n"),
+                nameLocation: 'middle',
+                nameGap: 30,
+                nameRotate: 0,
                 type: 'value',
                 min: dInfo['yMin'],
                 max: dInfo['yMax'],

@@ -32,11 +32,35 @@ var commonObject = (function () {
     var newObjectText = "确认创建";
     var editObjectText = "确认修改";
 
+    var legendUnit = {
+        "温度": "°C",
+        "湿度": "%RH",
+        "光照": "Lux",
+        "脑电波": "Hz",
+        "压力": "Pa",
+        "相对高度": "m",
+        "X轴加速度": "m/s^2",
+        "Y轴加速度": "m/s^2",
+        "Z轴加速度": "m/s^2",
+        "气压": "Pa",
+        "X轴角速度": "°/s",
+        "Y轴角速度": "°/s",
+        "Z轴角速度": "°/s",
+        "X轴磁力": "Gs",
+        "Y轴磁力": "Gs",
+        "Z轴磁力": "Gs",
+        "航向": "°",
+        "横滚角": "°",
+        "俯仰角": "°",
+        "": ""
+    };
+
     return {
         printRejectMsg: ajaxRejectMsg,
         printExceptionMsg: ajaxExceptionMsg,
         newText: newObjectText,
-        editText: editObjectText
+        editText: editObjectText,
+        legendUnit: legendUnit
     }
 })();
 

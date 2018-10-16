@@ -88,7 +88,7 @@ function askForRecorderDataAndInitDom(recorderId) {
             if (!isEmptyObject(defineData)) {
                 defineData.forEach(function (dInfo) {
                     var chartId = 'define-chart-' + dInfo['info']['id'];
-                    var legend = dInfo['info']['x'] + "-" + dInfo['info']['y'];;
+                    var legend = dInfo['info']['x'] + "-" + dInfo['info']['y'];
                     $dom3.append(generateDefineChartDom(chartId, legend, dInfo['info']['name'], dInfo['info']['desc']));
                     chartLegends[chartId] = legend;
 
@@ -305,14 +305,12 @@ function generateTimeLine(minTime, maxTime) {
 
 /** 初始化图表内容 **/
 function generateChartDom(legend, chartId) {
-    var legendClass = "cube-" + legend;
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
         '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
         '<div class="col-sm-2 col-md-2" style="padding-top: 5px">' +
         '<div style="padding-left: 22%;"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
-        '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-        '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
+        generateDataCubeDom(legend) +
         '</div></div>' +
         '</div>';
 }
@@ -322,12 +320,10 @@ function generateChartCube(chartLegends) {
     var html = "";
     Object.keys(chartLegends).forEach(function (chartId) {
         var legend = chartLegends[chartId];
-        var legendClass = "cube-" + legend;
         var cube = "cube-" + chartId;
         html += '<div class="col-sm-2 col-md-2 col-little-padding-both" id="' + cube + '">' +
             '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
-            '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-            '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
+            generateDataCubeDom(legend) +
             '</div>' +
             '</div>';
     });
@@ -336,18 +332,31 @@ function generateChartCube(chartLegends) {
 
 /** 初始化用户自定义图表数据 **/
 function generateDefineChartDom(chartId, legend, title, desc) {
-    var legendClass = "cube-" + legend;
+    var legend1 = legend.split("-")[0];
+    var legend2 = legend.split("-")[1];
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
         '<div class="row in-row"><div class="col-sm-12"><span style="font-size: 18px; font-weight: 600; padding-left: 50px">' + title + '</span><span style="font-size: 16px; padding-left: 20px; padding-top: 3px">' + desc + '</span></div></div>' +
         '<div class="row in-row">' +
         '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
         '<div class="col-sm-2 col-md-2" style="padding-top: 20px">' +
-        '<div style="padding-left: 22%;"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
-        '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-        '<div class="text-center cube-text ' + legendClass + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
+        '<div style="padding-left: 22%;"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 130px; white-space: pre-wrap"" key="' + chartId + '">' +
+        generateDataCubeDom(legend1) +
+        '<div style="margin-bottom: 5px"></div>' +
+        generateDataCubeDom(legend2) +
         '</div></div></div></div>' +
         '<hr/>';
+}
+
+function generateDataCubeDom(legend) {
+    var unit = "";
+    if (commonObject.legendUnit.hasOwnProperty(legend)) {
+        unit = commonObject.legendUnit[legend];
+    }
+
+    return '<div style="font-size: 12px; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
+        '<div class="text-center cube-text cube-' + legend + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
+        '<div class="text-center" style="font-size: 12px">' + unit + '</div>';
 }
 
 /** 点击cube时的动作 **/
@@ -401,12 +410,10 @@ function generateVideoCube(chartLegends, videoHeight) {
     var html = '<div style="height: ' + videoHeight + 'px; overflow-x: hidden; overflow-y: auto;">';
     Object.keys(chartLegends).forEach(function(chartId) {
         var legend = chartLegends[chartId];
-        var legendClass = "cube-" + legend;
         var cube = "cube-" + chartId;
 
         var infoDom = '<div class="btn btn-default btn-block" onclick="clickAddCube(this)" style="height: 90px; white-space: pre-wrap" key="' + chartId + '">' +
-            '<div style="font-size: 14px; font-weight: 600; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-            '<div class="text-center cube-text ' + legendClass + '" style="font-size: 14px;color: #35b5eb;">-</div>' +
+            generateDataCubeDom(legend) +
             '</div>';
         html += '<div class="col-sm-6 col-little-padding-both" id="' + cube + '">' + infoDom + '</div>';
     });
