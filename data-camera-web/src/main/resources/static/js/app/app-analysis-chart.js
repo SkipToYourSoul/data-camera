@@ -307,9 +307,9 @@ function generateTimeLine(minTime, maxTime) {
 function generateChartDom(legend, chartId) {
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
-        '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
-        '<div class="col-sm-2 col-md-2" style="padding-top: 5px">' +
-        '<div style="padding-left: 22%;"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
+        '<div class="col-sm-11 col-md-11 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
+        '<div class="col-sm-1 col-md-1" style="padding-top: 5px">' +
+        '<div style="margin-left: -115%"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
         generateDataCubeDom(legend) +
         '</div></div>' +
         '</div>';
@@ -336,16 +336,20 @@ function generateDefineChartDom(chartId, legend, title, desc) {
     var legend2 = legend.split("-")[1];
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
-        '<div class="row in-row"><div class="col-sm-12"><span style="font-size: 18px; font-weight: 600; padding-left: 50px">' + title + '</span><span style="font-size: 16px; padding-left: 20px; padding-top: 3px">' + desc + '</span></div></div>' +
         '<div class="row in-row">' +
-        '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
-        '<div class="col-sm-2 col-md-2" style="padding-top: 20px">' +
-        '<div style="padding-left: 22%;"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 130px; white-space: pre-wrap"" key="' + chartId + '">' +
+        '<div class="col-sm-10 col-md-10 col-no-padding-both">' +
+        '<div><span style="font-size: 18px; font-weight: 600; padding-left: 50px">' + title + '</span><span style="font-size: 16px; padding-left: 20px; padding-top: 3px">' + desc + '</span></div>' +
+        '<div id="' + chartId + '" style="margin-bottom: 5px"></div>' +
+        '</div>' +
+        '<div class="col-sm-2 col-md-2 col-no-padding-left">' +
+        '<div class="row in-row">' +
+        '<div class="col-sm-2 col-no-padding-both"><div class="text-right" style="font-weight: 600; font-size: 16px; margin-bottom: 55px">横<br/>坐<br/>标</div><div class="text-right" style="font-weight: 600; font-size: 16px">纵<br/>坐<br/>标</div></div>' +
+        '<div class="col-sm-10 col-no-padding-right" style="padding-left: 16%">' +
+        '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 200px; white-space: pre-wrap"" key="' + chartId + '">' +
         generateDataCubeDom(legend1) +
-        '<div style="margin-bottom: 5px"></div>' +
+        '<div style="margin-bottom: 35px"></div>' +
         generateDataCubeDom(legend2) +
-        '</div></div></div></div>' +
-        '<hr/>';
+        '</div></div></div></div></div>';
 }
 
 function generateDataCubeDom(legend) {
@@ -354,8 +358,8 @@ function generateDataCubeDom(legend) {
         unit = commonObject.legendUnit[legend];
     }
 
-    return '<div style="font-size: 12px; padding-bottom: 5px" class="text-center">' + legend + '</div>' +
-        '<div class="text-center cube-text cube-' + legend + '" style="font-size: 13px;color: #35b5eb;">-</div>' +
+    return '<div style="font-size: 12px; font-weight: 600; padding-bottom: 5px; padding-top: 10px" class="text-center">' + legend + '</div>' +
+        '<div class="text-center cube-text cube-' + legend + '" style="font-size: 16px; font-weight: 600; color: #35b5eb;">-</div>' +
         '<div class="text-center" style="font-size: 12px">' + unit + '</div>';
 }
 

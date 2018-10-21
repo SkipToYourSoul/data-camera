@@ -198,7 +198,7 @@ function buildAnalysisChartOption(data, legend) {
             top: 15,
             bottom: 5,
             left: 50,
-            right: 15
+            right: 45
         }],
         dataZoom: {
             type: 'inside',
