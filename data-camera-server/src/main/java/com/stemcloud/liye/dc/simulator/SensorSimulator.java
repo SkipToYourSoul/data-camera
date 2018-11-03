@@ -33,6 +33,8 @@ public class SensorSimulator implements Runnable {
         SENSORS.forEach((code, sensor) -> {
             if (sensor.getId() == 8) {
                 // 【水火箭】实验专用数据
+            } else if (sensor.getId() == 11) {
+                // 【单摆】实验专用数据
             } else {
                 SensorConfig config = sensorConfigMap.get(sensor.getSensorConfigId());
                 if (config != null){
@@ -45,6 +47,7 @@ public class SensorSimulator implements Runnable {
         });
     }
 
+    // 模拟生成水火箭数据
     public void rocket() {
         String rocketCode = "1001";
         if (SENSORS.containsKey(rocketCode)) {
@@ -52,6 +55,18 @@ public class SensorSimulator implements Runnable {
             Map<String, Double> values = DataGenerator.getRocket(config.getDimension());
             if (!values.isEmpty()) {
                 handleValue(rocketCode, values);
+            }
+        }
+    }
+
+    // 模拟生成单摆数据
+    public void swag() {
+        String swagCode = "2001";
+        if (SENSORS.containsKey(swagCode)) {
+            SensorConfig config = sensorConfigMap.get(SENSORS.get(swagCode).getSensorConfigId());
+            Map<String, Double> values = DataGenerator.getSwag(config.getDimension());
+            if (!values.isEmpty()) {
+                handleValue(swagCode, values);
             }
         }
     }

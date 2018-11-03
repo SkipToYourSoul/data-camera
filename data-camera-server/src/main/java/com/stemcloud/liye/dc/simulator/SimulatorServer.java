@@ -49,6 +49,13 @@ public class SimulatorServer implements Server {
                     TimeUnit.MILLISECONDS
             );
 
+            // -- 单摆数据模拟
+            SCHEDULE.scheduleAtFixedRate(
+                    sensorSimulator::swag,
+                    0L, 500L,
+                    TimeUnit.MILLISECONDS
+            );
+
             // -- 传感器状态刷新
             SCHEDULE.scheduleWithFixedDelay(
                     sensorSimulator::refresh,
