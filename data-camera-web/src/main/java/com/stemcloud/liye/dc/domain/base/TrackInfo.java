@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.sound.midi.Track;
 import java.util.Date;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "dc_base_track_info")
-public class TrackInfo {
+public class TrackInfo implements Comparable<TrackInfo> {
     @Id
     @GeneratedValue
     private long id;
@@ -103,11 +104,22 @@ public class TrackInfo {
         TrackInfo trackInfo = (TrackInfo) o;
 
         return id == trackInfo.id;
-
     }
 
     @Override
     public int hashCode() {
         return (int) (id ^ (id >>> 32));
+    }
+
+    @Override
+    public int compareTo(TrackInfo t) {
+        // type=2 优先
+        if (this.getType() > t.getType()) {
+            return -1;
+        } else if (this.getType() == t.getType()){
+            return 0;
+        } else {
+            return 1;
+        }
     }
 }

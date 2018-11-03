@@ -70,7 +70,7 @@ function initExperiment(iFi){
                     var videoPlayer = cyberplayer(videoId).setup({
                         width: $(dom).width,
                         height: 300,
-                        file: "/camera/img/rocket.mp4",
+                        file: "/camera/img/" + liveAddress,
                         autostart: false,
                         stretching: "uniform",
                         volume: 100,

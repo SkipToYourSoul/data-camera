@@ -23,7 +23,7 @@
 			<div th:if="${#maps.isEmpty(experiments)}" class="alert alert-info my-alert" role="alert">TIPS:
 				场景中还没有传感器组，请点击上方“添加传感器组”按钮可进行相关操作:)</div>
 
-			<!-- 遍历构造实验panel -->
+			<!-- 遍历构造实验(传感器组)panel -->
 			<th:block th:each="experiment,expIndex:${experiments}">
 				<div class="panel-heading" style="border-bottom: solid 1px #eee; border-top: solid 1px #eee">
 					<div class="panel-title row">
@@ -86,6 +86,7 @@
 							<div th:if="${#lists.isEmpty(experiment.value.trackInfoList)}"
 								class="alert alert-info my-alert" role="alert">TIPS:
 								传感器组中暂无任何传感器，点击上方“+”按钮可添加传感器:)</div>
+							<!-- 遍历构造传感器track -->
 							<th:block th:each="track,trackIndex:${experiment.value.trackInfoList}">
 								<div class="track">
 									<!-- 轨迹信息 -->
@@ -114,8 +115,7 @@
 														</span>
 													</div>
 												</div>
-												<div th:id="'exp-'+${experiment.key}+'-'+${track.id}+'-'+${dim}"
-													class="panel-collapse collapse in" role="tabpanel">
+												<div th:id="'exp-'+${experiment.key}+'-'+${track.id}+'-'+${dim}" class="panel-collapse collapse in" role="tabpanel">
 													<div class="panel-body my-panel-body">
 														<div class="row" >
 															<!-- 轨迹绑定的传感器内容，包括：未绑定，数值型，摄像头 -->

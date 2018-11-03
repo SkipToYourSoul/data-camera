@@ -93,7 +93,7 @@ public class ViewController {
                     expRecorderTime.put(expId, baseInfoService.getRecorderInfoOfExp(expId).getStartTime());
                 }
 
-                Set<TrackInfo> newTracks = new HashSet<TrackInfo>();
+                Set<TrackInfo> newTracks = new TreeSet<TrackInfo>();
                 for (TrackInfo track: exp.getTrackInfoList()){
                     if (track.getIsDeleted() == 0){
                         tracks.put(track.getId(), track);
