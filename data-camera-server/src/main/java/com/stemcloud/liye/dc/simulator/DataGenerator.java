@@ -24,10 +24,13 @@ public class DataGenerator {
     private static List<String> rocketLines = new ArrayList<>();
     private static int swagFlag = 0;
     private static List<String> swagLines = new ArrayList<>();
+    private static int phFlag = 0;
+    private static List<String> phLines = new ArrayList<>();
 
     public static void init() {
         rocketLines = fileReader("./rocket.dat");
         swagLines = fileReader("./swag.txt");
+        phLines = fileReader("./ph.txt");
         LOGGER.info("init data generator, data size = {}, flag = {}", rocketLines.size(), rocketFlag);
     }
 
@@ -77,6 +80,21 @@ public class DataGenerator {
         return result;
     }
 
+    public static Map<String, Double> getPh(List<String> dim) {
+        Map<String, Double> result = new HashMap<>();
+        String recorder = phLines.get(phFlag);
+
+        String[] values = recorder.split("\t");
+        if (values.length == 1) {
+            for (int i = 0; i < dim.size(); i++) {
+                result.put(dim.get(i), Double.valueOf(values[i]));
+            }
+        }
+        phFlag = (phFlag == phLines.size() - 1) ? 0 : (phFlag+1);
+
+        return result;
+    }
+
     public static Map<String, Double> generateRandom(SensorConfig config) {
         Map<String, Double> values = new HashMap<>();
         if (config != null) {
@@ -115,6 +133,8 @@ public class DataGenerator {
         return random.nextDouble() * from + (to - from);
     }
 
+
+    // --- 模拟数据生成
     private static void simulatorRocket() {
         String dim = "相对高度;X轴加速度;Y轴加速度;Z轴加速度;气压;X轴角速度;Y轴角速度;Z轴角速度;X轴磁力;Y轴磁力;Z轴磁力;航向;横滚角;俯仰角;温度";
         List<String> dims = Arrays.asList(dim.split(";"));
@@ -141,11 +161,24 @@ public class DataGenerator {
         }
     }
 
+    private static void simulatorPh() {
+        String dim = "PH值";
+        List<String> dims = Arrays.asList(dim.split(";"));
+        long beginTime = System.currentTimeMillis();
+        for (int i = 0; i < 372; i++) {
+            Map<String, Double> values = DataGenerator.getPh(dims);
+            for (Map.Entry<String, Double> entry : values.entrySet()) {
+                MysqlRepository.saveValueData(13, 56, entry.getKey(), entry.getValue(), beginTime);
+            }
+            beginTime += 400;
+        }
+    }
+
     public static void main(String[] args) {
         // 模拟完整数据生成
         DataGenerator.init();
         // simulatorRocket();
 
-        simulatorSwag();
+        simulatorPh();
     }
 }

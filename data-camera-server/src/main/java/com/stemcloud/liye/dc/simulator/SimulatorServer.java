@@ -56,6 +56,13 @@ public class SimulatorServer implements Server {
                     TimeUnit.MILLISECONDS
             );
 
+            // -- 酚酞数据模拟
+            SCHEDULE.scheduleAtFixedRate(
+                    sensorSimulator::ph,
+                    0L, 500L,
+                    TimeUnit.MILLISECONDS
+            );
+
             // -- 传感器状态刷新
             SCHEDULE.scheduleWithFixedDelay(
                     sensorSimulator::refresh,

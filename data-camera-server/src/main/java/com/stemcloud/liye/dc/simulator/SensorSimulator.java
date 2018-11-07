@@ -71,6 +71,18 @@ public class SensorSimulator implements Runnable {
         }
     }
 
+    // -- 酚酞数据模拟
+    public void ph() {
+        String phCode = "3001";
+        if (SENSORS.containsKey(phCode)) {
+            SensorConfig config = sensorConfigMap.get(SENSORS.get(phCode).getSensorConfigId());
+            Map<String, Double> values = DataGenerator.getPh(config.getDimension());
+            if (!values.isEmpty()) {
+                handleValue(phCode, values);
+            }
+        }
+    }
+
     /**
      * 周期方法，更新目前已绑定的SENSOR的状态
      */
