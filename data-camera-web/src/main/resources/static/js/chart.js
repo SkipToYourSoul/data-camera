@@ -198,7 +198,7 @@ function buildAnalysisChartOption(data, legend) {
             top: 15,
             bottom: 5,
             left: 50,
-            right: 45
+            right: 8
         }],
         dataZoom: {
             type: 'inside',
@@ -331,7 +331,7 @@ function buildAnalysisDefineChartOption(dInfo, legend) {
             top: 20,
             bottom: 30,
             left: 50,
-            right: 15
+            right: 10
         }],
         xAxis: [
             {

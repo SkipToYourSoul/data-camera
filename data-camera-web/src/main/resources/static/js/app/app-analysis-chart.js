@@ -307,12 +307,11 @@ function generateTimeLine(minTime, maxTime) {
 function generateChartDom(legend, chartId) {
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
-        '<div class="col-sm-11 col-md-11 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
-        '<div class="col-sm-1 col-md-1" style="padding-top: 5px">' +
-        '<div style="margin-left: -115%"><div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
+        '<div class="col-sm-10 col-md-10 col-no-padding-both"><div id="' + chartId + '" style="margin-bottom: 5px"></div></div>' +
+        '<div class="col-sm-2 col-md-2 col-little-padding-left" style="padding-top: 5px">' +
+        '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 90px; white-space: pre-wrap"" key="' + chartId + '">' +
         generateDataCubeDom(legend) +
-        '</div></div>' +
-        '</div>';
+        '</div></div>';
 }
 
 /** 初始化图表数据方格 **/
@@ -337,19 +336,17 @@ function generateDefineChartDom(chartId, legend, title, desc) {
     var chartDom = chartId + "-dom";
     return '<div class="row in-row ' + chartDom + '" hidden="hidden">' +
         '<div class="row in-row">' +
-        '<div class="col-sm-10 col-md-10 col-no-padding-both">' +
+        '<div class="col-sm-9 col-md-9 col-no-padding-both">' +
         '<div><span style="font-size: 18px; font-weight: 600; padding-left: 50px">' + title + '</span><span style="font-size: 16px; padding-left: 20px; padding-top: 3px">' + desc + '</span></div>' +
         '<div id="' + chartId + '" style="margin-bottom: 5px"></div>' +
         '</div>' +
-        '<div class="col-sm-2 col-md-2 col-no-padding-left">' +
-        '<div class="row in-row">' +
-        '<div class="col-sm-2 col-no-padding-both"><div class="text-right" style="font-weight: 600; font-size: 16px; margin-bottom: 55px">横<br/>坐<br/>标</div><div class="text-right" style="font-weight: 600; font-size: 16px">纵<br/>坐<br/>标</div></div>' +
-        '<div class="col-sm-10 col-no-padding-right" style="padding-left: 16%">' +
+        '<div class="col-sm-1 col-no-padding-both"><div class="text-right" style="font-weight: 600; font-size: 16px; margin-bottom: 55px; padding-right: 10px">横<br/>坐<br/>标</div><div class="text-right" style="font-weight: 600; font-size: 16px; padding-right: 10px">纵<br/>坐<br/>标</div></div>' +
+        '<div class="col-sm-2 col-little-padding-left">' +
         '<div class="btn btn-default btn-block" onclick="clickHideCube(this)" style="height: 200px; white-space: pre-wrap"" key="' + chartId + '">' +
         generateDataCubeDom(legend1) +
         '<div style="margin-bottom: 35px"></div>' +
         generateDataCubeDom(legend2) +
-        '</div></div></div></div></div>';
+        '</div></div></div>';
 }
 
 function generateDataCubeDom(legend) {
@@ -358,9 +355,16 @@ function generateDataCubeDom(legend) {
         unit = commonObject.legendUnit[legend];
     }
 
-    return '<div style="font-size: 12px; font-weight: 600; padding-bottom: 5px; padding-top: 10px" class="text-center">' + legend + '</div>' +
-        '<div class="text-center cube-text cube-' + legend + '" style="font-size: 16px; font-weight: 600; color: #35b5eb;">-</div>' +
-        '<div class="text-center" style="font-size: 12px">' + unit + '</div>';
+    if (legend.indexOf("-") === -1) {
+        return '<div style="font-size: 12px; font-weight: 600; padding-bottom: 5px; padding-top: 10px" class="text-center">' + legend + '</div>' +
+            '<div class="text-center cube-text cube-' + legend + '" style="font-size: 16px; font-weight: 600; color: #35b5eb;">-</div>' +
+            '<div class="text-center" style="font-size: 12px">' + unit + '</div>';
+    } else {
+        // user define cube
+        var text = legend.split("-")[0] + "<br/><div style='font-weight: normal; margin: 5px 0;'>VS</div>" + legend.split("-")[1];
+        return '<div style="font-size: 12px; font-weight: 600; padding-bottom: 5px; padding-top: 10px" class="text-center">' + text + '</div>';
+    }
+
 }
 
 /** 点击cube时的动作 **/
