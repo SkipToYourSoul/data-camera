@@ -72,6 +72,12 @@ function recorderComplete() {
         analysisObject.playStatus = "normal";
         $('#play-btn').removeAttr('disabled');
         $('#pause-btn').attr('disabled', 'disabled');
+
+        // 暂停视频
+        Object.keys(analysisObject.video).forEach(function (i) {
+            var video = analysisObject.video[i];
+            video.pause();
+        });
     }
 }
 
