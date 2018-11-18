@@ -10,14 +10,13 @@
 						<!-- 操作按钮 -->
 						<div class="action-bar">
 							<!-- 播放速度 -->
-							<select class="selectpicker cuspicker" data-width="10%" id="recorder-speed" disabled="disabled">
+							<select class="selectpicker cuspicker" data-width="10%" id="recorder-speed" onchange="changeSpeed(this)">
 								<option value="1">X 1</option>
 								<option value="0.025">X 0.025</option>
 								<option value="0.05">X 0.05</option>
 								<option value="0.1">X 0.1</option>
 								<option value="0.25">X 0.25</option>
 								<option value="0.5">X 0.5</option>
-								<option value="1">X 1</option>
 								<option value="4">X 4</option>
 								<option value="8">X 8</option>
 								<option value="16">X 16</option>
@@ -65,9 +64,9 @@
 									<div class="record-time">
 										<span id="recorder-current-time">00:00</span> / <span id="recorder-total-time">-</span>
 									</div>
-									<div class="record-time">
+									<!--<div class="record-time">
 										<span>2018-09-08 18:25:01</span>
-									</div>
+									</div>-->
 								</div>
 							</div>
 						</div>

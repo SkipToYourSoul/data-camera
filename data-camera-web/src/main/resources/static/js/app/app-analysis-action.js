@@ -131,8 +131,10 @@ function recorderReset() {
 
 function slideChange(e, ui) {
     // 时间轴标注
-    $('#recorder-current-time').html(analysisObject.secondLine[ui.values[0]]);
-    $('#recorder-total-time').html(analysisObject.secondLine[ui.values[1]]);
+    // todo：显示真实视频播放时间，后续需接入摄像头录制倍数
+    $('#recorder-current-time').html(/*analysisObject.secondLine[ui.values[0]]*/ui.values[0]);
+    $('#recorder-total-time').html(/*analysisObject.secondLine[ui.values[1]]*/ ui.values[1] + "s");
+
     analysisObject.timelineStart = ui.values[0];
     analysisObject.timelineEnd = ui.values[1];
 
@@ -191,6 +193,10 @@ function slideChange(e, ui) {
             video.currentTime(vTime);
         });
     }
+}
+
+function changeSpeed(select) {
+    console.info($(select).selectpicker('val'));
 }
 
 /**

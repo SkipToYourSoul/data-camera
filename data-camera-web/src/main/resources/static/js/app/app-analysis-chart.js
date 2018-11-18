@@ -201,7 +201,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                         setTimeout(function () {
                             videoHeight = $videoDom.height();
                             // 新增统计数据
-                            $('#video-cube').append(generateVideoCube(chartLegends, videoHeight));
+                            $('#video-cube').html(generateVideoCube(chartLegends, videoHeight));
                         }, 500);
                     });
                 } else {
