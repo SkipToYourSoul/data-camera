@@ -262,9 +262,9 @@ $('#new-data-recorder-form').formValidation({
             "desc": $('#new-recorder-desc').val()
         },
         success: function (response) {
-            if (response.code == "1111"){
+            if (response.code === "1111"){
                 commonObject.printExceptionMsg(response.data);
-            } else if (response.code == "0000"){
+            } else if (response.code === "0000"){
                 window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
             }
         },
@@ -366,7 +366,7 @@ $('#new-analysis-chart-form').formValidation({
         data: $(this).serialize() + "&recorder-id=" + analysisObject.currentRecorderId,
         success: function (response) {
             if (response.code === "0000"){
-                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data;
+                window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + response.data["recorder"] + "&chart=" + response.data["id"];
             } else if (response.code === "1111") {
                 commonObject.printExceptionMsg(response.data);
             }

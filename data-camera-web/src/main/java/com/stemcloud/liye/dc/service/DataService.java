@@ -284,7 +284,7 @@ public class DataService {
         return contentRepository.findByIsSharedAndIsDeletedAndTitleLikeOrderByLikeDesc(1,0,'%' + search + '%');
     }
 
-    public Long userNewChart(long sensorId, long recorderId, String x, String y, String name, String desc) {
+    public Map<String, String> userNewChart(long sensorId, long recorderId, String x, String y, String name, String desc) {
         UserDefineChart chart = new UserDefineChart();
         chart.setRecorderId(recorderId);
         chart.setSensorId(sensorId);
@@ -292,6 +292,12 @@ public class DataService {
         chart.setY(y);
         chart.setName(name);
         chart.setDesc(desc);
-        return userDefineChartRepository.save(chart).getRecorderId();
+
+        UserDefineChart newChart = userDefineChartRepository.save(chart);
+        Map<String, String> result = new HashMap<String, String>();
+        result.put("id", String.valueOf(newChart.getId()));
+        result.put("recorder", String.valueOf(newChart.getRecorderId()));
+
+        return result;
     }
 }

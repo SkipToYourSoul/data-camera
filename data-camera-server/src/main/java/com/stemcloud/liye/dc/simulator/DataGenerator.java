@@ -28,7 +28,7 @@ public class DataGenerator {
     private static List<String> phLines = new ArrayList<>();
 
     public static void init() {
-        rocketLines = fileReader("./rocket.dat");
+        rocketLines = fileReader("./rocket.txt");
         swagLines = fileReader("./swag.txt");
         phLines = fileReader("./ph.txt");
         LOGGER.info("init data generator, data size = {}, flag = {}", rocketLines.size(), rocketFlag);
@@ -179,6 +179,7 @@ public class DataGenerator {
         DataGenerator.init();
         // simulatorRocket();
 
+        simulatorSwag();
         simulatorPh();
     }
 }

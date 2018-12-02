@@ -15,7 +15,7 @@ $(function () {
             message_info("你的浏览器不支持websocket，不能正常使用监控功能", "error");
         } else {
             if (websocket == null) {
-                websocket = new WebSocket("ws://10.221.73.206:8889/dc-websocket");
+                websocket = new WebSocket("ws://113.207.89.122/dc-websocket");
                 console.info("websocket链接中");
 
                 websocket.onopen = function (ev) {

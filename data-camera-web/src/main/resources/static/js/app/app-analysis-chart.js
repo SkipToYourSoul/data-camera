@@ -107,6 +107,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                 });
             }
 
+            // 录制生成的图表
             Object.keys(chartData).forEach(function (sensorId) {
                 var data = chartData[sensorId];
                 Object.keys(data).forEach(function (legend) {
@@ -120,6 +121,7 @@ function askForRecorderDataAndInitDom(recorderId) {
                         });
                         chart.setOption(buildAnalysisChartOption(chartData[sensorId][legend], legend));
                         chart.on('click', function (params) {
+                            var chartId = $(this)[0]['_dom'].getAttribute('id');
                             if (params['componentType'] === 'series') {
                                 bootbox.dialog({
                                     title: "为数据点添加描述",
@@ -146,7 +148,13 @@ function askForRecorderDataAndInitDom(recorderId) {
                                                         if (response.code === "1111"){
                                                             commonObject.printExceptionMsg(response.data);
                                                         } else if (response.code === "0000"){
-                                                            window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + analysisObject.currentRecorderId;
+                                                            // window.location.href = current_address + "?id=" + app['id'] + "&tab=2&recorder=" + analysisObject.currentRecorderId;
+                                                            params['data']['name'] = $('#dialog-data-mark').val();
+                                                            // 异步刷新图表
+                                                            var dataIndex = params['dataIndex'];
+                                                            var chartData = analysisObject.chartData[chartId];
+                                                            chartData[dataIndex] = params['data'];
+                                                            analysisObject.chart[chartId].setOption(buildAnalysisChartOption(chartData, params['seriesName']));
                                                         }
                                                     },
                                                     error: function () {
@@ -165,6 +173,11 @@ function askForRecorderDataAndInitDom(recorderId) {
                     }
                 });
             });
+
+            // 默认点击显示刚生成的用户自定义图表
+            var showDefineChartId = 'define-chart-' + getQueryString("chart");
+            var $select = "[key=" + showDefineChartId + "]";
+            clickAddCube($($select));
 
             // 如果没有视频数据，则初始化数据方格
             if (isEmptyObject(videoData)) {
@@ -247,19 +260,14 @@ function askForRecorderDataAndInitDom(recorderId) {
         // 双击可切换查看相应数据
         $eventTable.on('click-row.bs.table', function (row, $element, field) {
             var tableTime = $element['time'];
-            var line = [{
-                xAxis: transferTime(tableTime)
-            }];
-            Object.keys(analysisObject.chart).forEach(function (i) {
-                if (i.startsWith("define")) {
-                    return;
+            // 触发sliderChange事件，改变图表和视频内容
+            for (var index in analysisObject.timeline) {
+                var time = analysisObject.timeline[index];
+                if (transferTime(tableTime).startsWith(time)) {
+                    $(".slider").slider({values: [index, analysisObject.timeline.length - 1]}).slider("pips", "refresh").slider("float", "refresh");
+                    break;
                 }
-                var series = analysisObject.chart[i].getOption()['series'];
-                series[0]['markLine']['data'] = line;
-                analysisObject.chart[i].setOption({
-                    series: series
-                });
-            });
+            }
         });
     }
 }
