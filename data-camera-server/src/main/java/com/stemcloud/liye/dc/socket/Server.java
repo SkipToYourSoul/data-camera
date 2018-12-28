@@ -16,12 +16,15 @@ public interface Server {
     boolean isStarted();
 
 
-    static Server def() {
-//        return NettyServer.I;
+    static Server simulator() {
         return SimulatorServer.I;
     }
 
     static Server webSocket() {
         return WebSocketServer.I;
+    }
+
+    static Server nettyServer() {
+        return NettyServer.I;
     }
 }

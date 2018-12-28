@@ -68,9 +68,15 @@ public class AdminController {
             for (RecorderDevices d : devices) {
                 long sensorId = d.getSensor();
                 long track = d.getTrack();
-                List<ValueData> values = valueDataRepository.findBySensorIdAndTrackIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sensorId, track, startTime, endTime);
-                for (ValueData v : values) {
-                    onlineValueIds.add(v.getId());
+                try {
+                    List<ValueData> values = valueDataRepository.findBySensorIdAndTrackIdAndCreateTimeGreaterThanEqualAndCreateTimeLessThanEqualOrderByCreateTime(sensorId, track, startTime, endTime);
+                    if (values != null) {
+                        for (ValueData v : values) {
+                            onlineValueIds.add(v.getId());
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Exception in get values");
                 }
             }
         }

@@ -18,8 +18,7 @@ import java.util.zip.CRC32;
  */
 public class Client {
 
-
-    public static void main(String[] agrs) throws IOException {
+    public static void main(String[] args) throws IOException {
         JSONObject jobj = new JSONObject();
         jobj.put("key", 0.001);
         String code = "qazw";
@@ -41,7 +40,7 @@ public class Client {
         buf.writeInt(bodyLength);
         buf.writeBytes(bytes);
 
-        Socket socket = new Socket("localhost", 8888);
+        Socket socket = new Socket("47.100.187.24", 8889);
         OutputStream outputStream = socket.getOutputStream();
         byte[] send = new byte[buf.readableBytes()];
         buf.readBytes(send);

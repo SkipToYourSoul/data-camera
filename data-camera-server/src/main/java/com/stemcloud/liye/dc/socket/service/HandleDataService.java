@@ -29,7 +29,7 @@ public class HandleDataService implements Service {
 
     @Override
     public void handle(ChannelHandlerContext context, Packet packet) {
-        LOG.info("handle packet -> '{}'", packet);
+        LOG.debug("handle packet -> '{}'", packet);
 
         if (handle(packet)){
             Packet ack = packet.ack(AckResult.OK);
@@ -81,12 +81,14 @@ public class HandleDataService implements Service {
         String code = packet.getCode();
         Map<String, Object> meta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.RECORD, code);
         if (meta == null || meta.isEmpty()){
-            // LOG.info("this packet do not record, code is '{}'", code);
+            LOG.debug("this packet do not record, code is '{}'", code);
         }else {
             // 处理记录
             Map<String, Object> data = packet.asJson();
             meta.put("data", data);
-            MysqlRepository.saveValueDatas(meta);
+
+            LOG.info("save recorder data to mysql, code is {}", code);
+            // MysqlRepository.saveValueDatas(meta);
         }
 
     }

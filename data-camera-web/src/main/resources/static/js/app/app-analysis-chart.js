@@ -175,9 +175,11 @@ function askForRecorderDataAndInitDom(recorderId) {
             });
 
             // 默认点击显示刚生成的用户自定义图表
-            var showDefineChartId = 'define-chart-' + getQueryString("chart");
-            var $select = "[key=" + showDefineChartId + "]";
-            clickAddCube($($select));
+            if (getQueryString("chart") != null) {
+                var showDefineChartId = 'define-chart-' + getQueryString("chart");
+                var $select = "[key=" + showDefineChartId + "]";
+                clickAddCube($($select));
+            }
 
             // 如果没有视频数据，则初始化数据方格
             if (isEmptyObject(videoData)) {
