@@ -21,7 +21,7 @@ public class Client {
     public static void main(String[] args) throws IOException {
         JSONObject jobj = new JSONObject();
         jobj.put("key", 0.001);
-        String code = "qazw";
+        String code = "0001";
         int sn = 1;
         int head = 0;
         int flag = 0;
@@ -31,6 +31,8 @@ public class Client {
         CRC32 crc32 = new CRC32();
         crc32.update(bytes);
         int crc = (int)crc32.getValue();
+
+
         ByteBuf buf = Unpooled.buffer();
         buf.writeInt(head);
         buf.writeCharSequence(code, Charset.forName("utf8"));

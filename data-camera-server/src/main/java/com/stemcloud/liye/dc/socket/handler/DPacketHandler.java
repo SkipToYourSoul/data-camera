@@ -1,11 +1,10 @@
 package com.stemcloud.liye.dc.socket.handler;
 
-import com.stemcloud.liye.dc.socket.common.AckResult;
-import com.stemcloud.liye.dc.socket.Packet;
+import com.stemcloud.liye.dc.socket.common.DPacket;
 import com.stemcloud.liye.dc.socket.connection.Connection;
 import com.stemcloud.liye.dc.socket.connection.ConnectionManager;
 import com.stemcloud.liye.dc.socket.connection.NettyConnection;
-import com.stemcloud.liye.dc.socket.service.Service;
+import com.stemcloud.liye.dc.socket.service.DService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -14,17 +13,17 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executor;
 
 /**
- * Project : data-camera
- * Author  : Bean
- * Contact : guhaibin1847@gmail.com
+ * Belongs to data-camera-server
+ * Description:
+ *  管理数据包channel
+ * @author liye on 2019/1/20
  */
-public class ReceiveDataHandler extends SimpleChannelInboundHandler<Packet> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ReceiveDataHandler.class);
+public class DPacketHandler extends SimpleChannelInboundHandler<DPacket> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DPacketHandler.class);
     private Executor executor;
-    private Service service;
+    private DService service;
 
-    public ReceiveDataHandler(Service service, Executor executor){
+    public DPacketHandler(DService service, Executor executor){
         this.service = service;
         this.executor = executor;
     }
@@ -42,16 +41,8 @@ public class ReceiveDataHandler extends SimpleChannelInboundHandler<Packet> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Packet msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, DPacket packet) throws Exception {
         // 处理业务逻辑
-        if (msg.crcValid()) {
-            executor.execute(() -> service.handle(ctx, msg));
-        }else {
-            LOG.error("received data crc check error, packet is '{}', channel is '{}'",
-                    msg, ctx.channel());
-            // ack error
-            Packet ack = msg.ack(AckResult.FAILED);
-            ctx.channel().write(ack);
-        }
+        executor.execute(() -> service.handle(channelHandlerContext, packet));
     }
 }

@@ -1,6 +1,7 @@
 package com.stemcloud.liye.dc.socket;
 
 import com.alibaba.fastjson.JSON;
+import com.stemcloud.liye.dc.socket.common.AckResult;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -139,7 +140,7 @@ public class Packet {
 
     @Override
     public String toString() {
-        return "Packet{" +
+        return "DPacket{" +
                 "head='" + head + "\'" +
                 ", code='" + code + '\'' +
                 ", sn='" + sn + "\'" +

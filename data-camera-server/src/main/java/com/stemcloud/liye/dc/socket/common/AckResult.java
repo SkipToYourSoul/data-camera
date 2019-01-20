@@ -1,4 +1,4 @@
-package com.stemcloud.liye.dc.socket;
+package com.stemcloud.liye.dc.socket.common;
 
 /**
  * Project : data-camera
@@ -7,9 +7,9 @@ package com.stemcloud.liye.dc.socket;
  */
 public enum AckResult {
 
-    UNKNOWN(0),
-    OK(1),
-    FAILED(2);
+    UNKNOWN(-1),
+    OK(0),
+    FAILED(1);
 
     public final int value;
     AckResult(int value){

@@ -74,7 +74,7 @@ public class PacketCodec extends MessageToMessageCodec<ByteBuf, Packet> {
             packet.setBodyLength(bodyLength);
             packet.setBody(body);
 
-            LOG.info("Read Packet '{}'", packet);
+            LOG.info("Read packet '{}'", packet);
 
             out.add(packet);
         }catch (Exception e){

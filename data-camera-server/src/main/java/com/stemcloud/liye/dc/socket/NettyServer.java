@@ -1,8 +1,12 @@
 package com.stemcloud.liye.dc.socket;
 
 import com.stemcloud.liye.dc.common.PropKit;
+import com.stemcloud.liye.dc.socket.codec.DPacketCodec;
 import com.stemcloud.liye.dc.socket.codec.PacketCodec;
+import com.stemcloud.liye.dc.socket.handler.DPacketHandler;
 import com.stemcloud.liye.dc.socket.handler.ReceiveDataHandler;
+import com.stemcloud.liye.dc.socket.service.DPacketService;
+import com.stemcloud.liye.dc.socket.service.DService;
 import com.stemcloud.liye.dc.socket.service.HandleDataService;
 import com.stemcloud.liye.dc.socket.service.Service;
 import io.netty.bootstrap.ServerBootstrap;
@@ -28,7 +32,7 @@ public final class NettyServer implements Server {
     public static final NettyServer I = new NettyServer();
 
     private AtomicBoolean started = new AtomicBoolean(false);
-    private Service service = new HandleDataService();
+    private DService service = new DPacketService();
     private EventLoopGroup boss;
     private EventLoopGroup worker;
     private ChannelFuture channelFuture;
@@ -57,10 +61,12 @@ public final class NettyServer implements Server {
                             protected void initChannel(Channel ch) throws Exception {
                                 ch.pipeline().addLast("LengthFieldDecoder",
                                         new LengthFieldBasedFrameDecoder(MAX_FRAME_LENGTH, 20, 4));
+                                // 数据包解码
                                 ch.pipeline().addLast("PacketCodec",
-                                        new PacketCodec());
+                                        new DPacketCodec());
+                                // 数据处理逻辑
                                 ch.pipeline().addLast("ServerHandler",
-                                        new ReceiveDataHandler(service, Threads.RECEIVER_DATA_HANDLER));
+                                        new DPacketHandler(service, Threads.RECEIVER_DATA_HANDLER));
                             }
                         });
 
