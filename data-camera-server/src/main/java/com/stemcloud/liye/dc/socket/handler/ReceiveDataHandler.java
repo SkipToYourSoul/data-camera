@@ -1,7 +1,7 @@
 package com.stemcloud.liye.dc.socket.handler;
 
 import com.stemcloud.liye.dc.socket.common.AckResult;
-import com.stemcloud.liye.dc.socket.Packet;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import com.stemcloud.liye.dc.socket.connection.Connection;
 import com.stemcloud.liye.dc.socket.connection.ConnectionManager;
 import com.stemcloud.liye.dc.socket.connection.NettyConnection;

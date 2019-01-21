@@ -1,11 +1,10 @@
 package com.stemcloud.liye.dc.socket.codec;
 
-import com.stemcloud.liye.dc.socket.Packet;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import io.netty.handler.codec.MessageToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

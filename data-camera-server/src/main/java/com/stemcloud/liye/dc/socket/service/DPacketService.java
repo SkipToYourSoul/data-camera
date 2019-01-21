@@ -23,7 +23,7 @@ public class DPacketService implements DService {
 
     @Override
     public void handle(ChannelHandlerContext context, DPacket packet) {
-        context.channel().write(handle(packet));
+        context.channel().writeAndFlush(handle(packet));
     }
 
     private DPacket handle(DPacket packet) {

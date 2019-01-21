@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc.socket.service;
 
-import com.stemcloud.liye.dc.socket.Packet;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import io.netty.channel.ChannelHandlerContext;
 
 /**

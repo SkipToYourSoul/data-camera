@@ -79,7 +79,7 @@ public class DPacket {
     }
 
     public MsgType getMsgTypeEnum() {
-        int msgFlag = flag & 0xFF;
+        int msgFlag = msgType & 0xFF;
         switch (msgFlag) {
             case 1: return MsgType.REG_REQ;
             case 2: return MsgType.REG_RES;

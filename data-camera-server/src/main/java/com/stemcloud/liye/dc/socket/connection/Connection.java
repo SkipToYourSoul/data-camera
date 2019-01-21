@@ -1,6 +1,5 @@
 package com.stemcloud.liye.dc.socket.connection;
 
-import com.stemcloud.liye.dc.socket.Packet;
 import io.netty.channel.Channel;
 
 /**

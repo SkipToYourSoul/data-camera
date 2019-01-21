@@ -1,15 +1,11 @@
 package com.stemcloud.liye.dc.socket;
 
-import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.util.zip.CRC32;
 
 /**
  * Project : data-camera
@@ -19,34 +15,43 @@ import java.util.zip.CRC32;
 public class Client {
 
     public static void main(String[] args) throws IOException {
-        JSONObject jobj = new JSONObject();
-        jobj.put("key", 0.001);
-        String code = "0001";
-        int sn = 1;
-        int head = 0;
-        int flag = 0;
-        String body = jobj.toJSONString();
-        byte[] bytes = body.getBytes(Charset.forName("utf8"));
-        int bodyLength = bytes.length;
-        CRC32 crc32 = new CRC32();
-        crc32.update(bytes);
-        int crc = (int)crc32.getValue();
-
+        byte msgType = (byte)0x05;
+        int sessionId = 12345678;
+        byte flag = (byte)0x00;
+        String jsonStr = "{\"device_id\":\"201807160001\",\"cmd\":\"push_sensor_data\"," +
+                "\"params\":[{\"type\":\"temperature\",\"length\":2,\"data\":[255,159]}," +
+                "{\"type\":\"acceleration\",\"length\":2,\"data\":[255,259]}]}";
+        byte[] body = jsonStr.getBytes(Charset.forName("utf8"));
+        int bodyLength = body.length;
 
         ByteBuf buf = Unpooled.buffer();
-        buf.writeInt(head);
-        buf.writeCharSequence(code, Charset.forName("utf8"));
-        buf.writeInt(sn);
-        buf.writeInt(flag);
-        buf.writeInt(crc);
+        buf.writeByte(msgType);
+        buf.writeInt(sessionId);
+        buf.writeByte(flag);
         buf.writeInt(bodyLength);
-        buf.writeBytes(bytes);
+        buf.writeBytes(body);
 
-        Socket socket = new Socket("47.100.187.24", 8889);
+        // server: 47.100.187.24
+        Socket socket = new Socket("localhost", 8889);
         OutputStream outputStream = socket.getOutputStream();
         byte[] send = new byte[buf.readableBytes()];
         buf.readBytes(send);
         outputStream.write(send);
+
+        byte[] receiver = new byte[1024];
+        InputStream in = socket.getInputStream();
+        int len ;
+        File f = new File("./test.byte");
+        if (f.exists()) {
+            f.delete();
+        }
+        f.createNewFile();
+        OutputStream out = new FileOutputStream(f);
+        while ((len = in.read(receiver)) > 0) {
+            System.out.println(len);
+            out.write(receiver, 0, len);
+        }
+        out.close();
         socket.close();
     }
 

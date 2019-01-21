@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
 /**
  * Belongs to data-camera-server
  * Description:
- *  管理数据包channel
+ *  channel管理
  * @author liye on 2019/1/20
  */
 public class DPacketHandler extends SimpleChannelInboundHandler<DPacket> {

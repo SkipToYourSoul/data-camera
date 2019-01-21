@@ -4,7 +4,7 @@ import com.stemcloud.liye.dc.common.JSON;
 import com.stemcloud.liye.dc.dao.MysqlRepository;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 import com.stemcloud.liye.dc.domain.SensorStatus;
-import com.stemcloud.liye.dc.socket.Packet;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import com.stemcloud.liye.dc.socket.service.HandleDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

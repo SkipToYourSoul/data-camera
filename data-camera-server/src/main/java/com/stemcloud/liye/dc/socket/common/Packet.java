@@ -1,7 +1,6 @@
-package com.stemcloud.liye.dc.socket;
+package com.stemcloud.liye.dc.socket.common;
 
 import com.alibaba.fastjson.JSON;
-import com.stemcloud.liye.dc.socket.common.AckResult;
 
 import java.nio.charset.Charset;
 import java.util.Collections;

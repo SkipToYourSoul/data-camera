@@ -61,9 +61,9 @@ public class DPacketCodec extends MessageToMessageCodec<ByteBuf, DPacket> {
             packet.setBody(body);
 
             list.add(packet);
-            LOGGER.info("Read packet, --> {}", packet);
+            LOGGER.info("Read packet --> {}", packet);
         } catch (Exception e) {
-            LOGGER.error("read packet error, --> {}", byteBuf.toString(), e);
+            LOGGER.error("read packet error --> {}", byteBuf.toString(), e);
         }
     }
 }

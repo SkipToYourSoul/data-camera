@@ -2,13 +2,9 @@ package com.stemcloud.liye.dc.socket;
 
 import com.stemcloud.liye.dc.common.PropKit;
 import com.stemcloud.liye.dc.socket.codec.DPacketCodec;
-import com.stemcloud.liye.dc.socket.codec.PacketCodec;
 import com.stemcloud.liye.dc.socket.handler.DPacketHandler;
-import com.stemcloud.liye.dc.socket.handler.ReceiveDataHandler;
 import com.stemcloud.liye.dc.socket.service.DPacketService;
 import com.stemcloud.liye.dc.socket.service.DService;
-import com.stemcloud.liye.dc.socket.service.HandleDataService;
-import com.stemcloud.liye.dc.socket.service.Service;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.stemcloud.liye.dc.socket.Packet.MAX_FRAME_LENGTH;
+import static com.stemcloud.liye.dc.socket.common.Packet.MAX_FRAME_LENGTH;
 
 /**
  * Project : data-camera
@@ -60,7 +56,7 @@ public final class NettyServer implements Server {
                             @Override
                             protected void initChannel(Channel ch) throws Exception {
                                 ch.pipeline().addLast("LengthFieldDecoder",
-                                        new LengthFieldBasedFrameDecoder(MAX_FRAME_LENGTH, 20, 4));
+                                        new LengthFieldBasedFrameDecoder(MAX_FRAME_LENGTH, 6, 4));
                                 // 数据包解码
                                 ch.pipeline().addLast("PacketCodec",
                                         new DPacketCodec());

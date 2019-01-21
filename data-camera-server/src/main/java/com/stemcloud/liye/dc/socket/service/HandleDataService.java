@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.stemcloud.liye.dc.Constants;
 import com.stemcloud.liye.dc.common.GV;
 import com.stemcloud.liye.dc.common.RedisClient;
-import com.stemcloud.liye.dc.socket.Packet;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import com.stemcloud.liye.dc.socket.common.AckResult;
 import com.stemcloud.liye.dc.websocket.MessageHandler;
 import com.stemcloud.liye.dc.websocket.message.MessageType;

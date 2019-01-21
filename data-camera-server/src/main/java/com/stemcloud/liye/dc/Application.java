@@ -14,10 +14,10 @@ import com.stemcloud.liye.dc.socket.Server;
 public class Application {
     public static void main(String[] args) {
         // simulator
-        Server.simulator().start();
+        // Server.simulator().start();
 
         // web socket
-        Server.webSocket().start();
+        // Server.webSocket().start();
 
         // netty
         Server.nettyServer().start();
