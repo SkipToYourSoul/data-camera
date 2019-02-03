@@ -24,7 +24,7 @@ public class GV {
     // 传感器对应的ChannelGroup，用于WebSocket消息通信
     public static ConcurrentMap<Long, ChannelGroup> sensorChannelGroup = new ConcurrentHashMap<>();
 
-    // 传感器对应的监控状态，用户判断webSocket是否向前端发消息
+    // 传感器对应的监控状态，用于判断webSocket是否向前端发消息
     public static ConcurrentMap<Long, Boolean> sensorIsMonitor = new ConcurrentHashMap<>();
 
     /** sensor config, load when server start **/

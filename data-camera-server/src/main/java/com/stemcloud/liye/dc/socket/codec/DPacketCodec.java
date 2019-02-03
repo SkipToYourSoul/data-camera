@@ -37,8 +37,10 @@ public class DPacketCodec extends MessageToMessageCodec<ByteBuf, DPacket> {
     protected void encode(ChannelHandlerContext channelHandlerContext, DPacket dPacket, List<Object> list) throws Exception {
         LOGGER.info("encode message --> {}", dPacket);
         ByteBuf buf = Unpooled.buffer(32 * 4);
-        buf.writeInt(dPacket.getMsgType());
+        buf.writeByte(dPacket.getMsgType());
         buf.writeInt(dPacket.getSessionId());
+        buf.writeByte(dPacket.getFlag());
+        buf.writeInt(dPacket.getBodyLength());
         buf.writeBytes(dPacket.getBody());
         list.add(buf);
     }

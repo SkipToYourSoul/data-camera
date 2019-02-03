@@ -38,7 +38,7 @@ public class Client {
         buf.readBytes(send);
         outputStream.write(send);
 
-        byte[] receiver = new byte[1024];
+        /*byte[] receiver = new byte[1024];
         InputStream in = socket.getInputStream();
         int len ;
         File f = new File("./test.byte");
@@ -51,7 +51,7 @@ public class Client {
             System.out.println(len);
             out.write(receiver, 0, len);
         }
-        out.close();
+        out.close();*/
         socket.close();
     }
 
