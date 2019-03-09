@@ -1,8 +1,7 @@
 # data-camera-server
 
-socket模块
-
-web-socket模块
+- socket模块，依赖于netty
+- web-socket模块
 
 ## 报文样式：
 
