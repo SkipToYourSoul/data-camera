@@ -1,8 +1,24 @@
 # data-camera
-**Let your data dance!**
+**Let your data [DANCE](http://47.100.187.24:8080/camera/index)**
+
+data-camera是一个传感器数据可视化的数据平台，你可以在系统中绑定你的传感器设备，以应用场景的方式记录你的数据。
+
+data-camera提供了数据分析的功能，你可以任意截取和标注你的记录数据，并做成有意义的内容分享给其他用户。
 
 ## data-camera-web
-web应用模块，提供用户对数据设备的操作界面
+data-camera的web应用模块，提供用户对设备和数据的交互界面，系统中主要包括以下页面：
+
+首页：提供功能列表与场景说明
+
+场景页：对场景进行试验和分析操作
+
+设备页：对传感器设备进行管理
+
+内容页：浏览和管理发布的内容
+
+管理页：管理员专用，提供对设备、用户、权限、数据库后台的管理功能
+
+[说明链接](https://github.com/SkipToYourSoul/data-camera/blob/master/data-camera-web/README.md)
 
 ## data-camera-server
 **分为三个子模块：**

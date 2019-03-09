@@ -27,9 +27,9 @@
 	<link rel="stylesheet" th:href="@{source/messenger/messenger.css}" />
 	<link rel="stylesheet" th:href="@{source/messenger/messenger-theme-air.css}" />
 
-	<link rel="stylesheet" th:href="@{css/bsq/main.css}" />
-	<link rel="stylesheet" th:href="@{css/bsq/app.css}" />
-	<link rel="stylesheet" th:href="@{css/bsq/app-content.css}" />
+	<link rel="stylesheet" th:href="@{css/main.css}" />
+	<link rel="stylesheet" th:href="@{css/app.css}" />
+	<link rel="stylesheet" th:href="@{css/app-content.css}" />
 </head>
 <body>
 	<div class="navbar-wrapper" th:include="module/common::nav"></div>
@@ -135,12 +135,10 @@
 			<div th:if="!${param.id}" id="app-management">
 				<img th:src="@{/img/quickstart.jpg}" class="img-responsive" />
 				<div style="min-height: 170px; width: 100%; background: url(img/app-bottom.png) no-repeat;">
-					<div>
-						<div class="app-title">优秀案例</div>
-						<div class="app-summary">小字描述优秀案例的内容做简要概括</div>
-						<div style="margin-top: 10px; padding-left: 110px;">
-							<button class="btn btn-white">点击查看</button>
-						</div>
+					<div class="app-title">优秀案例</div>
+					<div class="app-summary">小字描述优秀案例的内容做简要概括</div>
+					<div style="margin-top: 10px; padding-left: 110px;">
+						<button class="btn btn-white">点击查看</button>
 					</div>
 				</div>
 			</div>

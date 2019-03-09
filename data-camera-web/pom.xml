@@ -79,13 +79,14 @@
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <!-- javacv to handle video stream -->
-        <dependency>
+
+        <!-- javacv to handle video stream, 对直播流进行录制和解析处理，暂时停用 -->
+        <!--<dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
             <version>1.4.1</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
     <build>

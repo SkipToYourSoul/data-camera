@@ -2,10 +2,7 @@ package com.stemcloud.liye.dc.util;
 
 import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
-import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.service.OssService;
-import org.bytedeco.javacpp.avutil;
-import org.bytedeco.javacv.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,7 @@ import java.util.Map;
 /**
  * Belongs to data-camera-web
  * Description:
- *  控制直播流的录制
+ *  控制直播流的录制，截取录制的直播流并保存文件和上传阿里云
  * @author liye on 2018/6/6
  */
 @Component
@@ -54,12 +51,13 @@ public class LiveRecorderUtil {
      * @param sensorId 用以标记文件名
      */
     public boolean startRecordByFrame(String liveAddress, int audioChannel, long appId, long expId, long sensorId) {
-        // 构造直播流地址
+        /*// 构造直播流地址
         String inputFile = liveServer + liveAddress;
 
         // 该地址只能是文件地址，如果使用该方法推送流媒体服务器会报错，原因是没有设置编码格式
         String key = LiveRecorderUtil.mkLiveVideoKey(appId, expId, sensorId);
         String outputFile = String.format("%s/%s.mp4", baseServerUploadPath, key);
+
         // 获取视频源
         FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
         // 流媒体输出地址，分辨率（长，高），是否录制音频（0:不录制/1:录制）
@@ -84,7 +82,8 @@ public class LiveRecorderUtil {
             waitCount --;
         }
 
-        return waitCount > 0;
+        return waitCount > 0;*/
+        return true;
     }
 
     /**
@@ -94,7 +93,7 @@ public class LiveRecorderUtil {
      * @param isSave
      */
     public void endRecorderByFrame(RecorderInfo recorderInfo, long sensorId, long trackId, int isSave) {
-        String key = mkLiveVideoKey(recorderInfo.getAppId(), recorderInfo.getExpId(), sensorId);
+        /*String key = mkLiveVideoKey(recorderInfo.getAppId(), recorderInfo.getExpId(), sensorId);
         final String filename = String.format("%s.mp4", key);
 
         // -- 移除全局变量中的key，停止直播流的录制并中断录制线程
@@ -110,7 +109,7 @@ public class LiveRecorderUtil {
         videoData.setTrackId(trackId);
         videoData.setRecorderInfo(recorderInfo);
         videoData.setVideoPath("/camera/img/rocket.mp4");
-        final long vid = videoDataRepository.save(videoData).getId();
+        final long vid = videoDataRepository.save(videoData).getId();*/
 
         // 异步上传阿里云
         /*ExecutorUtil.UPLOAD_EXECUTOR.submit(new Runnable() {
@@ -131,7 +130,7 @@ public class LiveRecorderUtil {
         });*/
     }
 
-    class SyncRecorder implements Runnable {
+    /*class SyncRecorder implements Runnable {
         private FFmpegFrameGrabber grabber;
         private FFmpegFrameRecorder recorder;
         private String recorderKey;
@@ -182,5 +181,5 @@ public class LiveRecorderUtil {
 
             LOGGER.info("Exit recorder threads: " + recorderKey);
         }
-    }
+    }*/
 }

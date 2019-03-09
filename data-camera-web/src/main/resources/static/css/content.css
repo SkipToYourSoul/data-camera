@@ -229,7 +229,7 @@ body{
 	border-radius:50%;
 	width:90px;
 	height:90px;
-	background-image:url(../../img/app-bottom.png);
+	background-image:url(../img/app-bottom.png);
 }
 
 .btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus,
