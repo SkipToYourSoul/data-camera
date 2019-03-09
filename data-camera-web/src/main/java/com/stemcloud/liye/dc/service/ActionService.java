@@ -1,7 +1,6 @@
 package com.stemcloud.liye.dc.service;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.stemcloud.liye.dc.common.ExpStatus;
 import com.stemcloud.liye.dc.common.GV;
 import com.stemcloud.liye.dc.common.SensorType;
@@ -9,30 +8,23 @@ import com.stemcloud.liye.dc.dao.base.AppRepository;
 import com.stemcloud.liye.dc.dao.base.ExperimentRepository;
 import com.stemcloud.liye.dc.dao.base.SensorRepository;
 import com.stemcloud.liye.dc.dao.data.RecorderRepository;
-import com.stemcloud.liye.dc.dao.data.VideoDataRepository;
 import com.stemcloud.liye.dc.domain.base.ExperimentInfo;
 import com.stemcloud.liye.dc.domain.base.SensorInfo;
 import com.stemcloud.liye.dc.domain.base.TrackInfo;
 import com.stemcloud.liye.dc.domain.data.RecorderDevices;
 import com.stemcloud.liye.dc.domain.data.RecorderInfo;
-import com.stemcloud.liye.dc.domain.data.VideoData;
 import com.stemcloud.liye.dc.domain.message.SensorStatus;
 import com.stemcloud.liye.dc.util.ExecutorUtil;
 import com.stemcloud.liye.dc.util.LiveRecorderUtil;
 import com.stemcloud.liye.dc.util.RedisKeyUtils;
 import com.stemcloud.liye.dc.util.RedisUtils;
-import org.bytedeco.javacpp.avutil;
-import org.bytedeco.javacv.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Belongs to data-camera-web
