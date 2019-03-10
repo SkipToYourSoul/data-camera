@@ -72,7 +72,7 @@ public class RedisClient {
     }
 
     public void set(String key, Object value){
-        set(key, JSON.toJson(value));
+        set(key, M_JSON.toJson(value));
     }
 
     public void del(String key){
@@ -87,11 +87,11 @@ public class RedisClient {
     /********************* list ************************/
 
     public void lpush(String key, Object value){
-        call((jedis) -> jedis.lpush(key, JSON.toJson(value)));
+        call((jedis) -> jedis.lpush(key, M_JSON.toJson(value)));
     }
 
     public void rpush(String key, Object value){
-        call(jedis -> jedis.rpush(key, JSON.toJson(value)));
+        call(jedis -> jedis.rpush(key, M_JSON.toJson(value)));
     }
 
     public Long llen(String key){
@@ -117,13 +117,13 @@ public class RedisClient {
 
     public <T> List<T> lrange(Class<T> clazz, String key, long offset, long limit){
         List<String> data = lrange(key, offset, limit);
-        return data.stream().map(d -> JSON.from(d, clazz)).collect(Collectors.toList());
+        return data.stream().map(d -> M_JSON.from(d, clazz)).collect(Collectors.toList());
     }
 
     public <T> T blpop(Class<T> clazz, String key){
         String json = blpop(key);
         if (json != null){
-            return JSON.from(json, clazz);
+            return M_JSON.from(json, clazz);
         }else {
             return null;
         }
@@ -136,7 +136,7 @@ public class RedisClient {
     public <T> T brpop(Class<T> clazz, String key){
         String json = brpop(key);
         if (json != null){
-            return JSON.from(json, clazz);
+            return M_JSON.from(json, clazz);
         }else {
             return null;
         }
@@ -166,13 +166,13 @@ public class RedisClient {
     }
 
     public void mput(String key, String subKey, Object value){
-        call((jedis) -> jedis.hset(key, subKey, JSON.toJson(value)));
+        call((jedis) -> jedis.hset(key, subKey, M_JSON.toJson(value)));
     }
 
     public void mput(String key, Map<String, Object> map){
         batchCall((pipeline ->
             map.forEach((k, v) ->
-                pipeline.hset(key, k, JSON.toJson(v))
+                pipeline.hset(key, k, M_JSON.toJson(v))
             )
         ));
     }
@@ -193,7 +193,7 @@ public class RedisClient {
         return call(jedis -> {
             Map<String, String> map = jedis.hgetAll(key);
             Map<String, T> ret = new HashMap<>(map.size());
-            map.forEach((k, v) -> ret.put(k, JSON.from(v, clazz)));
+            map.forEach((k, v) -> ret.put(k, M_JSON.from(v, clazz)));
             return ret;
         }, Collections.<String, T>emptyMap());
     }
@@ -215,7 +215,7 @@ public class RedisClient {
     public <T> List<T> mget(Class<T> clazz, String key, String ... subKeys){
         return call(jedis -> {
             List<String> data = jedis.hmget(key, subKeys);
-            return data.stream().map(d -> JSON.from(d, clazz)).collect(Collectors.toList());
+            return data.stream().map(d -> M_JSON.from(d, clazz)).collect(Collectors.toList());
         }, Collections.<T>emptyList());
     }
 

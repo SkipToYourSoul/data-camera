@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.stemcloud.liye.dc.Constants;
 import com.stemcloud.liye.dc.common.GV;
+import com.stemcloud.liye.dc.common.M_JSON;
 import com.stemcloud.liye.dc.common.RedisClient;
 import com.stemcloud.liye.dc.socket.common.AckResult;
-import com.stemcloud.liye.dc.socket.common.BodyMsg5;
 import com.stemcloud.liye.dc.socket.common.DPacket;
-import com.stemcloud.liye.dc.socket.common.MsgType;
+import com.stemcloud.liye.dc.socket.common.Instructions;
 import com.stemcloud.liye.dc.websocket.MessageHandler;
 import com.stemcloud.liye.dc.websocket.message.MessageType;
 import com.stemcloud.liye.dc.websocket.message.ServerMessage;
@@ -38,13 +38,19 @@ public class DPacketService implements DService {
     private DPacket handle(DPacket packet) {
         switch (packet.getMsgTypeEnum()) {
             case ONE_WAY:
+                // 单向广播，用于设备发送数据
                 try {
-                    handleSensorData(packet);
+                    handleOneWayMsg(packet);
                     return packet.ack(AckResult.OK, packet);
                 } catch (Exception e) {
                     LOGGER.error("handleTxtMonitor error, packet is '{}'", packet, e);
                     return packet.ack(AckResult.FAILED, packet);
                 }
+            case REG_REQ:
+                // 设备注册请求
+                Map<String, Object> map = packet.asJson();
+                String deviceId = map.get("device_id").toString();
+
             case PING:
                 return packet.ack(AckResult.OK, packet);
             default:
@@ -52,15 +58,14 @@ public class DPacketService implements DService {
         }
     }
 
-    private void handleSensorData(DPacket packet) {
-        Map<String, Object> map = packet.asJson();
-        String deviceId = map.get("device_id").toString();
-        List<Map<String, Object>> params = (List<Map<String, Object>>) map.get("params");
-        params.forEach((param) -> {
+    private void handleOneWayMsg(DPacket packet) {
+        Instructions instructions = packet.asInstructions();
+        String deviceId = instructions.getDeviceId();
+        instructions.getParams().forEach((param) -> {
             String type = param.get("type").toString();
             Integer length = (Integer) param.get("length");
             List<Double> data = (List<Double>) param.get("data");
-            LOGGER.info("Msg5, deviceId = {}, type = {}, length = {}, data = {}", deviceId, type, length, com.stemcloud.liye.dc.common.JSON.toJson(data));
+            LOGGER.info("Msg5, deviceId = {}, type = {}, length = {}, data = {}", deviceId, type, length, M_JSON.toJson(data));
         });
 
         // 检查当前设备是否处于监控状态
@@ -68,7 +73,7 @@ public class DPacketService implements DService {
         if (monitorMeta != null && !monitorMeta.isEmpty()) {
             // sensorId: 应用端的传感器编号
             Long sensorId = ((Integer) monitorMeta.get("id")).longValue();
-            monitorMeta.put("data", map);
+            // monitorMeta.put("data", map);
             monitorMeta.put("timestamp", System.currentTimeMillis());
 
             // 通过webSocket向已建立链接的页面发送通知
@@ -85,6 +90,6 @@ public class DPacketService implements DService {
 
         }
 
-        LOGGER.info("Handle sensor data, --> {}", JSON.toJSON(map));
+        LOGGER.info("Handle sensor data, --> {}", instructions.toString());
     }
 }

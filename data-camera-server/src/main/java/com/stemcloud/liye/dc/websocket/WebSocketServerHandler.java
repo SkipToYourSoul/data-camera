@@ -1,7 +1,7 @@
 package com.stemcloud.liye.dc.websocket;
 
 import com.stemcloud.liye.dc.common.GV;
-import com.stemcloud.liye.dc.common.JSON;
+import com.stemcloud.liye.dc.common.M_JSON;
 import com.stemcloud.liye.dc.socket.connection.Connection;
 import com.stemcloud.liye.dc.socket.connection.ConnectionManager;
 import com.stemcloud.liye.dc.socket.connection.NettyConnection;
@@ -17,7 +17,6 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
         try {
             // 处理从客户端发过来的消息
             String jMessage = frame.text();
-            ClientMessage message = JSON.from(jMessage, ClientMessage.class);
+            ClientMessage message = M_JSON.from(jMessage, ClientMessage.class);
             String type = message.getType();
             Map<String, Object> data = message.getData();
             LOGGER.info("Client message: {}", jMessage);

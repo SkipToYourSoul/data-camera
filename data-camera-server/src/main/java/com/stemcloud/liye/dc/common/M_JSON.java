@@ -5,7 +5,7 @@ package com.stemcloud.liye.dc.common;
  * Author  : Bean
  * Contact : guhaibin1847@gmail.com
  */
-public final class JSON {
+public final class M_JSON {
 
     public static String toJson(Object obj){
         return com.alibaba.fastjson.JSON.toJSONString(obj);

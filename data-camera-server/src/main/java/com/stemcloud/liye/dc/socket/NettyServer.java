@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.stemcloud.liye.dc.socket.common.Packet.MAX_FRAME_LENGTH;
+import static com.stemcloud.liye.dc.socket.common.DPacket.MAX_FRAME_LENGTH;
 
 /**
  * Project : data-camera

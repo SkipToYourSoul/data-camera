@@ -2,7 +2,6 @@ package com.stemcloud.liye.dc.dao;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
-import com.stemcloud.liye.dc.common.JSON;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 import com.stemcloud.liye.dc.domain.SensorStatus;
 import org.slf4j.Logger;

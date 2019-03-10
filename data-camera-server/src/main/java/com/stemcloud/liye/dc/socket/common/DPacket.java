@@ -2,6 +2,7 @@ package com.stemcloud.liye.dc.socket.common;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.stemcloud.liye.dc.common.M_JSON;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -14,6 +15,11 @@ import java.util.Map;
  * @author liye on 2019/1/20
  */
 public class DPacket {
+    /**
+     *  10M
+     * */
+    public static final int MAX_FRAME_LENGTH = 10 * 1024 * 1024;
+
     private byte msgType;
     private int sessionId;
     private byte flag;
@@ -107,6 +113,11 @@ public class DPacket {
         } else {
             return JSON.parseObject(text);
         }
+    }
+
+    public Instructions asInstructions() {
+        String text = asText();
+        return M_JSON.from(text, Instructions.class);
     }
 
     @Override

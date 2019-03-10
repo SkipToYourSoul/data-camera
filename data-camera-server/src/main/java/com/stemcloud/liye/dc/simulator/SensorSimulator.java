@@ -1,20 +1,20 @@
 package com.stemcloud.liye.dc.simulator;
 
-import com.stemcloud.liye.dc.common.JSON;
 import com.stemcloud.liye.dc.dao.MysqlRepository;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 import com.stemcloud.liye.dc.domain.SensorStatus;
-import com.stemcloud.liye.dc.socket.common.Packet;
-import com.stemcloud.liye.dc.socket.service.HandleDataService;
+import com.stemcloud.liye.dc.socket.service.DPacketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.stemcloud.liye.dc.common.GV.*;
+import static com.stemcloud.liye.dc.common.GV.sensorConfigMap;
 
 /**
  * Project : data-camera
@@ -24,7 +24,7 @@ import static com.stemcloud.liye.dc.common.GV.*;
 public class SensorSimulator implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorSimulator.class);
 
-    private static final HandleDataService HANDLER = new HandleDataService();
+    private static final DPacketService HANDLER = new DPacketService();
     private static final ConcurrentMap<String, SensorStatus> SENSORS = new ConcurrentHashMap<>();
 
     @Override
@@ -106,12 +106,12 @@ public class SensorSimulator implements Runnable {
     }
 
     private void handleValue(String code, Map<String, Double> values) {
-        Packet p = new Packet();
+        /*Packet p = new Packet();
         p.setCode(code);
         p.setFlag(0);
-        p.setBody(JSON.toJson(values).getBytes(Charset.forName("utf8")));
-        // LOGGER.info("Handle code = {}, value = {}", code, JSON.toJson(values));
+        p.setBody(M_JSON.toJson(values).getBytes(Charset.forName("utf8")));
+        LOGGER.info("Handle code = {}, value = {}", code, M_JSON.toJson(values));
 
-        HANDLER.handle(p);
+        HANDLER.handle(p);*/
     }
 }

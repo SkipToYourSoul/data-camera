@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc.websocket.message;
 
-import com.stemcloud.liye.dc.common.JSON;
+import com.stemcloud.liye.dc.common.M_JSON;
 
 import java.util.Map;
 
@@ -29,6 +29,6 @@ public class ServerMessage {
 
     @Override
     public String toString() {
-        return JSON.toJson(this);
+        return M_JSON.toJson(this);
     }
 }
