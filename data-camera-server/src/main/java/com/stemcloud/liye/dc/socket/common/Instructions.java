@@ -26,6 +26,18 @@ public class Instructions {
         return params;
     }
 
+    public void setDevice_id(String device_id) {
+        this.device_id = device_id;
+    }
+
+    public void setCmd(String cmd) {
+        this.cmd = cmd;
+    }
+
+    public void setParams(List<Map<String, Object>> params) {
+        this.params = params;
+    }
+
     @Override
     public String toString() {
         return "Instructions{" +

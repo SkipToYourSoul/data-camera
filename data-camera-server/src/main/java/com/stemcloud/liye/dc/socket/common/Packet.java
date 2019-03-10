@@ -84,6 +84,8 @@ public class Packet {
         packet.setBodyLength(bodyLength);
         packet.setBody(bytes);
 
+        System.out.println("Ack return: " + packet.toString());
+
         return packet;
     }
 
@@ -125,7 +127,7 @@ public class Packet {
 
     @Override
     public String toString() {
-        return "Packet{" +
+        return "Packet {" +
                 "msgType=" + msgType +
                 ", sessionId=" + sessionId +
                 ", flag=" + flag +

@@ -59,7 +59,7 @@ class OneWayMsgHandler implements MsgHandler {
         });
 
         // 检查当前设备是否处于监控状态
-        Map<String, Object> monitorMeta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.MONITOR, deviceId);
+        /*Map<String, Object> monitorMeta = REDIS.msingle(JSONObject.class, Constants.RedisNamespace.MONITOR, deviceId);
         if (monitorMeta != null && !monitorMeta.isEmpty()) {
             // sensorId: 应用端的传感器编号
             Long sensorId = ((Integer) monitorMeta.get("id")).longValue();
@@ -78,7 +78,7 @@ class OneWayMsgHandler implements MsgHandler {
         if (recordMeta != null && !recordMeta.isEmpty()) {
             // 解析数据并插入数据库
 
-        }
+        }*/
 
         LOGGER.info("Handle sensor data, --> {}", instructions.toString());
 

@@ -15,3 +15,6 @@ src/main/resources/**
 /.project
 
 *.dat
+
+# git update-index --assume-unchanged src/main/resources/*.properties
+# git update-index --no-assume-unchanged src/main/resources/*.properties
