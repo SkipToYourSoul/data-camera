@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc.socket.codec;
 
-import com.stemcloud.liye.dc.socket.common.DPacket;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,18 +30,18 @@ import java.util.List;
  *
  * @author liye on 2019/1/20
  */
-public class DPacketCodec extends MessageToMessageCodec<ByteBuf, DPacket> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DPacketCodec.class);
+public class PacketCodec extends MessageToMessageCodec<ByteBuf, Packet> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PacketCodec.class);
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, DPacket dPacket, List<Object> list) throws Exception {
-        LOGGER.info("encode message --> {}", dPacket);
+    protected void encode(ChannelHandlerContext channelHandlerContext, Packet packet, List<Object> list) throws Exception {
+        LOGGER.info("encode message --> {}", packet);
         ByteBuf buf = Unpooled.buffer(32 * 4);
-        buf.writeByte(dPacket.getMsgType());
-        buf.writeInt(dPacket.getSessionId());
-        buf.writeByte(dPacket.getFlag());
-        buf.writeInt(dPacket.getBodyLength());
-        buf.writeBytes(dPacket.getBody());
+        buf.writeByte(packet.getMsgType());
+        buf.writeInt(packet.getSessionId());
+        buf.writeByte(packet.getFlag());
+        buf.writeInt(packet.getBodyLength());
+        buf.writeBytes(packet.getBody());
         list.add(buf);
     }
 
@@ -55,7 +55,7 @@ public class DPacketCodec extends MessageToMessageCodec<ByteBuf, DPacket> {
             byte[] body = new byte[bodyLength];
             byteBuf.readBytes(body);
 
-            DPacket packet = new DPacket();
+            Packet packet = new Packet();
             packet.setMsgType(msgType);
             packet.setSessionId(sessionId);
             packet.setFlag(flag);

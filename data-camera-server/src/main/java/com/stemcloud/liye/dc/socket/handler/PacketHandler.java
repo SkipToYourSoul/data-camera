@@ -1,10 +1,10 @@
 package com.stemcloud.liye.dc.socket.handler;
 
-import com.stemcloud.liye.dc.socket.common.DPacket;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import com.stemcloud.liye.dc.socket.connection.Connection;
 import com.stemcloud.liye.dc.socket.connection.ConnectionManager;
 import com.stemcloud.liye.dc.socket.connection.NettyConnection;
-import com.stemcloud.liye.dc.socket.service.DService;
+import com.stemcloud.liye.dc.socket.service.Service;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -18,12 +18,12 @@ import java.util.concurrent.Executor;
  *  channel管理
  * @author liye on 2019/1/20
  */
-public class DPacketHandler extends SimpleChannelInboundHandler<DPacket> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DPacketHandler.class);
+public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PacketHandler.class);
     private Executor executor;
-    private DService service;
+    private Service service;
 
-    public DPacketHandler(DService service, Executor executor){
+    public PacketHandler(Service service, Executor executor){
         this.service = service;
         this.executor = executor;
     }
@@ -41,7 +41,7 @@ public class DPacketHandler extends SimpleChannelInboundHandler<DPacket> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, DPacket packet) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
         // 处理业务逻辑
         executor.execute(() -> service.handle(channelHandlerContext, packet));
     }

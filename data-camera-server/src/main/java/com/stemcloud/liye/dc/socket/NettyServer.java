@@ -1,10 +1,10 @@
 package com.stemcloud.liye.dc.socket;
 
 import com.stemcloud.liye.dc.common.PropKit;
-import com.stemcloud.liye.dc.socket.codec.DPacketCodec;
-import com.stemcloud.liye.dc.socket.handler.DPacketHandler;
-import com.stemcloud.liye.dc.socket.service.DPacketService;
-import com.stemcloud.liye.dc.socket.service.DService;
+import com.stemcloud.liye.dc.socket.codec.PacketCodec;
+import com.stemcloud.liye.dc.socket.handler.PacketHandler;
+import com.stemcloud.liye.dc.socket.service.PacketService;
+import com.stemcloud.liye.dc.socket.service.Service;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.stemcloud.liye.dc.socket.common.DPacket.MAX_FRAME_LENGTH;
+import static com.stemcloud.liye.dc.socket.common.Packet.MAX_FRAME_LENGTH;
 
 /**
  * Project : data-camera
@@ -28,7 +28,7 @@ public final class NettyServer implements Server {
     public static final NettyServer I = new NettyServer();
 
     private AtomicBoolean started = new AtomicBoolean(false);
-    private DService service = new DPacketService();
+    private Service service = new PacketService();
     private EventLoopGroup boss;
     private EventLoopGroup worker;
     private ChannelFuture channelFuture;
@@ -59,10 +59,10 @@ public final class NettyServer implements Server {
                                         new LengthFieldBasedFrameDecoder(MAX_FRAME_LENGTH, 6, 4));
                                 // 数据包解码
                                 ch.pipeline().addLast("PacketCodec",
-                                        new DPacketCodec());
+                                        new PacketCodec());
                                 // 数据处理逻辑
                                 ch.pipeline().addLast("ServerHandler",
-                                        new DPacketHandler(service, Threads.RECEIVER_DATA_HANDLER));
+                                        new PacketHandler(service, Threads.RECEIVER_DATA_HANDLER));
                             }
                         });
 

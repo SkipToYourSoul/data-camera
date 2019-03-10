@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc.socket.service;
 
-import com.stemcloud.liye.dc.socket.common.DPacket;
+import com.stemcloud.liye.dc.socket.common.Packet;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -9,6 +9,6 @@ import io.netty.channel.ChannelHandlerContext;
  *  service impl
  * @author liye on 2019/1/20
  */
-public interface DService {
-    void handle(ChannelHandlerContext context, DPacket packet);
+public interface Service {
+    void handle(ChannelHandlerContext context, Packet packet);
 }

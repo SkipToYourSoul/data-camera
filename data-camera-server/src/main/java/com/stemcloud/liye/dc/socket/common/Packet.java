@@ -14,7 +14,7 @@ import java.util.Map;
  *  packet of device
  * @author liye on 2019/1/20
  */
-public class DPacket {
+public class Packet {
     /**
      *  10M
      * */
@@ -66,8 +66,8 @@ public class DPacket {
         this.body = body;
     }
 
-    public DPacket ack(AckResult ackResult, DPacket dPacket) {
-        DPacket packet = new DPacket();
+    public Packet ack(AckResult ackResult, Packet dPacket) {
+        Packet packet = new Packet();
         packet.setMsgType(dPacket.getMsgType());
         packet.setSessionId(dPacket.getSessionId());
         packet.setFlag(dPacket.getFlag());
@@ -122,7 +122,7 @@ public class DPacket {
 
     @Override
     public String toString() {
-        return "DPacket{" +
+        return "Packet{" +
                 "msgType=" + msgType +
                 ", sessionId=" + sessionId +
                 ", flag=" + flag +

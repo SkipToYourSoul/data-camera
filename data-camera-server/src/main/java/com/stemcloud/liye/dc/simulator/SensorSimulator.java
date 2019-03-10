@@ -3,7 +3,7 @@ package com.stemcloud.liye.dc.simulator;
 import com.stemcloud.liye.dc.dao.MysqlRepository;
 import com.stemcloud.liye.dc.domain.SensorConfig;
 import com.stemcloud.liye.dc.domain.SensorStatus;
-import com.stemcloud.liye.dc.socket.service.DPacketService;
+import com.stemcloud.liye.dc.socket.service.PacketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ import static com.stemcloud.liye.dc.common.GV.sensorConfigMap;
 public class SensorSimulator implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorSimulator.class);
 
-    private static final DPacketService HANDLER = new DPacketService();
+    private static final PacketService HANDLER = new PacketService();
     private static final ConcurrentMap<String, SensorStatus> SENSORS = new ConcurrentHashMap<>();
 
     @Override
