@@ -66,14 +66,17 @@ public class Packet {
         this.body = body;
     }
 
-    public Packet ack(AckResult ackResult, Packet dPacket) {
+    public Packet ack(AckResult ackResult, Map<String, Object> result) {
         Packet packet = new Packet();
-        packet.setMsgType(dPacket.getMsgType());
-        packet.setSessionId(dPacket.getSessionId());
-        packet.setFlag(dPacket.getFlag());
+        packet.setMsgType(this.msgType);
+        packet.setSessionId(this.sessionId);
+        packet.setFlag(this.flag);
 
         JSONObject jobj = new JSONObject();
         jobj.put("code", ackResult.value);
+        if (result != null && result.size() > 0) {
+            jobj.put("result", result);
+        }
         String body = jobj.toJSONString();
         byte[] bytes = body.getBytes(Charset.forName("utf8"));
         int bodyLength = bytes.length;

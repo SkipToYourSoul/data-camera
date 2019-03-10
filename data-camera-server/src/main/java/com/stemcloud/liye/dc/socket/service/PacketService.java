@@ -18,6 +18,10 @@ public class PacketService implements Service {
     public void handle(ChannelHandlerContext context, Packet packet) {
         LOGGER.info("Packet Service Handle Msg, type = {}", packet.getMsgType());
         MsgHandler handler = MsgHandlerFactory.getInstance(packet.getMsgTypeEnum());
-        context.channel().writeAndFlush(handler.handleMsg(packet));
+        if (handler != null) {
+            context.channel().writeAndFlush(handler.handleMsg(packet));
+        } else {
+            LOGGER.warn("None handler!!!");
+        }
     }
 }
