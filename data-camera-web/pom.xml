@@ -91,7 +91,7 @@
 
     <build>
         <finalName>
-            tag-checker-front
+            data-camera-web
         </finalName>
         <resources>
             <resource>

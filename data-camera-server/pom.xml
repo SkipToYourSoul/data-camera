@@ -64,7 +64,7 @@
 
     <build>
         <finalName>
-            tag-checker-backend
+            data-camera-server
         </finalName>
 
         <plugins>
