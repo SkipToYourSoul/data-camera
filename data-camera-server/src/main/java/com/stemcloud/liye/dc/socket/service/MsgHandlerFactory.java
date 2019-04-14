@@ -1,18 +1,8 @@
 package com.stemcloud.liye.dc.socket.service;
 
-import com.alibaba.fastjson.JSONObject;
-import com.stemcloud.liye.dc.Constants;
-import com.stemcloud.liye.dc.common.GV;
 import com.stemcloud.liye.dc.common.M_JSON;
 import com.stemcloud.liye.dc.common.RedisClient;
-import com.stemcloud.liye.dc.socket.common.AckResult;
-import com.stemcloud.liye.dc.socket.common.Packet;
-import com.stemcloud.liye.dc.socket.common.Instructions;
-import com.stemcloud.liye.dc.socket.common.MsgType;
-import com.stemcloud.liye.dc.websocket.MessageHandler;
-import com.stemcloud.liye.dc.websocket.message.MessageType;
-import com.stemcloud.liye.dc.websocket.message.ServerMessage;
-import io.netty.channel.group.ChannelGroup;
+import com.stemcloud.liye.dc.socket.common.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +24,7 @@ public class MsgHandlerFactory {
             case REG_REQ:
                 return new RegisterMsgHandler();
             default:
-                return null;
+                return new DefaultMsgHandler();
 
         }
     }
@@ -45,7 +35,7 @@ class OneWayMsgHandler implements MsgHandler {
     private static final RedisClient REDIS = RedisClient.I;
 
     @Override
-    public Packet handleMsg(Packet packet) {
+    public Packet handleMsg(String channelId, Packet packet) {
         Instructions instructions = packet.asInstructions();
         LOGGER.info("Handle ONE_WAY Msg, instruction = {}", M_JSON.toJson(instructions));
 
@@ -67,8 +57,8 @@ class OneWayMsgHandler implements MsgHandler {
             monitorMeta.put("timestamp", System.currentTimeMillis());
 
             // 通过webSocket向已建立链接的页面发送通知
-            if (GV.sensorIsMonitor.containsKey(sensorId) && GV.sensorIsMonitor.get(sensorId)) {
-                ChannelGroup ctxGroup = GV.sensorChannelGroup.get(sensorId);
+            if (Constants.sensorIsMonitor.containsKey(sensorId) && Constants.sensorIsMonitor.get(sensorId)) {
+                ChannelGroup ctxGroup = Constants.sensorChannelGroup.get(sensorId);
                 MessageHandler.push(ctxGroup, new ServerMessage(MessageType.DATA.getValue(), monitorMeta).toString());
             }
         }
@@ -82,7 +72,12 @@ class OneWayMsgHandler implements MsgHandler {
 
         LOGGER.info("Handle sensor data, --> {}", instructions.toString());
 
-        return packet.ack(AckResult.OK, null);
+        AckInstructions ack = new AckInstructions();
+        ack.setCode(AckResult.OK.value);
+        ack.setCmd("push_sensor_data");
+        ack.setDevice_id(deviceId);
+
+        return packet.ack(MsgType.ONE_WAY, ack);
     }
 }
 
@@ -90,29 +85,60 @@ class RegisterMsgHandler implements MsgHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterMsgHandler.class);
 
     @Override
-    public Packet handleMsg(Packet packet) {
-        Instructions instructions = packet.asInstructions();
-        LOGGER.info("Handle REG_REQ Msg, instruction = {}", M_JSON.toJson(instructions));
+    public Packet handleMsg(String channelId, Packet packet) {
+        String deviceId = "";
+        String cmd = "";
+        try {
+            Instructions instructions = packet.asInstructions();
+            deviceId = instructions.getDeviceId();
+            cmd = instructions.getCmd();
+            List<Map<String, Object>> params = instructions.getParams();
+            LOGGER.info("Handle REG_REQ Msg, instruction = {}", M_JSON.toJson(instructions));
 
-        String deviceId = instructions.getDeviceId();
-        List<Map<String, Object>> params = instructions.getParams();
-        if (params.size() > 0) {
-            String security = (String) params.get(0).get("security");
-            // security验证
+            AckInstructions ack = new AckInstructions();
+            ack.setDevice_id(deviceId);
+            ack.setCmd(cmd);
+            if (params.size() > 0) {
+                String security = (String) params.get(0).get("security");
+                // security验证
+                System.out.println(security);
 
-            // 获取最新硬件版本号
-            String latestFimwareVersion = "";
+                // 获取最新硬件版本号
+                String latestFimwareVersion = "";
 
-            Map<String, Object> result = new HashMap<String, Object>() {{
-                put("latest_firmware_version", latestFimwareVersion);
-                put("server_timestamp", System.currentTimeMillis());
-            }};
-            return packet.ack(AckResult.OK, result);
+                // 注册成功时，需要记录deviceId和channelId的对应关系
+                SocketConstants.channelToDevice.put(channelId, deviceId);
+                SocketConstants.deviceToChannel.put(deviceId, channelId);
+
+                Map<String, Object> result = new HashMap<String, Object>() {{
+                    put("latest_firmware_version", latestFimwareVersion);
+                    put("server_timestamp", System.currentTimeMillis());
+                }};
+
+                ack.setCode(AckResult.OK.value);
+                ack.setParams(result);
+                return packet.ack(MsgType.REG_RES, ack);
+            } else {
+                ack.setCode(AckResult.FAILED.value);
+                ack.setParams(new HashMap<String, Object>() {{
+                    put("error", "empty params");
+                }});
+                return packet.ack(MsgType.REG_RES, ack);
+            }
+        } catch (Exception e) {
+            LOGGER.error("RegisterMsg, DeviceId={}", deviceId, e);
+            AckInstructions ack = new AckInstructions(deviceId, cmd, AckResult.FAILED.value, new HashMap<String, Object>() {{
+                put("error", e.getMessage());
+            }});
+            return packet.ack(MsgType.REG_RES, ack);
         }
+    }
+}
 
-        Map<String, Object> failReason = new HashMap<String, Object>() {{
-            put("error", "empty params");
-        }};
-        return packet.ack(AckResult.FAILED, failReason);
+class DefaultMsgHandler implements MsgHandler {
+
+    @Override
+    public Packet handleMsg(String channelId, Packet packet) {
+        return packet;
     }
 }

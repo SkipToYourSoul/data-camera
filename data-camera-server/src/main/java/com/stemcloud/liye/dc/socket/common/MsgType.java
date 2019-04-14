@@ -13,5 +13,18 @@ package com.stemcloud.liye.dc.socket.common;
  * @author liye on 2019/1/20
  */
 public enum MsgType {
-    REG_REQ, REG_RES, NORMAL_REQ, NORMAL_RES, ONE_WAY, PING, PONG, UN_KNOW;
+    REG_REQ((byte)0x01),
+    REG_RES((byte)0x02),
+    NORMAL_REQ((byte)0x03),
+    NORMAL_RES((byte)0x04),
+    ONE_WAY((byte)0x05),
+    PING((byte)0x06),
+    PONG((byte)0x07),
+    UN_KNOW((byte)0x00);
+
+    public final byte value;
+
+    MsgType(byte value) {
+        this.value = value;
+    }
 }

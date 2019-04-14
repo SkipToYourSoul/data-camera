@@ -1,7 +1,6 @@
 package com.stemcloud.liye.dc.socket.common;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.stemcloud.liye.dc.common.M_JSON;
 
 import java.nio.charset.Charset;
@@ -25,6 +24,20 @@ public class Packet {
     private byte flag;
     private int bodyLength;
     private byte[] body;
+
+    public Packet(byte msgType, int sessionId, byte flag, Instructions instructions) {
+        this.msgType = msgType;
+        this.sessionId = sessionId;
+        this.flag = flag;
+
+        String bodyStr = M_JSON.toJson(instructions);
+        byte[] body = bodyStr.getBytes(Charset.forName("utf8"));
+        this.bodyLength = body.length;
+        this.body = body;
+    }
+
+    public Packet() {
+    }
 
     public byte getMsgType() {
         return msgType;
@@ -66,25 +79,18 @@ public class Packet {
         this.body = body;
     }
 
-    public Packet ack(AckResult ackResult, Map<String, Object> result) {
+    public Packet ack(MsgType msgType, AckInstructions ack) {
         Packet packet = new Packet();
-        packet.setMsgType(this.msgType);
+        packet.setMsgType(msgType.value);
         packet.setSessionId(this.sessionId);
         packet.setFlag(this.flag);
 
-        JSONObject jobj = new JSONObject();
-        jobj.put("code", ackResult.value);
-        if (result != null && result.size() > 0) {
-            jobj.put("result", result);
-        }
-        String body = jobj.toJSONString();
+        String body = M_JSON.toJson(ack);
         byte[] bytes = body.getBytes(Charset.forName("utf8"));
         int bodyLength = bytes.length;
 
         packet.setBodyLength(bodyLength);
         packet.setBody(bytes);
-
-        System.out.println("Ack return: " + packet.toString());
 
         return packet;
     }

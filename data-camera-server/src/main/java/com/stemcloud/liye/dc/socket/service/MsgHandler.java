@@ -11,8 +11,9 @@ import com.stemcloud.liye.dc.socket.common.Packet;
 public interface MsgHandler {
     /**
      * 消息处理函数
+     * @param channelId: channel id
      * @param packet: msg packet
      * @return Ack result
      */
-    public Packet handleMsg(Packet packet);
+    Packet handleMsg(String channelId, Packet packet);
 }

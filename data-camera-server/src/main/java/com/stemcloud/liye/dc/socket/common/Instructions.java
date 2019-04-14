@@ -10,9 +10,18 @@ import java.util.Map;
  * @author liye on 2019/3/10.
  */
 public class Instructions {
-    String device_id;
-    String cmd;
-    List<Map<String, Object>> params;
+    private String device_id;
+    private String cmd;
+    private  List<Map<String, Object>> params;
+
+    public Instructions() {
+    }
+
+    public Instructions(String device_id, String cmd, List<Map<String, Object>> params) {
+        this.device_id = device_id;
+        this.cmd = cmd;
+        this.params = params;
+    }
 
     public String getDeviceId() {
         return device_id;

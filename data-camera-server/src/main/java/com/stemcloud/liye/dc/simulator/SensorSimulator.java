@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.stemcloud.liye.dc.common.GV.sensorConfigMap;
+import static com.stemcloud.liye.dc.common.Constants.sensorConfigMap;
 
 /**
  * Project : data-camera

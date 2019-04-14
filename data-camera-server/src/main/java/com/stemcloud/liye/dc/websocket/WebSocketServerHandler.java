@@ -1,6 +1,6 @@
 package com.stemcloud.liye.dc.websocket;
 
-import com.stemcloud.liye.dc.common.GV;
+import com.stemcloud.liye.dc.common.Constants;
 import com.stemcloud.liye.dc.common.M_JSON;
 import com.stemcloud.liye.dc.socket.connection.Connection;
 import com.stemcloud.liye.dc.socket.connection.ConnectionManager;
@@ -65,13 +65,13 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                 List<Integer> sensorIds = (List<Integer>) data.get("sensors");
                 sensorIds.forEach((sensorId) -> {
                     long id = (long) sensorId;
-                    if (GV.sensorChannelGroup.containsKey(id)) {
-                        ChannelGroup group = GV.sensorChannelGroup.get(id);
+                    if (Constants.sensorChannelGroup.containsKey(id)) {
+                        ChannelGroup group = Constants.sensorChannelGroup.get(id);
                         group.add(ctx.channel());
                     } else {
                         ChannelGroup group = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
                         group.add(ctx.channel());
-                        GV.sensorChannelGroup.put(id, group);
+                        Constants.sensorChannelGroup.put(id, group);
                     }
                 });
             } else if (type.equals(MessageType.START_M.getValue()) || type.equals(MessageType.START_R.getValue())) {
@@ -80,10 +80,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                 for (int i = 0; i < sensorIds.size(); i++) {
                     long sensorId = sensorIds.get(i);
                     if (type.equals(MessageType.START_M.getValue())) {
-                        GV.sensorIsMonitor.put(sensorId, true);
+                        Constants.sensorIsMonitor.put(sensorId, true);
                     }
-                    if (GV.sensorChannelGroup.containsKey(sensorId) && !isStart) {
-                        MessageHandler.push(GV.sensorChannelGroup.get(sensorId),
+                    if (Constants.sensorChannelGroup.containsKey(sensorId) && !isStart) {
+                        MessageHandler.push(Constants.sensorChannelGroup.get(sensorId),
                                 new ServerMessage(type, data).toString());
                         isStart = true;
                     }
@@ -94,10 +94,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                 for (int i = 0; i < sensorIds.size(); i++) {
                     long sensorId = sensorIds.get(i);
                     if (type.equals(MessageType.END_M.getValue())) {
-                        GV.sensorIsMonitor.put(sensorId, false);
+                        Constants.sensorIsMonitor.put(sensorId, false);
                     }
-                    if (GV.sensorChannelGroup.containsKey(sensorId) && !isEnd) {
-                        MessageHandler.push(GV.sensorChannelGroup.get(sensorId),
+                    if (Constants.sensorChannelGroup.containsKey(sensorId) && !isEnd) {
+                        MessageHandler.push(Constants.sensorChannelGroup.get(sensorId),
                                 new ServerMessage(type, data).toString());
                         isEnd = true;
                     }

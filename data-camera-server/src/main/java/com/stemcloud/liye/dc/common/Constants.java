@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
  *  global variables for socket server
  * @author liye on 2017/11/18
  */
-public class GV {
+public class Constants {
     public static final String MONITOR = "monitor";
     public static final String RECORD = "record";
     public static final int START = 1;

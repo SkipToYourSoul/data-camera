@@ -1,5 +1,7 @@
 package com.stemcloud.liye.dc.socket.connection;
 
+import com.stemcloud.liye.dc.socket.common.SocketConstants;
+import com.stemcloud.liye.dc.socket.service.MsgSenderFactory;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,27 @@ public final class ConnectionManager {
             List<String> timeOutKeys = new ArrayList<>();
             CONNECTIONS.forEach((k, v) -> {
                 if (v.isTimeout()){
+                    // 链接超时，从连接池中移除链接
                     LOG.warn("Connection Timeout. Id is '{}'", k);
                     timeOutKeys.add(k);
+                } else {
+                    // 发送心跳包
+                    if (SocketConstants.channelToDevice.containsKey(k)) {
+                        MsgSenderFactory.sendPingPongMsg(k);
+                    }
                 }
             });
             if (!timeOutKeys.isEmpty()) {
                 timeOutKeys.forEach(CONNECTIONS::remove);
+
+                // 移除channelId和deviceId的对应关系
+                timeOutKeys.forEach((k) -> {
+                    if (SocketConstants.channelToDevice.containsKey(k)) {
+                        String deviceId = SocketConstants.channelToDevice.get(k);
+                        SocketConstants.deviceToChannel.remove(deviceId);
+                        SocketConstants.channelToDevice.remove(k);
+                    }
+                });
             }
         }, Connection.TIME_OUT_DURATION, Connection.TIME_OUT_DURATION, TimeUnit.MILLISECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -59,6 +76,11 @@ public final class ConnectionManager {
     }
 
     public static Connection remove(String id){
+        if (SocketConstants.channelToDevice.containsKey(id)) {
+            String deviceId = SocketConstants.channelToDevice.get(id);
+            SocketConstants.deviceToChannel.remove(deviceId);
+            SocketConstants.channelToDevice.remove(id);
+        }
         return CONNECTIONS.remove(id);
     }
 

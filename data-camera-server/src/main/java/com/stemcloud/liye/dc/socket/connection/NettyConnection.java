@@ -56,4 +56,8 @@ public class NettyConnection implements Connection {
         long writeDuration = System.currentTimeMillis() - lastWriteTime;
         return readDuration > TIME_OUT_DURATION && writeDuration > TIME_OUT_DURATION;
     }
+
+    public Channel getChannel() {
+        return channel;
+    }
 }
