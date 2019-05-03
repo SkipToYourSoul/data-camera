@@ -29,6 +29,20 @@
 *    |               ...                 |
 ```
 
+## 消息类型
+
+```
+ *  1.	0x01 REG_REQ 设备注册请求
+ *  2.	0x02 REG_RES 设备注册响应
+ *  3.	0x03 NORMAL_REQ 普通请求
+ *  4.	0x04 NORMAL_RES 普通响应
+ *  5.	0x05 ONE_WAY 单向广播，无需响应
+ *  6.	0x06 PING 心跳请求PING
+ *  7.	0x07 PONG 心跳响应PONG
+ *
+ *  20. 0x20 TEST 用于测试
+```
+
 ## Ack返回包
 
 ```java
@@ -70,3 +84,8 @@ public enum MessageType {
 * connection: channel connection的管理
 * handler: channel handler
 * service: packet数据逻辑，包括数据处理和消息发送
+
+## socket流程
+
+接收消息 -> 建立链接(PacketHandler) -> 解码(PacketCodec) -> 处理逻辑(PacketService)
+发送消息(xxx.writeAndFlush) -> 编码(PacketCodec)

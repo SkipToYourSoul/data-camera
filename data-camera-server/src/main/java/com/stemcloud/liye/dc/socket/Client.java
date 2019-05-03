@@ -50,7 +50,7 @@ public class Client {
         return buf;
     }
 
-    public static ByteBuf msg1() {
+    public static ByteBuf registerMsg() {
         byte msgType = (byte)0x01;
         int sessionId = 12345678;
         byte flag = (byte)0x00;
@@ -69,16 +69,39 @@ public class Client {
         return buf;
     }
 
-    public static void main(String[] args) throws IOException {
-        ByteBuf byteBuf = msg1();
+    public static ByteBuf testMsg() {
+        byte msgType = (byte)0x10;
+        int sessionId = 12345678;
+        byte flag = (byte)0x00;
+        String jsonStr = "{\"device_id\":\"201807160001\",\"cmd\":\"timer_start\"}";
+        byte[] body = jsonStr.getBytes(Charset.forName("utf8"));
+        int bodyLength = body.length;
+
+        ByteBuf buf = Unpooled.buffer();
+        buf.writeByte(msgType);
+        buf.writeInt(sessionId);
+        buf.writeByte(flag);
+        buf.writeInt(bodyLength);
+        buf.writeBytes(body);
+
+        return buf;
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        ByteBuf byteBuf = registerMsg();
 
         // server: 47.100.187.24
         Socket socket = new Socket("localhost", 8889);
+
         OutputStream outputStream = socket.getOutputStream();
         byte[] send = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(send);
         outputStream.write(send);
 
-        socket.close();
+        while (true) {
+
+        }
+
+        // socket.close();
     }
 }

@@ -1,7 +1,7 @@
 package com.stemcloud.liye.dc.socket.common;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Belongs to data-camera-server
@@ -14,11 +14,13 @@ public class SocketConstants {
      * key: channel_id
      * value: 硬件注册成功时写入的device_id
      */
-    public static ConcurrentMap<String, String> channelToDevice = new ConcurrentHashMap<>();
+    public static Map<String, String> channelToDevice = new ConcurrentHashMap<>();
 
     /**
      * key: device_id
      * value: channel_id
      */
-    public static ConcurrentMap<String, String> deviceToChannel = new ConcurrentHashMap<>();
+    public static Map<String, String> deviceToChannel = new ConcurrentHashMap<>();
+
+    public static volatile String test;
 }

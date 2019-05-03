@@ -32,11 +32,13 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Connection connection = new NettyConnection();
         connection.init(ctx.channel());
+        LOGGER.info("Add channel, channelId = {}", connection.id());
         ConnectionManager.add(connection);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        LOGGER.info("Remove channel, channelId = {}", ctx.channel().id());
         ConnectionManager.remove(ctx.channel());
     }
 

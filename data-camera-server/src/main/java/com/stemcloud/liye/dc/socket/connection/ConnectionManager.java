@@ -48,6 +48,7 @@ public final class ConnectionManager {
 
                 // 移除channelId和deviceId的对应关系
                 timeOutKeys.forEach((k) -> {
+                    LOG.info("Timeout, ConnectManage remove channel {}", k);
                     if (SocketConstants.channelToDevice.containsKey(k)) {
                         String deviceId = SocketConstants.channelToDevice.get(k);
                         SocketConstants.deviceToChannel.remove(deviceId);
@@ -76,6 +77,7 @@ public final class ConnectionManager {
     }
 
     public static Connection remove(String id){
+        LOG.info("ConnectManage remove channel {}", id);
         if (SocketConstants.channelToDevice.containsKey(id)) {
             String deviceId = SocketConstants.channelToDevice.get(id);
             SocketConstants.deviceToChannel.remove(deviceId);

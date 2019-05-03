@@ -6,6 +6,7 @@ import com.stemcloud.liye.dc.socket.common.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +102,7 @@ class RegisterMsgHandler implements MsgHandler {
             if (params.size() > 0) {
                 String security = (String) params.get(0).get("security");
                 // security验证
-                System.out.println(security);
+                // System.out.println(security);
 
                 // 获取最新硬件版本号
                 String latestFimwareVersion = "";
@@ -109,6 +110,8 @@ class RegisterMsgHandler implements MsgHandler {
                 // 注册成功时，需要记录deviceId和channelId的对应关系
                 SocketConstants.channelToDevice.put(channelId, deviceId);
                 SocketConstants.deviceToChannel.put(deviceId, channelId);
+                LOGGER.info("deviceToChannel = {}", SocketConstants.deviceToChannel);
+                LOGGER.info("channelToDevice = {}", SocketConstants.channelToDevice);
 
                 Map<String, Object> result = new HashMap<String, Object>() {{
                     put("latest_firmware_version", latestFimwareVersion);
@@ -139,6 +142,38 @@ class DefaultMsgHandler implements MsgHandler {
 
     @Override
     public Packet handleMsg(String channelId, Packet packet) {
+
+        Instructions instructions = packet.asInstructions();
+        String deviceId = instructions.getDeviceId();
+        String cmd = instructions.getCmd();
+
+        switch (cmd) {
+            case "timer_start":
+                MsgSenderFactory.sendTimerStartMsg(Collections.singletonList(deviceId));
+                break;
+            case "timer_pause":
+                MsgSenderFactory.sendTimerPauseMsg(Collections.singletonList(deviceId));
+                break;
+            case "timer_reset":
+                MsgSenderFactory.sendTimerResetMsg(Collections.singletonList(deviceId));
+                break;
+            case "app_view":
+                MsgSenderFactory.sendAppViewMsg(deviceId);
+                break;
+            case "app_switch_2":
+                MsgSenderFactory.sendAppSwitchMsg(deviceId, 2);
+                break;
+            case "app_switch_3":
+                MsgSenderFactory.sendAppSwitchMsg(deviceId, 3);
+                break;
+            case "app_switch_4":
+                MsgSenderFactory.sendAppSwitchMsg(deviceId, 4);
+                break;
+            default:
+                System.out.println("un_know test cmd: " + cmd);
+                break;
+        }
+
         return packet;
     }
 }

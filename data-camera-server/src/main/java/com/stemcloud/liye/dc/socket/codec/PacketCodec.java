@@ -35,14 +35,15 @@ public class PacketCodec extends MessageToMessageCodec<ByteBuf, Packet> {
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Packet packet, List<Object> list) throws Exception {
-        LOGGER.info("encode message --> {}", packet);
         ByteBuf buf = Unpooled.buffer(32 * 4);
         buf.writeByte(packet.getMsgType());
         buf.writeInt(packet.getSessionId());
         buf.writeByte(packet.getFlag());
         buf.writeInt(packet.getBodyLength());
         buf.writeBytes(packet.getBody());
+
         list.add(buf);
+        LOGGER.info("Encode packet --> {}", packet);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class PacketCodec extends MessageToMessageCodec<ByteBuf, Packet> {
             packet.setBody(body);
 
             list.add(packet);
-            LOGGER.info("Read packet --> {}", packet);
+            LOGGER.info("Decode packet --> {}", packet);
         } catch (Exception e) {
             LOGGER.error("read packet error --> {}", byteBuf.toString(), e);
         }

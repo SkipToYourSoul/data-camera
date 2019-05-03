@@ -11,7 +11,8 @@ public enum Cmd {
     HEARTBEAT_REQ("heartbeat_req"),
     TIMER_START("timer_start"),
     TIMER_PAUSE("timer_pause"),
-    TIMER_RESET("timer_reset");
+    TIMER_RESET("timer_reset"),
+    APP_TYPE_REQ("app_type_req");
 
     public final String value;
     Cmd(String value) {

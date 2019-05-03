@@ -10,6 +10,8 @@ package com.stemcloud.liye.dc.socket.common;
  *  5.	0x05 ONE_WAY 单向广播，无需响应
  *  6.	0x06 PING 心跳请求PING
  *  7.	0x07 PONG 心跳响应PONG
+ *
+ *  20. 0x10 TEST 用于测试
  * @author liye on 2019/1/20
  */
 public enum MsgType {
@@ -20,7 +22,8 @@ public enum MsgType {
     ONE_WAY((byte)0x05),
     PING((byte)0x06),
     PONG((byte)0x07),
-    UN_KNOW((byte)0x00);
+    UN_KNOW((byte)0x00),
+    TEST((byte)0x10);
 
     public final byte value;
 

@@ -105,6 +105,7 @@ public class Packet {
             case 5: return MsgType.ONE_WAY;
             case 6: return MsgType.PING;
             case 7: return MsgType.PONG;
+            case 20: return MsgType.TEST;
             default:
                 return MsgType.UN_KNOW;
         }
