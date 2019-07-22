@@ -1,5 +1,8 @@
 package com.stemcloud.liye.dc.domain.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,5 +44,13 @@ public class RecorderDevices {
 
     public void setLegends(List<String> legends) {
         this.legends = legends;
+    }
+
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<String>();
+        list.add("温度");
+        list.add("湿度");
+        RecorderDevices devices = new RecorderDevices((long)3, (long)2, list);
+        System.out.println(new Gson().toJson(devices));
     }
 }
